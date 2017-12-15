@@ -41,7 +41,7 @@ pub enum AccessKind {
 }
 
 /// Uniquely identifies a specific constant or static.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, RustcEncodable, RustcDecodable)]
 pub struct GlobalId<'tcx> {
     /// For a constant or static, the `Instance` of the item itself.
     /// For a promoted global, the `Instance` of the function they belong to.
@@ -101,7 +101,7 @@ pub trait PointerArithmetic: layout::HasDataLayout {
 impl<T: layout::HasDataLayout> PointerArithmetic for T {}
 
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, RustcEncodable, RustcDecodable, Hash)]
 pub struct MemoryPointer {
     pub alloc_id: AllocId,
     pub offset: u64,
@@ -145,8 +145,12 @@ impl<'tcx> MemoryPointer {
 }
 
 
-#[derive(Copy, Clone, Eq, Hash, Ord, PartialEq, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, RustcEncodable, RustcDecodable)]
 pub struct AllocId(pub u64);
+
+impl ::rustc_serialize::UseSpecializedEncodable for AllocId {}
+impl ::rustc_serialize::UseSpecializedDecodable for AllocId {}
+
 
 impl fmt::Display for AllocId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -154,7 +158,7 @@ impl fmt::Display for AllocId {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, RustcEncodable, RustcDecodable)]
 pub struct Allocation {
     /// The actual bytes of the allocation.
     /// Note that the bytes of a pointer represent the offset of the pointer
@@ -188,7 +192,7 @@ impl Allocation {
 type Block = u64;
 const BLOCK_SIZE: u64 = 64;
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, RustcEncodable, RustcDecodable)]
 pub struct UndefMask {
     blocks: Vec<Block>,
     len: u64,

@@ -47,6 +47,7 @@
 #![feature(core_intrinsics)]
 #![feature(drain_filter)]
 #![feature(dyn_trait)]
+#![feature(entry_or_default)]
 #![feature(from_ref)]
 #![feature(i128)]
 #![feature(i128_type)]
