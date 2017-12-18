@@ -19,6 +19,7 @@ use traits::Reveal;
 use ty::subst::{Kind, Substs};
 use ty::{self, Ty, TyCtxt, TypeFoldable};
 use ty::error::{ExpectedFound, TypeError};
+use mir::interpret::Value;
 use util::common::ErrorReported;
 use std::rc::Rc;
 use std::iter;
@@ -442,6 +443,7 @@ pub fn super_relate_tys<'a, 'gcx, 'tcx, R>(relation: &mut R,
             let to_u64 = |x: &'tcx ty::Const<'tcx>| -> Result<u64, ErrorReported> {
                 match x.val {
                     ConstVal::Integral(x) => Ok(x.to_u64().unwrap()),
+                    ConstVal::Value(Value::ByVal(prim)) => Ok(prim.to_u64().unwrap()),
                     ConstVal::Unevaluated(def_id, substs) => {
                         // FIXME(eddyb) get the right param_env.
                         let param_env = ty::ParamEnv::empty(Reveal::UserFacing);

@@ -20,7 +20,6 @@ use rustc_const_math::ConstInt;
 use std::fmt;
 use std::error::Error;
 
-
 pub fn mk_eval_cx<'a, 'tcx>(
     tcx: TyCtxt<'a, 'tcx, 'tcx>,
     instance: Instance<'tcx>,
@@ -45,7 +44,7 @@ pub fn eval_body<'a, 'tcx>(
     tcx: TyCtxt<'a, 'tcx, 'tcx>,
     instance: Instance<'tcx>,
     param_env: ty::ParamEnv<'tcx>,
-) -> EvalResult<'tcx, (Pointer, Ty<'tcx>)> {
+) -> EvalResult<'tcx, (Value, Pointer, Ty<'tcx>)> {
     debug!("eval_body: {:?}, {:?}", instance, param_env);
     let limits = super::ResourceLimits::default();
     let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator, ());
@@ -81,8 +80,13 @@ pub fn eval_body<'a, 'tcx>(
 
         while ecx.step()? {}
     }
-    let value = tcx.interpret_interner.borrow().get_cached(cid).expect("global not cached");
-    Ok((value, instance_ty))
+    let ptr = tcx.interpret_interner.borrow().get_cached(cid).expect("global not cached");
+    let align = ecx.layout_of(instance_ty)?.align;
+    let value = match ecx.try_read_value(ptr, align, instance_ty)? {
+        Some(val) => val,
+        _ => Value::ByRef(ptr, align),
+    };
+    Ok((value, ptr, instance_ty))
 }
 
 pub fn eval_body_as_integer<'a, 'tcx>(
@@ -90,11 +94,9 @@ pub fn eval_body_as_integer<'a, 'tcx>(
     param_env: ty::ParamEnv<'tcx>,
     instance: Instance<'tcx>,
 ) -> EvalResult<'tcx, ConstInt> {
-    let ptr_ty = eval_body(tcx, instance, param_env);
-    let (ptr, ty) = ptr_ty?;
-    let ecx = mk_eval_cx(tcx, instance, param_env)?;
-    let prim = match ecx.try_read_value(ptr, ecx.layout_of(ty)?.align, ty)? {
-        Some(Value::ByVal(prim)) => prim.to_bytes()?,
+    let (value, _, ty) = eval_body(tcx, instance, param_env)?;
+    let prim = match value {
+        Value::ByVal(prim) => prim.to_bytes()?,
         _ => return err!(TypeNotPrimitive(ty)),
     };
     use syntax::ast::{IntTy, UintTy};
@@ -133,7 +135,7 @@ pub struct CompileTimeEvaluator;
 
 impl<'tcx> Into<EvalError<'tcx>> for ConstEvalError {
     fn into(self) -> EvalError<'tcx> {
-        EvalErrorKind::MachineError(Box::new(self)).into()
+        EvalErrorKind::MachineError(self.to_string()).into()
     }
 }
 
@@ -334,35 +336,48 @@ pub fn const_eval_provider<'a, 'tcx>(
         return Err(ConstEvalErr { span: body.value.span, kind: TypeckError })
     }
 
+
+    let instance = ty::Instance::new(def_id, substs);
+    if tcx.sess.opts.debugging_opts.miri {
+        return match ::interpret::eval_body(tcx, instance, key.param_env) {
+            Ok((miri_value, _, miri_ty)) => Ok(tcx.mk_const(ty::Const {
+                val: ConstVal::Value(miri_value),
+                ty: miri_ty,
+            })),
+            Err(err) => {
+                Err(ConstEvalErr { span: body.value.span, kind: err.into() })
+            }
+        };
+    }
+
     trace!("running old const eval");
     let old_result = ConstContext::new(tcx, key.param_env.and(substs), tables).eval(&body.value);
     trace!("old const eval produced {:?}", old_result);
-    if tcx.sess.opts.debugging_opts.miri {
-        let instance = ty::Instance::new(def_id, substs);
-        trace!("const eval instance: {:?}, {:?}", instance, key.param_env);
-        let miri_result = ::interpret::eval_body(tcx, instance, key.param_env);
-        match (miri_result, old_result) {
-            (Err(err), Ok(ok)) => {
-                trace!("miri failed, ctfe returned {:?}", ok);
-                tcx.sess.span_warn(
-                    tcx.def_span(key.value.0),
-                    "miri failed to eval, while ctfe succeeded",
-                );
-                let ecx = mk_eval_cx(tcx, instance, key.param_env).unwrap();
-                let () = unwrap_miri(&ecx, Err(err));
-                Ok(ok)
-            },
-            (_, Err(err)) => Err(err),
-            (Ok((miri_val, miri_ty)), Ok(ctfe)) => {
-                let mut ecx = mk_eval_cx(tcx, instance, key.param_env).unwrap();
-                let layout = ecx.layout_of(miri_ty).unwrap();
-                let miri_place = Place::from_primval_ptr(miri_val, layout.align);
-                check_ctfe_against_miri(&mut ecx, miri_place, miri_ty, ctfe.val);
-                Ok(ctfe)
-            }
+    trace!("const eval instance: {:?}, {:?}", instance, key.param_env);
+    let miri_result = ::interpret::eval_body(tcx, instance, key.param_env);
+    match (miri_result, old_result) {
+        (Err(err), Ok(ok)) => {
+            trace!("miri failed, ctfe returned {:?}", ok);
+            tcx.sess.span_warn(
+                tcx.def_span(key.value.0),
+                "miri failed to eval, while ctfe succeeded",
+            );
+            let ecx = mk_eval_cx(tcx, instance, key.param_env).unwrap();
+            let () = unwrap_miri(&ecx, Err(err));
+            Ok(ok)
+        },
+        (Ok((value, _, ty)), Err(_)) => Ok(tcx.mk_const(ty::Const {
+            val: ConstVal::Value(value),
+            ty,
+        })),
+        (Err(_), Err(err)) => Err(err),
+        (Ok((_, miri_ptr, miri_ty)), Ok(ctfe)) => {
+            let mut ecx = mk_eval_cx(tcx, instance, key.param_env).unwrap();
+            let layout = ecx.layout_of(miri_ty).unwrap();
+            let miri_place = Place::from_primval_ptr(miri_ptr, layout.align);
+            check_ctfe_against_miri(&mut ecx, miri_place, miri_ty, ctfe.val);
+            Ok(ctfe)
         }
-    } else {
-        old_result
     }
 }
 
