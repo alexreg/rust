@@ -281,7 +281,9 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
             }
         }
 
-        hir::ExprLit(..) => ExprKind::Literal { literal: cx.const_eval_literal(expr) },
+        hir::ExprLit(ref lit) => ExprKind::Literal {
+            literal: cx.const_eval_literal(&lit.node, expr_ty, lit.span),
+        },
 
         hir::ExprBinary(op, ref lhs, ref rhs) => {
             if cx.tables().is_method_call(expr) {
@@ -368,8 +370,10 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
                 overloaded_operator(cx, expr, vec![arg.to_ref()])
             } else {
                 // FIXME runtime-overflow
-                if let hir::ExprLit(_) = arg.node {
-                    ExprKind::Literal { literal: cx.const_eval_literal(expr) }
+                if let hir::ExprLit(ref lit) = arg.node {
+                    ExprKind::Literal {
+                        literal: cx.const_eval_literal(&lit.node, expr_ty, lit.span)
+                    }
                 } else {
                     ExprKind::Unary {
                         op: UnOp::Neg,
