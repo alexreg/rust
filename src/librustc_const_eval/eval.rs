@@ -444,7 +444,8 @@ fn eval_const_expr_partial<'a, 'tcx>(cx: &ConstContext<'a, 'tcx>,
         if let Aggregate(Tuple(fields)) = cx.eval(base)?.val {
             fields[index.node]
         } else {
-            signal!(base, ExpectedConstTuple);
+            span_bug!(base.span, "{:#?}", cx.eval(base)?.val);
+            //signal!(base, ExpectedConstTuple);
         }
       }
       hir::ExprField(ref base, field_name) => {
@@ -580,7 +581,7 @@ fn cast_const<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     }
 }
 
-fn lit_to_const<'a, 'tcx>(lit: &'tcx ast::LitKind,
+pub fn lit_to_const<'a, 'tcx>(lit: &'tcx ast::LitKind,
                           tcx: TyCtxt<'a, 'tcx, 'tcx>,
                           mut ty: Ty<'tcx>)
                           -> Result<ConstVal<'tcx>, ErrKind<'tcx>> {

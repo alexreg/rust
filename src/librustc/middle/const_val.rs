@@ -14,7 +14,7 @@ use hir::def_id::DefId;
 use ty::{self, TyCtxt, layout};
 use ty::subst::Substs;
 use rustc_const_math::*;
-use mir::interpret::Value;
+use mir::interpret::{Value, PrimVal};
 
 use graphviz::IntoCow;
 use errors::DiagnosticBuilder;
@@ -76,7 +76,14 @@ impl<'tcx> ConstVal<'tcx> {
             ConstVal::Integral(i) => Some(i),
             ConstVal::Bool(b) => Some(ConstInt::U8(b as u8)),
             ConstVal::Char(ch) => Some(ConstInt::U32(ch as u32)),
+            ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))) => Some(ConstInt::U128(b)),
             _ => None
+        }
+    }
+    pub fn unwrap_u64(&self) -> u64 {
+        match self.to_const_int().and_then(ConstInt::to_u64) {
+            Some(val) => val,
+            None => bug!("expected constant u64, got {:#?}", self),
         }
     }
 }

@@ -129,6 +129,9 @@ impl<'a, 'gcx> CheckCrateVisitor<'a, 'gcx> {
     }
 
     fn check_const_eval(&self, expr: &'gcx hir::Expr) {
+        if self.tcx.sess.opts.debugging_opts.miri {
+            return;
+        }
         if let Err(err) = self.const_cx().eval(expr) {
             match err.kind {
                 UnimplementedConstVal(_) => {}
@@ -298,7 +301,7 @@ impl<'a, 'tcx> Visitor<'tcx> for CheckCrateVisitor<'a, 'tcx> {
             self.promotable = false;
         }
 
-        if self.in_fn && self.promotable {
+        if self.in_fn && self.promotable && !self.tcx.sess.opts.debugging_opts.miri {
             match self.const_cx().eval(ex) {
                 Ok(_) => {}
                 Err(ConstEvalErr { kind: UnimplementedConstVal(_), .. }) |

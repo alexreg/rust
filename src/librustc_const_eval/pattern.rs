@@ -670,6 +670,30 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
     }
 
     fn lower_lit(&mut self, expr: &'tcx hir::Expr) -> PatternKind<'tcx> {
+        if self.tcx.sess.opts.debugging_opts.miri {
+            match expr.node {
+                hir::ExprLit(ref lit) => {
+                    let ty = self.tables.expr_ty(expr);
+                    return match ::eval::lit_to_const(&lit.node, self.tcx, ty) {
+                        Ok(value) => PatternKind::Constant {
+                            value: self.tcx.mk_const(ty::Const {
+                                ty,
+                                val: value,
+                            }),
+                        },
+                        Err(e) => {
+                            self.errors.push(PatternError::ConstEval(ConstEvalErr {
+                                span: lit.span,
+                                kind: e,
+                            }));
+                            PatternKind::Wild
+                        },
+                    };
+                },
+                hir::ExprPath(_) => {},
+                _ => {},
+            }
+        }
         let const_cx = eval::ConstContext::new(self.tcx,
                                                self.param_env.and(self.substs),
                                                self.tables);
@@ -735,7 +759,7 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                 let ty = self.tables.node_id_to_type(callee.hir_id);
                 let def = self.tables.qpath_def(qpath, callee.hir_id);
                 match def {
-                    Def::Fn(..) | Def::Method(..) => self.lower_lit(expr),
+                    Def::Fn(..) | Def::Method(..) => span_bug!(expr.span, "{:#?}", expr),
                     _ => {
                         let subpatterns = args.iter().enumerate().map(|(i, expr)| {
                             FieldPattern {

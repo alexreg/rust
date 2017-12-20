@@ -480,8 +480,7 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
             let def_id = cx.tcx.hir.body_owner_def_id(count);
             let substs = Substs::identity_for_item(cx.tcx.global_tcx(), def_id);
             let count = match cx.tcx.at(c.span).const_eval(cx.param_env.and((def_id, substs))) {
-                Ok(&ty::Const { val: ConstVal::Integral(ConstInt::Usize(u)), .. }) => u,
-                Ok(other) => bug!("constant evaluation of repeat count yielded {:?}", other),
+                Ok(cv) => cv.val.unwrap_u64(),
                 Err(s) => cx.fatal_const_eval_err(&s, c.span, "expression")
             };
 
