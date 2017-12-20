@@ -10,7 +10,6 @@
 
 use hair::*;
 use rustc_data_structures::indexed_vec::Idx;
-use rustc_const_math::ConstInt;
 use hair::cx::Cx;
 use hair::cx::block;
 use hair::cx::to_ref::ToRef;
@@ -369,16 +368,9 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
             if cx.tables().is_method_call(expr) {
                 overloaded_operator(cx, expr, vec![arg.to_ref()])
             } else {
-                // FIXME runtime-overflow
-                if let hir::ExprLit(ref lit) = arg.node {
-                    ExprKind::Literal {
-                        literal: cx.const_eval_literal(&lit.node, expr_ty, lit.span)
-                    }
-                } else {
-                    ExprKind::Unary {
-                        op: UnOp::Neg,
-                        arg: arg.to_ref(),
-                    }
+                ExprKind::Unary {
+                    op: UnOp::Neg,
+                    arg: arg.to_ref(),
                 }
             }
         }
@@ -480,7 +472,7 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
             let def_id = cx.tcx.hir.body_owner_def_id(count);
             let substs = Substs::identity_for_item(cx.tcx.global_tcx(), def_id);
             let count = match cx.tcx.at(c.span).const_eval(cx.param_env.and((def_id, substs))) {
-                Ok(cv) => cv.val.unwrap_u64(),
+                Ok(cv) => cv.val.unwrap_usize(cx.tcx),
                 Err(s) => cx.fatal_const_eval_err(&s, c.span, "expression")
             };
 

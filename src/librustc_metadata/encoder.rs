@@ -149,10 +149,14 @@ impl<'a, 'tcx> SpecializedEncoder<Ty<'tcx>> for EncodeContext<'a, 'tcx> {
 
 impl<'a, 'tcx> SpecializedEncoder<interpret::AllocId> for EncodeContext<'a, 'tcx> {
     fn specialized_encode(&mut self, alloc_id: &interpret::AllocId) -> Result<(), Self::Error> {
+        trace!("encoding {:?}", alloc_id);
         if let Some(shorthand) = self.interpret_alloc_shorthands.get(alloc_id).cloned() {
             return self.emit_usize(shorthand);
         }
         let start = self.position();
+        // cache the allocation shorthand now, because the allocation itself might recursively
+        // point to itself.
+        self.interpret_alloc_shorthands.insert(*alloc_id, start);
         let interpret_interner = self.tcx.interpret_interner.borrow();
         if let Some(alloc) = interpret_interner.get_alloc(alloc_id.0) {
             usize::max_value().encode(self)?;
@@ -173,11 +177,6 @@ impl<'a, 'tcx> SpecializedEncoder<interpret::AllocId> for EncodeContext<'a, 'tcx
         } else {
             bug!("alloc id without corresponding allocation: {}", alloc_id.0);
         }
-        let len = self.position() - start * 7;
-        // Check that the shorthand is a not longer than the
-        // full encoding itself, i.e. it's an obvious win.
-        assert!(len >= 64 || (start as u64) < (1 << len));
-        self.interpret_alloc_shorthands.insert(*alloc_id, start);
         Ok(())
     }
 }

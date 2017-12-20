@@ -145,7 +145,7 @@ impl<'tcx> MemoryPointer {
 }
 
 
-#[derive(Copy, Clone, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Copy, Clone, Eq, Hash, Ord, PartialEq, PartialOrd, Debug)]
 pub struct AllocId(pub u64);
 
 impl ::rustc_serialize::UseSpecializedEncodable for AllocId {}

@@ -16,6 +16,7 @@ use rustc::hir::def_id::DefId;
 use rustc::infer::TransNormalize;
 use rustc::traits;
 use rustc::mir;
+use rustc::mir::interpret::{Value as MiriValue, PrimVal};
 use rustc::mir::tcx::PlaceTy;
 use rustc::ty::{self, Ty, TyCtxt, TypeFoldable};
 use rustc::ty::layout::{self, LayoutOf, Size};
@@ -38,6 +39,7 @@ use value::Value;
 
 use syntax_pos::Span;
 use syntax::ast;
+use syntax::symbol::Symbol;
 
 use std::fmt;
 use std::ptr;
@@ -81,12 +83,40 @@ impl<'a, 'tcx> Const<'tcx> {
         Const { llval: llval, ty: ty }
     }
 
+    fn from_bytes(ccx: &CrateContext<'a, 'tcx>, b: u128, ty: Ty<'tcx>) -> Const<'tcx> {
+        let llval = match ty.sty {
+            ty::TyInt(i) => C_int(Type::int_from_ty(ccx, i), b as i128 as i64),
+            ty::TyUint(u) => C_uint(Type::uint_from_ty(ccx, u), b as u64),
+            ty::TyBool => {
+                assert!(b <= 1);
+                C_bool(ccx, b == 1)
+            },
+            ty::TyChar => {
+                assert_eq!(b as u32 as u128, b);
+                let c = b as u32;
+                assert!(::std::char::from_u32(c).is_some());
+                C_uint(Type::char(ccx), c as u64)
+            },
+            ty::TyFloat(fty) => {
+                let llty = ccx.layout_of(ty).llvm_type(ccx);
+                let bits = match fty {
+                    ast::FloatTy::F32 => C_u32(ccx, b as u32),
+                    ast::FloatTy::F64 => C_u64(ccx, b as u64),
+                };
+                consts::bitcast(bits, llty)
+            },
+            _ => bug!("from_bytes({}, {})", b, ty),
+        };
+        Const { llval: llval, ty }
+    }
+
     /// Translate ConstVal into a LLVM constant value.
     pub fn from_constval(ccx: &CrateContext<'a, 'tcx>,
                          cv: &ConstVal,
                          ty: Ty<'tcx>)
                          -> Const<'tcx> {
         let llty = ccx.layout_of(ty).llvm_type(ccx);
+        trace!("from_constval: {:#?}: {}", cv, ty);
         let val = match *cv {
             ConstVal::Float(v) => {
                 let bits = match v.ty {
@@ -108,7 +138,41 @@ impl<'a, 'tcx> Const<'tcx> {
             ConstVal::Unevaluated(..) => {
                 bug!("MIR must not use `{:?}` (aggregates are expanded to MIR rvalues)", cv)
             }
-            ConstVal::Value(_) => unimplemented!(),
+            ConstVal::Value(MiriValue::ByRef(..)) => unimplemented!(),
+            ConstVal::Value(MiriValue::ByValPair(PrimVal::Ptr(ptr), PrimVal::Bytes(len))) => {
+                match ty.sty {
+                    ty::TyRef(_, ref tam) => match tam.ty.sty {
+                        ty::TyStr => {},
+                        _ => unimplemented!("non-str fat pointer: {:?}: {:?}", ptr, ty),
+                    },
+                    _ => unimplemented!("non-str fat pointer: {:?}: {:?}", ptr, ty),
+                }
+                let alloc = ccx
+                    .tcx()
+                    .interpret_interner
+                    .borrow()
+                    .get_alloc(ptr.alloc_id.0)
+                    .expect("miri alloc not found");
+                assert_eq!(len as usize as u128, len);
+                let slice = &alloc.bytes[(ptr.offset as usize)..][..(len as usize)];
+                let s = ::std::str::from_utf8(slice)
+                    .expect("non utf8 str from miri");
+                C_str_slice(ccx, Symbol::intern(s).as_str())
+            },
+            ConstVal::Value(MiriValue::ByValPair(..)) => unimplemented!(),
+            ConstVal::Value(MiriValue::ByVal(PrimVal::Bytes(b))) =>
+                return Const::from_bytes(ccx, b, ty),
+            ConstVal::Value(MiriValue::ByVal(PrimVal::Undef)) => C_undef(llty),
+            ConstVal::Value(MiriValue::ByVal(PrimVal::Ptr(ptr))) => {
+                let alloc = ccx
+                    .tcx()
+                    .interpret_interner
+                    .borrow()
+                    .get_alloc(ptr.alloc_id.0)
+                    .expect("miri alloc not found");
+                let data = &alloc.bytes[(ptr.offset as usize)..];
+                consts::addr_of(ccx, C_bytes(ccx, data), ccx.align_of(ty), "byte_str")
+            }
         };
 
         assert!(!ty.has_erasable_regions());

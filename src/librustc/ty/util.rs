@@ -23,6 +23,7 @@ use ty::subst::{Subst, Kind};
 use ty::TypeVariants::*;
 use util::common::ErrorReported;
 use middle::lang_items;
+use mir::interpret::{Value, PrimVal};
 
 use rustc_const_math::{ConstInt, ConstIsize, ConstUsize};
 use rustc_data_structures::stable_hasher::{StableHasher, StableHasherResult,
@@ -757,6 +758,7 @@ impl<'a, 'gcx, 'tcx, W> TypeVisitor<'tcx> for TypeIdHasher<'a, 'gcx, 'tcx, W>
                 self.hash_discriminant_u8(&n.val);
                 match n.val {
                     ConstVal::Integral(x) => self.hash(x.to_u64().unwrap()),
+                    ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))) => self.hash(b),
                     ConstVal::Unevaluated(def_id, _) => self.def_id(def_id),
                     _ => bug!("arrays should not have {:?} as length", n)
                 }

@@ -39,7 +39,7 @@ pub enum ConstVal<'tcx> {
     Function(DefId, &'tcx Substs<'tcx>),
     Aggregate(ConstAggregate<'tcx>),
     Unevaluated(DefId, &'tcx Substs<'tcx>),
-    /// A miri value, currently only produced if old ctfe fails, but miri succeeds
+    /// A miri value, currently only produced if --miri is enabled
     Value(Value),
 }
 
@@ -81,9 +81,22 @@ impl<'tcx> ConstVal<'tcx> {
         }
     }
     pub fn unwrap_u64(&self) -> u64 {
-        match self.to_const_int().and_then(ConstInt::to_u64) {
+        match self.to_const_int().and_then(|i| i.to_u64()) {
             Some(val) => val,
             None => bug!("expected constant u64, got {:#?}", self),
+        }
+    }
+    pub fn unwrap_usize<'a, 'gcx>(&self, tcx: TyCtxt<'a, 'gcx, 'tcx>) -> ConstUsize {
+        match *self {
+            ConstVal::Integral(ConstInt::Usize(i)) => i,
+            ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))) => {
+                assert_eq!(b as u64 as u128, b);
+                match ConstUsize::new(b as u64, tcx.sess.target.usize_ty) {
+                    Ok(val) => val,
+                    Err(e) => bug!("{:#?} is not a usize {:?}", self, e),
+                }
+            },
+            _ => bug!("expected constant u64, got {:#?}", self),
         }
     }
 }
