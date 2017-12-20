@@ -428,7 +428,7 @@ fn all_constructors<'a, 'tcx: 'a>(cx: &mut MatchCheckCtxt<'a, 'tcx>,
             }).collect()
         }
         ty::TyArray(ref sub_ty, len) if len.val.to_const_int().is_some() => {
-            let len = len.val.to_const_int().unwrap().to_u64().unwrap();
+            let len = len.val.unwrap_u64();
             if len != 0 && cx.is_uninhabited(sub_ty) {
                 vec![]
             } else {
@@ -796,7 +796,7 @@ fn pat_constructors<'tcx>(_cx: &mut MatchCheckCtxt,
             Some(vec![ConstantRange(lo, hi, end)]),
         PatternKind::Array { .. } => match pcx.ty.sty {
             ty::TyArray(_, length) => Some(vec![
-                Slice(length.val.to_const_int().unwrap().to_u64().unwrap())
+                Slice(length.val.unwrap_u64())
             ]),
             _ => span_bug!(pat.span, "bad ty {:?} for array pattern", pcx.ty)
         },

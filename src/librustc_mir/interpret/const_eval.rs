@@ -460,7 +460,7 @@ fn check_ctfe_against_miri<'a, 'tcx>(
             }
         },
         TyArray(elem_ty, n) => {
-            let n = n.val.to_const_int().unwrap().to_u64().unwrap();
+            let n = n.val.unwrap_u64();
             let vec: Vec<(ConstVal, Ty<'tcx>)> = match ctfe {
                 ConstVal::ByteStr(arr) => arr.data.iter().map(|&b| {
                     (ConstVal::Integral(ConstInt::U8(b)), ecx.tcx.types.u8)

@@ -429,7 +429,7 @@ impl<'a, 'b, 'gcx, 'tcx> TypeVerifier<'a, 'b, 'gcx, 'tcx> {
             ProjectionElem::Subslice { from, to } => PlaceTy::Ty {
                 ty: match base_ty.sty {
                     ty::TyArray(inner, size) => {
-                        let size = size.val.to_const_int().unwrap().to_u64().unwrap();
+                        let size = size.val.unwrap_u64();
                         let min_size = (from as u64) + (to as u64);
                         if let Some(rest_size) = size.checked_sub(min_size) {
                             tcx.mk_array(inner, rest_size)

@@ -435,7 +435,7 @@ fn eval_const_expr_partial<'a, 'tcx>(cx: &ConstContext<'a, 'tcx>,
       }
       hir::ExprRepeat(ref elem, _) => {
           let n = match ty.sty {
-            ty::TyArray(_, n) => n.val.to_const_int().unwrap().to_u64().unwrap(),
+            ty::TyArray(_, n) => n.val.unwrap_u64(),
             _ => span_bug!(e.span, "typeck error")
           };
           mk_const(Aggregate(Repeat(cx.eval(elem)?, n)))
@@ -555,7 +555,7 @@ fn cast_const<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
             },
             ty::TyRef(_, ty::TypeAndMut { ref ty, mutbl: hir::MutImmutable }) => match ty.sty {
                 ty::TyArray(ty, n) => {
-                    let n = n.val.to_const_int().unwrap().to_u64().unwrap();
+                    let n = n.val.unwrap_u64();
                     if ty == tcx.types.u8 && n == b.data.len() as u64 {
                         Ok(val)
                     } else {

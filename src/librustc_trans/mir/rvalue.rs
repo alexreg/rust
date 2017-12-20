@@ -491,7 +491,7 @@ impl<'a, 'tcx> MirContext<'a, 'tcx> {
         if let mir::Place::Local(index) = *place {
             if let LocalRef::Operand(Some(op)) = self.locals[index] {
                 if let ty::TyArray(_, n) = op.layout.ty.sty {
-                    let n = n.val.to_const_int().unwrap().to_u64().unwrap();
+                    let n = n.val.unwrap_u64();
                     return common::C_usize(bcx.ccx, n);
                 }
             }

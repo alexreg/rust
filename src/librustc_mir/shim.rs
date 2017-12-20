@@ -299,7 +299,7 @@ fn build_clone_shim<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     match self_ty.sty {
         _ if is_copy => builder.copy_shim(),
         ty::TyArray(ty, len) => {
-            let len = len.val.to_const_int().unwrap().to_u64().unwrap();
+            let len = len.val.unwrap_u64();
             builder.array_shim(ty, len)
         }
         ty::TyClosure(def_id, substs) => {

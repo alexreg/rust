@@ -1229,7 +1229,7 @@ impl<'a, 'tcx> LayoutDetails {
                 }
 
                 let element = cx.layout_of(element)?;
-                let count = count.val.to_const_int().unwrap().to_u64().unwrap();
+                let count = count.val.unwrap_u64();
                 let size = element.size.checked_mul(count, dl)
                     .ok_or(LayoutError::SizeOverflow(ty))?;
 
