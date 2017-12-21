@@ -676,7 +676,7 @@ fn parse_float<'tcx>(num: &str, fty: ast::FloatTy)
     })
 }
 
-pub fn compare_const_vals(_tcx: TyCtxt, span: Span, a: &ConstVal, b: &ConstVal, ty: Ty)
+pub fn compare_const_vals(tcx: TyCtxt, span: Span, a: &ConstVal, b: &ConstVal, ty: Ty)
                           -> Result<Ordering, ErrorReported>
 {
     let result = match (a, b) {
@@ -694,6 +694,22 @@ pub fn compare_const_vals(_tcx: TyCtxt, span: Span, a: &ConstVal, b: &ConstVal, 
                 Some(a.cmp(&b))
              }
          },
+         (&Value(Value::ByValPair(PrimVal::Ptr(p1), PrimVal::Bytes(b1))),
+          &Value(Value::ByValPair(PrimVal::Ptr(p2), PrimVal::Bytes(b2)))) => {
+            let alloc1 = tcx
+                .interpret_interner
+                .borrow()
+                .get_alloc(p1.alloc_id.0)
+                .unwrap();
+            let alloc2 = tcx
+                .interpret_interner
+                .borrow()
+                .get_alloc(p2.alloc_id.0)
+                .unwrap();
+            let a1 = &alloc1.bytes[(p1.offset as usize)..][..(b1 as usize)];
+            let a2 = &alloc2.bytes[(p2.offset as usize)..][..(b2 as usize)];
+            Some(a1.cmp(&a2))
+          }
         _ => None,
     };
 
