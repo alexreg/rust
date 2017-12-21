@@ -26,6 +26,7 @@ use rustc::ty::fold::TypeFoldable;
 use rustc::ty::{self, ToPolyTraitRef, Ty, TyCtxt, TypeVariants};
 use rustc::middle::const_val::ConstVal;
 use rustc::mir::*;
+use rustc::mir::interpret::{Value, PrimVal};
 use rustc::mir::tcx::PlaceTy;
 use rustc::mir::visit::{PlaceContext, Visitor};
 use std::fmt;
@@ -258,7 +259,18 @@ impl<'a, 'b, 'gcx, 'tcx> TypeVerifier<'a, 'b, 'gcx, 'tcx> {
                 // constraints on `'a` and `'b`. These constraints
                 // would be lost if we just look at the normalized
                 // value.
-                if let ConstVal::Function(def_id, ..) = value.val {
+                let did = match value.val {
+                    ConstVal::Function(def_id, ..) => Some(def_id),
+                    ConstVal::Value(Value::ByVal(PrimVal::Ptr(p))) => {
+                        self.tcx()
+                            .interpret_interner
+                            .borrow()
+                            .get_fn(p.alloc_id.0)
+                            .map(|instance| instance.def_id())
+                    },
+                    _ => None,
+                };
+                if let Some(def_id) = did {
                     let tcx = self.tcx();
                     let type_checker = &mut self.cx;
 
@@ -1007,13 +1019,24 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
                     Literal::Value {
                         value:
                             &ty::Const {
-                                val: ConstVal::Function(def_id, _),
+                                val,
                                 ..
                             },
                         ..
                     },
                 ..
-            }) => Some(def_id) == self.tcx().lang_items().box_free_fn(),
+            }) => match val {
+                ConstVal::Function(def_id, _) => {
+                    Some(def_id) == self.tcx().lang_items().box_free_fn()
+                },
+                ConstVal::Value(Value::ByVal(PrimVal::Ptr(p))) => {
+                    let inst = self.tcx().interpret_interner.borrow().get_fn(p.alloc_id.0);
+                    inst.map_or(false, |inst| {
+                        Some(inst.def_id()) == self.tcx().lang_items().box_free_fn()
+                    })
+                },
+                _ => false,
+            }
             _ => false,
         }
     }

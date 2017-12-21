@@ -24,6 +24,7 @@ use rustc::middle::const_val::ConstVal;
 use rustc::ty::{self, Ty};
 use rustc::ty::util::IntTypeExt;
 use rustc::mir::*;
+use rustc::mir::interpret::{Value, PrimVal};
 use rustc::hir::RangeEnd;
 use syntax_pos::Span;
 use std::cmp::Ordering;
@@ -229,7 +230,9 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     let (true_bb, false_bb) = (self.cfg.start_new_block(),
                                                self.cfg.start_new_block());
                     let ret = match options[0].val {
+                        ConstVal::Value(Value::ByVal(PrimVal::Bytes(1))) |
                         ConstVal::Bool(true) => vec![true_bb, false_bb],
+                        ConstVal::Value(Value::ByVal(PrimVal::Bytes(0))) |
                         ConstVal::Bool(false) => vec![false_bb, true_bb],
                         v => span_bug!(test.span, "expected boolean value but got {:?}", v)
                     };
@@ -261,9 +264,22 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             TestKind::Eq { value, mut ty } => {
                 let mut val = Operand::Copy(place.clone());
 
+
+                let bytes = match value.val {
+                    ConstVal::ByteStr(bytes) => Some(bytes.data),
+                    ConstVal::Value(Value::ByVal(PrimVal::Ptr(p))) => {
+                        self.hir
+                            .tcx()
+                            .interpret_interner
+                            .borrow()
+                            .get_alloc(p.alloc_id.0)
+                            .map(|alloc| &alloc.bytes[..])
+                    },
+                    _ => None,
+                };
                 // If we're using b"..." as a pattern, we need to insert an
                 // unsizing coercion, as the byte string has the type &[u8; N].
-                let expect = if let ConstVal::ByteStr(bytes) = value.val {
+                let expect = if let Some(bytes) = bytes {
                     let tcx = self.hir.tcx();
 
                     // Unsize the place to &[u8], too, if necessary.
@@ -279,7 +295,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
                     assert!(ty.is_slice());
 
-                    let array_ty = tcx.mk_array(tcx.types.u8, bytes.data.len() as u64);
+                    let array_ty = tcx.mk_array(tcx.types.u8, bytes.len() as u64);
                     let array_ref = tcx.mk_imm_ref(tcx.types.re_static, array_ty);
                     let array = self.literal_operand(test.span, array_ref, Literal::Value {
                         value
