@@ -19,7 +19,7 @@ use traits::Reveal;
 use ty::subst::{Kind, Substs};
 use ty::{self, Ty, TyCtxt, TypeFoldable};
 use ty::error::{ExpectedFound, TypeError};
-use mir::interpret::Value;
+use mir::interpret::{Value, PrimVal};
 use util::common::ErrorReported;
 use std::rc::Rc;
 use std::iter;
@@ -452,6 +452,13 @@ pub fn super_relate_tys<'a, 'gcx, 'tcx, R>(relation: &mut R,
                                 match tcx.const_eval(param_env.and((def_id, substs))) {
                                     Ok(&ty::Const { val: ConstVal::Integral(x), .. }) => {
                                         return Ok(x.to_u64().unwrap());
+                                    }
+                                    Ok(&ty::Const {
+                                        val: ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))),
+                                        ..
+                                    }) => {
+                                        assert_eq!(b as u64 as u128, b);
+                                        return Ok(b as u64);
                                     }
                                     _ => {}
                                 }

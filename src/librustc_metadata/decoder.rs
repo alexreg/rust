@@ -279,7 +279,7 @@ impl<'a, 'tcx> SpecializedDecoder<interpret::AllocId> for DecodeContext<'a, 'tcx
         let tcx = self.tcx;
         let interpret_interner = || tcx.unwrap().interpret_interner.borrow_mut();
         let pos = self.position();
-        match self.read_usize()? {
+        match usize::decode(self)? {
             ::std::usize::MAX => {
                 let id = interpret_interner().reserve();
                 let alloc_id = interpret::AllocId(id);
@@ -288,6 +288,7 @@ impl<'a, 'tcx> SpecializedDecoder<interpret::AllocId> for DecodeContext<'a, 'tcx
                 self.interpret_alloc_cache.insert(pos, alloc_id);
 
                 let allocation = interpret::Allocation::decode(self)?;
+                trace!("decoded alloc {:?} {:#?}", alloc_id, allocation);
                 let allocation = self.tcx.unwrap().intern_const_alloc(allocation);
                 interpret_interner().intern_at_reserved(id, allocation);
 
@@ -306,13 +307,23 @@ impl<'a, 'tcx> SpecializedDecoder<interpret::AllocId> for DecodeContext<'a, 'tcx
                 Ok(alloc_id)
             },
             MAX1 => {
+                trace!("creating fn alloc id at {}", pos);
                 let instance = ty::Instance::decode(self)?;
+                trace!("decoded fn alloc instance: {:?}", instance);
                 let id = interpret::AllocId(interpret_interner().create_fn_alloc(instance));
-                trace!("creating alloc id {:?}", id);
+                trace!("created fn alloc id: {:?}", id);
                 self.interpret_alloc_cache.insert(pos, id);
                 Ok(id)
             },
-            shorthand => Ok(self.interpret_alloc_cache[&shorthand]),
+            shorthand => {
+                trace!("loading shorthand {}", shorthand);
+                if let Some(&alloc_id) = self.interpret_alloc_cache.get(&shorthand) {
+                    return Ok(alloc_id);
+                }
+                trace!("shorthand {} not cached, loading entire allocation", shorthand);
+                // need to load allocation
+                self.with_position(shorthand, |this| interpret::AllocId::decode(this))
+            },
         }
     }
 }

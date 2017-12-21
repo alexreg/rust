@@ -1808,6 +1808,20 @@ impl<'a, 'gcx, 'tcx> AdtDef {
                             explicit_value = v;
                             break;
                         }
+                        Ok(&ty::Const {
+                            val: ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))),
+                            ..
+                        }) => {
+                            trace!("discriminants: {} ({:?})", b, repr_type);
+                            use syntax::attr::IntType;
+                            explicit_value = match repr_type {
+                                IntType::SignedInt(int_type) => ConstInt::new_signed(
+                                    b as i128, int_type, tcx.sess.target.isize_ty).unwrap(),
+                                IntType::UnsignedInt(uint_type) => ConstInt::new_unsigned(
+                                    b, uint_type, tcx.sess.target.usize_ty).unwrap(),
+                            };
+                            break;
+                        }
                         err => {
                             if !expr_did.is_local() {
                                 span_bug!(tcx.def_span(expr_did),

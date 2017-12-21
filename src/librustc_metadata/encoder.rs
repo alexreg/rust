@@ -149,9 +149,10 @@ impl<'a, 'tcx> SpecializedEncoder<Ty<'tcx>> for EncodeContext<'a, 'tcx> {
 
 impl<'a, 'tcx> SpecializedEncoder<interpret::AllocId> for EncodeContext<'a, 'tcx> {
     fn specialized_encode(&mut self, alloc_id: &interpret::AllocId) -> Result<(), Self::Error> {
-        trace!("encoding {:?}", alloc_id);
+        trace!("encoding {:?} at {}", alloc_id, self.position());
         if let Some(shorthand) = self.interpret_alloc_shorthands.get(alloc_id).cloned() {
-            return self.emit_usize(shorthand);
+            trace!("encoding {:?} as shorthand to {}", alloc_id, shorthand);
+            return shorthand.encode(self);
         }
         let start = self.position();
         // cache the allocation shorthand now, because the allocation itself might recursively
@@ -159,6 +160,7 @@ impl<'a, 'tcx> SpecializedEncoder<interpret::AllocId> for EncodeContext<'a, 'tcx
         self.interpret_alloc_shorthands.insert(*alloc_id, start);
         let interpret_interner = self.tcx.interpret_interner.borrow();
         if let Some(alloc) = interpret_interner.get_alloc(alloc_id.0) {
+            trace!("encoding {:?} with {:#?}", alloc_id, alloc);
             usize::max_value().encode(self)?;
             alloc.encode(self)?;
             let globals = interpret_interner.get_globals(interpret::Pointer {
@@ -172,6 +174,7 @@ impl<'a, 'tcx> SpecializedEncoder<interpret::AllocId> for EncodeContext<'a, 'tcx
                 glob.encode(self)?;
             }
         } else if let Some(fn_instance) = interpret_interner.get_fn(alloc_id.0) {
+            trace!("encoding {:?} with {:#?}", alloc_id, fn_instance);
             (usize::max_value() - 1).encode(self)?;
             fn_instance.encode(self)?;
         } else {
