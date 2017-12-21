@@ -13,6 +13,7 @@ use rustc::middle::const_val::ConstAggregate::*;
 use rustc::middle::const_val::ErrKind::*;
 use rustc::middle::const_val::{ByteArray, ConstVal, ConstEvalErr, EvalResult, ErrKind};
 
+use rustc::mir::interpret::{Value, PrimVal};
 use rustc::hir::map::blocks::FnLikeNode;
 use rustc::hir::def::{Def, CtorKind};
 use rustc::hir::def_id::DefId;
@@ -588,6 +589,45 @@ pub fn lit_to_const<'a, 'tcx>(lit: &'tcx ast::LitKind,
     use syntax::ast::*;
     use syntax::ast::LitIntType::*;
 
+    if tcx.sess.opts.debugging_opts.miri {
+        use rustc::mir::interpret::*;
+        let lit = match *lit {
+            LitKind::Str(ref s, _) => {
+                let s = s.as_str();
+                let id = tcx.allocate_cached(s.as_bytes());
+                let ptr = MemoryPointer::new(AllocId(id), 0);
+                Value::ByValPair(
+                    PrimVal::Ptr(ptr),
+                    PrimVal::from_u128(s.len() as u128),
+                )
+            },
+            LitKind::ByteStr(ref data) => {
+                let id = tcx.allocate_cached(data);
+                let ptr = MemoryPointer::new(AllocId(id), 0);
+                Value::ByVal(PrimVal::Ptr(ptr))
+            },
+            LitKind::Byte(n) => Value::ByVal(PrimVal::Bytes(n as u128)),
+            LitKind::Int(n, _) => Value::ByVal(PrimVal::Bytes(n)),
+            LitKind::Float(n, fty) => {
+                let n = n.as_str();
+                let bits = parse_float(&n, fty)?.bits;
+                Value::ByVal(PrimVal::Bytes(bits))
+            }
+            LitKind::FloatUnsuffixed(n) => {
+                let fty = match ty.sty {
+                    ty::TyFloat(fty) => fty,
+                    _ => bug!()
+                };
+                let n = n.as_str();
+                let bits = parse_float(&n, fty)?.bits;
+                Value::ByVal(PrimVal::Bytes(bits))
+            }
+            LitKind::Bool(b) => Value::ByVal(PrimVal::Bytes(b as u128)),
+            LitKind::Char(c) => Value::ByVal(PrimVal::Bytes(c as u128)),
+        };
+        return Ok(ConstVal::Value(lit));
+    }
+
     if let ty::TyAdt(adt, _) = ty.sty {
         if adt.is_enum() {
             ty = adt.repr.discr_type().to_ty(tcx)
@@ -636,7 +676,7 @@ fn parse_float<'tcx>(num: &str, fty: ast::FloatTy)
     })
 }
 
-pub fn compare_const_vals(tcx: TyCtxt, span: Span, a: &ConstVal, b: &ConstVal)
+pub fn compare_const_vals(_tcx: TyCtxt, span: Span, a: &ConstVal, b: &ConstVal, ty: Ty)
                           -> Result<Ordering, ErrorReported>
 {
     let result = match (a, b) {
@@ -646,17 +686,20 @@ pub fn compare_const_vals(tcx: TyCtxt, span: Span, a: &ConstVal, b: &ConstVal)
         (&Bool(a), &Bool(b)) => Some(a.cmp(&b)),
         (&ByteStr(a), &ByteStr(b)) => Some(a.data.cmp(b.data)),
         (&Char(a), &Char(b)) => Some(a.cmp(&b)),
+        (&Value(Value::ByVal(PrimVal::Bytes(a))),
+         &Value(Value::ByVal(PrimVal::Bytes(b)))) => {
+             if ty.is_signed() {
+                Some((a as i128).cmp(&(b as i128)))
+             } else {
+                Some(a.cmp(&b))
+             }
+         },
         _ => None,
     };
 
     match result {
         Some(result) => Ok(result),
-        None => {
-            // FIXME: can this ever be reached?
-            tcx.sess.delay_span_bug(span,
-                &format!("type mismatch comparing {:?} and {:?}", a, b));
-            Err(ErrorReported)
-        }
+        None => span_bug!(span, "type mismatch comparing {:?} and {:?}", a, b),
     }
 }
 
@@ -666,6 +709,7 @@ impl<'a, 'tcx> ConstContext<'a, 'tcx> {
                              a: &'tcx Expr,
                              b: &'tcx Expr) -> Result<Ordering, ErrorReported> {
         let tcx = self.tcx;
+        let ty = self.tables.expr_ty(a);
         let a = match self.eval(a) {
             Ok(a) => a,
             Err(e) => {
@@ -680,6 +724,6 @@ impl<'a, 'tcx> ConstContext<'a, 'tcx> {
                 return Err(ErrorReported);
             }
         };
-        compare_const_vals(tcx, span, &a.val, &b.val)
+        compare_const_vals(tcx, span, &a.val, &b.val, ty)
     }
 }

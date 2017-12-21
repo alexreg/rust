@@ -28,6 +28,7 @@ use rustc::hir::RangeEnd;
 use rustc::ty::{self, Ty, TyCtxt, TypeFoldable};
 
 use rustc::mir::Field;
+use rustc::mir::interpret::{Value, PrimVal};
 use rustc::util::common::ErrorReported;
 
 use syntax_pos::{Span, DUMMY_SP};
@@ -194,6 +195,36 @@ impl<'a, 'tcx> MatchCheckCtxt<'a, 'tcx> {
                             })
                         }
                     })).collect()
+                }
+                box PatternKind::Constant {
+                    value: &ty::Const { val: ConstVal::Value(b), .. }
+                } => {
+                    match b {
+                        Value::ByVal(PrimVal::Ptr(ptr)) => {
+                            let alloc = tcx
+                                .interpret_interner
+                                .borrow()
+                                .get_alloc(ptr.alloc_id.0)
+                                .unwrap();
+                            assert_eq!(ptr.offset, 0);
+                            // FIXME: check length
+                            alloc.bytes.iter().map(|b| {
+                                &*pattern_arena.alloc(Pattern {
+                                    ty: tcx.types.u8,
+                                    span: pat.span,
+                                    kind: box PatternKind::Constant {
+                                        value: tcx.mk_const(ty::Const {
+                                            val: ConstVal::Value(Value::ByVal(
+                                                PrimVal::Bytes(*b as u128),
+                                            )),
+                                            ty: tcx.types.u8
+                                        })
+                                    }
+                                })
+                            }).collect()
+                        },
+                        _ => bug!("not a byte str: {:?}", b),
+                    }
                 }
                 _ => span_bug!(pat.span, "unexpected byte array pattern {:?}", pat)
             }
@@ -422,7 +453,11 @@ fn all_constructors<'a, 'tcx: 'a>(cx: &mut MatchCheckCtxt<'a, 'tcx>,
         ty::TyBool => {
             [true, false].iter().map(|&b| {
                 ConstantValue(cx.tcx.mk_const(ty::Const {
-                    val: ConstVal::Bool(b),
+                    val: if cx.tcx.sess.opts.debugging_opts.miri {
+                        ConstVal::Value(Value::ByVal(PrimVal::Bytes(b as u128)))
+                    } else {
+                        ConstVal::Bool(b)
+                    },
                     ty: cx.tcx.types.bool
                 }))
             }).collect()
@@ -461,7 +496,7 @@ fn all_constructors<'a, 'tcx: 'a>(cx: &mut MatchCheckCtxt<'a, 'tcx>,
 }
 
 fn max_slice_length<'p, 'a: 'p, 'tcx: 'a, I>(
-    _cx: &mut MatchCheckCtxt<'a, 'tcx>,
+    cx: &mut MatchCheckCtxt<'a, 'tcx>,
     patterns: I) -> u64
     where I: Iterator<Item=&'p Pattern<'tcx>>
 {
@@ -537,6 +572,19 @@ fn max_slice_length<'p, 'a: 'p, 'tcx: 'a, I>(
         match *row.kind {
             PatternKind::Constant { value: &ty::Const { val: ConstVal::ByteStr(b), .. } } => {
                 max_fixed_len = cmp::max(max_fixed_len, b.data.len() as u64);
+            }
+            PatternKind::Constant {
+                value: &ty::Const {
+                    val: ConstVal::Value(Value::ByVal(PrimVal::Ptr(ptr))),
+                    ..
+                }
+            } => {
+                let alloc = cx.tcx
+                    .interpret_interner
+                    .borrow()
+                    .get_alloc(ptr.alloc_id.0)
+                    .unwrap();
+                max_fixed_len = cmp::max(max_fixed_len, alloc.bytes.len() as u64);
             }
             PatternKind::Slice { ref prefix, slice: None, ref suffix } => {
                 let fixed_len = prefix.len() as u64 + suffix.len() as u64;
@@ -876,14 +924,25 @@ fn constructor_sub_pattern_tys<'a, 'tcx: 'a>(cx: &MatchCheckCtxt<'a, 'tcx>,
     }
 }
 
-fn slice_pat_covered_by_constructor(_tcx: TyCtxt, _span: Span,
+fn slice_pat_covered_by_constructor(tcx: TyCtxt, _span: Span,
                                     ctor: &Constructor,
                                     prefix: &[Pattern],
                                     slice: &Option<Pattern>,
                                     suffix: &[Pattern])
                                     -> Result<bool, ErrorReported> {
-    let data = match *ctor {
+    let data: &[u8] = match *ctor {
         ConstantValue(&ty::Const { val: ConstVal::ByteStr(b), .. }) => b.data,
+        ConstantValue(&ty::Const { val: ConstVal::Value(
+            Value::ByVal(PrimVal::Ptr(ptr))
+        ), .. }) => {
+            tcx
+                .interpret_interner
+                .borrow()
+                .get_alloc(ptr.alloc_id.0)
+                .unwrap()
+                .bytes
+                .as_ref()
+        }
         _ => bug!()
     };
 
@@ -903,6 +962,12 @@ fn slice_pat_covered_by_constructor(_tcx: TyCtxt, _span: Span,
                         return Ok(false);
                     }
                 },
+                ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))) => {
+                    assert_eq!(b as u8 as u128, b);
+                    if b as u8 != *ch {
+                        return Ok(false);
+                    }
+                }
                 _ => span_bug!(pat.span, "bad const u8 {:?}", value)
             },
             _ => {}
@@ -915,10 +980,12 @@ fn slice_pat_covered_by_constructor(_tcx: TyCtxt, _span: Span,
 fn constructor_covered_by_range(tcx: TyCtxt, span: Span,
                                 ctor: &Constructor,
                                 from: &ConstVal, to: &ConstVal,
-                                end: RangeEnd)
+                                end: RangeEnd,
+                                ty: Ty)
                                 -> Result<bool, ErrorReported> {
-    let cmp_from = |c_from| Ok(compare_const_vals(tcx, span, c_from, from)? != Ordering::Less);
-    let cmp_to = |c_to| compare_const_vals(tcx, span, c_to, to);
+    trace!("constructor_covered_by_range {:?}, {:?}, {}", from, to, ty);
+    let cmp_from = |c_from| Ok(compare_const_vals(tcx, span, c_from, from, ty)? != Ordering::Less);
+    let cmp_to = |c_to| compare_const_vals(tcx, span, c_to, to, ty);
     match *ctor {
         ConstantValue(value) => {
             let to = cmp_to(&value.val)?;
@@ -1006,12 +1073,27 @@ fn specialize<'p, 'a: 'p, 'tcx: 'a>(
                             None
                         }
                     }
+                    ConstVal::Value(Value::ByVal(PrimVal::Ptr(ptr))) => {
+                        let data_len = cx.tcx
+                            .interpret_interner
+                            .borrow()
+                            .get_alloc(ptr.alloc_id.0)
+                            .unwrap()
+                            .bytes
+                            .len();
+                        if wild_patterns.len() == data_len {
+                            Some(cx.lower_byte_str_pattern(pat))
+                        } else {
+                            None
+                        }
+                    }
                     _ => span_bug!(pat.span,
                         "unexpected const-val {:?} with ctor {:?}", value, constructor)
                 },
                 _ => {
                     match constructor_covered_by_range(
-                        cx.tcx, pat.span, constructor, &value.val, &value.val, RangeEnd::Included
+                        cx.tcx, pat.span, constructor, &value.val, &value.val, RangeEnd::Included,
+                        value.ty,
                             ) {
                         Ok(true) => Some(vec![]),
                         Ok(false) => None,
@@ -1023,7 +1105,7 @@ fn specialize<'p, 'a: 'p, 'tcx: 'a>(
 
         PatternKind::Range { lo, hi, ref end } => {
             match constructor_covered_by_range(
-                cx.tcx, pat.span, constructor, &lo.val, &hi.val, end.clone()
+                cx.tcx, pat.span, constructor, &lo.val, &hi.val, end.clone(), lo.ty,
             ) {
                 Ok(true) => Some(vec![]),
                 Ok(false) => None,

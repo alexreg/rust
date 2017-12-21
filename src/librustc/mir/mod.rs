@@ -2367,6 +2367,15 @@ impl<'tcx, B, V, T> TypeFoldable<'tcx> for Projection<'tcx, B, V, T>
     }
 }
 
+impl<'tcx> TypeFoldable<'tcx> for Field {
+    fn super_fold_with<'gcx: 'tcx, F: TypeFolder<'gcx, 'tcx>>(&self, _: &mut F) -> Self {
+        *self
+    }
+    fn super_visit_with<V: TypeVisitor<'tcx>>(&self, _: &mut V) -> bool {
+        false
+    }
+}
+
 impl<'tcx> TypeFoldable<'tcx> for Constant<'tcx> {
     fn super_fold_with<'gcx: 'tcx, F: TypeFolder<'gcx, 'tcx>>(&self, folder: &mut F) -> Self {
         Constant {

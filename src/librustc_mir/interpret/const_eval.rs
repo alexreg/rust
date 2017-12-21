@@ -298,6 +298,43 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
     }
 }
 
+pub fn const_val_field<'a, 'tcx>(
+    tcx: TyCtxt<'a, 'tcx, 'tcx>,
+    key: ty::ParamEnvAnd<'tcx, (ty::Instance<'tcx>, mir::Field, Value, Ty<'tcx>)>,
+) -> ::rustc::middle::const_val::EvalResult<'tcx> {
+    trace!("const_val_field: {:#?}", key);
+    match const_val_field_inner(tcx, key) {
+        Ok((field, ty)) => Ok(tcx.mk_const(ty::Const {
+            val: ConstVal::Value(field),
+            ty,
+        })),
+        Err(err) => Err(ConstEvalErr {
+            span: tcx.def_span(key.value.0.def_id()),
+            kind: err.into(),
+        }),
+    }
+}
+
+fn const_val_field_inner<'a, 'tcx>(
+    tcx: TyCtxt<'a, 'tcx, 'tcx>,
+    key: ty::ParamEnvAnd<'tcx, (ty::Instance<'tcx>, mir::Field, Value, Ty<'tcx>)>,
+) -> ::rustc::mir::interpret::EvalResult<'tcx, (Value, Ty<'tcx>)> {
+    trace!("const_val_field: {:#?}", key);
+    let (instance, field, value, ty) = key.value;
+    let mut ecx = mk_eval_cx(tcx, instance, key.param_env).unwrap();
+    let (field, ty) = match value {
+        Value::ByValPair(..) | Value::ByVal(_) => ecx.read_field(value, field, ty)?.expect("const_val_field on non-field"),
+        Value::ByRef(ptr, align) => {
+            let place = Place::from_primval_ptr(ptr, align);
+            let layout = ecx.layout_of(ty)?;
+            let (place, layout) = ecx.place_field(place, field, layout)?;
+            let (ptr, align) = place.to_ptr_align();
+            (Value::ByRef(ptr, align), layout.ty)
+        }
+    };
+    Ok((field, ty))
+}
+
 pub fn const_eval_provider<'a, 'tcx>(
     tcx: TyCtxt<'a, 'tcx, 'tcx>,
     key: ty::ParamEnvAnd<'tcx, (DefId, &'tcx Substs<'tcx>)>,
