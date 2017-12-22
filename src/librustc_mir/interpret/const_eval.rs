@@ -41,53 +41,6 @@ pub fn mk_eval_cx<'a, 'tcx>(
     Ok(ecx)
 }
 
-pub fn eval_fn_call<'a, 'tcx>(
-    tcx: TyCtxt<'a, 'tcx, 'tcx>,
-    instance: Instance<'tcx>,
-    param_env: ty::ParamEnv<'tcx>,
-    args: Vec<ValTy<'tcx>>,
-) -> EvalResult<'tcx, Value> {
-    debug!("eval: {:?}, {:?}, {:#?}", instance, param_env, args);
-
-    let limits = super::ResourceLimits::default();
-    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator, ());
-
-    let return_ty = instance.ty(tcx).fn_sig(tcx).output();
-    let return_ty = return_ty.skip_binder();
-    let mir = ecx.load_mir(instance.def)?;
-    let layout = ecx.layout_of(return_ty)?;
-    assert!(!layout.is_unsized());
-    let ptr = ecx.memory.allocate(
-        layout.size.bytes(),
-        layout.align,
-        None,
-    )?;
-    let cleanup = StackPopCleanup::MarkStatic(Mutability::Immutable);
-    let name = ty::tls::with(|tcx| tcx.item_path_str(instance.def_id()));
-    trace!("const_eval: pushing stack frame for global: {}", name);
-    ecx.push_stack_frame(
-        instance,
-        mir.span,
-        mir,
-        Place::from_ptr(ptr, layout.align),
-        cleanup.clone(),
-    )?;
-
-    for (arg_local, valty) in mir.args_iter().zip(args) {
-        let dest = ecx.eval_place(&mir::Place::Local(arg_local))?;
-        ecx.write_value(valty, dest)?;
-    }
-
-    while ecx.step()? {}
-
-    let align = layout.align;
-    let value = match ecx.try_read_value(PrimVal::Ptr(ptr).into(), align, return_ty)? {
-        Some(val) => val,
-        _ => unimplemented!("ByRef ad hoc fn eval",)
-    };
-    Ok(value)
-}
-
 pub fn eval_body<'a, 'tcx>(
     tcx: TyCtxt<'a, 'tcx, 'tcx>,
     instance: Instance<'tcx>,
@@ -363,20 +316,63 @@ pub fn cmp_const_vals<'a, 'tcx>(
         .expect("cannot find cmp method on PartialOrd trait");
     let substs = tcx.mk_substs_trait(ty, &[]);
     let instance = Instance::resolve(tcx, key.param_env, method.def_id, substs).expect("cmp_const_vals could not find cmp method");
-    let args = vec![
-        ValTy { value: a, ty },
-        ValTy { value: b, ty },
-    ];
-    let val = eval_fn_call(tcx, instance, key.param_env, args)?;
-    if let Value::ByVal(PrimVal::Bytes(n)) = val {
-        match n as i128 {
-            -1 => Ok(::std::cmp::Ordering::Less),
-            0 => Ok(::std::cmp::Ordering::Equal),
-            1 => Ok(::std::cmp::Ordering::Greater),
-            n => bug!("{} is not a valid Ordering value", n),
-        }
-    } else {
-        bug!("cmp_const_vals got {:?} from miri", val);
+
+    let limits = super::ResourceLimits::default();
+    let mut ecx = EvalContext::new(tcx, key.param_env, limits, CompileTimeEvaluator, ());
+
+    let return_ty = instance.ty(tcx).fn_sig(tcx).output();
+    let return_ty = return_ty.skip_binder();
+    let mir = ecx.load_mir(instance.def)?;
+    let layout = ecx.layout_of(return_ty)?;
+    assert!(!layout.is_unsized());
+    let ptr = ecx.memory.allocate(
+        layout.size.bytes(),
+        layout.align,
+        None,
+    )?;
+    let cleanup = StackPopCleanup::MarkStatic(Mutability::Immutable);
+    let name = ty::tls::with(|tcx| tcx.item_path_str(instance.def_id()));
+    trace!("const_eval: pushing stack frame for global: {}", name);
+    ecx.push_stack_frame(
+        instance,
+        mir.span,
+        mir,
+        Place::from_ptr(ptr, layout.align),
+        cleanup.clone(),
+    )?;
+
+    let arg_layout = ecx.layout_of(ty)?;
+    for (arg_local, value) in mir.args_iter().zip(vec![a, b]) {
+        let dest = ecx.eval_place(&mir::Place::Local(arg_local))?;
+        let ptr = ecx.memory.allocate(
+            arg_layout.size.bytes(),
+            arg_layout.align,
+            None,
+        )?;
+        ecx.write_value_to_ptr(
+            value,
+            ptr.into(),
+            arg_layout.align,
+            ty,
+        )?;
+        ecx.write_value(ValTy {
+            value: Value::ByVal(PrimVal::Ptr(ptr)),
+            ty: tcx.mk_imm_ptr(ty),
+        }, dest)?;
+    }
+
+    while ecx.step()? {}
+
+    let value = match ecx.try_read_value(PrimVal::Ptr(ptr).into(), layout.align, return_ty)? {
+        Some(Value::ByVal(PrimVal::Bytes(n))) => n as i128,
+        other => bug!("Ord::cmp produced {:?}", other),
+    };
+
+    match value {
+        -1 => Ok(::std::cmp::Ordering::Less),
+        0 => Ok(::std::cmp::Ordering::Equal),
+        1 => Ok(::std::cmp::Ordering::Greater),
+        n => bug!("{} is not a valid Ordering value", n),
     }
 }
 
