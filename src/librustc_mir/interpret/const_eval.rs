@@ -1,5 +1,5 @@
 use rustc::ty::{self, TyCtxt, Ty, Instance};
-use rustc::ty::layout::{self, LayoutOf};
+use rustc::ty::layout::{self, LayoutOf, Align};
 use rustc::ty::subst::Substs;
 use rustc::hir::def_id::DefId;
 use rustc::mir;
@@ -14,7 +14,7 @@ use syntax::symbol::Symbol;
 use syntax::codemap::Span;
 
 use rustc::mir::interpret::{EvalResult, EvalError, EvalErrorKind, GlobalId, Value, Pointer, PrimVal};
-use super::{Place, EvalContext, StackPopCleanup, ValTy};
+use super::{Place, EvalContext, StackPopCleanup, ValTy, HasMemory};
 
 use rustc_const_math::ConstInt;
 
@@ -28,7 +28,7 @@ pub fn mk_eval_cx<'a, 'tcx>(
 ) -> EvalResult<'tcx, EvalContext<'a, 'tcx, CompileTimeEvaluator>> {
     debug!("mk_eval_cx: {:?}, {:?}", instance, param_env);
     let limits = super::ResourceLimits::default();
-    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator, ());
+    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator { require_const_fn: true }, ());
     let mir = ecx.load_mir(instance.def)?;
     // insert a stack frame so any queries have the correct substs
     ecx.push_stack_frame(
@@ -48,7 +48,7 @@ pub fn eval_body<'a, 'tcx>(
 ) -> EvalResult<'tcx, (Value, Pointer, Ty<'tcx>)> {
     debug!("eval_body: {:?}, {:?}", instance, param_env);
     let limits = super::ResourceLimits::default();
-    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator, ());
+    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator { require_const_fn: false }, ());
     let cid = GlobalId {
         instance,
         promoted: None,
@@ -132,7 +132,9 @@ pub fn eval_body_as_integer<'a, 'tcx>(
     })
 }
 
-pub struct CompileTimeEvaluator;
+pub struct CompileTimeEvaluator {
+    require_const_fn: bool,
+}
 
 impl<'tcx> Into<EvalError<'tcx>> for ConstEvalError {
     fn into(self) -> EvalError<'tcx> {
@@ -183,12 +185,12 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
         ecx: &mut EvalContext<'a, 'tcx, Self>,
         instance: ty::Instance<'tcx>,
         destination: Option<(Place, mir::BasicBlock)>,
-        _args: &[ValTy<'tcx>],
+        args: &[ValTy<'tcx>],
         span: Span,
-        _sig: ty::FnSig<'tcx>,
+        sig: ty::FnSig<'tcx>,
     ) -> EvalResult<'tcx, bool> {
         debug!("eval_fn_call: {:?}", instance);
-        if !ecx.tcx.is_const_fn(instance.def_id()) {
+        if ecx.machine.require_const_fn && !ecx.tcx.is_const_fn(instance.def_id()) {
             return Err(
                 ConstEvalError::NotConst(format!("calling non-const fn `{}`", instance)).into(),
             );
@@ -196,11 +198,52 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
         let mir = match ecx.load_mir(instance.def) {
             Ok(mir) => mir,
             Err(EvalError { kind: EvalErrorKind::NoMirFor(path), .. }) => {
-                // some simple things like `malloc` might get accepted in the future
-                return Err(
-                    ConstEvalError::NeedsRfc(format!("calling extern function `{}`", path))
-                        .into(),
-                );
+                if ecx.machine.require_const_fn {
+                    return Err(
+                        ConstEvalError::NeedsRfc(format!("calling extern function `{}`", path))
+                            .into(),
+                    );
+                }
+                let attrs = ecx.tcx.get_attrs(instance.def_id());
+                use syntax::attr;
+                let link_name = match attr::first_attr_value_str_by_name(&attrs, "link_name") {
+                    Some(name) => name.as_str(),
+                    None => ecx.tcx.item_name(instance.def_id()),
+                };
+                let (dest, dest_block) = destination.unwrap();
+                let dest_ty = sig.output();
+                match &link_name[..] {
+                    "memcmp" => {
+                        let left = ecx.into_ptr(args[0].value)?;
+                        let right = ecx.into_ptr(args[1].value)?;
+                        let n = ecx.value_to_primval(args[2])?.to_u64()?;
+
+                        let result = {
+                            let left_bytes = ecx.memory.read_bytes(left, n)?;
+                            let right_bytes = ecx.memory.read_bytes(right, n)?;
+
+                            use std::cmp::Ordering::*;
+                            match left_bytes.cmp(right_bytes) {
+                                Less => -1i8,
+                                Equal => 0,
+                                Greater => 1,
+                            }
+                        };
+
+                        ecx.write_primval(
+                            dest,
+                            PrimVal::Bytes(result as u128),
+                            dest_ty,
+                        )?;
+                    },
+                    // some simple things like `malloc` might get accepted in the future
+                    other => return Err(
+                        ConstEvalError::NeedsRfc(format!("calling extern function `{}`", other))
+                            .into(),
+                    ),
+                }
+                ecx.goto_block(dest_block);
+                return Ok(true);
             }
             Err(other) => return Err(other),
         };
@@ -224,7 +267,7 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
     fn call_intrinsic<'a>(
         ecx: &mut EvalContext<'a, 'tcx, Self>,
         instance: ty::Instance<'tcx>,
-        _args: &[ValTy<'tcx>],
+        args: &[ValTy<'tcx>],
         dest: Place,
         dest_layout: layout::TyLayout<'tcx>,
         target: mir::BasicBlock,
@@ -244,6 +287,12 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
                 let ty = substs.type_at(0);
                 let size = ecx.layout_of(ty)?.size.bytes() as u128;
                 ecx.write_primval(dest, PrimVal::from_u128(size), dest_layout.ty)?;
+            }
+
+            "transmute" if !ecx.machine.require_const_fn => {
+                let src_ty = substs.type_at(0);
+                let ptr = ecx.force_allocation(dest)?.to_ptr()?;
+                ecx.write_value_to_ptr(args[0].value, ptr.into(), Align::from_bytes(1, 1).unwrap(), src_ty)?;
             }
 
             name => return Err(ConstEvalError::NeedsRfc(format!("calling intrinsic `{}`", name)).into()),
@@ -318,7 +367,7 @@ pub fn cmp_const_vals<'a, 'tcx>(
     let instance = Instance::resolve(tcx, key.param_env, method.def_id, substs).expect("cmp_const_vals could not find cmp method");
 
     let limits = super::ResourceLimits::default();
-    let mut ecx = EvalContext::new(tcx, key.param_env, limits, CompileTimeEvaluator, ());
+    let mut ecx = EvalContext::new(tcx, key.param_env, limits, CompileTimeEvaluator { require_const_fn: false }, ());
 
     let return_ty = instance.ty(tcx).fn_sig(tcx).output();
     let return_ty = return_ty.skip_binder();
