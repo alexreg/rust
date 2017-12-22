@@ -71,18 +71,23 @@ impl<'tcx> Decodable for ConstAggregate<'tcx> {
 }
 
 impl<'tcx> ConstVal<'tcx> {
-    pub fn to_const_int(&self) -> Option<ConstInt> {
+    pub fn to_u128(&self) -> Option<u128> {
         match *self {
-            ConstVal::Integral(i) => Some(i),
-            ConstVal::Bool(b) => Some(ConstInt::U8(b as u8)),
-            ConstVal::Char(ch) => Some(ConstInt::U32(ch as u32)),
-            ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))) => Some(ConstInt::U128(b)),
-            _ => None
+            ConstVal::Integral(i) => i.to_u128(),
+            ConstVal::Bool(b) => Some(b as u128),
+            ConstVal::Char(ch) => Some(ch as u32 as u128),
+            ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))) => {
+                Some(b)
+            },
+            _ => None,
         }
     }
     pub fn unwrap_u64(&self) -> u64 {
-        match self.to_const_int().and_then(|i| i.to_u64()) {
-            Some(val) => val,
+        match self.to_u128() {
+            Some(val) => {
+                assert_eq!(val as u64 as u128, val);
+                val as u64
+            },
             None => bug!("expected constant u64, got {:#?}", self),
         }
     }

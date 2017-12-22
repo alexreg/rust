@@ -27,7 +27,6 @@ use syntax::abi::Abi;
 use syntax::ast;
 use syntax::attr;
 use rustc::hir::{self, Expr};
-use syntax_pos::Span;
 
 use std::cmp::Ordering;
 
@@ -675,36 +674,27 @@ fn parse_float<'tcx>(num: &str, fty: ast::FloatTy)
     })
 }
 
-pub fn compare_const_vals<'a, 'tcx: 'a>(
-    tcx: TyCtxt<'a, 'tcx, 'tcx>,
-    param_env: ty::ParamEnv<'tcx>,
-    span: Span,
-    a: &ConstVal<'tcx>,
-    b: &ConstVal<'tcx>,
-    ty: Ty<'tcx>,
-) -> Result<Ordering, ErrorReported> {
-    let result = match (a, b) {
+pub fn compare_const_vals(a: &ConstVal, b: &ConstVal, ty: Ty) -> Option<Ordering> {
+    use rustc::mir::interpret::{Value, PrimVal};
+    match (a, b) {
         (&Integral(a), &Integral(b)) => a.try_cmp(b).ok(),
-        (&Float(a), &Float(b)) => a.try_cmp(b).ok(),
-        (&Str(ref a), &Str(ref b)) => Some(a.cmp(b)),
-        (&Bool(a), &Bool(b)) => Some(a.cmp(&b)),
-        (&ByteStr(a), &ByteStr(b)) => Some(a.data.cmp(b.data)),
         (&Char(a), &Char(b)) => Some(a.cmp(&b)),
-        (&Value(a), &Value(b)) => Some(tcx.cmp_const_vals(param_env.and((a, b, ty))).unwrap()),
+        (&Value(Value::ByVal(PrimVal::Bytes(a))),
+         &Value(Value::ByVal(PrimVal::Bytes(b)))) => {
+            Some(if ty.is_signed() {
+                (a as i128).cmp(&(b as i128))
+            } else {
+                a.cmp(&b)
+            })
+        },
         _ => None,
-    };
-
-    match result {
-        Some(result) => Ok(result),
-        None => span_bug!(span, "type mismatch comparing {:?} and {:?}", a, b),
     }
 }
 
 impl<'a, 'tcx> ConstContext<'a, 'tcx> {
     pub fn compare_lit_exprs(&self,
-                             span: Span,
                              a: &'tcx Expr,
-                             b: &'tcx Expr) -> Result<Ordering, ErrorReported> {
+                             b: &'tcx Expr) -> Result<Option<Ordering>, ErrorReported> {
         let tcx = self.tcx;
         let ty = self.tables.expr_ty(a);
         let a = match self.eval(a) {
@@ -721,6 +711,6 @@ impl<'a, 'tcx> ConstContext<'a, 'tcx> {
                 return Err(ErrorReported);
             }
         };
-        compare_const_vals(tcx, self.param_env, span, &a.val, &b.val, ty)
+        Ok(compare_const_vals(&a.val, &b.val, ty))
     }
 }

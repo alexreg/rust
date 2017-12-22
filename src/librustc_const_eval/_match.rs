@@ -26,7 +26,6 @@ use pattern::{PatternFoldable, PatternFolder};
 use rustc::hir::def_id::DefId;
 use rustc::hir::RangeEnd;
 use rustc::ty::{self, Ty, TyCtxt, TypeFoldable};
-use rustc::traits::Reveal;
 
 use rustc::mir::Field;
 use rustc::mir::interpret::{Value, PrimVal};
@@ -463,7 +462,7 @@ fn all_constructors<'a, 'tcx: 'a>(cx: &mut MatchCheckCtxt<'a, 'tcx>,
                 }))
             }).collect()
         }
-        ty::TyArray(ref sub_ty, len) if len.val.to_const_int().is_some() => {
+        ty::TyArray(ref sub_ty, len) if len.val.to_u128().is_some() => {
             let len = len.val.unwrap_u64();
             if len != 0 && cx.is_uninhabited(sub_ty) {
                 vec![]
@@ -978,41 +977,41 @@ fn slice_pat_covered_by_constructor(tcx: TyCtxt, _span: Span,
     Ok(true)
 }
 
-fn constructor_covered_by_range<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, span: Span,
-                                ctor: &Constructor<'tcx>,
-                                from: &ConstVal<'tcx>, to: &ConstVal<'tcx>,
+fn constructor_covered_by_range(ctor: &Constructor,
+                                from: &ConstVal, to: &ConstVal,
                                 end: RangeEnd,
-                                ty: Ty<'tcx>)
+                                ty: Ty)
                                 -> Result<bool, ErrorReported> {
     trace!("constructor_covered_by_range {:?}, {:?}, {}", from, to, ty);
-    let param_env = ty::ParamEnv::empty(Reveal::All);
-    let cmp_from = |c_from| Ok(compare_const_vals(
-        tcx,
-        param_env,
-        span,
-        c_from,
-        from,
-        ty,
-    )? != Ordering::Less);
-    let cmp_to = |c_to| compare_const_vals(tcx, param_env, span, c_to, to, ty);
+    let cmp_from = |c_from| compare_const_vals(c_from, from, ty)
+        .map(|res| res != Ordering::Less);
+    let cmp_to = |c_to| compare_const_vals(c_to, to, ty);
+    macro_rules! some_or_ok {
+        ($e:expr) => {
+            match $e {
+                Some(to) => to,
+                None => return Ok(true), // not char or int
+            }
+        };
+    }
     match *ctor {
         ConstantValue(value) => {
-            let to = cmp_to(&value.val)?;
+            let to = some_or_ok!(cmp_to(&value.val));
             let end = (to == Ordering::Less) ||
                       (end == RangeEnd::Included && to == Ordering::Equal);
-            Ok(cmp_from(&value.val)? && end)
+            Ok(some_or_ok!(cmp_from(&value.val)) && end)
         },
         ConstantRange(from, to, RangeEnd::Included) => {
-            let to = cmp_to(&to.val)?;
+            let to = some_or_ok!(cmp_to(&to.val));
             let end = (to == Ordering::Less) ||
                       (end == RangeEnd::Included && to == Ordering::Equal);
-            Ok(cmp_from(&from.val)? && end)
+            Ok(some_or_ok!(cmp_from(&from.val)) && end)
         },
         ConstantRange(from, to, RangeEnd::Excluded) => {
-            let to = cmp_to(&to.val)?;
+            let to = some_or_ok!(cmp_to(&to.val));
             let end = (to == Ordering::Less) ||
                       (end == RangeEnd::Excluded && to == Ordering::Equal);
-            Ok(cmp_from(&from.val)? && end)
+            Ok(some_or_ok!(cmp_from(&from.val)) && end)
         }
         Single => Ok(true),
         _ => bug!(),
@@ -1101,7 +1100,7 @@ fn specialize<'p, 'a: 'p, 'tcx: 'a>(
                 },
                 _ => {
                     match constructor_covered_by_range(
-                        cx.tcx, pat.span, constructor, &value.val, &value.val, RangeEnd::Included,
+                        constructor, &value.val, &value.val, RangeEnd::Included,
                         value.ty,
                             ) {
                         Ok(true) => Some(vec![]),
@@ -1114,7 +1113,7 @@ fn specialize<'p, 'a: 'p, 'tcx: 'a>(
 
         PatternKind::Range { lo, hi, ref end } => {
             match constructor_covered_by_range(
-                cx.tcx, pat.span, constructor, &lo.val, &hi.val, end.clone(), lo.ty,
+                constructor, &lo.val, &hi.val, end.clone(), lo.ty,
             ) {
                 Ok(true) => Some(vec![]),
                 Ok(false) => None,

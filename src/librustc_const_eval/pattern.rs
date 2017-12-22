@@ -665,7 +665,13 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
         if self.tcx.sess.opts.debugging_opts.miri {
             return match expr.node {
                 hir::ExprLit(ref lit) => {
-                    let ty = self.tables.expr_ty(expr);
+                    let mut ty = self.tables.expr_ty(expr);
+                    if let ty::TyAdt(adt, _) = ty.sty {
+                        if adt.is_enum() {
+                            use rustc::ty::util::IntTypeExt;
+                            ty = adt.repr.discr_type().to_ty(self.tcx)
+                        }
+                    }
                     match ::eval::lit_to_const(&lit.node, self.tcx, ty) {
                         Ok(value) => PatternKind::Constant {
                             value: self.tcx.mk_const(ty::Const {

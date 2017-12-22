@@ -113,7 +113,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                                      test_place: &Place<'tcx>,
                                      candidate: &Candidate<'pat, 'tcx>,
                                      switch_ty: Ty<'tcx>,
-                                     options: &mut Vec<&'tcx ty::Const<'tcx>>,
+                                     options: &mut Vec<u128>,
                                      indices: &mut FxHashMap<&'tcx ty::Const<'tcx>, usize>)
                                      -> bool
     {
@@ -129,7 +129,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
                 indices.entry(value)
                        .or_insert_with(|| {
-                           options.push(value);
+                           options.push(value.to_u128().expect("switching on int"));
                            options.len() - 1
                        });
                 true
@@ -229,11 +229,9 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     assert!(options.len() > 0 && options.len() <= 2);
                     let (true_bb, false_bb) = (self.cfg.start_new_block(),
                                                self.cfg.start_new_block());
-                    let ret = match options[0].val {
-                        ConstVal::Value(Value::ByVal(PrimVal::Bytes(1))) |
-                        ConstVal::Bool(true) => vec![true_bb, false_bb],
-                        ConstVal::Value(Value::ByVal(PrimVal::Bytes(0))) |
-                        ConstVal::Bool(false) => vec![false_bb, true_bb],
+                    let ret = match options[0] {
+                        1 => vec![true_bb, false_bb],
+                        0 => vec![false_bb, true_bb],
                         v => span_bug!(test.span, "expected boolean value but got {:?}", v)
                     };
                     (ret, TerminatorKind::if_(self.hir.tcx(), Operand::Copy(place.clone()),
@@ -247,13 +245,10 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                                .map(|_| self.cfg.start_new_block())
                                .chain(Some(otherwise))
                                .collect();
-                    let values: Vec<_> = options.iter().map(|v|
-                        v.val.to_const_int().expect("switching on integral")
-                    ).collect();
                     (targets.clone(), TerminatorKind::SwitchInt {
                         discr: Operand::Copy(place.clone()),
                         switch_ty,
-                        values: From::from(values),
+                        values: options.to_owned(),
                         targets,
                     })
                 };

@@ -15,7 +15,7 @@
 use graphviz::IntoCow;
 use middle::const_val::ConstVal;
 use middle::region;
-use rustc_const_math::{ConstUsize, ConstInt, ConstMathErr};
+use rustc_const_math::{ConstUsize, ConstMathErr};
 use rustc_data_structures::indexed_vec::{IndexVec, Idx};
 use rustc_data_structures::control_flow_graph::dominators::{Dominators, dominators};
 use rustc_data_structures::control_flow_graph::{GraphPredecessors, GraphSuccessors};
@@ -694,7 +694,7 @@ pub enum TerminatorKind<'tcx> {
 
         /// Possible values. The locations to branch to in each case
         /// are found in the corresponding indices from the `targets` vector.
-        values: Cow<'tcx, [ConstInt]>,
+        values: Cow<'tcx, [u128]>,
 
         /// Possible branch sites. The last element of this vector is used
         /// for the otherwise branch, so targets.len() == values.len() + 1
@@ -826,7 +826,7 @@ impl<'tcx> Terminator<'tcx> {
 impl<'tcx> TerminatorKind<'tcx> {
     pub fn if_<'a, 'gcx>(tcx: TyCtxt<'a, 'gcx, 'tcx>, cond: Operand<'tcx>,
                          t: BasicBlock, f: BasicBlock) -> TerminatorKind<'tcx> {
-        static BOOL_SWITCH_FALSE: &'static [ConstInt] = &[ConstInt::U8(0)];
+        static BOOL_SWITCH_FALSE: &'static [u128] = &[0];
         TerminatorKind::SwitchInt {
             discr: cond,
             switch_ty: tcx.types.bool,
@@ -1057,11 +1057,7 @@ impl<'tcx> TerminatorKind<'tcx> {
             Goto { .. } => vec!["".into()],
             SwitchInt { ref values, .. } => {
                 values.iter()
-                      .map(|const_val| {
-                          let mut buf = String::new();
-                          fmt_const_val(&mut buf, &ConstVal::Integral(*const_val)).unwrap();
-                          buf.into()
-                      })
+                      .map(|u| u.to_string().into())
                       .chain(iter::once(String::from("otherwise").into()))
                       .collect()
             }

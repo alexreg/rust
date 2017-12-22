@@ -262,7 +262,7 @@ impl<'a, 'gcx, 'tcx> TyS<'tcx> {
                 }))
             },
             TyArray(ty, len) => {
-                if len.val.to_const_int().and_then(|i| i.to_u64()) == Some(0) {
+                if len.val.to_u128() == Some(0) {
                     DefIdForest::empty()
                 } else {
                     ty.uninhabited_from(visited, tcx)

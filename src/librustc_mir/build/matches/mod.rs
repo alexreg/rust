@@ -338,7 +338,7 @@ enum TestKind<'tcx> {
     // test the branches of enum
     SwitchInt {
         switch_ty: Ty<'tcx>,
-        options: Vec<&'tcx ty::Const<'tcx>>,
+        options: Vec<u128>,
         indices: FxHashMap<&'tcx ty::Const<'tcx>, usize>,
     },
 
