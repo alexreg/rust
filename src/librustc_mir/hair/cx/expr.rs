@@ -15,6 +15,7 @@ use hair::cx::block;
 use hair::cx::to_ref::ToRef;
 use rustc::hir::def::{Def, CtorKind};
 use rustc::middle::const_val::ConstVal;
+use rustc::mir::interpret::{MemoryPointer, AllocId, Value, PrimVal};
 use rustc::ty::{self, AdtKind, VariantDef, Ty};
 use rustc::ty::adjustment::{Adjustment, Adjust, AutoBorrow};
 use rustc::ty::cast::CastKind as TyCastKind;
@@ -596,8 +597,18 @@ fn method_callee<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
         span: expr.span,
         kind: ExprKind::Literal {
             literal: Literal::Value {
-                value: cx.tcx.mk_const(ty::Const {
-                    val: ConstVal::Function(def_id, substs),
+                value: cx.tcx().mk_const(ty::Const {
+                    val: if cx.tcx().sess.opts.debugging_opts.miri {
+                        let inst = ty::Instance::new(def_id, substs);
+                        let ptr = cx.tcx()
+                            .interpret_interner
+                            .borrow_mut()
+                            .create_fn_alloc(inst);
+                        let ptr = MemoryPointer::new(AllocId(ptr), 0);
+                        ConstVal::Value(Value::ByVal(PrimVal::Ptr(ptr)))
+                    } else {
+                        ConstVal::Function(def_id, substs)
+                    },
                     ty
                 }),
             },
