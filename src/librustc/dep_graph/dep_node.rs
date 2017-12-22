@@ -519,11 +519,6 @@ define_dep_nodes!( <'tcx>
     [] HasTypeckTables(DefId),
     [] ConstEval { param_env: ParamEnvAnd<'tcx, (DefId, &'tcx Substs<'tcx>)> },
     [] ConstValField { param_env: ParamEnvAnd<'tcx, (Instance<'tcx>, mir::Field, mir::interpret::Value, Ty<'tcx>)> },
-    [] CmpConstVals { param_env: ParamEnvAnd<'tcx, (
-        mir::interpret::Value,
-        mir::interpret::Value,
-        Ty<'tcx>,
-    )> },
     [] CheckMatch(DefId),
     [] SymbolName(DefId),
     [] InstanceSymbolName { instance: Instance<'tcx> },

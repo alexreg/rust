@@ -11,7 +11,7 @@
 use std::fmt;
 use rustc::hir;
 use rustc::mir::*;
-use rustc::middle::const_val::{ConstInt, ConstVal};
+use rustc::middle::const_val::ConstVal;
 use rustc::middle::lang_items;
 use rustc::ty::{self, Ty, TyCtxt};
 use rustc::ty::subst::{Kind, Substs};
@@ -480,7 +480,7 @@ impl<'l, 'b, 'tcx, D> DropCtxt<'l, 'b, 'tcx, D>
     fn adt_switch_block(&mut self,
                         adt: &'tcx ty::AdtDef,
                         blocks: Vec<BasicBlock>,
-                        values: &[ConstInt],
+                        values: &[u128],
                         succ: BasicBlock,
                         unwind: Unwind)
                         -> BasicBlock {
@@ -799,7 +799,7 @@ impl<'l, 'b, 'tcx, D> DropCtxt<'l, 'b, 'tcx, D>
                 self.complete_drop(Some(DropFlagMode::Deep), succ, unwind)
             }
             ty::TyArray(ety, size) => self.open_drop_for_array(
-                ety, size.val.to_u64()),
+                ety, size.val.to_u128() as u64),
             ty::TySlice(ety) => self.open_drop_for_array(ety, None),
 
             _ => bug!("open drop from non-ADT `{:?}`", ty)

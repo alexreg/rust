@@ -129,7 +129,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
                 indices.entry(value)
                        .or_insert_with(|| {
-                           options.push(value.to_u128().expect("switching on int"));
+                           options.push(value.val.to_u128().expect("switching on int"));
                            options.len() - 1
                        });
                 true
@@ -194,7 +194,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 let tcx = self.hir.tcx();
                 for (idx, discr) in adt_def.discriminants(tcx).enumerate() {
                     target_blocks.place_back() <- if variants.contains(idx) {
-                        values.push(discr);
+                        values.push(discr.to_u128().expect("int"));
                         *(targets.place_back() <- self.cfg.start_new_block())
                     } else {
                         if otherwise_block.is_none() {
@@ -248,7 +248,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     (targets.clone(), TerminatorKind::SwitchInt {
                         discr: Operand::Copy(place.clone()),
                         switch_ty,
-                        values: options.to_owned(),
+                        values: options.clone().into(),
                         targets,
                     })
                 };

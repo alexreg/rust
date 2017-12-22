@@ -214,13 +214,6 @@ define_maps! { <'tcx>
     [] fn const_val_field: const_val_field_dep_node(ty::ParamEnvAnd<'tcx, (ty::Instance<'tcx>, mir::Field, mir::interpret::Value, Ty<'tcx>)>)
         -> const_val::EvalResult<'tcx>,
 
-    /// Compare two values by interpreting the Ord impl
-    [] fn cmp_const_vals: cmp_const_vals_dep_node(ty::ParamEnvAnd<'tcx, (
-        mir::interpret::Value,
-        mir::interpret::Value,
-        Ty<'tcx>,
-    )>) -> mir::interpret::EvalResult<'tcx, ::std::cmp::Ordering>,
-
     [] fn check_match: CheckMatch(DefId)
         -> Result<(), ErrorReported>,
 
@@ -431,16 +424,6 @@ fn const_val_field_dep_node<'tcx>(
     param_env: ty::ParamEnvAnd<'tcx, (ty::Instance<'tcx>, mir::Field, mir::interpret::Value, Ty<'tcx>)>,
 ) -> DepConstructor<'tcx> {
     DepConstructor::ConstValField { param_env }
-}
-
-fn cmp_const_vals_dep_node<'tcx>(
-    param_env: ty::ParamEnvAnd<'tcx, (
-        mir::interpret::Value,
-        mir::interpret::Value,
-        Ty<'tcx>,
-    )>,
-) -> DepConstructor<'tcx> {
-    DepConstructor::CmpConstVals { param_env }
 }
 
 fn mir_keys<'tcx>(_: CrateNum) -> DepConstructor<'tcx> {

@@ -10,7 +10,6 @@ use rustc::mir::Field;
 use rustc_data_structures::indexed_vec::Idx;
 
 use syntax::ast::Mutability;
-use syntax::symbol::Symbol;
 use syntax::codemap::Span;
 
 use rustc::mir::interpret::{EvalResult, EvalError, EvalErrorKind, GlobalId, Value, Pointer, PrimVal};
@@ -28,7 +27,7 @@ pub fn mk_eval_cx<'a, 'tcx>(
 ) -> EvalResult<'tcx, EvalContext<'a, 'tcx, CompileTimeEvaluator>> {
     debug!("mk_eval_cx: {:?}, {:?}", instance, param_env);
     let limits = super::ResourceLimits::default();
-    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator { require_const_fn: true }, ());
+    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator, ());
     let mir = ecx.load_mir(instance.def)?;
     // insert a stack frame so any queries have the correct substs
     ecx.push_stack_frame(
@@ -48,7 +47,7 @@ pub fn eval_body<'a, 'tcx>(
 ) -> EvalResult<'tcx, (Value, Pointer, Ty<'tcx>)> {
     debug!("eval_body: {:?}, {:?}", instance, param_env);
     let limits = super::ResourceLimits::default();
-    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator { require_const_fn: false }, ());
+    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator, ());
     let cid = GlobalId {
         instance,
         promoted: None,
@@ -132,9 +131,7 @@ pub fn eval_body_as_integer<'a, 'tcx>(
     })
 }
 
-pub struct CompileTimeEvaluator {
-    require_const_fn: bool,
-}
+pub struct CompileTimeEvaluator;
 
 impl<'tcx> Into<EvalError<'tcx>> for ConstEvalError {
     fn into(self) -> EvalError<'tcx> {
@@ -190,7 +187,7 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
         sig: ty::FnSig<'tcx>,
     ) -> EvalResult<'tcx, bool> {
         debug!("eval_fn_call: {:?}", instance);
-        if ecx.machine.require_const_fn && !ecx.tcx.is_const_fn(instance.def_id()) {
+        if !ecx.tcx.is_const_fn(instance.def_id()) {
             return Err(
                 ConstEvalError::NotConst(format!("calling non-const fn `{}`", instance)).into(),
             );
@@ -198,52 +195,10 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
         let mir = match ecx.load_mir(instance.def) {
             Ok(mir) => mir,
             Err(EvalError { kind: EvalErrorKind::NoMirFor(path), .. }) => {
-                if ecx.machine.require_const_fn {
-                    return Err(
-                        ConstEvalError::NeedsRfc(format!("calling extern function `{}`", path))
-                            .into(),
-                    );
-                }
-                let attrs = ecx.tcx.get_attrs(instance.def_id());
-                use syntax::attr;
-                let link_name = match attr::first_attr_value_str_by_name(&attrs, "link_name") {
-                    Some(name) => name.as_str(),
-                    None => ecx.tcx.item_name(instance.def_id()),
-                };
-                let (dest, dest_block) = destination.unwrap();
-                let dest_ty = sig.output();
-                match &link_name[..] {
-                    "memcmp" => {
-                        let left = ecx.into_ptr(args[0].value)?;
-                        let right = ecx.into_ptr(args[1].value)?;
-                        let n = ecx.value_to_primval(args[2])?.to_u64()?;
-
-                        let result = {
-                            let left_bytes = ecx.memory.read_bytes(left, n)?;
-                            let right_bytes = ecx.memory.read_bytes(right, n)?;
-
-                            use std::cmp::Ordering::*;
-                            match left_bytes.cmp(right_bytes) {
-                                Less => -1i8,
-                                Equal => 0,
-                                Greater => 1,
-                            }
-                        };
-
-                        ecx.write_primval(
-                            dest,
-                            PrimVal::Bytes(result as u128),
-                            dest_ty,
-                        )?;
-                    },
-                    // some simple things like `malloc` might get accepted in the future
-                    other => return Err(
-                        ConstEvalError::NeedsRfc(format!("calling extern function `{}`", other))
-                            .into(),
-                    ),
-                }
-                ecx.goto_block(dest_block);
-                return Ok(true);
+                return Err(
+                    ConstEvalError::NeedsRfc(format!("calling extern function `{}`", path))
+                        .into(),
+                );
             }
             Err(other) => return Err(other),
         };
@@ -287,12 +242,6 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
                 let ty = substs.type_at(0);
                 let size = ecx.layout_of(ty)?.size.bytes() as u128;
                 ecx.write_primval(dest, PrimVal::from_u128(size), dest_layout.ty)?;
-            }
-
-            "transmute" if !ecx.machine.require_const_fn => {
-                let src_ty = substs.type_at(0);
-                let ptr = ecx.force_allocation(dest)?.to_ptr()?;
-                ecx.write_value_to_ptr(args[0].value, ptr.into(), Align::from_bytes(1, 1).unwrap(), src_ty)?;
             }
 
             name => return Err(ConstEvalError::NeedsRfc(format!("calling intrinsic `{}`", name)).into()),
@@ -345,83 +294,6 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
         Err(
             ConstEvalError::NotConst("statics with `linkage` attribute".to_string()).into(),
         )
-    }
-}
-
-pub fn cmp_const_vals<'a, 'tcx>(
-    tcx: TyCtxt<'a, 'tcx, 'tcx>,
-    key: ty::ParamEnvAnd<'tcx, (Value, Value, Ty<'tcx>)>,
-) -> ::rustc::mir::interpret::EvalResult<'tcx, ::std::cmp::Ordering> {
-    let (a, b, ty) = key.value;
-    trace!("cmp_const_vals {:?}.cmp({:?}) ({:?})", a, b, ty);
-    let did = tcx.lang_items().ord_trait().expect("PartialOrd trait not registered");
-    let name = Symbol::intern("cmp");
-    for item in tcx.associated_items(did) {
-        trace!("{:?}", item);
-    }
-    let method = tcx
-        .associated_items(did)
-        .find(|item| item.kind == ty::AssociatedKind::Method && item.name == name)
-        .expect("cannot find cmp method on PartialOrd trait");
-    let substs = tcx.mk_substs_trait(ty, &[]);
-    let instance = Instance::resolve(tcx, key.param_env, method.def_id, substs).expect("cmp_const_vals could not find cmp method");
-
-    let limits = super::ResourceLimits::default();
-    let mut ecx = EvalContext::new(tcx, key.param_env, limits, CompileTimeEvaluator { require_const_fn: false }, ());
-
-    let return_ty = instance.ty(tcx).fn_sig(tcx).output();
-    let return_ty = return_ty.skip_binder();
-    let mir = ecx.load_mir(instance.def)?;
-    let layout = ecx.layout_of(return_ty)?;
-    assert!(!layout.is_unsized());
-    let ptr = ecx.memory.allocate(
-        layout.size.bytes(),
-        layout.align,
-        None,
-    )?;
-    let cleanup = StackPopCleanup::MarkStatic(Mutability::Immutable);
-    let name = ty::tls::with(|tcx| tcx.item_path_str(instance.def_id()));
-    trace!("const_eval: pushing stack frame for global: {}", name);
-    ecx.push_stack_frame(
-        instance,
-        mir.span,
-        mir,
-        Place::from_ptr(ptr, layout.align),
-        cleanup.clone(),
-    )?;
-
-    let arg_layout = ecx.layout_of(ty)?;
-    for (arg_local, value) in mir.args_iter().zip(vec![a, b]) {
-        let dest = ecx.eval_place(&mir::Place::Local(arg_local))?;
-        let ptr = ecx.memory.allocate(
-            arg_layout.size.bytes(),
-            arg_layout.align,
-            None,
-        )?;
-        ecx.write_value_to_ptr(
-            value,
-            ptr.into(),
-            arg_layout.align,
-            ty,
-        )?;
-        ecx.write_value(ValTy {
-            value: Value::ByVal(PrimVal::Ptr(ptr)),
-            ty: tcx.mk_imm_ptr(ty),
-        }, dest)?;
-    }
-
-    while ecx.step()? {}
-
-    let value = match ecx.try_read_value(PrimVal::Ptr(ptr).into(), layout.align, return_ty)? {
-        Some(Value::ByVal(PrimVal::Bytes(n))) => n as i128,
-        other => bug!("Ord::cmp produced {:?}", other),
-    };
-
-    match value {
-        -1 => Ok(::std::cmp::Ordering::Less),
-        0 => Ok(::std::cmp::Ordering::Equal),
-        1 => Ok(::std::cmp::Ordering::Greater),
-        n => bug!("{} is not a valid Ordering value", n),
     }
 }
 

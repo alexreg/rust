@@ -749,7 +749,6 @@ pub fn force_from_dep_node<'a, 'gcx, 'lcx>(tcx: TyCtxt<'a, 'gcx, 'lcx>,
         DepKind::Layout |
         DepKind::ConstEval |
         DepKind::ConstValField |
-        DepKind::CmpConstVals |
         DepKind::InstanceSymbolName |
         DepKind::MirShim |
         DepKind::BorrowCheckKrate |

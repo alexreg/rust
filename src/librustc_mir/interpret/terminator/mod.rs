@@ -46,7 +46,7 @@ impl<'a, 'tcx, M: Machine<'tcx>> EvalContext<'a, 'tcx, M> {
                 let mut target_block = targets[targets.len() - 1];
 
                 for (index, const_int) in values.iter().enumerate() {
-                    let prim = PrimVal::Bytes(const_int.to_u128_unchecked());
+                    let prim = PrimVal::Bytes(const_int);
                     if discr_prim.to_bytes()? == prim.to_bytes()? {
                         target_block = targets[index];
                         break;
