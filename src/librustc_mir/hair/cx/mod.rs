@@ -30,6 +30,7 @@ use syntax::attr;
 use syntax::symbol::Symbol;
 use rustc::hir;
 use rustc_const_math::{ConstInt, ConstUsize};
+use rustc::mir::interpret::{Value, PrimVal};
 use std::rc::Rc;
 
 #[derive(Clone)]
@@ -118,7 +119,11 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
             Ok(val) => {
                 Literal::Value {
                     value: self.tcx.mk_const(ty::Const {
-                        val: ConstVal::Integral(ConstInt::Usize(val)),
+                        val: if self.tcx.sess.opts.debugging_opts.miri {
+                            ConstVal::Value(Value::ByVal(PrimVal::Bytes(value as u128)))
+                        } else {
+                            ConstVal::Integral(ConstInt::Usize(val))
+                        },
                         ty: self.tcx.types.usize
                     })
                 }
@@ -138,7 +143,11 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
     pub fn true_literal(&mut self) -> Literal<'tcx> {
         Literal::Value {
             value: self.tcx.mk_const(ty::Const {
-                val: ConstVal::Bool(true),
+                val: if self.tcx.sess.opts.debugging_opts.miri {
+                    ConstVal::Value(Value::ByVal(PrimVal::Bytes(1)))
+                } else {
+                    ConstVal::Bool(true)
+                },
                 ty: self.tcx.types.bool
             })
         }
@@ -147,7 +156,11 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
     pub fn false_literal(&mut self) -> Literal<'tcx> {
         Literal::Value {
             value: self.tcx.mk_const(ty::Const {
-                val: ConstVal::Bool(false),
+                val: if self.tcx.sess.opts.debugging_opts.miri {
+                    ConstVal::Value(Value::ByVal(PrimVal::Bytes(0)))
+                } else {
+                    ConstVal::Bool(false)
+                },
                 ty: self.tcx.types.bool
             })
         }
@@ -160,6 +173,12 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
         sp: Span,
     ) -> Literal<'tcx> {
         let tcx = self.tcx.global_tcx();
+
+        if let ty::TyAdt(adt, _) = ty.sty {
+            if adt.is_enum() {
+                ty = adt.repr.discr_type().to_ty(tcx)
+            }
+        }
 
         let parse_float = |num: &str, fty| -> ConstFloat {
             ConstFloat::from_str(num, fty).unwrap_or_else(|_| {
@@ -219,12 +238,6 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
         use rustc::ty::util::IntTypeExt;
         use rustc::middle::const_val::ByteArray;
         use rustc_const_math::ConstFloat;
-
-        if let ty::TyAdt(adt, _) = ty.sty {
-            if adt.is_enum() {
-                ty = adt.repr.discr_type().to_ty(tcx)
-            }
-        }
 
         let lit = match *lit {
             LitKind::Str(ref s, _) => Ok(Str(s.as_str())),

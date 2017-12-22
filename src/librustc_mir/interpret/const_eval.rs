@@ -10,6 +10,7 @@ use rustc::mir::Field;
 use rustc_data_structures::indexed_vec::Idx;
 
 use syntax::ast::Mutability;
+use syntax::symbol::Symbol;
 use syntax::codemap::Span;
 
 use rustc::mir::interpret::{EvalResult, EvalError, EvalErrorKind, GlobalId, Value, Pointer, PrimVal};
@@ -38,6 +39,53 @@ pub fn mk_eval_cx<'a, 'tcx>(
         StackPopCleanup::None,
     )?;
     Ok(ecx)
+}
+
+pub fn eval_fn_call<'a, 'tcx>(
+    tcx: TyCtxt<'a, 'tcx, 'tcx>,
+    instance: Instance<'tcx>,
+    param_env: ty::ParamEnv<'tcx>,
+    args: Vec<ValTy<'tcx>>,
+) -> EvalResult<'tcx, Value> {
+    debug!("eval: {:?}, {:?}, {:#?}", instance, param_env, args);
+
+    let limits = super::ResourceLimits::default();
+    let mut ecx = EvalContext::new(tcx, param_env, limits, CompileTimeEvaluator, ());
+
+    let return_ty = instance.ty(tcx).fn_sig(tcx).output();
+    let return_ty = return_ty.skip_binder();
+    let mir = ecx.load_mir(instance.def)?;
+    let layout = ecx.layout_of(return_ty)?;
+    assert!(!layout.is_unsized());
+    let ptr = ecx.memory.allocate(
+        layout.size.bytes(),
+        layout.align,
+        None,
+    )?;
+    let cleanup = StackPopCleanup::MarkStatic(Mutability::Immutable);
+    let name = ty::tls::with(|tcx| tcx.item_path_str(instance.def_id()));
+    trace!("const_eval: pushing stack frame for global: {}", name);
+    ecx.push_stack_frame(
+        instance,
+        mir.span,
+        mir,
+        Place::from_ptr(ptr, layout.align),
+        cleanup.clone(),
+    )?;
+
+    for (arg_local, valty) in mir.args_iter().zip(args) {
+        let dest = ecx.eval_place(&mir::Place::Local(arg_local))?;
+        ecx.write_value(valty, dest)?;
+    }
+
+    while ecx.step()? {}
+
+    let align = layout.align;
+    let value = match ecx.try_read_value(PrimVal::Ptr(ptr).into(), align, return_ty)? {
+        Some(val) => val,
+        _ => unimplemented!("ByRef ad hoc fn eval",)
+    };
+    Ok(value)
 }
 
 pub fn eval_body<'a, 'tcx>(
@@ -295,6 +343,40 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
         Err(
             ConstEvalError::NotConst("statics with `linkage` attribute".to_string()).into(),
         )
+    }
+}
+
+pub fn cmp_const_vals<'a, 'tcx>(
+    tcx: TyCtxt<'a, 'tcx, 'tcx>,
+    key: ty::ParamEnvAnd<'tcx, (Value, Value, Ty<'tcx>)>,
+) -> ::rustc::mir::interpret::EvalResult<'tcx, ::std::cmp::Ordering> {
+    let (a, b, ty) = key.value;
+    trace!("cmp_const_vals {:?}.cmp({:?}) ({:?})", a, b, ty);
+    let did = tcx.lang_items().ord_trait().expect("PartialOrd trait not registered");
+    let name = Symbol::intern("cmp");
+    for item in tcx.associated_items(did) {
+        trace!("{:?}", item);
+    }
+    let method = tcx
+        .associated_items(did)
+        .find(|item| item.kind == ty::AssociatedKind::Method && item.name == name)
+        .expect("cannot find cmp method on PartialOrd trait");
+    let substs = tcx.mk_substs_trait(ty, &[]);
+    let instance = Instance::resolve(tcx, key.param_env, method.def_id, substs).expect("cmp_const_vals could not find cmp method");
+    let args = vec![
+        ValTy { value: a, ty },
+        ValTy { value: b, ty },
+    ];
+    let val = eval_fn_call(tcx, instance, key.param_env, args)?;
+    if let Value::ByVal(PrimVal::Bytes(n)) = val {
+        match n as i128 {
+            -1 => Ok(::std::cmp::Ordering::Less),
+            0 => Ok(::std::cmp::Ordering::Equal),
+            1 => Ok(::std::cmp::Ordering::Greater),
+            n => bug!("{} is not a valid Ordering value", n),
+        }
+    } else {
+        bug!("cmp_const_vals got {:?} from miri", val);
     }
 }
 

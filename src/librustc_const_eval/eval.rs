@@ -13,7 +13,6 @@ use rustc::middle::const_val::ConstAggregate::*;
 use rustc::middle::const_val::ErrKind::*;
 use rustc::middle::const_val::{ByteArray, ConstVal, ConstEvalErr, EvalResult, ErrKind};
 
-use rustc::mir::interpret::{Value, PrimVal};
 use rustc::hir::map::blocks::FnLikeNode;
 use rustc::hir::def::{Def, CtorKind};
 use rustc::hir::def_id::DefId;
@@ -676,9 +675,14 @@ fn parse_float<'tcx>(num: &str, fty: ast::FloatTy)
     })
 }
 
-pub fn compare_const_vals(tcx: TyCtxt, span: Span, a: &ConstVal, b: &ConstVal, ty: Ty)
-                          -> Result<Ordering, ErrorReported>
-{
+pub fn compare_const_vals<'a, 'tcx: 'a>(
+    tcx: TyCtxt<'a, 'tcx, 'tcx>,
+    param_env: ty::ParamEnv<'tcx>,
+    span: Span,
+    a: &ConstVal<'tcx>,
+    b: &ConstVal<'tcx>,
+    ty: Ty<'tcx>,
+) -> Result<Ordering, ErrorReported> {
     let result = match (a, b) {
         (&Integral(a), &Integral(b)) => a.try_cmp(b).ok(),
         (&Float(a), &Float(b)) => a.try_cmp(b).ok(),
@@ -686,30 +690,7 @@ pub fn compare_const_vals(tcx: TyCtxt, span: Span, a: &ConstVal, b: &ConstVal, t
         (&Bool(a), &Bool(b)) => Some(a.cmp(&b)),
         (&ByteStr(a), &ByteStr(b)) => Some(a.data.cmp(b.data)),
         (&Char(a), &Char(b)) => Some(a.cmp(&b)),
-        (&Value(Value::ByVal(PrimVal::Bytes(a))),
-         &Value(Value::ByVal(PrimVal::Bytes(b)))) => {
-             if ty.is_signed() {
-                Some((a as i128).cmp(&(b as i128)))
-             } else {
-                Some(a.cmp(&b))
-             }
-         },
-         (&Value(Value::ByValPair(PrimVal::Ptr(p1), PrimVal::Bytes(b1))),
-          &Value(Value::ByValPair(PrimVal::Ptr(p2), PrimVal::Bytes(b2)))) => {
-            let alloc1 = tcx
-                .interpret_interner
-                .borrow()
-                .get_alloc(p1.alloc_id.0)
-                .unwrap();
-            let alloc2 = tcx
-                .interpret_interner
-                .borrow()
-                .get_alloc(p2.alloc_id.0)
-                .unwrap();
-            let a1 = &alloc1.bytes[(p1.offset as usize)..][..(b1 as usize)];
-            let a2 = &alloc2.bytes[(p2.offset as usize)..][..(b2 as usize)];
-            Some(a1.cmp(&a2))
-          }
+        (&Value(a), &Value(b)) => Some(tcx.cmp_const_vals(param_env.and((a, b, ty))).unwrap()),
         _ => None,
     };
 
@@ -740,6 +721,6 @@ impl<'a, 'tcx> ConstContext<'a, 'tcx> {
                 return Err(ErrorReported);
             }
         };
-        compare_const_vals(tcx, span, &a.val, &b.val, ty)
+        compare_const_vals(tcx, self.param_env, span, &a.val, &b.val, ty)
     }
 }

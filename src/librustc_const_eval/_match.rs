@@ -26,6 +26,7 @@ use pattern::{PatternFoldable, PatternFolder};
 use rustc::hir::def_id::DefId;
 use rustc::hir::RangeEnd;
 use rustc::ty::{self, Ty, TyCtxt, TypeFoldable};
+use rustc::traits::Reveal;
 
 use rustc::mir::Field;
 use rustc::mir::interpret::{Value, PrimVal};
@@ -977,15 +978,23 @@ fn slice_pat_covered_by_constructor(tcx: TyCtxt, _span: Span,
     Ok(true)
 }
 
-fn constructor_covered_by_range(tcx: TyCtxt, span: Span,
-                                ctor: &Constructor,
-                                from: &ConstVal, to: &ConstVal,
+fn constructor_covered_by_range<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, span: Span,
+                                ctor: &Constructor<'tcx>,
+                                from: &ConstVal<'tcx>, to: &ConstVal<'tcx>,
                                 end: RangeEnd,
-                                ty: Ty)
+                                ty: Ty<'tcx>)
                                 -> Result<bool, ErrorReported> {
     trace!("constructor_covered_by_range {:?}, {:?}, {}", from, to, ty);
-    let cmp_from = |c_from| Ok(compare_const_vals(tcx, span, c_from, from, ty)? != Ordering::Less);
-    let cmp_to = |c_to| compare_const_vals(tcx, span, c_to, to, ty);
+    let param_env = ty::ParamEnv::empty(Reveal::All);
+    let cmp_from = |c_from| Ok(compare_const_vals(
+        tcx,
+        param_env,
+        span,
+        c_from,
+        from,
+        ty,
+    )? != Ordering::Less);
+    let cmp_to = |c_to| compare_const_vals(tcx, param_env, span, c_to, to, ty);
     match *ctor {
         ConstantValue(value) => {
             let to = cmp_to(&value.val)?;
@@ -1036,7 +1045,7 @@ fn patterns_for_variant<'p, 'a: 'p, 'tcx: 'a>(
 fn specialize<'p, 'a: 'p, 'tcx: 'a>(
     cx: &mut MatchCheckCtxt<'a, 'tcx>,
     r: &[&'p Pattern<'tcx>],
-    constructor: &Constructor,
+    constructor: &Constructor<'tcx>,
     wild_patterns: &[&'p Pattern<'tcx>])
     -> Option<Vec<&'p Pattern<'tcx>>>
 {

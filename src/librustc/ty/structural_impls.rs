@@ -802,6 +802,29 @@ impl<
     }
 }
 
+impl<
+    'tcx,
+    T: TypeFoldable<'tcx>,
+    U: TypeFoldable<'tcx>,
+    V: TypeFoldable<'tcx>,
+> TypeFoldable<'tcx> for (T, U, V) {
+    fn super_fold_with<'gcx: 'tcx, F: TypeFolder<'gcx, 'tcx>>(
+        &self, folder: &mut F,
+    ) -> (T, U, V) {
+        (
+            self.0.fold_with(folder),
+            self.1.fold_with(folder),
+            self.2.fold_with(folder),
+        )
+    }
+
+    fn super_visit_with<TV: TypeVisitor<'tcx>>(&self, visitor: &mut TV) -> bool {
+        self.0.visit_with(visitor) ||
+        self.1.visit_with(visitor) ||
+        self.2.visit_with(visitor)
+    }
+}
+
 impl<'tcx, T:TypeFoldable<'tcx>, U:TypeFoldable<'tcx>> TypeFoldable<'tcx> for (T, U) {
     fn super_fold_with<'gcx: 'tcx, F: TypeFolder<'gcx, 'tcx>>(&self, folder: &mut F) -> (T, U) {
         (self.0.fold_with(folder), self.1.fold_with(folder))

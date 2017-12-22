@@ -125,6 +125,15 @@ impl<'tcx> Key for (ty::Instance<'tcx>, mir::Field, mir::interpret::Value, Ty<'t
     }
 }
 
+impl<'tcx> Key for (mir::interpret::Value, mir::interpret::Value, Ty<'tcx>) {
+    fn map_crate(&self) -> CrateNum {
+        LOCAL_CRATE
+    }
+    fn default_span(&self, _tcx: TyCtxt) -> Span {
+        DUMMY_SP
+    }
+}
+
 impl<'tcx> Key for (ty::ParamEnv<'tcx>, ty::PolyTraitRef<'tcx>) {
     fn map_crate(&self) -> CrateNum {
         self.1.def_id().krate

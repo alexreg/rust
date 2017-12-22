@@ -170,6 +170,18 @@ impl<'tcx> QueryDescription<'tcx> for queries::const_val_field<'tcx> {
     }
 }
 
+impl<'tcx> QueryDescription<'tcx> for queries::cmp_const_vals<'tcx> {
+    fn describe(
+        _: TyCtxt,
+        key: ty::ParamEnvAnd<'tcx, (mir::interpret::Value, mir::interpret::Value, Ty<'tcx>)>,
+    ) -> String {
+        format!(
+            "const cmp {:?} and {:?} ({})",
+            key.value.0, key.value.1, key.value.2,
+        )
+    }
+}
+
 impl<'tcx> QueryDescription<'tcx> for queries::mir_keys<'tcx> {
     fn describe(_: TyCtxt, _: CrateNum) -> String {
         format!("getting a list of all mir_keys")
