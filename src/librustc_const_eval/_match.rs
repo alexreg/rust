@@ -623,7 +623,7 @@ pub fn is_useful<'p, 'a: 'p, 'tcx: 'a>(cx: &mut MatchCheckCtxt<'a, 'tcx>,
                            witness: WitnessPreference)
                            -> Usefulness<'tcx> {
     let &Matrix(ref rows) = matrix;
-    debug!("is_useful({:?}, {:?})", matrix, v);
+    debug!("is_useful({:#?}, {:#?})", matrix, v);
 
     // The base case. We are pattern-matching on () and the return value is
     // based on whether our matrix has a row or not.
@@ -649,10 +649,10 @@ pub fn is_useful<'p, 'a: 'p, 'tcx: 'a>(cx: &mut MatchCheckCtxt<'a, 'tcx>,
         max_slice_length: max_slice_length(cx, rows.iter().map(|r| r[0]).chain(Some(v[0])))
     };
 
-    debug!("is_useful_expand_first_col: pcx={:?}, expanding {:?}", pcx, v[0]);
+    debug!("is_useful_expand_first_col: pcx={:#?}, expanding {:#?}", pcx, v[0]);
 
     if let Some(constructors) = pat_constructors(cx, v[0], pcx) {
-        debug!("is_useful - expanding constructors: {:?}", constructors);
+        debug!("is_useful - expanding constructors: {:#?}", constructors);
         constructors.into_iter().map(|c|
             is_useful_specialized(cx, matrix, v, c.clone(), pcx.ty, witness)
         ).find(|result| result.is_useful()).unwrap_or(NotUseful)
@@ -662,9 +662,9 @@ pub fn is_useful<'p, 'a: 'p, 'tcx: 'a>(cx: &mut MatchCheckCtxt<'a, 'tcx>,
         let used_ctors: Vec<Constructor> = rows.iter().flat_map(|row| {
             pat_constructors(cx, row[0], pcx).unwrap_or(vec![])
         }).collect();
-        debug!("used_ctors = {:?}", used_ctors);
+        debug!("used_ctors = {:#?}", used_ctors);
         let all_ctors = all_constructors(cx, pcx);
-        debug!("all_ctors = {:?}", all_ctors);
+        debug!("all_ctors = {:#?}", all_ctors);
         let missing_ctors: Vec<Constructor> = all_ctors.iter().filter(|c| {
             !used_ctors.contains(*c)
         }).cloned().collect();
@@ -692,7 +692,7 @@ pub fn is_useful<'p, 'a: 'p, 'tcx: 'a>(cx: &mut MatchCheckCtxt<'a, 'tcx>,
             all_ctors.is_empty() && !cx.is_uninhabited(pcx.ty);
         let is_declared_nonexhaustive =
             cx.is_non_exhaustive_enum(pcx.ty) && !cx.is_local(pcx.ty);
-        debug!("missing_ctors={:?} is_privately_empty={:?} is_declared_nonexhaustive={:?}",
+        debug!("missing_ctors={:#?} is_privately_empty={:#?} is_declared_nonexhaustive={:#?}",
                missing_ctors, is_privately_empty, is_declared_nonexhaustive);
 
         // For privately empty and non-exhaustive enums, we work as if there were an "extra"
@@ -792,7 +792,7 @@ fn is_useful_specialized<'p, 'a:'p, 'tcx: 'a>(
     lty: Ty<'tcx>,
     witness: WitnessPreference) -> Usefulness<'tcx>
 {
-    debug!("is_useful_specialized({:?}, {:?}, {:?})", v, ctor, lty);
+    debug!("is_useful_specialized({:#?}, {:#?}, {:?})", v, ctor, lty);
     let sub_pat_tys = constructor_sub_pattern_tys(cx, &ctor, lty);
     let wild_patterns_owned: Vec<_> = sub_pat_tys.iter().map(|ty| {
         Pattern {
@@ -865,7 +865,7 @@ fn pat_constructors<'tcx>(_cx: &mut MatchCheckCtxt,
 /// For instance, a tuple pattern (_, 42, Some([])) has the arity of 3.
 /// A struct pattern's arity is the number of fields it contains, etc.
 fn constructor_arity(_cx: &MatchCheckCtxt, ctor: &Constructor, ty: Ty) -> u64 {
-    debug!("constructor_arity({:?}, {:?})", ctor, ty);
+    debug!("constructor_arity({:#?}, {:?})", ctor, ty);
     match ty.sty {
         ty::TyTuple(ref fs, _) => fs.len() as u64,
         ty::TySlice(..) | ty::TyArray(..) => match *ctor {
@@ -889,7 +889,7 @@ fn constructor_sub_pattern_tys<'a, 'tcx: 'a>(cx: &MatchCheckCtxt<'a, 'tcx>,
                                              ctor: &Constructor,
                                              ty: Ty<'tcx>) -> Vec<Ty<'tcx>>
 {
-    debug!("constructor_sub_pattern_tys({:?}, {:?})", ctor, ty);
+    debug!("constructor_sub_pattern_tys({:#?}, {:?})", ctor, ty);
     match ty.sty {
         ty::TyTuple(ref fs, _) => fs.into_iter().map(|t| *t).collect(),
         ty::TySlice(ty) | ty::TyArray(ty, _) => match *ctor {
@@ -982,7 +982,7 @@ fn constructor_covered_by_range(ctor: &Constructor,
                                 end: RangeEnd,
                                 ty: Ty)
                                 -> Result<bool, ErrorReported> {
-    trace!("constructor_covered_by_range {:?}, {:?}, {}", from, to, ty);
+    trace!("constructor_covered_by_range {:#?}, {:#?}, {:#?}, {}", ctor, from, to, ty);
     let cmp_from = |c_from| compare_const_vals(c_from, from, ty)
         .map(|res| res != Ordering::Less);
     let cmp_to = |c_to| compare_const_vals(c_to, to, ty);
@@ -990,7 +990,7 @@ fn constructor_covered_by_range(ctor: &Constructor,
         ($e:expr) => {
             match $e {
                 Some(to) => to,
-                None => return Ok(true), // not char or int
+                None => return Ok(false), // not char or int
             }
         };
     }
@@ -1029,7 +1029,7 @@ fn patterns_for_variant<'p, 'a: 'p, 'tcx: 'a>(
         result[subpat.field.index()] = &subpat.pattern;
     }
 
-    debug!("patterns_for_variant({:?}, {:?}) = {:?}", subpatterns, wild_patterns, result);
+    debug!("patterns_for_variant({:#?}, {:#?}) = {:#?}", subpatterns, wild_patterns, result);
     result
 }
 
@@ -1157,7 +1157,7 @@ fn specialize<'p, 'a: 'p, 'tcx: 'a>(
             }
         }
     };
-    debug!("specialize({:?}, {:?}) = {:?}", r[0], wild_patterns, head);
+    debug!("specialize({:#?}, {:#?}) = {:#?}", r[0], wild_patterns, head);
 
     head.map(|mut head| {
         head.extend_from_slice(&r[1 ..]);

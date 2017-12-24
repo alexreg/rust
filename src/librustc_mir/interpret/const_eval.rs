@@ -1,5 +1,5 @@
 use rustc::ty::{self, TyCtxt, Ty, Instance};
-use rustc::ty::layout::{self, LayoutOf, Align};
+use rustc::ty::layout::{self, LayoutOf};
 use rustc::ty::subst::Substs;
 use rustc::hir::def_id::DefId;
 use rustc::mir;
@@ -13,7 +13,7 @@ use syntax::ast::Mutability;
 use syntax::codemap::Span;
 
 use rustc::mir::interpret::{EvalResult, EvalError, EvalErrorKind, GlobalId, Value, Pointer, PrimVal};
-use super::{Place, EvalContext, StackPopCleanup, ValTy, HasMemory};
+use super::{Place, EvalContext, StackPopCleanup, ValTy};
 
 use rustc_const_math::ConstInt;
 
@@ -182,9 +182,9 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
         ecx: &mut EvalContext<'a, 'tcx, Self>,
         instance: ty::Instance<'tcx>,
         destination: Option<(Place, mir::BasicBlock)>,
-        args: &[ValTy<'tcx>],
+        _args: &[ValTy<'tcx>],
         span: Span,
-        sig: ty::FnSig<'tcx>,
+        _sig: ty::FnSig<'tcx>,
     ) -> EvalResult<'tcx, bool> {
         debug!("eval_fn_call: {:?}", instance);
         if !ecx.tcx.is_const_fn(instance.def_id()) {
@@ -222,7 +222,7 @@ impl<'tcx> super::Machine<'tcx> for CompileTimeEvaluator {
     fn call_intrinsic<'a>(
         ecx: &mut EvalContext<'a, 'tcx, Self>,
         instance: ty::Instance<'tcx>,
-        args: &[ValTy<'tcx>],
+        _args: &[ValTy<'tcx>],
         dest: Place,
         dest_layout: layout::TyLayout<'tcx>,
         target: mir::BasicBlock,

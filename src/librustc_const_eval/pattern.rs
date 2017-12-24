@@ -672,7 +672,7 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                             ty = adt.repr.discr_type().to_ty(self.tcx)
                         }
                     }
-                    match ::eval::lit_to_const(&lit.node, self.tcx, ty) {
+                    match ::eval::lit_to_const(&lit.node, self.tcx, ty, false) {
                         Ok(value) => PatternKind::Constant {
                             value: self.tcx.mk_const(ty::Const {
                                 ty,
@@ -689,6 +689,34 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                     }
                 },
                 hir::ExprPath(ref qpath) => *self.lower_path(qpath, expr.hir_id, expr.span).kind,
+                hir::ExprUnary(hir::UnNeg, ref expr) => {
+                    let mut ty = self.tables.expr_ty(expr);
+                    if let ty::TyAdt(adt, _) = ty.sty {
+                        if adt.is_enum() {
+                            use rustc::ty::util::IntTypeExt;
+                            ty = adt.repr.discr_type().to_ty(self.tcx)
+                        }
+                    }
+                    let lit = match expr.node {
+                        hir::ExprLit(ref lit) => lit,
+                        _ => span_bug!(expr.span, "not a literal: {:?}", expr),
+                    };
+                    match ::eval::lit_to_const(&lit.node, self.tcx, ty, true) {
+                        Ok(value) => PatternKind::Constant {
+                            value: self.tcx.mk_const(ty::Const {
+                                ty,
+                                val: value,
+                            }),
+                        },
+                        Err(e) => {
+                            self.errors.push(PatternError::ConstEval(ConstEvalErr {
+                                span: lit.span,
+                                kind: e,
+                            }));
+                            PatternKind::Wild
+                        },
+                    }
+                }
                 _ => span_bug!(expr.span, "not a literal: {:?}", expr),
             }
         }

@@ -83,8 +83,10 @@ impl<'a, 'tcx> Const<'tcx> {
         Const { llval: llval, ty: ty }
     }
 
-    fn from_bytes(ccx: &CrateContext<'a, 'tcx>, b: u128, ty: Ty<'tcx>) -> Const<'tcx> {
+    pub fn from_bytes(ccx: &CrateContext<'a, 'tcx>, b: u128, ty: Ty<'tcx>) -> Const<'tcx> {
         let llval = match ty.sty {
+            ty::TyInt(ast::IntTy::I128) |
+            ty::TyUint(ast::UintTy::U128) => C_uint_big(Type::i128(ccx), b),
             ty::TyInt(i) => C_int(Type::int_from_ty(ccx, i), b as i128 as i64),
             ty::TyUint(u) => C_uint(Type::uint_from_ty(ccx, u), b as u64),
             ty::TyBool => {

@@ -425,7 +425,7 @@ impl<'l, 'b, 'tcx, D> DropCtxt<'l, 'b, 'tcx, D>
                     variant_path,
                     &adt.variants[variant_index],
                     substs);
-                values.push(discr);
+                values.push(discr.to_u128().unwrap());
                 if let Unwind::To(unwind) = unwind {
                     // We can't use the half-ladder from the original
                     // drop ladder, because this breaks the
@@ -799,7 +799,7 @@ impl<'l, 'b, 'tcx, D> DropCtxt<'l, 'b, 'tcx, D>
                 self.complete_drop(Some(DropFlagMode::Deep), succ, unwind)
             }
             ty::TyArray(ety, size) => self.open_drop_for_array(
-                ety, size.val.to_u128() as u64),
+                ety, size.val.to_u128().map(|i| i as u64)),
             ty::TySlice(ety) => self.open_drop_for_array(ety, None),
 
             _ => bug!("open drop from non-ADT `{:?}`", ty)
