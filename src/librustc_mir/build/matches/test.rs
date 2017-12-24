@@ -263,12 +263,20 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 let bytes = match value.val {
                     ConstVal::ByteStr(bytes) => Some(bytes.data),
                     ConstVal::Value(Value::ByVal(PrimVal::Ptr(p))) => {
-                        self.hir
-                            .tcx()
-                            .interpret_interner
-                            .borrow()
-                            .get_alloc(p.alloc_id.0)
-                            .map(|alloc| &alloc.bytes[..])
+                        let is_array_ptr = ty
+                            .builtin_deref(true, ty::NoPreference)
+                            .and_then(|t| t.ty.builtin_index())
+                            .map_or(false, |t| t == self.hir.tcx().types.u8);
+                        if is_array_ptr {
+                            self.hir
+                                .tcx()
+                                .interpret_interner
+                                .borrow()
+                                .get_alloc(p.alloc_id.0)
+                                .map(|alloc| &alloc.bytes[..])
+                        } else {
+                            None
+                        }
                     },
                     _ => None,
                 };
@@ -308,10 +316,15 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
                 // Use PartialEq::eq for &str and &[u8] slices, instead of BinOp::Eq.
                 let fail = self.cfg.start_new_block();
-                if let ty::TyRef(_, mt) = ty.sty {
-                    assert!(ty.is_slice());
+                let str_or_bytestr = ty
+                    .builtin_deref(true, ty::NoPreference)
+                    .and_then(|tam| match tam.ty.sty {
+                        ty::TyStr => Some(tam.ty),
+                        ty::TySlice(inner) if inner == self.hir.tcx().types.u8 => Some(tam.ty),
+                        _ => None,
+                    });
+                if let Some(ty) = str_or_bytestr {
                     let eq_def_id = self.hir.tcx().lang_items().eq_trait().unwrap();
-                    let ty = mt.ty;
                     let (mty, method) = self.hir.trait_method(eq_def_id, "eq", ty, &[ty]);
 
                     let bool_ty = self.hir.bool_ty();

@@ -12,6 +12,7 @@ use hir::def_id::DefId;
 use infer::type_variable;
 use middle::const_val::ConstVal;
 use ty::{self, BoundRegion, DefIdTree, Region, Ty, TyCtxt};
+use mir::interpret::{Value, PrimVal};
 
 use std::fmt;
 use syntax::abi;
@@ -193,10 +194,12 @@ impl<'a, 'gcx, 'lcx, 'tcx> ty::TyS<'tcx> {
             ty::TyAdt(def, _) => format!("{} `{}`", def.descr(), tcx.item_path_str(def.did)),
             ty::TyForeign(def_id) => format!("extern type `{}`", tcx.item_path_str(def_id)),
             ty::TyArray(_, n) => {
-                if let ConstVal::Integral(ConstInt::Usize(n)) = n.val {
-                    format!("array of {} elements", n)
-                } else {
-                    "array".to_string()
+                match n.val {
+                    ConstVal::Integral(ConstInt::Usize(n)) =>
+                        format!("array of {} elements", n),
+                    ConstVal::Value(Value::ByVal(PrimVal::Bytes(n))) =>
+                        format!("array of {} elements", n),
+                    _ => "array".to_string(),
                 }
             }
             ty::TySlice(_) => "slice".to_string(),

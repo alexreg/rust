@@ -12,6 +12,7 @@ use eval;
 
 use rustc::middle::const_val::{ConstEvalErr, ConstVal, ConstAggregate};
 use rustc::mir::{Field, BorrowKind, Mutability};
+use rustc::mir::interpret::{Value, PrimVal};
 use rustc::ty::{self, TyCtxt, AdtDef, Ty, Region};
 use rustc::ty::subst::{Substs, Kind};
 use rustc::hir::{self, PatKind, RangeEnd};
@@ -107,19 +108,32 @@ pub enum PatternKind<'tcx> {
     },
 }
 
-fn print_const_val(value: &ConstVal, f: &mut fmt::Formatter) -> fmt::Result {
-    match *value {
+fn print_const_val(value: &ty::Const, f: &mut fmt::Formatter) -> fmt::Result {
+    match value.val {
         ConstVal::Float(ref x) => write!(f, "{}", x),
         ConstVal::Integral(ref i) => write!(f, "{}", i),
         ConstVal::Str(ref s) => write!(f, "{:?}", &s[..]),
         ConstVal::ByteStr(b) => write!(f, "{:?}", b.data),
         ConstVal::Bool(b) => write!(f, "{:?}", b),
         ConstVal::Char(c) => write!(f, "{:?}", c),
+        ConstVal::Value(v) => print_miri_value(v, value.ty, f),
         ConstVal::Variant(_) |
         ConstVal::Function(..) |
         ConstVal::Aggregate(_) |
-        ConstVal::Value(_) |
         ConstVal::Unevaluated(..) => bug!("{:?} not printable in a pattern", value)
+    }
+}
+
+fn print_miri_value(value: Value, ty: Ty, f: &mut fmt::Formatter) -> fmt::Result {
+    use rustc::ty::TypeVariants::*;
+    match (value, &ty.sty) {
+        (Value::ByVal(PrimVal::Bytes(0)), &TyBool) => write!(f, "false"),
+        (Value::ByVal(PrimVal::Bytes(1)), &TyBool) => write!(f, "true"),
+        (Value::ByVal(PrimVal::Bytes(n)), &TyUint(..)) => write!(f, "{:?}", n),
+        (Value::ByVal(PrimVal::Bytes(n)), &TyInt(..)) => write!(f, "{:?}", n as i128),
+        (Value::ByVal(PrimVal::Bytes(n)), &TyChar) =>
+            write!(f, "{:?}", ::std::char::from_u32(n as u32).unwrap()),
+        _ => bug!("{:?}: {} not printable in a pattern", value, ty),
     }
 }
 
@@ -230,15 +244,15 @@ impl<'tcx> fmt::Display for Pattern<'tcx> {
                 write!(f, "{}", subpattern)
             }
             PatternKind::Constant { value } => {
-                print_const_val(&value.val, f)
+                print_const_val(value, f)
             }
             PatternKind::Range { lo, hi, end } => {
-                print_const_val(&lo.val, f)?;
+                print_const_val(lo, f)?;
                 match end {
                     RangeEnd::Included => write!(f, "...")?,
                     RangeEnd::Excluded => write!(f, "..")?,
                 }
-                print_const_val(&hi.val, f)
+                print_const_val(hi, f)
             }
             PatternKind::Slice { ref prefix, ref slice, ref suffix } |
             PatternKind::Array { ref prefix, ref slice, ref suffix } => {

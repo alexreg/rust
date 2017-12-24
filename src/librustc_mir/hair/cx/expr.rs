@@ -282,7 +282,7 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
         }
 
         hir::ExprLit(ref lit) => ExprKind::Literal {
-            literal: cx.const_eval_literal(&lit.node, expr_ty, lit.span),
+            literal: cx.const_eval_literal(&lit.node, expr_ty, lit.span, false),
         },
 
         hir::ExprBinary(op, ref lhs, ref rhs) => {
@@ -369,9 +369,15 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
             if cx.tables().is_method_call(expr) {
                 overloaded_operator(cx, expr, vec![arg.to_ref()])
             } else {
-                ExprKind::Unary {
-                    op: UnOp::Neg,
-                    arg: arg.to_ref(),
+                if let hir::ExprLit(ref lit) = arg.node {
+                    ExprKind::Literal {
+                        literal: cx.const_eval_literal(&lit.node, expr_ty, lit.span, true),
+                    }
+                } else {
+                    ExprKind::Unary {
+                        op: UnOp::Neg,
+                        arg: arg.to_ref(),
+                    }
                 }
             }
         }

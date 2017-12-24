@@ -79,6 +79,7 @@ use transform::{MirPass, MirSource};
 use transform::simplify;
 use transform::no_landing_pads::no_landing_pads;
 use dataflow::{do_dataflow, DebugFormatted, MaybeStorageLive, state_for_location};
+use rustc::mir::interpret::{Value, PrimVal};
 
 pub struct StateTransform;
 
@@ -180,7 +181,11 @@ impl<'a, 'tcx> TransformVisitor<'a, 'tcx> {
             ty: self.tcx.types.u32,
             literal: Literal::Value {
                 value: self.tcx.mk_const(ty::Const {
-                    val: ConstVal::Integral(ConstInt::U32(state_disc)),
+                    val: if self.tcx.sess.opts.debugging_opts.miri {
+                        ConstVal::Value(Value::ByVal(PrimVal::Bytes(state_disc.into())))
+                    } else {
+                        ConstVal::Integral(ConstInt::U32(state_disc))
+                    },
                     ty: self.tcx.types.u32
                 }),
             },

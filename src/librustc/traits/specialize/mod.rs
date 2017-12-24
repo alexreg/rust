@@ -307,6 +307,7 @@ impl SpecializesCache {
 pub(super) fn specialization_graph_provider<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                                       trait_id: DefId)
                                                       -> Rc<specialization_graph::Graph> {
+    trace!("specialization_graph_provider {:?}", trait_id);
     let mut sg = specialization_graph::Graph::new();
 
     let mut trait_impls = Vec::new();
@@ -317,6 +318,11 @@ pub(super) fn specialization_graph_provider<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx
     // negated CrateNum (so remote definitions are visited first) and then
     // by a flattened version of the DefIndex.
     trait_impls.sort_unstable_by_key(|def_id| {
+        trace!("specialization_graph_provider {:?}", def_id);
+        trace!("specialization_graph_provider:0 {:?}", def_id.krate);
+        trace!("specialization_graph_provider:1 {:?}", def_id.krate.as_u32());
+        trace!("specialization_graph_provider:2 {:?}", def_id.krate.as_u32() as i64);
+        trace!("specialization_graph_provider:3 {:?}", -(def_id.krate.as_u32() as i64));
         (-(def_id.krate.as_u32() as i64),
          def_id.index.address_space().index(),
          def_id.index.as_array_index())

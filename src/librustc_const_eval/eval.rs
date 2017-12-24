@@ -556,9 +556,11 @@ pub fn lit_to_const<'a, 'tcx>(lit: &'tcx ast::LitKind,
                 Value::ByVal(PrimVal::Ptr(ptr))
             },
             LitKind::Byte(n) => Value::ByVal(PrimVal::Bytes(n as u128)),
-            LitKind::Int(n, _) if neg && n as i128 == i128::min_value() =>
-                Value::ByVal(PrimVal::Bytes(i128::min_value() as u128)),
-            LitKind::Int(n, _) if neg => Value::ByVal(PrimVal::Bytes((-(n as i128)) as u128)),
+            LitKind::Int(n, _) if neg => {
+                let n = n as i128;
+                let n = n.overflowing_neg().0;
+                Value::ByVal(PrimVal::Bytes(n as u128))
+            },
             LitKind::Int(n, _) => Value::ByVal(PrimVal::Bytes(n as u128)),
             LitKind::Float(n, fty) => {
                 let n = n.as_str();
@@ -595,15 +597,15 @@ pub fn lit_to_const<'a, 'tcx>(lit: &'tcx ast::LitKind,
                 (&ty::TyInt(ity), _) |
                 (_, Signed(ity)) => {
                     let mut n = n as i128;
-                    if neg && n != i128::min_value() {
-                        n = -n;
+                    if neg {
+                        n = n.overflowing_neg().0;
                     }
                     Ok(Integral(ConstInt::new_signed_truncating(n,
                         ity, tcx.sess.target.isize_ty)))
                 }
                 (&ty::TyUint(uty), _) |
                 (_, Unsigned(uty)) => {
-                    Ok(Integral(ConstInt::new_unsigned_truncating(n as u128,
+                    Ok(Integral(ConstInt::new_unsigned_truncating(n,
                         uty, tcx.sess.target.usize_ty)))
                 }
                 _ => bug!()

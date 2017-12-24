@@ -31,6 +31,7 @@ use middle::lang_items;
 use middle::resolve_lifetime::{self, ObjectLifetimeDefault};
 use middle::stability;
 use mir::{Mir, interpret};
+use mir::interpret::{Value, PrimVal};
 use ty::subst::{Kind, Substs};
 use ty::ReprOptions;
 use ty::Instance;
@@ -2018,7 +2019,11 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
 
     pub fn mk_array_const_usize(self, ty: Ty<'tcx>, n: ConstUsize) -> Ty<'tcx> {
         self.mk_ty(TyArray(ty, self.mk_const(ty::Const {
-            val: ConstVal::Integral(ConstInt::Usize(n)),
+            val: if self.sess.opts.debugging_opts.miri {
+                ConstVal::Value(Value::ByVal(PrimVal::Bytes(n.as_u64().into())))
+            } else {
+                ConstVal::Integral(ConstInt::Usize(n))
+            },
             ty: self.types.usize
         })))
     }

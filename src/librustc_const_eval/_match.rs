@@ -197,10 +197,15 @@ impl<'a, 'tcx> MatchCheckCtxt<'a, 'tcx> {
                     })).collect()
                 }
                 box PatternKind::Constant {
-                    value: &ty::Const { val: ConstVal::Value(b), .. }
+                    value: &ty::Const { val: ConstVal::Value(b), ty }
                 } => {
                     match b {
                         Value::ByVal(PrimVal::Ptr(ptr)) => {
+                            let is_array_ptr = ty
+                                .builtin_deref(true, ty::NoPreference)
+                                .and_then(|t| t.ty.builtin_index())
+                                .map_or(false, |t| t == tcx.types.u8);
+                            assert!(is_array_ptr);
                             let alloc = tcx
                                 .interpret_interner
                                 .borrow()
@@ -576,15 +581,21 @@ fn max_slice_length<'p, 'a: 'p, 'tcx: 'a, I>(
             PatternKind::Constant {
                 value: &ty::Const {
                     val: ConstVal::Value(Value::ByVal(PrimVal::Ptr(ptr))),
-                    ..
+                    ty,
                 }
             } => {
-                let alloc = cx.tcx
-                    .interpret_interner
-                    .borrow()
-                    .get_alloc(ptr.alloc_id.0)
-                    .unwrap();
-                max_fixed_len = cmp::max(max_fixed_len, alloc.bytes.len() as u64);
+                let is_array_ptr = ty
+                    .builtin_deref(true, ty::NoPreference)
+                    .and_then(|t| t.ty.builtin_index())
+                    .map_or(false, |t| t == cx.tcx.types.u8);
+                if is_array_ptr {
+                    let alloc = cx.tcx
+                        .interpret_interner
+                        .borrow()
+                        .get_alloc(ptr.alloc_id.0)
+                        .unwrap();
+                    max_fixed_len = cmp::max(max_fixed_len, alloc.bytes.len() as u64);
+                }
             }
             PatternKind::Slice { ref prefix, slice: None, ref suffix } => {
                 let fixed_len = prefix.len() as u64 + suffix.len() as u64;
@@ -934,7 +945,12 @@ fn slice_pat_covered_by_constructor(tcx: TyCtxt, _span: Span,
         ConstantValue(&ty::Const { val: ConstVal::ByteStr(b), .. }) => b.data,
         ConstantValue(&ty::Const { val: ConstVal::Value(
             Value::ByVal(PrimVal::Ptr(ptr))
-        ), .. }) => {
+        ), ty }) => {
+            let is_array_ptr = ty
+                .builtin_deref(true, ty::NoPreference)
+                .and_then(|t| t.ty.builtin_index())
+                .map_or(false, |t| t == tcx.types.u8);
+            assert!(is_array_ptr);
             tcx
                 .interpret_interner
                 .borrow()
@@ -1082,6 +1098,11 @@ fn specialize<'p, 'a: 'p, 'tcx: 'a>(
                         }
                     }
                     ConstVal::Value(Value::ByVal(PrimVal::Ptr(ptr))) => {
+                        let is_array_ptr = value.ty
+                            .builtin_deref(true, ty::NoPreference)
+                            .and_then(|t| t.ty.builtin_index())
+                            .map_or(false, |t| t == cx.tcx.types.u8);
+                        assert!(is_array_ptr);
                         let data_len = cx.tcx
                             .interpret_interner
                             .borrow()

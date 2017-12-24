@@ -18,6 +18,7 @@ use rustc::ty::subst::{Kind, Substs};
 use rustc::ty::util::IntTypeExt;
 use rustc_data_structures::indexed_vec::Idx;
 use util::patch::MirPatch;
+use rustc::mir::interpret::{Value, PrimVal};
 
 use std::{iter, u32};
 
@@ -945,7 +946,11 @@ impl<'l, 'b, 'tcx, D> DropCtxt<'l, 'b, 'tcx, D>
             ty: self.tcx().types.usize,
             literal: Literal::Value {
                 value: self.tcx().mk_const(ty::Const {
-                    val: ConstVal::Integral(self.tcx().const_usize(val)),
+                    val: if self.tcx().sess.opts.debugging_opts.miri {
+                        ConstVal::Value(Value::ByVal(PrimVal::Bytes(val.into())))
+                    } else {
+                        ConstVal::Integral(self.tcx().const_usize(val))
+                    },
                     ty: self.tcx().types.usize
                 })
             }

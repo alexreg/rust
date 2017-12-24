@@ -199,6 +199,7 @@ impl<'a, 'tcx> MirContext<'a, 'tcx> {
                     if let [0] = values[..] {
                         bcx.cond_br(discr.immediate(), llfalse, lltrue);
                     } else {
+                        assert_eq!(&values[..], &[1]);
                         bcx.cond_br(discr.immediate(), lltrue, llfalse);
                     }
                 } else {
