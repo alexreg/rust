@@ -161,7 +161,12 @@ impl<'tcx> QueryDescription<'tcx> for queries::const_eval<'tcx> {
 impl<'tcx> QueryDescription<'tcx> for queries::const_val_field<'tcx> {
     fn describe(
         _: TyCtxt,
-        key: ty::ParamEnvAnd<'tcx, (ty::Instance<'tcx>, mir::Field, mir::interpret::Value, Ty<'tcx>)>,
+        key: ty::ParamEnvAnd<'tcx, (
+            ty::Instance<'tcx>,
+            mir::Field,
+            mir::interpret::Value,
+            Ty<'tcx>,
+        )>,
     ) -> String {
         format!(
             "const computing field {:?} of `{:#?}` ({})",
