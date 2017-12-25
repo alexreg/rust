@@ -268,6 +268,12 @@ impl<'a, 'b, 'gcx, 'tcx> TypeVerifier<'a, 'b, 'gcx, 'tcx> {
                             .get_fn(p.alloc_id.0)
                             .map(|instance| instance.def_id())
                     },
+                    ConstVal::Value(Value::ByVal(PrimVal::Undef)) => {
+                        match value.ty.sty {
+                            ty::TyFnDef(ty_def_id, _) => Some(ty_def_id),
+                            _ => None,
+                        }
+                    },
                     _ => None,
                 };
                 if let Some(def_id) = did {
@@ -1020,7 +1026,7 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
                         value:
                             &ty::Const {
                                 val,
-                                ..
+                                ty,
                             },
                         ..
                     },
@@ -1035,6 +1041,14 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
                         Some(inst.def_id()) == self.tcx().lang_items().box_free_fn()
                     })
                 },
+                ConstVal::Value(Value::ByVal(PrimVal::Undef)) => {
+                    match ty.sty {
+                        ty::TyFnDef(ty_def_id, _) => {
+                            Some(ty_def_id) == self.tcx().lang_items().box_free_fn()
+                        }
+                        _ => false,
+                    }
+                }
                 _ => false,
             }
             _ => false,
