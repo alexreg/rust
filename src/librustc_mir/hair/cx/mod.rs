@@ -169,15 +169,16 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
     pub fn const_eval_literal(
         &mut self,
         lit: &'tcx ast::LitKind,
-        mut ty: Ty<'tcx>,
+        ty: Ty<'tcx>,
         sp: Span,
         neg: bool,
     ) -> Literal<'tcx> {
         let tcx = self.tcx.global_tcx();
 
+        let mut repr_ty = ty;
         if let ty::TyAdt(adt, _) = ty.sty {
             if adt.is_enum() {
-                ty = adt.repr.discr_type().to_ty(tcx)
+                repr_ty = adt.repr.discr_type().to_ty(tcx)
             }
         }
 
@@ -253,7 +254,7 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
             },
             LitKind::Byte(n) => Ok(Integral(U8(n))),
             LitKind::Int(n, hint) => {
-                match (&ty.sty, hint) {
+                match (&repr_ty.sty, hint) {
                     (&ty::TyInt(ity), _) |
                     (_, Signed(ity)) => {
                         let mut n = n as i128;

@@ -679,13 +679,7 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
         if self.tcx.sess.opts.debugging_opts.miri {
             return match expr.node {
                 hir::ExprLit(ref lit) => {
-                    let mut ty = self.tables.expr_ty(expr);
-                    if let ty::TyAdt(adt, _) = ty.sty {
-                        if adt.is_enum() {
-                            use rustc::ty::util::IntTypeExt;
-                            ty = adt.repr.discr_type().to_ty(self.tcx)
-                        }
-                    }
+                    let ty = self.tables.expr_ty(expr);
                     match ::eval::lit_to_const(&lit.node, self.tcx, ty, false) {
                         Ok(value) => PatternKind::Constant {
                             value: self.tcx.mk_const(ty::Const {
@@ -704,13 +698,7 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                 },
                 hir::ExprPath(ref qpath) => *self.lower_path(qpath, expr.hir_id, expr.span).kind,
                 hir::ExprUnary(hir::UnNeg, ref expr) => {
-                    let mut ty = self.tables.expr_ty(expr);
-                    if let ty::TyAdt(adt, _) = ty.sty {
-                        if adt.is_enum() {
-                            use rustc::ty::util::IntTypeExt;
-                            ty = adt.repr.discr_type().to_ty(self.tcx)
-                        }
-                    }
+                    let ty = self.tables.expr_ty(expr);
                     let lit = match expr.node {
                         hir::ExprLit(ref lit) => lit,
                         _ => span_bug!(expr.span, "not a literal: {:?}", expr),
@@ -778,7 +766,30 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                 self.tcx.sess.span_err(span, &msg);
                 PatternKind::Wild
             },
-            ty::TyAdt(adt_def, _) if adt_def.is_enum() => unimplemented!(),
+            ty::TyAdt(adt_def, substs) if adt_def.is_enum() => {
+                let variant_index = match cv.val {
+                    ConstVal::Value(Value::ByVal(PrimVal::Bytes(n))) => {
+                        adt_def
+                            .discriminants(self.tcx)
+                            .position(|var| var.to_u128_unchecked() == n)
+                            .unwrap()
+                    },
+                    ConstVal::Variant(var_did) => {
+                        adt_def
+                            .variants
+                            .iter()
+                            .position(|var| var.did == var_did)
+                            .unwrap()
+                    }
+                    _ => bug!("const_to_pat: {:?}", cv),
+                };
+                PatternKind::Variant {
+                    adt_def,
+                    substs,
+                    variant_index,
+                    subpatterns: Vec::new(),
+                }
+            },
             ty::TyAdt(adt_def, _) => {
                 let struct_var = adt_def.struct_variant();
                 PatternKind::Leaf {

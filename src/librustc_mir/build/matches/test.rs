@@ -259,7 +259,6 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             TestKind::Eq { value, mut ty } => {
                 let mut val = Operand::Copy(place.clone());
 
-
                 let bytes = match value.val {
                     ConstVal::ByteStr(bytes) => Some(bytes.data),
                     ConstVal::Value(Value::ByVal(PrimVal::Ptr(p))) => {

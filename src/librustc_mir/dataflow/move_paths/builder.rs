@@ -354,7 +354,7 @@ impl<'b, 'a, 'gcx, 'tcx> Gatherer<'b, 'a, 'gcx, 'tcx> {
 
             TerminatorKind::Assert { .. } |
             TerminatorKind::SwitchInt { .. } => {
-                // branching terminators - these don't move anything
+                // branching terminators - they don't move anything
             }
 
             TerminatorKind::Yield { ref value, .. } => {

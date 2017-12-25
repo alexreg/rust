@@ -107,9 +107,13 @@ impl<'a, 'tcx> Const<'tcx> {
                 };
                 consts::bitcast(bits, llty)
             },
+            ty::TyAdt(adt, _) if adt.is_enum() => {
+                use rustc::ty::util::IntTypeExt;
+                Const::from_bytes(ccx, b, adt.repr.discr_type().to_ty(ccx.tcx())).llval
+            },
             _ => bug!("from_bytes({}, {})", b, ty),
         };
-        Const { llval: llval, ty }
+        Const { llval, ty }
     }
 
     /// Translate ConstVal into a LLVM constant value.
