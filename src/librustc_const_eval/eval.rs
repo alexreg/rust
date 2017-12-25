@@ -564,7 +564,11 @@ pub fn lit_to_const<'a, 'tcx>(lit: &'tcx ast::LitKind,
             LitKind::Int(n, _) => Value::ByVal(PrimVal::Bytes(n as u128)),
             LitKind::Float(n, fty) => {
                 let n = n.as_str();
-                let bits = parse_float(&n, fty)?.bits;
+                let mut f = parse_float(&n, fty)?;
+                if neg {
+                    f = -f;
+                }
+                let bits = f.bits;
                 Value::ByVal(PrimVal::Bytes(bits))
             }
             LitKind::FloatUnsuffixed(n) => {
@@ -573,7 +577,11 @@ pub fn lit_to_const<'a, 'tcx>(lit: &'tcx ast::LitKind,
                     _ => bug!()
                 };
                 let n = n.as_str();
-                let bits = parse_float(&n, fty)?.bits;
+                let mut f = parse_float(&n, fty)?;
+                if neg {
+                    f = -f;
+                }
+                let bits = f.bits;
                 Value::ByVal(PrimVal::Bytes(bits))
             }
             LitKind::Bool(b) => Value::ByVal(PrimVal::Bytes(b as u128)),
@@ -612,14 +620,22 @@ pub fn lit_to_const<'a, 'tcx>(lit: &'tcx ast::LitKind,
             }
         }
         LitKind::Float(n, fty) => {
-            parse_float(&n.as_str(), fty).map(Float)
+            let mut f = parse_float(&n.as_str(), fty)?;
+            if neg {
+                f = -f;
+            }
+            Ok(Float(f))
         }
         LitKind::FloatUnsuffixed(n) => {
             let fty = match ty.sty {
                 ty::TyFloat(fty) => fty,
                 _ => bug!()
             };
-            parse_float(&n.as_str(), fty).map(Float)
+            let mut f = parse_float(&n.as_str(), fty)?;
+            if neg {
+                f = -f;
+            }
+            Ok(Float(f))
         }
         LitKind::Bool(b) => Ok(Bool(b)),
         LitKind::Char(c) => Ok(Char(c)),

@@ -215,7 +215,11 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
                 LitKind::Int(n, _) => Value::ByVal(PrimVal::Bytes(n)),
                 LitKind::Float(n, fty) => {
                     let n = n.as_str();
-                    let bits = parse_float(&n, fty).bits;
+                    let mut f = parse_float(&n, fty);
+                    if neg {
+                        f = -f;
+                    }
+                    let bits = f.bits;
                     Value::ByVal(PrimVal::Bytes(bits))
                 }
                 LitKind::FloatUnsuffixed(n) => {
@@ -224,7 +228,11 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
                         _ => bug!()
                     };
                     let n = n.as_str();
-                    let bits = parse_float(&n, fty).bits;
+                    let mut f = parse_float(&n, fty);
+                    if neg {
+                        f = -f;
+                    }
+                    let bits = f.bits;
                     Value::ByVal(PrimVal::Bytes(bits))
                 }
                 LitKind::Bool(b) => Value::ByVal(PrimVal::Bytes(b as u128)),
@@ -273,14 +281,22 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
                 }
             }
             LitKind::Float(n, fty) => {
-                Ok(ConstVal::Float(parse_float(&n.as_str(), fty)))
+                let mut f = parse_float(&n.as_str(), fty);
+                if neg {
+                    f = -f;
+                }
+                Ok(ConstVal::Float(f))
             }
             LitKind::FloatUnsuffixed(n) => {
                 let fty = match ty.sty {
                     ty::TyFloat(fty) => fty,
                     _ => bug!()
                 };
-                Ok(ConstVal::Float(parse_float(&n.as_str(), fty)))
+                let mut f = parse_float(&n.as_str(), fty);
+                if neg {
+                    f = -f;
+                }
+                Ok(ConstVal::Float(f))
             }
             LitKind::Bool(b) => Ok(Bool(b)),
             LitKind::Char(c) => Ok(Char(c)),

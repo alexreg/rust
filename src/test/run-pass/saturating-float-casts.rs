@@ -117,7 +117,7 @@ pub fn main() {
 
     // # i32
     // -2147483648. is i32::MIN (exactly)
-    test_c!(-2147483648., f* -> i32, i32::MIN);
+    test!(-2147483648., f* -> i32, i32::MIN);
     // 2147483648. is i32::MAX rounded up
     test!(2147483648., f32 -> i32, 2147483647);
     // With 24 significand bits, floats with magnitude in [2^30 + 1, 2^31] are rounded to
