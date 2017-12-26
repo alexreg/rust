@@ -407,7 +407,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 Literal::Value {
                     value: self.hir.tcx().mk_const(ty::Const {
                         val: if self.hir.tcx().sess.opts.debugging_opts.miri {
-                            ConstVal::Value(Value::ByVal(PrimVal::Bytes(-1i128 as u128)))
+                            ConstVal::Value(Value::ByVal(PrimVal::Bytes(val.to_u128_unchecked())))
                         } else {
                             ConstVal::Integral(val)
                         },
@@ -450,7 +450,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     value: self.hir.tcx().mk_const(ty::Const {
                         val: if self.hir.tcx().sess.opts.debugging_opts.miri {
                             ConstVal::Value(Value::ByVal(PrimVal::Bytes(
-                                i128::min_value() as u128
+                                val.to_u128_unchecked()
                             )))
                         } else {
                             ConstVal::Integral(val)
