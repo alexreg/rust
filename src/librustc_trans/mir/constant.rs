@@ -144,7 +144,7 @@ impl<'a, 'tcx> Const<'tcx> {
             ConstVal::Unevaluated(..) => {
                 bug!("MIR must not use `{:?}` (aggregates are expanded to MIR rvalues)", cv)
             }
-            ConstVal::Value(MiriValue::ByRef(..)) => unimplemented!(),
+            ConstVal::Value(MiriValue::ByRef(..)) => unimplemented!("{:#?}:{}", cv, ty),
             ConstVal::Value(MiriValue::ByValPair(PrimVal::Ptr(ptr), PrimVal::Bytes(len))) => {
                 match ty.sty {
                     ty::TyRef(_, ref tam) => match tam.ty.sty {
