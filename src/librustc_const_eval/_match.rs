@@ -906,6 +906,7 @@ fn constructor_sub_pattern_tys<'a, 'tcx: 'a>(cx: &MatchCheckCtxt<'a, 'tcx>,
         ty::TySlice(ty) | ty::TyArray(ty, _) => match *ctor {
             Slice(length) => (0..length).map(|_| ty).collect(),
             ConstantValue(_) => vec![],
+            Single => vec![ty],
             _ => bug!("bad slice pattern {:?} {:?}", ctor, ty)
         },
         ty::TyRef(_, ref ty_and_mut) => vec![ty_and_mut.ty],
@@ -914,6 +915,9 @@ fn constructor_sub_pattern_tys<'a, 'tcx: 'a>(cx: &MatchCheckCtxt<'a, 'tcx>,
                 // Use T as the sub pattern type of Box<T>.
                 vec![substs[0].as_type().unwrap()]
             } else {
+                if let ConstantValue(_) = *ctor {
+                    return vec![];
+                }
                 adt.variants[ctor.variant_index_for_adt(adt)].fields.iter().map(|field| {
                     let is_visible = adt.is_enum()
                         || field.vis.is_accessible_from(cx.module, cx.tcx);
