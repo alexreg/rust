@@ -207,6 +207,13 @@ impl<'a, 'tcx> Inliner<'a, 'tcx> {
             return false;
         }
 
+        // Do not inline {u,i}128 lang items, trans const eval depends
+        // on detecting calls to these lang items and intercepting them
+        if tcx.is_binop_lang_item(callsite.callee).is_some() {
+            debug!("    not inlining 128bit integer lang item");
+            return false;
+        }
+
         let attrs = tcx.get_attrs(callsite.callee);
         let hint = attr::find_inline_attr(None, &attrs[..]);
 

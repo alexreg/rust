@@ -24,9 +24,11 @@ use rustc_serialize as serialize;
 use hir::def::CtorKind;
 use hir::def_id::DefId;
 use mir::visit::MirVisitable;
+use mir::interpret::{Value, PrimVal};
 use ty::subst::{Subst, Substs};
 use ty::{self, AdtDef, ClosureSubsts, Region, Ty, TyCtxt, GeneratorInterior};
 use ty::fold::{TypeFoldable, TypeFolder, TypeVisitor};
+use ty::TypeAndMut;
 use util::ppaux;
 use std::slice;
 use hir::{self, InlineAsm};
@@ -1055,9 +1057,17 @@ impl<'tcx> TerminatorKind<'tcx> {
         match *self {
             Return | Resume | Abort | Unreachable | GeneratorDrop => vec![],
             Goto { .. } => vec!["".into()],
-            SwitchInt { ref values, .. } => {
+            SwitchInt { ref values, switch_ty, .. } => {
                 values.iter()
-                      .map(|u| u.to_string().into())
+                      .map(|&u| {
+                          let mut s = String::new();
+                          print_miri_value(
+                              Value::ByVal(PrimVal::Bytes(u)),
+                              switch_ty,
+                              &mut s,
+                          ).unwrap();
+                          s.into()
+                      })
                       .chain(iter::once(String::from("otherwise").into()))
                       .collect()
             }
@@ -1430,7 +1440,12 @@ impl<'tcx> Operand<'tcx> {
             ty,
             literal: Literal::Value {
                 value: tcx.mk_const(ty::Const {
-                    val: ConstVal::Function(def_id, substs),
+                    val: if tcx.sess.opts.debugging_opts.miri {
+                        // ZST function type
+                        ConstVal::Value(Value::ByVal(PrimVal::Undef))
+                    } else {
+                        ConstVal::Function(def_id, substs)
+                    },
                     ty
                 })
             },
@@ -1750,7 +1765,7 @@ impl<'tcx> Debug for Literal<'tcx> {
         match *self {
             Value { value } => {
                 write!(fmt, "const ")?;
-                fmt_const_val(fmt, &value.val)
+                fmt_const_val(fmt, value)
             }
             Promoted { index } => {
                 write!(fmt, "{:?}", index)
@@ -1760,9 +1775,9 @@ impl<'tcx> Debug for Literal<'tcx> {
 }
 
 /// Write a `ConstVal` in a way closer to the original source code than the `Debug` output.
-fn fmt_const_val<W: Write>(fmt: &mut W, const_val: &ConstVal) -> fmt::Result {
+fn fmt_const_val<W: Write>(fmt: &mut W, const_val: &ty::Const) -> fmt::Result {
     use middle::const_val::ConstVal::*;
-    match *const_val {
+    match const_val.val {
         Float(f) => write!(fmt, "{:?}", f),
         Integral(n) => write!(fmt, "{}", n),
         Str(s) => write!(fmt, "{:?}", s),
@@ -1779,7 +1794,41 @@ fn fmt_const_val<W: Write>(fmt: &mut W, const_val: &ConstVal) -> fmt::Result {
         Function(def_id, _) => write!(fmt, "{}", item_path_str(def_id)),
         Aggregate(_) => bug!("`ConstVal::{:?}` should not be in MIR", const_val),
         Unevaluated(..) => write!(fmt, "{:?}", const_val),
-        Value(val) => write!(fmt, "{:?}", val),
+        Value(val) => print_miri_value(val, const_val.ty, fmt),
+    }
+}
+
+fn print_miri_value<W: Write>(value: Value, ty: Ty, f: &mut W) -> fmt::Result {
+    use ty::TypeVariants::*;
+    use rustc_const_math::ConstFloat;
+    match (value, &ty.sty) {
+        (Value::ByVal(PrimVal::Bytes(0)), &TyBool) => write!(f, "false"),
+        (Value::ByVal(PrimVal::Bytes(1)), &TyBool) => write!(f, "true"),
+        (Value::ByVal(PrimVal::Bytes(bits)), &TyFloat(fty)) =>
+            write!(f, "{}", ConstFloat { bits, ty: fty }),
+        (Value::ByVal(PrimVal::Bytes(n)), &TyUint(ui)) => write!(f, "{:?}{}", n, ui),
+        (Value::ByVal(PrimVal::Bytes(n)), &TyInt(i)) => write!(f, "{:?}{}", n as i128, i),
+        (Value::ByVal(PrimVal::Bytes(n)), &TyChar) =>
+            write!(f, "{:?}", ::std::char::from_u32(n as u32).unwrap()),
+        (Value::ByVal(PrimVal::Undef), &TyFnDef(did, _)) =>
+            write!(f, "{}", item_path_str(did)),
+        (Value::ByValPair(PrimVal::Ptr(ptr), PrimVal::Bytes(len)), &TyRef(_, TypeAndMut {
+            ty: &ty::TyS { sty: TyStr, .. }, ..
+        })) => {
+            ty::tls::with(|tcx| {
+                let alloc = tcx
+                    .interpret_interner
+                    .borrow()
+                    .get_alloc(ptr.alloc_id.0)
+                    .expect("miri alloc not found");
+                assert_eq!(len as usize as u128, len);
+                let slice = &alloc.bytes[(ptr.offset as usize)..][..(len as usize)];
+                let s = ::std::str::from_utf8(slice)
+                    .expect("non utf8 str from miri");
+                write!(f, "{:?}", s)
+            })
+        },
+        _ => write!(f, "{:?}:{}", value, ty),
     }
 }
 

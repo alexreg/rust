@@ -781,7 +781,13 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                             .position(|var| var.did == var_did)
                             .unwrap()
                     }
-                    _ => bug!("const_to_pat: {:?}", cv),
+                    _ => return Pattern {
+                        span,
+                        ty: cv.ty,
+                        kind: Box::new(PatternKind::Constant {
+                            value: cv,
+                        }),
+                    }
                 };
                 PatternKind::Variant {
                     adt_def,

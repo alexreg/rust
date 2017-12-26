@@ -29,16 +29,4 @@ pub fn main() {
       'a'...'z' => {}
       _ => panic!("should suppport char ranges")
     }
-    match -3_isize {
-      -7...5 => {}
-      _ => panic!("should match signed range")
-    }
-    match 3.0f64 {
-      1.0...5.0 => {}
-      _ => panic!("should match float range")
-    }
-    match -1.5f64 {
-      -3.6...3.6 => {}
-      _ => panic!("should match negative float range")
-    }
 }

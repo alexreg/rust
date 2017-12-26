@@ -352,7 +352,12 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
                 return (method_ty,
                         Literal::Value {
                             value: self.tcx.mk_const(ty::Const {
-                                val: ConstVal::Function(item.def_id, substs),
+                                val: if self.tcx.sess.opts.debugging_opts.miri {
+                                    // ZST function type
+                                    ConstVal::Value(Value::ByVal(PrimVal::Undef))
+                                } else {
+                                    ConstVal::Function(item.def_id, substs)
+                                },
                                 ty: method_ty
                             }),
                         });

@@ -425,7 +425,12 @@ impl<'a, 'tcx> CloneShimBuilder<'a, 'tcx> {
             ty: func_ty,
             literal: Literal::Value {
                 value: tcx.mk_const(ty::Const {
-                    val: ConstVal::Function(self.def_id, substs),
+                    val: if tcx.sess.opts.debugging_opts.miri {
+                        // ZST function type
+                        ConstVal::Value(Value::ByVal(PrimVal::Undef))
+                    } else {
+                        ConstVal::Function(self.def_id, substs)
+                    },
                     ty: func_ty
                 }),
             },
@@ -748,8 +753,12 @@ fn build_call_shim<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                 ty,
                 literal: Literal::Value {
                     value: tcx.mk_const(ty::Const {
-                        val: ConstVal::Function(def_id,
-                            Substs::identity_for_item(tcx, def_id)),
+                        val: if tcx.sess.opts.debugging_opts.miri {
+                            // ZST function type
+                            ConstVal::Value(Value::ByVal(PrimVal::Undef))
+                        } else {
+                            ConstVal::Function(def_id, Substs::identity_for_item(tcx, def_id))
+                        },
                         ty
                     }),
                 },

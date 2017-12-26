@@ -40,20 +40,4 @@ pub fn main() {
       -7...5 => {}
       _ => panic!("should match signed range")
     }
-    match 3.0f64 {
-      1.0...5.0 => {}
-      _ => panic!("should match float range")
-    }
-    match -1.5f64 {
-      -3.6...3.6 => {}
-      _ => panic!("should match negative float range")
-    }
-    match 3.5 {
-        0.0..3.5 => panic!("should not match the range end"),
-        _ => {},
-    }
-    match 0.0 {
-        0.0..3.5 => {},
-        _ => panic!("should match the range start"),
-    }
 }
