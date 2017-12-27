@@ -14,9 +14,6 @@ use rustc::hir::def_id::DefId;
 use rustc::ty::subst::Substs;
 use rustc::ty::{self, AdtKind, Ty, TyCtxt};
 use rustc::ty::layout::{self, LayoutOf};
-use middle::const_val::ConstVal;
-use rustc_mir::const_eval::ConstContext;
-use rustc::mir::interpret::{Value, PrimVal};
 use util::nodemap::FxHashSet;
 use lint::{LateContext, LintContext, LintArray};
 use lint::{LintPass, LateLintPass};
@@ -107,35 +104,7 @@ impl<'a, 'tcx> LateLintPass<'a, 'tcx> for TypeLimits {
                                 false
                             }
                         } else {
-                            // HACK(eddyb) This might be quite inefficient.
-                            // This would be better left to MIR constant propagation,
-                            // perhaps even at trans time (like is the case already
-                            // when the value being shifted is *also* constant).
-                            let parent_item = cx.tcx.hir.get_parent(e.id);
-                            let parent_def_id = cx.tcx.hir.local_def_id(parent_item);
-                            let substs = Substs::identity_for_item(cx.tcx, parent_def_id);
-                            let const_cx = ConstContext::new(cx.tcx,
-                                                             cx.param_env.and(substs),
-                                                             cx.tables);
-                            match const_cx.eval(&r) {
-                                Ok(&ty::Const { val: ConstVal::Integral(i), .. }) => {
-                                    i.is_negative() ||
-                                    i.to_u64()
-                                        .map(|i| i >= bits)
-                                        .unwrap_or(true)
-                                }
-                                Ok(&ty::Const {
-                                    val: ConstVal::Value(Value::ByVal(PrimVal::Bytes(b))),
-                                    ty,
-                                }) => {
-                                    if ty.is_signed() {
-                                        (b as i128) < 0
-                                    } else {
-                                        b >= bits as u128
-                                    }
-                                }
-                                _ => false,
-                            }
+                            false
                         };
                         if exceeding {
                             cx.span_lint(EXCEEDING_BITSHIFTS,

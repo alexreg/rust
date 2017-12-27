@@ -260,7 +260,6 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 let mut val = Operand::Copy(place.clone());
 
                 let bytes = match value.val {
-                    ConstVal::ByteStr(bytes) => Some(bytes.data),
                     ConstVal::Value(Value::ByVal(PrimVal::Ptr(p))) => {
                         let is_array_ptr = ty
                             .builtin_deref(true, ty::NoPreference)

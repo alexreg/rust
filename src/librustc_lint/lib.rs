@@ -43,7 +43,6 @@ extern crate rustc_mir;
 extern crate syntax_pos;
 
 use rustc::lint;
-use rustc::middle;
 use rustc::session;
 use rustc::util;
 

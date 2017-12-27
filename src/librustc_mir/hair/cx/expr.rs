@@ -16,7 +16,7 @@ use hair::cx::to_ref::ToRef;
 use rustc::hir::def::{Def, CtorKind};
 use rustc::middle::const_val::ConstVal;
 use rustc::mir::interpret::{Value, PrimVal};
-use rustc::ty::{self, AdtKind, VariantDef, Ty, TyCtxt};
+use rustc::ty::{self, AdtKind, VariantDef, Ty};
 use rustc::ty::adjustment::{Adjustment, Adjust, AutoBorrow};
 use rustc::ty::cast::CastKind as TyCastKind;
 use rustc::hir;
@@ -604,7 +604,7 @@ fn method_callee<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
         kind: ExprKind::Literal {
             literal: Literal::Value {
                 value: cx.tcx().mk_const(ty::Const {
-                    val: const_fn(cx.tcx, def_id, substs),
+                    val: ConstVal::Value(Value::ByVal(PrimVal::Undef)),
                     ty
                 }),
             },
@@ -629,28 +629,6 @@ fn convert_arm<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>, arm: &'tcx hir::Arm)
     }
 }
 
-fn const_fn<'a, 'gcx, 'tcx>(
-    tcx: TyCtxt<'a, 'gcx, 'tcx>,
-    def_id: DefId,
-    substs: &'tcx Substs<'tcx>,
-) -> ConstVal<'tcx> {
-    if tcx.sess.opts.debugging_opts.miri {
-        /*
-        let inst = ty::Instance::new(def_id, substs);
-        let ptr = tcx
-            .interpret_interner
-            .borrow_mut()
-            .create_fn_alloc(inst);
-        let ptr = MemoryPointer::new(AllocId(ptr), 0);
-        ConstVal::Value(Value::ByVal(PrimVal::Ptr(ptr)))
-        */
-        // ZST function type
-        ConstVal::Value(Value::ByVal(PrimVal::Undef))
-    } else {
-        ConstVal::Function(def_id, substs)
-    }
-}
-
 fn convert_path_expr<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
                                      expr: &'tcx hir::Expr,
                                      def: Def)
@@ -658,13 +636,13 @@ fn convert_path_expr<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
     let substs = cx.tables().node_substs(expr.hir_id);
     match def {
         // A regular function, constructor function or a constant.
-        Def::Fn(def_id) |
-        Def::Method(def_id) |
-        Def::StructCtor(def_id, CtorKind::Fn) |
-        Def::VariantCtor(def_id, CtorKind::Fn) => ExprKind::Literal {
+        Def::Fn(_) |
+        Def::Method(_) |
+        Def::StructCtor(_, CtorKind::Fn) |
+        Def::VariantCtor(_, CtorKind::Fn) => ExprKind::Literal {
             literal: Literal::Value {
                 value: cx.tcx.mk_const(ty::Const {
-                    val: const_fn(cx.tcx.global_tcx(), def_id, substs),
+                    val: ConstVal::Value(Value::ByVal(PrimVal::Undef)),
                     ty: cx.tables().node_id_to_type(expr.hir_id)
                 }),
             },
