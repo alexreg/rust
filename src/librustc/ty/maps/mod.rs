@@ -210,21 +210,6 @@ define_maps! { <'tcx>
     [] fn const_eval: const_eval_dep_node(ty::ParamEnvAnd<'tcx, (DefId, &'tcx Substs<'tcx>)>)
         -> const_val::EvalResult<'tcx>,
 
-    /// Obtain a struct/tuple field of a ConstVal
-    [] fn const_val_field: const_val_field_dep_node(ty::ParamEnvAnd<'tcx, (
-        ty::Instance<'tcx>,
-        mir::Field,
-        mir::interpret::Value,
-        Ty<'tcx>,
-    )>) -> const_val::EvalResult<'tcx>,
-
-    /// Obtain the discriminant value of an adt const val
-    [] fn const_discr: const_discr_dep_node(ty::ParamEnvAnd<'tcx, (
-        ty::Instance<'tcx>,
-        mir::interpret::Value,
-        Ty<'tcx>,
-    )>) -> mir::interpret::EvalResult<'tcx, u128>,
-
     [] fn check_match: CheckMatch(DefId)
         -> Result<(), ErrorReported>,
 
@@ -429,27 +414,6 @@ fn typeck_item_bodies_dep_node<'tcx>(_: CrateNum) -> DepConstructor<'tcx> {
 fn const_eval_dep_node<'tcx>(param_env: ty::ParamEnvAnd<'tcx, (DefId, &'tcx Substs<'tcx>)>)
                              -> DepConstructor<'tcx> {
     DepConstructor::ConstEval { param_env }
-}
-
-fn const_val_field_dep_node<'tcx>(
-    param_env: ty::ParamEnvAnd<'tcx, (
-        ty::Instance<'tcx>,
-        mir::Field,
-        mir::interpret::Value,
-        Ty<'tcx>,
-    )>,
-) -> DepConstructor<'tcx> {
-    DepConstructor::ConstValField { param_env }
-}
-
-fn const_discr_dep_node<'tcx>(
-    param_env: ty::ParamEnvAnd<'tcx, (
-        ty::Instance<'tcx>,
-        mir::interpret::Value,
-        Ty<'tcx>,
-    )>,
-) -> DepConstructor<'tcx> {
-    DepConstructor::ConstDiscr { param_env }
 }
 
 fn mir_keys<'tcx>(_: CrateNum) -> DepConstructor<'tcx> {

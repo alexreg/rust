@@ -13,7 +13,6 @@ use hir::def_id::{CrateNum, DefId, DefIndex};
 use ty::{self, Ty, TyCtxt};
 use ty::maps::queries;
 use ty::subst::Substs;
-use mir;
 
 use std::hash::Hash;
 use syntax_pos::symbol::InternedString;
@@ -155,39 +154,6 @@ impl<'tcx> QueryDescription<'tcx> for queries::reachable_set<'tcx> {
 impl<'tcx> QueryDescription<'tcx> for queries::const_eval<'tcx> {
     fn describe(tcx: TyCtxt, key: ty::ParamEnvAnd<'tcx, (DefId, &'tcx Substs<'tcx>)>) -> String {
         format!("const-evaluating `{}`", tcx.item_path_str(key.value.0))
-    }
-}
-
-impl<'tcx> QueryDescription<'tcx> for queries::const_val_field<'tcx> {
-    fn describe(
-        _: TyCtxt,
-        key: ty::ParamEnvAnd<'tcx, (
-            ty::Instance<'tcx>,
-            mir::Field,
-            mir::interpret::Value,
-            Ty<'tcx>,
-        )>,
-    ) -> String {
-        format!(
-            "const computing field {:?} of `{:#?}` ({})",
-            key.value.1, key.value.2, key.value.3,
-        )
-    }
-}
-
-impl<'tcx> QueryDescription<'tcx> for queries::const_discr<'tcx> {
-    fn describe(
-        _: TyCtxt,
-        key: ty::ParamEnvAnd<'tcx, (
-            ty::Instance<'tcx>,
-            mir::interpret::Value,
-            Ty<'tcx>,
-        )>,
-    ) -> String {
-        format!(
-            "const discr of {:?} ({})",
-            key.value.1, key.value.2
-        )
     }
 }
 
