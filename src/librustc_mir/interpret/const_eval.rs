@@ -328,7 +328,7 @@ fn const_val_field_inner<'a, 'tcx>(
     trace!("const_val_field: {:?}, {:?}, {:?}, {:?}", instance, field, value, ty);
     let mut ecx = mk_eval_cx(tcx, instance, param_env).unwrap();
     let (mut field, ty) = match value {
-        Value::ByValPair(..) | Value::ByVal(_) => ecx.read_field(value, field, ty)?.expect("const_val_field on non-field"),
+        Value::ByValPair(..) | Value::ByVal(_) => ecx.read_field(value, variant, field, ty)?.expect("const_val_field on non-field"),
         Value::ByRef(ptr, align) => {
             let place = Place::Ptr {
                 ptr,

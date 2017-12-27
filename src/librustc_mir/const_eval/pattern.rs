@@ -660,11 +660,6 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                 let substs = self.tables.node_substs(id);
                 match self.tcx.at(span).const_eval(self.param_env.and((def_id, substs))) {
                     Ok(value) => {
-                        if self.tcx.sess.opts.debugging_opts.miri {
-                            if let ConstVal::Value(_) = value.val {} else {
-                                panic!("const eval produced non-miri value: {:#?}", value);
-                            }
-                        }
                         let instance = ty::Instance::resolve(
                             self.tcx,
                             self.param_env,
