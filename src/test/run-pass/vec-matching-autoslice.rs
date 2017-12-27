@@ -21,13 +21,13 @@ pub fn main() {
         [_, _, _] => panic!(),
     }
 
-    let y = ([(1, true), (2, false)], 0.5f64);
+    let y = ([(1, true), (2, false)], 5);
     match y {
         ([(1, a), (b, false)], _) => {
             assert_eq!(a, true);
             assert_eq!(b, 2);
         }
-        ([_, _], 0.5) => panic!(),
+        ([_, _], 5) => panic!(),
         ([_, _], _) => panic!(),
     }
 }
