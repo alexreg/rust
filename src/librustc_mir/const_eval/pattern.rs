@@ -694,11 +694,13 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
             hir::ExprLit(ref lit) => {
                 let ty = self.tables.expr_ty(expr);
                 match super::eval::lit_to_const(&lit.node, self.tcx, ty, false) {
-                    Ok(value) => PatternKind::Constant {
-                        value: self.tcx.mk_const(ty::Const {
-                            ty,
-                            val: value,
-                        }),
+                    Ok(val) => {
+                        let instance = ty::Instance::new(
+                            self.tables.local_id_root.expect("literal outside any scope"),
+                            self.substs,
+                        );
+                        let cv = self.tcx.mk_const(ty::Const { val, ty });
+                        *self.const_to_pat(instance, cv, lit.span).kind
                     },
                     Err(e) => {
                         self.errors.push(PatternError::ConstEval(ConstEvalErr {
