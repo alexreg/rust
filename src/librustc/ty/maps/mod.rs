@@ -218,6 +218,13 @@ define_maps! { <'tcx>
         Ty<'tcx>,
     )>) -> const_val::EvalResult<'tcx>,
 
+    /// Obtain the discriminant value of an adt const val
+    [] fn const_discr: const_discr_dep_node(ty::ParamEnvAnd<'tcx, (
+        ty::Instance<'tcx>,
+        mir::interpret::Value,
+        Ty<'tcx>,
+    )>) -> mir::interpret::EvalResult<'tcx, u128>,
+
     [] fn check_match: CheckMatch(DefId)
         -> Result<(), ErrorReported>,
 
@@ -433,6 +440,16 @@ fn const_val_field_dep_node<'tcx>(
     )>,
 ) -> DepConstructor<'tcx> {
     DepConstructor::ConstValField { param_env }
+}
+
+fn const_discr_dep_node<'tcx>(
+    param_env: ty::ParamEnvAnd<'tcx, (
+        ty::Instance<'tcx>,
+        mir::interpret::Value,
+        Ty<'tcx>,
+    )>,
+) -> DepConstructor<'tcx> {
+    DepConstructor::ConstDiscr { param_env }
 }
 
 fn mir_keys<'tcx>(_: CrateNum) -> DepConstructor<'tcx> {

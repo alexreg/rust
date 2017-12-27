@@ -78,6 +78,7 @@ pub fn provide(providers: &mut Providers) {
     transform::provide(providers);
     providers.const_eval = interpret::const_eval_provider;
     providers.const_val_field = interpret::const_val_field;
+    providers.const_discr = interpret::const_discr;
 }
 
 __build_diagnostic_array! { librustc_mir, DIAGNOSTICS }

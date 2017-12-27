@@ -656,7 +656,12 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                                 panic!("const eval produced non-miri value: {:#?}", value);
                             }
                         }
-                        let instance = ty::Instance::new(def_id, substs);
+                        let instance = ty::Instance::resolve(
+                            self.tcx,
+                            self.param_env,
+                            def_id,
+                            substs,
+                        ).unwrap();
                         return self.const_to_pat(instance, value, span)
                     },
                     Err(e) => {
@@ -768,10 +773,13 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
             },
             ty::TyAdt(adt_def, substs) if adt_def.is_enum() => {
                 let variant_index = match cv.val {
-                    ConstVal::Value(Value::ByVal(PrimVal::Bytes(n))) => {
+                    ConstVal::Value(val) => {
+                        let discr = self.tcx.const_discr(self.param_env.and((
+                            instance, val, cv.ty
+                        ))).unwrap();
                         adt_def
                             .discriminants(self.tcx)
-                            .position(|var| var.to_u128_unchecked() == n)
+                            .position(|var| var.to_u128_unchecked() == discr)
                             .unwrap()
                     },
                     ConstVal::Variant(var_did) => {

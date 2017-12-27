@@ -339,6 +339,28 @@ fn const_val_field_inner<'a, 'tcx>(
     Ok((field, ty))
 }
 
+pub fn const_discr<'a, 'tcx>(
+    tcx: TyCtxt<'a, 'tcx, 'tcx>,
+    key: ty::ParamEnvAnd<'tcx, (ty::Instance<'tcx>, Value, Ty<'tcx>)>,
+) -> EvalResult<'tcx, u128> {
+    trace!("const_discr: {:#?}", key);
+    let (instance, value, ty) = key.value;
+    let mut ecx = mk_eval_cx(tcx, instance, key.param_env).unwrap();
+    let (ptr, align) = match value {
+        Value::ByValPair(..) | Value::ByVal(_) => {
+            let layout = ecx.layout_of(ty)?;
+            use super::MemoryKind;
+            let ptr = ecx.memory.allocate(layout.size.bytes(), layout.align, Some(MemoryKind::Stack))?;
+            let ptr: Pointer = ptr.into();
+            ecx.write_value_to_ptr(value, ptr, layout.align, ty)?;
+            (ptr, layout.align)
+        },
+        Value::ByRef(ptr, align) => (ptr, align),
+    };
+    let place = Place::from_primval_ptr(ptr, align);
+    ecx.read_discriminant_value(place, ty)
+}
+
 pub fn const_eval_provider<'a, 'tcx>(
     tcx: TyCtxt<'a, 'tcx, 'tcx>,
     key: ty::ParamEnvAnd<'tcx, (DefId, &'tcx Substs<'tcx>)>,

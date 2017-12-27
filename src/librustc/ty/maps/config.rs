@@ -175,6 +175,22 @@ impl<'tcx> QueryDescription<'tcx> for queries::const_val_field<'tcx> {
     }
 }
 
+impl<'tcx> QueryDescription<'tcx> for queries::const_discr<'tcx> {
+    fn describe(
+        _: TyCtxt,
+        key: ty::ParamEnvAnd<'tcx, (
+            ty::Instance<'tcx>,
+            mir::interpret::Value,
+            Ty<'tcx>,
+        )>,
+    ) -> String {
+        format!(
+            "const discr of {:?} ({})",
+            key.value.1, key.value.2
+        )
+    }
+}
+
 impl<'tcx> QueryDescription<'tcx> for queries::mir_keys<'tcx> {
     fn describe(_: TyCtxt, _: CrateNum) -> String {
         format!("getting a list of all mir_keys")

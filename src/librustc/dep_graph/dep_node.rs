@@ -524,6 +524,11 @@ define_dep_nodes!( <'tcx>
         mir::interpret::Value,
         Ty<'tcx>,
     )> },
+    [] ConstDiscr { param_env: ParamEnvAnd<'tcx, (
+        Instance<'tcx>,
+        mir::interpret::Value,
+        Ty<'tcx>,
+    )> },
     [] CheckMatch(DefId),
     [] SymbolName(DefId),
     [] InstanceSymbolName { instance: Instance<'tcx> },
