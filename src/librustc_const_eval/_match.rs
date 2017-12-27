@@ -1033,6 +1033,7 @@ fn constructor_covered_by_range(ctor: &Constructor,
                       (end == RangeEnd::Excluded && to == Ordering::Equal);
             Ok(some_or_ok!(cmp_from(&from.val)) && end)
         }
+        Variant(_) |
         Single => Ok(true),
         _ => bug!(),
     }

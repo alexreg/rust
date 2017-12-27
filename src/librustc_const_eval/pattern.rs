@@ -772,22 +772,51 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                 PatternKind::Wild
             },
             ty::TyAdt(adt_def, substs) if adt_def.is_enum() => {
-                let variant_index = match cv.val {
+                match cv.val {
                     ConstVal::Value(val) => {
                         let discr = self.tcx.const_discr(self.param_env.and((
                             instance, val, cv.ty
                         ))).unwrap();
-                        adt_def
+                        let variant_index = adt_def
                             .discriminants(self.tcx)
                             .position(|var| var.to_u128_unchecked() == discr)
-                            .unwrap()
+                            .unwrap();
+                        PatternKind::Variant {
+                            adt_def,
+                            substs,
+                            variant_index,
+                            subpatterns: adt_def
+                                .variants[variant_index]
+                                .fields
+                                .iter()
+                                .enumerate()
+                                .map(|(i, _)| {
+                                let field = Field::new(i);
+                                let val = match cv.val {
+                                    ConstVal::Value(miri) => self.tcx.const_val_field(
+                                        self.param_env.and((instance, field, miri, cv.ty)),
+                                    ).unwrap(),
+                                    _ => bug!("{:#?} is not a valid tuple", cv),
+                                };
+                                FieldPattern {
+                                    field,
+                                    pattern: self.const_to_pat(instance, val, span),
+                                }
+                            }).collect(),
+                        }
                     },
                     ConstVal::Variant(var_did) => {
-                        adt_def
+                        let variant_index = adt_def
                             .variants
                             .iter()
                             .position(|var| var.did == var_did)
-                            .unwrap()
+                            .unwrap();
+                        PatternKind::Variant {
+                            adt_def,
+                            substs,
+                            variant_index,
+                            subpatterns: Vec::new(),
+                        }
                     }
                     _ => return Pattern {
                         span,
@@ -796,12 +825,6 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                             value: cv,
                         }),
                     }
-                };
-                PatternKind::Variant {
-                    adt_def,
-                    substs,
-                    variant_index,
-                    subpatterns: Vec::new(),
                 }
             },
             ty::TyAdt(adt_def, _) => {
