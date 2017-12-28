@@ -838,8 +838,8 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                 }
             }
             ty::TyArray(_, n) => {
-                PatternKind::Leaf {
-                    subpatterns: (0..n.val.unwrap_u64()).map(|i| {
+                PatternKind::Array {
+                    prefix: (0..n.val.unwrap_u64()).map(|i| {
                         let i = i as usize;
                         let field = Field::new(i);
                         let val = match cv.val {
@@ -848,11 +848,10 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                             ).unwrap(),
                             _ => bug!("{:#?} is not a valid tuple", cv),
                         };
-                        FieldPattern {
-                            field,
-                            pattern: self.const_to_pat(instance, val, span),
-                        }
-                    }).collect()
+                        self.const_to_pat(instance, val, span)
+                    }).collect(),
+                    slice: None,
+                    suffix: Vec::new(),
                 }
             }
             _ => {
