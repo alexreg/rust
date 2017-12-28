@@ -2,7 +2,7 @@ error[E0080]: constant evaluation error
   --> $DIR/const-eval-overflow-2.rs:21:25
    |
 21 | const NEG_NEG_128: i8 = -NEG_128;
-   |                         ^^^^^^^^ miri failed: attempted to do overflowing math
+   |                         ^^^^^^^^ miri failed: Overflow(Neg) at $DIR/const-eval-overflow-2.rs:21:25: 21:33
    |
 note: for pattern here
   --> $DIR/const-eval-overflow-2.rs:26:9
