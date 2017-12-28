@@ -781,7 +781,8 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                                 let field = Field::new(i);
                                 let val = match cv.val {
                                     ConstVal::Value(miri) => const_val_field(
-                                        self.tcx, self.param_env, instance, Some(variant_index), field, miri, cv.ty,
+                                        self.tcx, self.param_env, instance,
+                                        Some(variant_index), field, miri, cv.ty,
                                     ).unwrap(),
                                     _ => bug!("{:#?} is not a valid tuple", cv),
                                 };
