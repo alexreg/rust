@@ -87,16 +87,14 @@
     message="cannot add `{RHS}` to `{Self}`",
     label="no implementation for `{Self} + {RHS}`",
 )]
-#[doc(alias = "+")]
 pub trait Add<RHS=Self> {
     /// The resulting type after applying the `+` operator.
     #[stable(feature = "rust1", since = "1.0.0")]
     type Output;
 
     /// Performs the `+` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn add(self, rhs: RHS) -> Self::Output;
+    fn add(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! add_impl {
@@ -107,7 +105,7 @@ macro_rules! add_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn add(self, other: $t) -> $t { self + other }
+            fn add(self, other: $t) -> $t { self + other }
         }
 
         forward_ref_binop! { impl Add, add for $t, $t }
@@ -185,16 +183,14 @@ add_impl! { usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 f32 f64 }
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="cannot subtract `{RHS}` from `{Self}`",
                          label="no implementation for `{Self} - {RHS}`")]
-#[doc(alias = "-")]
 pub trait Sub<RHS=Self> {
     /// The resulting type after applying the `-` operator.
     #[stable(feature = "rust1", since = "1.0.0")]
     type Output;
 
     /// Performs the `-` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn sub(self, rhs: RHS) -> Self::Output;
+    fn sub(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! sub_impl {
@@ -205,7 +201,7 @@ macro_rules! sub_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn sub(self, other: $t) -> $t { self - other }
+            fn sub(self, other: $t) -> $t { self - other }
         }
 
         forward_ref_binop! { impl Sub, sub for $t, $t }
@@ -305,16 +301,14 @@ sub_impl! { usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 f32 f64 }
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="cannot multiply `{RHS}` to `{Self}`",
                          label="no implementation for `{Self} * {RHS}`")]
-#[doc(alias = "*")]
 pub trait Mul<RHS=Self> {
     /// The resulting type after applying the `*` operator.
     #[stable(feature = "rust1", since = "1.0.0")]
     type Output;
 
     /// Performs the `*` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn mul(self, rhs: RHS) -> Self::Output;
+    fn mul(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! mul_impl {
@@ -325,7 +319,7 @@ macro_rules! mul_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn mul(self, other: $t) -> $t { self * other }
+            fn mul(self, other: $t) -> $t { self * other }
         }
 
         forward_ref_binop! { impl Mul, mul for $t, $t }
@@ -429,16 +423,14 @@ mul_impl! { usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 f32 f64 }
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="cannot divide `{Self}` by `{RHS}`",
                          label="no implementation for `{Self} / {RHS}`")]
-#[doc(alias = "/")]
 pub trait Div<RHS=Self> {
     /// The resulting type after applying the `/` operator.
     #[stable(feature = "rust1", since = "1.0.0")]
     type Output;
 
     /// Performs the `/` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn div(self, rhs: RHS) -> Self::Output;
+    fn div(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! div_impl_integer {
@@ -450,7 +442,7 @@ macro_rules! div_impl_integer {
             type Output = $t;
 
             #[inline]
-            const fn div(self, other: $t) -> $t { self / other }
+            fn div(self, other: $t) -> $t { self / other }
         }
 
         forward_ref_binop! { impl Div, div for $t, $t }
@@ -466,7 +458,7 @@ macro_rules! div_impl_float {
             type Output = $t;
 
             #[inline]
-            const fn div(self, other: $t) -> $t { self / other }
+            fn div(self, other: $t) -> $t { self / other }
         }
 
         forward_ref_binop! { impl Div, div for $t, $t }
@@ -514,16 +506,14 @@ div_impl_float! { f32 f64 }
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="cannot mod `{Self}` by `{RHS}`",
                          label="no implementation for `{Self} % {RHS}`")]
-#[doc(alias = "%")]
 pub trait Rem<RHS=Self> {
     /// The resulting type after applying the `%` operator.
     #[stable(feature = "rust1", since = "1.0.0")]
     type Output = Self;
 
     /// Performs the `%` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn rem(self, rhs: RHS) -> Self::Output;
+    fn rem(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! rem_impl_integer {
@@ -535,7 +525,7 @@ macro_rules! rem_impl_integer {
             type Output = $t;
 
             #[inline]
-            const fn rem(self, other: $t) -> $t { self % other }
+            fn rem(self, other: $t) -> $t { self % other }
         }
 
         forward_ref_binop! { impl Rem, rem for $t, $t }
@@ -552,7 +542,7 @@ macro_rules! rem_impl_float {
             type Output = $t;
 
             #[inline]
-            const fn rem(self, other: $t) -> $t { self % other }
+            fn rem(self, other: $t) -> $t { self % other }
         }
 
         forward_ref_binop! { impl Rem, rem for $t, $t }
@@ -599,16 +589,14 @@ rem_impl_float! { f32 f64 }
 /// ```
 #[lang = "neg"]
 #[stable(feature = "rust1", since = "1.0.0")]
-#[doc(alias = "-")]
 pub trait Neg {
     /// The resulting type after applying the `-` operator.
     #[stable(feature = "rust1", since = "1.0.0")]
     type Output;
 
     /// Performs the unary `-` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn neg(self) -> Self::Output;
+    fn neg(self) -> Self::Output;
 }
 
 
@@ -621,7 +609,7 @@ macro_rules! neg_impl_core {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn neg(self) -> $t { let $id = self; $body }
+            fn neg(self) -> $t { let $id = self; $body }
         }
 
         forward_ref_unop! { impl Neg, neg for $t }
@@ -676,8 +664,6 @@ neg_impl_numeric! { isize i8 i16 i32 i64 i128 f32 f64 }
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="cannot add-assign `{Rhs}` to `{Self}`",
                          label="no implementation for `{Self} += {Rhs}`")]
-#[doc(alias = "+")]
-#[doc(alias = "+=")]
 pub trait AddAssign<Rhs=Self> {
     /// Performs the `+=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
@@ -732,8 +718,6 @@ add_assign_impl! { usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 f32 f64 }
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="cannot subtract-assign `{Rhs}` from `{Self}`",
                          label="no implementation for `{Self} -= {Rhs}`")]
-#[doc(alias = "-")]
-#[doc(alias = "-=")]
 pub trait SubAssign<Rhs=Self> {
     /// Performs the `-=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
@@ -779,8 +763,6 @@ sub_assign_impl! { usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 f32 f64 }
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="cannot multiply-assign `{Rhs}` to `{Self}`",
                          label="no implementation for `{Self} *= {Rhs}`")]
-#[doc(alias = "*")]
-#[doc(alias = "*=")]
 pub trait MulAssign<Rhs=Self> {
     /// Performs the `*=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
@@ -826,8 +808,6 @@ mul_assign_impl! { usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 f32 f64 }
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="cannot divide-assign `{Self}` by `{Rhs}`",
                          label="no implementation for `{Self} /= {Rhs}`")]
-#[doc(alias = "/")]
-#[doc(alias = "/=")]
 pub trait DivAssign<Rhs=Self> {
     /// Performs the `/=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
@@ -876,8 +856,6 @@ div_assign_impl! { usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 f32 f64 }
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="cannot mod-assign `{Self}` by `{Rhs}``",
                          label="no implementation for `{Self} %= {Rhs}`")]
-#[doc(alias = "%")]
-#[doc(alias = "%=")]
 pub trait RemAssign<Rhs=Self> {
     /// Performs the `%=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]

@@ -465,7 +465,9 @@ pub use core::u128;
 #[stable(feature = "core_hint", since = "1.27.0")]
 pub use core::hint;
 
+#[cfg_attr(stage0, path = "f32_stage0.rs")]
 pub mod f32;
+#[cfg_attr(stage0, path = "f64_stage0.rs")]
 pub mod f64;
 
 #[macro_use]

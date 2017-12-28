@@ -154,7 +154,9 @@
 
 #![stable(feature = "rust1", since = "1.0.0")]
 
+#[cfg_attr(stage0, path = "arith_stage0.rs")]
 mod arith;
+#[cfg_attr(stage0, path = "bit_stage0.rs")]
 mod bit;
 mod deref;
 mod drop;

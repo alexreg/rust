@@ -69,7 +69,7 @@ macro_rules! nonzero_integers {
                 /// Create a non-zero if the given value is not zero.
                 #[$stability]
                 #[inline]
-                pub const fn new(n: $Int) -> Option<Self> {
+                pub fn new(n: $Int) -> Option<Self> {
                     if n != 0 {
                         Some($Ty(NonZero(n)))
                     } else {
@@ -80,7 +80,7 @@ macro_rules! nonzero_integers {
                 /// Returns the value as a primitive type.
                 #[$stability]
                 #[inline]
-                pub const fn get(self) -> $Int {
+                pub fn get(self) -> $Int {
                     self.0 .0
                 }
 
@@ -267,7 +267,7 @@ Basic usage:
 $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
-            pub const fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError> {
+            pub fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError> {
                 from_str_radix(src, radix)
             }
         }
@@ -288,7 +288,7 @@ $EndFeature, "
 "),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn count_ones(self) -> u32 { (self as $UnsignedT).count_ones() }
+            pub fn count_ones(self) -> u32 { (self as $UnsignedT).count_ones() }
         }
 
         doc_comment! {
@@ -303,7 +303,7 @@ Basic usage:
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn count_zeros(self) -> u32 {
+            pub fn count_zeros(self) -> u32 {
                 (!self).count_ones()
             }
         }
@@ -323,7 +323,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn leading_zeros(self) -> u32 {
+            pub fn leading_zeros(self) -> u32 {
                 (self as $UnsignedT).leading_zeros()
             }
         }
@@ -343,7 +343,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn trailing_zeros(self) -> u32 {
+            pub fn trailing_zeros(self) -> u32 {
                 (self as $UnsignedT).trailing_zeros()
             }
         }
@@ -368,7 +368,7 @@ $EndFeature, "
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub const fn rotate_left(self, n: u32) -> Self {
+        pub fn rotate_left(self, n: u32) -> Self {
             (self as $UnsignedT).rotate_left(n) as Self
         }
 
@@ -393,7 +393,7 @@ $EndFeature, "
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub const fn rotate_right(self, n: u32) -> Self {
+        pub fn rotate_right(self, n: u32) -> Self {
             (self as $UnsignedT).rotate_right(n) as Self
         }
 
@@ -417,7 +417,7 @@ $EndFeature, "
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub const fn swap_bytes(self) -> Self {
+        pub fn swap_bytes(self) -> Self {
             (self as $UnsignedT).swap_bytes() as Self
         }
 
@@ -444,7 +444,7 @@ $EndFeature, "
         #[unstable(feature = "reverse_bits", issue = "48763")]
         #[cfg(not(stage0))]
         #[inline]
-        pub const fn reverse_bits(self) -> Self {
+        pub fn reverse_bits(self) -> Self {
             (self as $UnsignedT).reverse_bits() as Self
         }
 
@@ -469,7 +469,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn from_be(x: Self) -> Self {
+            pub fn from_be(x: Self) -> Self {
                 if cfg!(target_endian = "big") { x } else { x.swap_bytes() }
             }
         }
@@ -495,7 +495,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn from_le(x: Self) -> Self {
+            pub fn from_le(x: Self) -> Self {
                 if cfg!(target_endian = "little") { x } else { x.swap_bytes() }
             }
         }
@@ -521,7 +521,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn to_be(self) -> Self { // or not to be?
+            pub fn to_be(self) -> Self { // or not to be?
                 if cfg!(target_endian = "big") { self } else { self.swap_bytes() }
             }
         }
@@ -547,7 +547,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn to_le(self) -> Self {
+            pub fn to_le(self) -> Self {
                 if cfg!(target_endian = "little") { self } else { self.swap_bytes() }
             }
         }
@@ -568,7 +568,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn checked_add(self, rhs: Self) -> Option<Self> {
+            pub fn checked_add(self, rhs: Self) -> Option<Self> {
                 let (a, b) = self.overflowing_add(rhs);
                 if b {None} else {Some(a)}
             }
@@ -590,7 +590,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn checked_sub(self, rhs: Self) -> Option<Self> {
+            pub fn checked_sub(self, rhs: Self) -> Option<Self> {
                 let (a, b) = self.overflowing_sub(rhs);
                 if b {None} else {Some(a)}
             }
@@ -612,7 +612,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn checked_mul(self, rhs: Self) -> Option<Self> {
+            pub fn checked_mul(self, rhs: Self) -> Option<Self> {
                 let (a, b) = self.overflowing_mul(rhs);
                 if b {None} else {Some(a)}
             }
@@ -635,7 +635,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn checked_div(self, rhs: Self) -> Option<Self> {
+            pub fn checked_div(self, rhs: Self) -> Option<Self> {
                 if rhs == 0 || (self == Self::min_value() && rhs == -1) {
                     None
                 } else {
@@ -688,7 +688,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn checked_rem(self, rhs: Self) -> Option<Self> {
+            pub fn checked_rem(self, rhs: Self) -> Option<Self> {
                 if rhs == 0 || (self == Self::min_value() && rhs == -1) {
                     None
                 } else {
@@ -740,7 +740,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn checked_neg(self) -> Option<Self> {
+            pub fn checked_neg(self) -> Option<Self> {
                 let (a, b) = self.overflowing_neg();
                 if b {None} else {Some(a)}
             }
@@ -761,7 +761,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn checked_shl(self, rhs: u32) -> Option<Self> {
+            pub fn checked_shl(self, rhs: u32) -> Option<Self> {
                 let (a, b) = self.overflowing_shl(rhs);
                 if b {None} else {Some(a)}
             }
@@ -782,7 +782,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn checked_shr(self, rhs: u32) -> Option<Self> {
+            pub fn checked_shr(self, rhs: u32) -> Option<Self> {
                 let (a, b) = self.overflowing_shr(rhs);
                 if b {None} else {Some(a)}
             }
@@ -805,7 +805,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "no_panic_abs", since = "1.13.0")]
             #[inline]
-            pub const fn checked_abs(self) -> Option<Self> {
+            pub fn checked_abs(self) -> Option<Self> {
                 if self.is_negative() {
                     self.checked_neg()
                 } else {
@@ -831,7 +831,7 @@ $EndFeature, "
 
             #[unstable(feature = "no_panic_pow", issue = "48320")]
             #[inline]
-            pub const fn checked_pow(self, mut exp: u32) -> Option<Self> {
+            pub fn checked_pow(self, mut exp: u32) -> Option<Self> {
                 let mut base = self;
                 let mut acc: Self = 1;
 
@@ -870,7 +870,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn saturating_add(self, rhs: Self) -> Self {
+            pub fn saturating_add(self, rhs: Self) -> Self {
                 match self.checked_add(rhs) {
                     Some(x) => x,
                     None if rhs >= 0 => Self::max_value(),
@@ -895,7 +895,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn saturating_sub(self, rhs: Self) -> Self {
+            pub fn saturating_sub(self, rhs: Self) -> Self {
                 match self.checked_sub(rhs) {
                     Some(x) => x,
                     None if rhs >= 0 => Self::min_value(),
@@ -922,7 +922,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn saturating_mul(self, rhs: Self) -> Self {
+            pub fn saturating_mul(self, rhs: Self) -> Self {
                 self.checked_mul(rhs).unwrap_or_else(|| {
                     if (self < 0 && rhs < 0) || (self > 0 && rhs > 0) {
                         Self::max_value()
@@ -952,7 +952,7 @@ $EndFeature, "
 ```"),
             #[unstable(feature = "no_panic_pow", issue = "48320")]
             #[inline]
-            pub const fn saturating_pow(self, exp: u32) -> Self {
+            pub fn saturating_pow(self, exp: u32) -> Self {
                 match self.checked_pow(exp) {
                     Some(x) => x,
                     None if self < 0 && exp % 2 == 1 => Self::min_value(),
@@ -977,7 +977,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn wrapping_add(self, rhs: Self) -> Self {
+            pub fn wrapping_add(self, rhs: Self) -> Self {
                 unsafe {
                     intrinsics::overflowing_add(self, rhs)
                 }
@@ -1000,7 +1000,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn wrapping_sub(self, rhs: Self) -> Self {
+            pub fn wrapping_sub(self, rhs: Self) -> Self {
                 unsafe {
                     intrinsics::overflowing_sub(self, rhs)
                 }
@@ -1022,7 +1022,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn wrapping_mul(self, rhs: Self) -> Self {
+            pub fn wrapping_mul(self, rhs: Self) -> Self {
                 unsafe {
                     intrinsics::overflowing_mul(self, rhs)
                 }
@@ -1052,7 +1052,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_div(self, rhs: Self) -> Self {
+            pub fn wrapping_div(self, rhs: Self) -> Self {
                 self.overflowing_div(rhs).0
             }
         }
@@ -1108,7 +1108,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_rem(self, rhs: Self) -> Self {
+            pub fn wrapping_rem(self, rhs: Self) -> Self {
                 self.overflowing_rem(rhs).0
             }
         }
@@ -1160,7 +1160,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_neg(self) -> Self {
+            pub fn wrapping_neg(self) -> Self {
                 self.overflowing_neg().0
             }
         }
@@ -1185,7 +1185,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_shl(self, rhs: u32) -> Self {
+            pub fn wrapping_shl(self, rhs: u32) -> Self {
                 unsafe {
                     intrinsics::unchecked_shl(self, (rhs & ($BITS - 1)) as $SelfT)
                 }
@@ -1212,7 +1212,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_shr(self, rhs: u32) -> Self {
+            pub fn wrapping_shr(self, rhs: u32) -> Self {
                 unsafe {
                     intrinsics::unchecked_shr(self, (rhs & ($BITS - 1)) as $SelfT)
                 }
@@ -1241,7 +1241,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "no_panic_abs", since = "1.13.0")]
             #[inline]
-            pub const fn wrapping_abs(self) -> Self {
+            pub fn wrapping_abs(self) -> Self {
                 if self.is_negative() {
                     self.wrapping_neg()
                 } else {
@@ -1267,7 +1267,7 @@ $EndFeature, "
 ```"),
             #[unstable(feature = "no_panic_pow", issue = "48320")]
             #[inline]
-            pub const fn wrapping_pow(self, mut exp: u32) -> Self {
+            pub fn wrapping_pow(self, mut exp: u32) -> Self {
                 let mut base = self;
                 let mut acc: Self = 1;
 
@@ -1309,7 +1309,7 @@ assert_eq!(", stringify!($SelfT), "::MAX.overflowing_add(1), (", stringify!($Sel
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_add(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_add(self, rhs: Self) -> (Self, bool) {
                 let (a, b) = unsafe {
                     intrinsics::add_with_overflow(self as $ActualT,
                                                   rhs as $ActualT)
@@ -1337,7 +1337,7 @@ assert_eq!(", stringify!($SelfT), "::MIN.overflowing_sub(1), (", stringify!($Sel
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
                 let (a, b) = unsafe {
                     intrinsics::sub_with_overflow(self as $ActualT,
                                                   rhs as $ActualT)
@@ -1363,7 +1363,7 @@ $EndFeature, "
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
                 let (a, b) = unsafe {
                     intrinsics::mul_with_overflow(self as $ActualT,
                                                   rhs as $ActualT)
@@ -1396,7 +1396,7 @@ $EndFeature, "
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_div(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_div(self, rhs: Self) -> (Self, bool) {
                 if self == Self::min_value() && rhs == -1 {
                     (self, true)
                 } else {
@@ -1461,7 +1461,7 @@ $EndFeature, "
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_rem(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_rem(self, rhs: Self) -> (Self, bool) {
                 if self == Self::min_value() && rhs == -1 {
                     (0, true)
                 } else {
@@ -1524,7 +1524,7 @@ assert_eq!(", stringify!($SelfT), "::MIN.overflowing_neg(), (", stringify!($Self
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_neg(self) -> (Self, bool) {
+            pub fn overflowing_neg(self) -> (Self, bool) {
                 if self == Self::min_value() {
                     (Self::min_value(), true)
                 } else {
@@ -1551,7 +1551,7 @@ $EndFeature, "
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_shl(self, rhs: u32) -> (Self, bool) {
+            pub fn overflowing_shl(self, rhs: u32) -> (Self, bool) {
                 (self.wrapping_shl(rhs), (rhs > ($BITS - 1)))
             }
         }
@@ -1574,7 +1574,7 @@ $EndFeature, "
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_shr(self, rhs: u32) -> (Self, bool) {
+            pub fn overflowing_shr(self, rhs: u32) -> (Self, bool) {
                 (self.wrapping_shr(rhs), (rhs > ($BITS - 1)))
             }
         }
@@ -1600,7 +1600,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "no_panic_abs", since = "1.13.0")]
             #[inline]
-            pub const fn overflowing_abs(self) -> (Self, bool) {
+            pub fn overflowing_abs(self) -> (Self, bool) {
                 if self.is_negative() {
                     self.overflowing_neg()
                 } else {
@@ -1627,7 +1627,7 @@ $EndFeature, "
 ```"),
             #[unstable(feature = "no_panic_pow", issue = "48320")]
             #[inline]
-            pub const fn overflowing_pow(self, mut exp: u32) -> (Self, bool) {
+            pub fn overflowing_pow(self, mut exp: u32) -> (Self, bool) {
                 let mut base = self;
                 let mut acc: Self = 1;
                 let mut overflown = false;
@@ -1675,7 +1675,7 @@ $EndFeature, "
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
             #[rustc_inherit_overflow_checks]
-            pub const fn pow(self, mut exp: u32) -> Self {
+            pub fn pow(self, mut exp: u32) -> Self {
                 let mut base = self;
                 let mut acc = 1;
 
@@ -1798,7 +1798,7 @@ $EndFeature, "
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
             #[rustc_inherit_overflow_checks]
-            pub const fn abs(self) -> Self {
+            pub fn abs(self) -> Self {
                 if self.is_negative() {
                     // Note that the #[inline] above means that the overflow
                     // semantics of this negation depend on the crate we're being
@@ -1829,7 +1829,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn signum(self) -> Self {
+            pub fn signum(self) -> Self {
                 match self {
                     n if n > 0 =>  1,
                     0          =>  0,
@@ -1853,7 +1853,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn is_positive(self) -> bool { self > 0 }
+            pub fn is_positive(self) -> bool { self > 0 }
         }
 
         doc_comment! {
@@ -1871,7 +1871,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn is_negative(self) -> bool { self < 0 }
+            pub fn is_negative(self) -> bool { self < 0 }
         }
 
         /// Return the memory representation of this integer as a byte array.
@@ -2023,7 +2023,7 @@ Basic usage:
 $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
-            pub const fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError> {
+            pub fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError> {
                 from_str_radix(src, radix)
             }
         }
@@ -2042,7 +2042,7 @@ assert_eq!(n.count_ones(), 3);", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn count_ones(self) -> u32 {
+            pub fn count_ones(self) -> u32 {
                 unsafe { intrinsics::ctpop(self as $ActualT) as u32 }
             }
         }
@@ -2059,7 +2059,7 @@ Basic usage:
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn count_zeros(self) -> u32 {
+            pub fn count_zeros(self) -> u32 {
                 (!self).count_ones()
             }
         }
@@ -2078,7 +2078,7 @@ assert_eq!(n.leading_zeros(), 2);", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn leading_zeros(self) -> u32 {
+            pub fn leading_zeros(self) -> u32 {
                 unsafe { intrinsics::ctlz(self as $ActualT) as u32 }
             }
         }
@@ -2098,7 +2098,7 @@ assert_eq!(n.trailing_zeros(), 3);", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn trailing_zeros(self) -> u32 {
+            pub fn trailing_zeros(self) -> u32 {
                 // As of LLVM 3.6 the codegen for the zero-safe cttz8 intrinsic
                 // emits two conditional moves on x86_64. By promoting the value to
                 // u16 and setting bit 8, we get better code without any conditional
@@ -2136,7 +2136,7 @@ assert_eq!(n.trailing_zeros(), 3);", $EndFeature, "
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub const fn rotate_left(self, n: u32) -> Self {
+        pub fn rotate_left(self, n: u32) -> Self {
             // Protect against undefined behaviour for over-long bit shifts
             let n = n % $BITS;
             (self << n) | (self >> (($BITS - n) % $BITS))
@@ -2163,7 +2163,7 @@ assert_eq!(n.trailing_zeros(), 3);", $EndFeature, "
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub const fn rotate_right(self, n: u32) -> Self {
+        pub fn rotate_right(self, n: u32) -> Self {
             // Protect against undefined behaviour for over-long bit shifts
             let n = n % $BITS;
             (self >> n) | (self << (($BITS - n) % $BITS))
@@ -2189,7 +2189,7 @@ assert_eq!(n.trailing_zeros(), 3);", $EndFeature, "
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub const fn swap_bytes(self) -> Self {
+        pub fn swap_bytes(self) -> Self {
             unsafe { intrinsics::bswap(self as $ActualT) as Self }
         }
 
@@ -2216,7 +2216,7 @@ assert_eq!(n.trailing_zeros(), 3);", $EndFeature, "
         #[unstable(feature = "reverse_bits", issue = "48763")]
         #[cfg(not(stage0))]
         #[inline]
-        pub const fn reverse_bits(self) -> Self {
+        pub fn reverse_bits(self) -> Self {
             unsafe { intrinsics::bitreverse(self as $ActualT) as Self }
         }
 
@@ -2241,7 +2241,7 @@ if cfg!(target_endian = \"big\") {
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn from_be(x: Self) -> Self {
+            pub fn from_be(x: Self) -> Self {
                 if cfg!(target_endian = "big") { x } else { x.swap_bytes() }
             }
         }
@@ -2267,7 +2267,7 @@ if cfg!(target_endian = \"little\") {
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn from_le(x: Self) -> Self {
+            pub fn from_le(x: Self) -> Self {
                 if cfg!(target_endian = "little") { x } else { x.swap_bytes() }
             }
         }
@@ -2293,7 +2293,7 @@ if cfg!(target_endian = \"big\") {
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn to_be(self) -> Self { // or not to be?
+            pub fn to_be(self) -> Self { // or not to be?
                 if cfg!(target_endian = "big") { self } else { self.swap_bytes() }
             }
         }
@@ -2319,7 +2319,7 @@ if cfg!(target_endian = \"little\") {
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn to_le(self) -> Self {
+            pub fn to_le(self) -> Self {
                 if cfg!(target_endian = "little") { self } else { self.swap_bytes() }
             }
         }
@@ -2339,7 +2339,7 @@ assert_eq!((", stringify!($SelfT), "::max_value() - 2).checked_add(3),None);", $
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn checked_add(self, rhs: Self) -> Option<Self> {
+            pub fn checked_add(self, rhs: Self) -> Option<Self> {
                 let (a, b) = self.overflowing_add(rhs);
                 if b {None} else {Some(a)}
             }
@@ -2359,7 +2359,7 @@ assert_eq!(0", stringify!($SelfT), ".checked_sub(1), None);", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn checked_sub(self, rhs: Self) -> Option<Self> {
+            pub fn checked_sub(self, rhs: Self) -> Option<Self> {
                 let (a, b) = self.overflowing_sub(rhs);
                 if b {None} else {Some(a)}
             }
@@ -2379,7 +2379,7 @@ assert_eq!(", stringify!($SelfT), "::max_value().checked_mul(2), None);", $EndFe
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn checked_mul(self, rhs: Self) -> Option<Self> {
+            pub fn checked_mul(self, rhs: Self) -> Option<Self> {
                 let (a, b) = self.overflowing_mul(rhs);
                 if b {None} else {Some(a)}
             }
@@ -2399,7 +2399,7 @@ assert_eq!(1", stringify!($SelfT), ".checked_div(0), None);", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn checked_div(self, rhs: Self) -> Option<Self> {
+            pub fn checked_div(self, rhs: Self) -> Option<Self> {
                 match rhs {
                     0 => None,
                     rhs => Some(unsafe { intrinsics::unchecked_div(self, rhs) }),
@@ -2446,7 +2446,7 @@ assert_eq!(5", stringify!($SelfT), ".checked_rem(0), None);", $EndFeature, "
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn checked_rem(self, rhs: Self) -> Option<Self> {
+            pub fn checked_rem(self, rhs: Self) -> Option<Self> {
                 if rhs == 0 {
                     None
                 } else {
@@ -2495,7 +2495,7 @@ assert_eq!(1", stringify!($SelfT), ".checked_neg(), None);", $EndFeature, "
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn checked_neg(self) -> Option<Self> {
+            pub fn checked_neg(self) -> Option<Self> {
                 let (a, b) = self.overflowing_neg();
                 if b {None} else {Some(a)}
             }
@@ -2515,7 +2515,7 @@ assert_eq!(0x10", stringify!($SelfT), ".checked_shl(129), None);", $EndFeature, 
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn checked_shl(self, rhs: u32) -> Option<Self> {
+            pub fn checked_shl(self, rhs: u32) -> Option<Self> {
                 let (a, b) = self.overflowing_shl(rhs);
                 if b {None} else {Some(a)}
             }
@@ -2535,7 +2535,7 @@ assert_eq!(0x10", stringify!($SelfT), ".checked_shr(129), None);", $EndFeature, 
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn checked_shr(self, rhs: u32) -> Option<Self> {
+            pub fn checked_shr(self, rhs: u32) -> Option<Self> {
                 let (a, b) = self.overflowing_shr(rhs);
                 if b {None} else {Some(a)}
             }
@@ -2556,7 +2556,7 @@ assert_eq!(", stringify!($SelfT), "::max_value().checked_pow(2), None);", $EndFe
 ```"),
             #[unstable(feature = "no_panic_pow", issue = "48320")]
             #[inline]
-            pub const fn checked_pow(self, mut exp: u32) -> Option<Self> {
+            pub fn checked_pow(self, mut exp: u32) -> Option<Self> {
                 let mut base = self;
                 let mut acc: Self = 1;
 
@@ -2593,7 +2593,7 @@ assert_eq!(200u8.saturating_add(127), 255);", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn saturating_add(self, rhs: Self) -> Self {
+            pub fn saturating_add(self, rhs: Self) -> Self {
                 match self.checked_add(rhs) {
                     Some(x) => x,
                     None => Self::max_value(),
@@ -2615,7 +2615,7 @@ assert_eq!(13", stringify!($SelfT), ".saturating_sub(127), 0);", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn saturating_sub(self, rhs: Self) -> Self {
+            pub fn saturating_sub(self, rhs: Self) -> Self {
                 match self.checked_sub(rhs) {
                     Some(x) => x,
                     None => Self::min_value(),
@@ -2640,7 +2640,7 @@ assert_eq!((", stringify!($SelfT), "::MAX).saturating_mul(10), ", stringify!($Se
 ```"),
             #[stable(feature = "wrapping", since = "1.7.0")]
             #[inline]
-            pub const fn saturating_mul(self, rhs: Self) -> Self {
+            pub fn saturating_mul(self, rhs: Self) -> Self {
                 self.checked_mul(rhs).unwrap_or(Self::max_value())
             }
         }
@@ -2663,7 +2663,7 @@ $EndFeature, "
 ```"),
             #[unstable(feature = "no_panic_pow", issue = "48320")]
             #[inline]
-            pub const fn saturating_pow(self, exp: u32) -> Self {
+            pub fn saturating_pow(self, exp: u32) -> Self {
                 match self.checked_pow(exp) {
                     Some(x) => x,
                     None => Self::max_value(),
@@ -2686,7 +2686,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn wrapping_add(self, rhs: Self) -> Self {
+            pub fn wrapping_add(self, rhs: Self) -> Self {
                 unsafe {
                     intrinsics::overflowing_add(self, rhs)
                 }
@@ -2708,7 +2708,7 @@ $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn wrapping_sub(self, rhs: Self) -> Self {
+            pub fn wrapping_sub(self, rhs: Self) -> Self {
                 unsafe {
                     intrinsics::overflowing_sub(self, rhs)
                 }
@@ -2731,7 +2731,7 @@ $EndFeature, "
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        pub const fn wrapping_mul(self, rhs: Self) -> Self {
+        pub fn wrapping_mul(self, rhs: Self) -> Self {
             unsafe {
                 intrinsics::overflowing_mul(self, rhs)
             }
@@ -2753,7 +2753,7 @@ Basic usage:
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_div(self, rhs: Self) -> Self {
+            pub fn wrapping_div(self, rhs: Self) -> Self {
                 self / rhs
             }
         }
@@ -2797,7 +2797,7 @@ Basic usage:
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_rem(self, rhs: Self) -> Self {
+            pub fn wrapping_rem(self, rhs: Self) -> Self {
                 self % rhs
             }
         }
@@ -2848,7 +2848,7 @@ assert_eq!(100", stringify!($SelfT), ".wrapping_mod_euc(10), 0);
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        pub const fn wrapping_neg(self) -> Self {
+        pub fn wrapping_neg(self) -> Self {
             self.overflowing_neg().0
         }
 
@@ -2874,7 +2874,7 @@ assert_eq!(1", stringify!($SelfT), ".wrapping_shl(128), 1);", $EndFeature, "
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_shl(self, rhs: u32) -> Self {
+            pub fn wrapping_shl(self, rhs: u32) -> Self {
                 unsafe {
                     intrinsics::unchecked_shl(self, (rhs & ($BITS - 1)) as $SelfT)
                 }
@@ -2903,7 +2903,7 @@ assert_eq!(128", stringify!($SelfT), ".wrapping_shr(128), 128);", $EndFeature, "
 ```"),
             #[stable(feature = "num_wrapping", since = "1.2.0")]
             #[inline]
-            pub const fn wrapping_shr(self, rhs: u32) -> Self {
+            pub fn wrapping_shr(self, rhs: u32) -> Self {
                 unsafe {
                     intrinsics::unchecked_shr(self, (rhs & ($BITS - 1)) as $SelfT)
                 }
@@ -2925,7 +2925,7 @@ assert_eq!(3u8.wrapping_pow(6), 217);", $EndFeature, "
 ```"),
             #[unstable(feature = "no_panic_pow", issue = "48320")]
             #[inline]
-            pub const fn wrapping_pow(self, mut exp: u32) -> Self {
+            pub fn wrapping_pow(self, mut exp: u32) -> Self {
                 let mut base = self;
                 let mut acc: Self = 1;
 
@@ -2967,7 +2967,7 @@ assert_eq!(", stringify!($SelfT), "::MAX.overflowing_add(1), (0, true));", $EndF
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_add(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_add(self, rhs: Self) -> (Self, bool) {
                 let (a, b) = unsafe {
                     intrinsics::add_with_overflow(self as $ActualT,
                                                   rhs as $ActualT)
@@ -2996,7 +2996,7 @@ $EndFeature, "
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
                 let (a, b) = unsafe {
                     intrinsics::sub_with_overflow(self as $ActualT,
                                                   rhs as $ActualT)
@@ -3024,7 +3024,7 @@ $EndFeature, "
         /// ```
         #[inline]
         #[stable(feature = "wrapping", since = "1.7.0")]
-        pub const fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
+        pub fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
             let (a, b) = unsafe {
                 intrinsics::mul_with_overflow(self as $ActualT,
                                               rhs as $ActualT)
@@ -3053,7 +3053,7 @@ Basic usage
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_div(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_div(self, rhs: Self) -> (Self, bool) {
                 (self / rhs, false)
             }
         }
@@ -3106,7 +3106,7 @@ Basic usage
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_rem(self, rhs: Self) -> (Self, bool) {
+            pub fn overflowing_rem(self, rhs: Self) -> (Self, bool) {
                 (self % rhs, false)
             }
         }
@@ -3157,7 +3157,7 @@ assert_eq!(2", stringify!($SelfT), ".overflowing_neg(), (-2i32 as ", stringify!(
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_neg(self) -> (Self, bool) {
+            pub fn overflowing_neg(self) -> (Self, bool) {
                 ((!self).wrapping_add(1), self != 0)
             }
         }
@@ -3181,7 +3181,7 @@ assert_eq!(0x1", stringify!($SelfT), ".overflowing_shl(132), (0x10, true));", $E
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_shl(self, rhs: u32) -> (Self, bool) {
+            pub fn overflowing_shl(self, rhs: u32) -> (Self, bool) {
                 (self.wrapping_shl(rhs), (rhs > ($BITS - 1)))
             }
         }
@@ -3205,7 +3205,7 @@ assert_eq!(0x10", stringify!($SelfT), ".overflowing_shr(132), (0x1, true));", $E
 ```"),
             #[inline]
             #[stable(feature = "wrapping", since = "1.7.0")]
-            pub const fn overflowing_shr(self, rhs: u32) -> (Self, bool) {
+            pub fn overflowing_shr(self, rhs: u32) -> (Self, bool) {
                 (self.wrapping_shr(rhs), (rhs > ($BITS - 1)))
             }
         }
@@ -3227,7 +3227,7 @@ assert_eq!(3u8.overflowing_pow(6), (217, true));", $EndFeature, "
 ```"),
             #[unstable(feature = "no_panic_pow", issue = "48320")]
             #[inline]
-            pub const fn overflowing_pow(self, mut exp: u32) -> (Self, bool) {
+            pub fn overflowing_pow(self, mut exp: u32) -> (Self, bool) {
                 let mut base = self;
                 let mut acc: Self = 1;
                 let mut overflown = false;
@@ -3272,7 +3272,7 @@ Basic usage:
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
         #[rustc_inherit_overflow_checks]
-        pub const fn pow(self, mut exp: u32) -> Self {
+        pub fn pow(self, mut exp: u32) -> Self {
             let mut base = self;
             let mut acc = 1;
 
@@ -3351,7 +3351,7 @@ assert!(!10", stringify!($SelfT), ".is_power_of_two());", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn is_power_of_two(self) -> bool {
+            pub fn is_power_of_two(self) -> bool {
                 (self.wrapping_sub(1)) & self == 0 && !(self == 0)
             }
         }
@@ -3366,7 +3366,7 @@ assert!(!10", stringify!($SelfT), ".is_power_of_two());", $EndFeature, "
         // overflow cases it instead ends up returning the maximum value
         // of the type, and can return 0 for 0.
         #[inline]
-        const fn one_less_than_next_power_of_two(self) -> Self {
+        fn one_less_than_next_power_of_two(self) -> Self {
             if self <= 1 { return 0; }
 
             // Because `p > 0`, it cannot consist entirely of leading zeros.
@@ -3395,7 +3395,7 @@ assert_eq!(3", stringify!($SelfT), ".next_power_of_two(), 4);", $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
             #[inline]
-            pub const fn next_power_of_two(self) -> Self {
+            pub fn next_power_of_two(self) -> Self {
                 // Call the trait to get overflow checks
                 ops::Add::add(self.one_less_than_next_power_of_two(), 1)
             }
@@ -3418,7 +3418,7 @@ assert_eq!(", stringify!($SelfT), "::max_value().checked_next_power_of_two(), No
 $EndFeature, "
 ```"),
             #[stable(feature = "rust1", since = "1.0.0")]
-            pub const fn checked_next_power_of_two(self) -> Option<Self> {
+            pub fn checked_next_power_of_two(self) -> Option<Self> {
                 self.one_less_than_next_power_of_two().checked_add(1)
             }
         }
@@ -3487,7 +3487,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    pub const fn is_ascii(&self) -> bool {
+    pub fn is_ascii(&self) -> bool {
         *self & 128 == 0
     }
 
@@ -3509,7 +3509,7 @@ impl u8 {
     /// [`make_ascii_uppercase`]: #method.make_ascii_uppercase
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    pub const fn to_ascii_uppercase(&self) -> u8 {
+    pub fn to_ascii_uppercase(&self) -> u8 {
         ASCII_UPPERCASE_MAP[*self as usize]
     }
 
@@ -3531,7 +3531,7 @@ impl u8 {
     /// [`make_ascii_lowercase`]: #method.make_ascii_lowercase
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    pub const fn to_ascii_lowercase(&self) -> u8 {
+    pub fn to_ascii_lowercase(&self) -> u8 {
         ASCII_LOWERCASE_MAP[*self as usize]
     }
 
@@ -3549,7 +3549,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    pub const fn eq_ignore_ascii_case(&self, other: &u8) -> bool {
+    pub fn eq_ignore_ascii_case(&self, other: &u8) -> bool {
         self.to_ascii_lowercase() == other.to_ascii_lowercase()
     }
 
@@ -3574,7 +3574,7 @@ impl u8 {
     /// [`to_ascii_uppercase`]: #method.to_ascii_uppercase
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    pub const fn make_ascii_uppercase(&mut self) {
+    pub fn make_ascii_uppercase(&mut self) {
         *self = self.to_ascii_uppercase();
     }
 
@@ -3599,7 +3599,7 @@ impl u8 {
     /// [`to_ascii_lowercase`]: #method.to_ascii_lowercase
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    pub const fn make_ascii_lowercase(&mut self) {
+    pub fn make_ascii_lowercase(&mut self) {
         *self = self.to_ascii_lowercase();
     }
 
@@ -3635,7 +3635,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_alphabetic(&self) -> bool {
+    pub fn is_ascii_alphabetic(&self) -> bool {
         if *self >= 0x80 { return false; }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             L | Lx | U | Ux => true,
@@ -3673,7 +3673,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_uppercase(&self) -> bool {
+    pub fn is_ascii_uppercase(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             U | Ux => true,
@@ -3711,7 +3711,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_lowercase(&self) -> bool {
+    pub fn is_ascii_lowercase(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             L | Lx => true,
@@ -3752,7 +3752,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_alphanumeric(&self) -> bool {
+    pub fn is_ascii_alphanumeric(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             D | L | Lx | U | Ux => true,
@@ -3790,7 +3790,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_digit(&self) -> bool {
+    pub fn is_ascii_digit(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             D => true,
@@ -3831,7 +3831,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_hexdigit(&self) -> bool {
+    pub fn is_ascii_hexdigit(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             D | Lx | Ux => true,
@@ -3873,7 +3873,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_punctuation(&self) -> bool {
+    pub fn is_ascii_punctuation(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             P => true,
@@ -3911,7 +3911,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_graphic(&self) -> bool {
+    pub fn is_ascii_graphic(&self) -> bool {
         if *self >= 0x80 { return false; }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             Ux | U | Lx | L | D | P => true,
@@ -3966,7 +3966,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_whitespace(&self) -> bool {
+    pub fn is_ascii_whitespace(&self) -> bool {
         if *self >= 0x80 { return false; }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             Cw | W => true,
@@ -4006,7 +4006,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    pub const fn is_ascii_control(&self) -> bool {
+    pub fn is_ascii_control(&self) -> bool {
         if *self >= 0x80 { return false; }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             C | Cw => true,
@@ -4112,49 +4112,49 @@ pub trait Float: Sized {
     type Bits;
 
     /// Returns `true` if this value is NaN and false otherwise.
-    const fn is_nan(self) -> bool;
+    fn is_nan(self) -> bool;
 
     /// Returns `true` if this value is positive infinity or negative infinity and
     /// false otherwise.
-    const fn is_infinite(self) -> bool;
+    fn is_infinite(self) -> bool;
 
     /// Returns `true` if this number is neither infinite nor NaN.
-    const fn is_finite(self) -> bool;
+    fn is_finite(self) -> bool;
 
     /// Returns `true` if this number is neither zero, infinite, denormal, or NaN.
-    const fn is_normal(self) -> bool;
+    fn is_normal(self) -> bool;
 
     /// Returns the category that this number falls into.
-    const fn classify(self) -> FpCategory;
+    fn classify(self) -> FpCategory;
 
     /// Returns `true` if `self` is positive, including `+0.0` and
     /// `Float::infinity()`.
-    const fn is_sign_positive(self) -> bool;
+    fn is_sign_positive(self) -> bool;
 
     /// Returns `true` if `self` is negative, including `-0.0` and
     /// `Float::neg_infinity()`.
-    const fn is_sign_negative(self) -> bool;
+    fn is_sign_negative(self) -> bool;
 
     /// Take the reciprocal (inverse) of a number, `1/x`.
-    const fn recip(self) -> Self;
+    fn recip(self) -> Self;
 
     /// Convert radians to degrees.
-    const fn to_degrees(self) -> Self;
+    fn to_degrees(self) -> Self;
 
     /// Convert degrees to radians.
-    const fn to_radians(self) -> Self;
+    fn to_radians(self) -> Self;
 
     /// Returns the maximum of the two numbers.
-    const fn max(self, other: Self) -> Self;
+    fn max(self, other: Self) -> Self;
 
     /// Returns the minimum of the two numbers.
-    const fn min(self, other: Self) -> Self;
+    fn min(self, other: Self) -> Self;
 
     /// Raw transmutation to integer.
-    const fn to_bits(self) -> Self::Bits;
+    fn to_bits(self) -> Self::Bits;
 
     /// Raw transmutation from integer.
-    const fn from_bits(v: Self::Bits) -> Self;
+    fn from_bits(v: Self::Bits) -> Self;
 }
 
 macro_rules! from_str_radix_int_impl {
@@ -4162,7 +4162,7 @@ macro_rules! from_str_radix_int_impl {
         #[stable(feature = "rust1", since = "1.0.0")]
         impl FromStr for $t {
             type Err = ParseIntError;
-            const fn from_str(src: &str) -> Result<Self, ParseIntError> {
+            fn from_str(src: &str) -> Result<Self, ParseIntError> {
                 from_str_radix(src, 10)
             }
         }
@@ -4181,7 +4181,7 @@ impl TryFromIntError {
                          not be exposed publicly",
                issue = "0")]
     #[doc(hidden)]
-    pub const fn __description(&self) -> &str {
+    pub fn __description(&self) -> &str {
         "out of range integral type conversion attempted"
     }
 }
@@ -4195,7 +4195,7 @@ impl fmt::Display for TryFromIntError {
 
 #[unstable(feature = "try_from", issue = "33417")]
 impl From<!> for TryFromIntError {
-    const fn from(never: !) -> TryFromIntError {
+    fn from(never: !) -> TryFromIntError {
         never
     }
 }
@@ -4208,7 +4208,7 @@ macro_rules! try_from_lower_bounded {
             type Error = TryFromIntError;
 
             #[inline]
-            const fn try_from(u: $source) -> Result<$target, TryFromIntError> {
+            fn try_from(u: $source) -> Result<$target, TryFromIntError> {
                 if u >= 0 {
                     Ok(u as $target)
                 } else {
@@ -4227,7 +4227,7 @@ macro_rules! try_from_upper_bounded {
             type Error = TryFromIntError;
 
             #[inline]
-            const fn try_from(u: $source) -> Result<$target, TryFromIntError> {
+            fn try_from(u: $source) -> Result<$target, TryFromIntError> {
                 if u > (<$target>::max_value() as $source) {
                     Err(TryFromIntError(()))
                 } else {
@@ -4246,7 +4246,7 @@ macro_rules! try_from_both_bounded {
             type Error = TryFromIntError;
 
             #[inline]
-            const fn try_from(u: $source) -> Result<$target, TryFromIntError> {
+            fn try_from(u: $source) -> Result<$target, TryFromIntError> {
                 let min = <$target>::min_value() as $source;
                 let max = <$target>::max_value() as $source;
                 if u < min || u > max {
@@ -4340,39 +4340,39 @@ mod ptr_try_from_impls {
 
 #[doc(hidden)]
 trait FromStrRadixHelper: PartialOrd + Copy {
-    const fn min_value() -> Self;
-    const fn max_value() -> Self;
-    const fn from_u32(u: u32) -> Self;
-    const fn checked_mul(&self, other: u32) -> Option<Self>;
-    const fn checked_sub(&self, other: u32) -> Option<Self>;
-    const fn checked_add(&self, other: u32) -> Option<Self>;
+    fn min_value() -> Self;
+    fn max_value() -> Self;
+    fn from_u32(u: u32) -> Self;
+    fn checked_mul(&self, other: u32) -> Option<Self>;
+    fn checked_sub(&self, other: u32) -> Option<Self>;
+    fn checked_add(&self, other: u32) -> Option<Self>;
 }
 
 macro_rules! doit {
     ($($t:ty)*) => ($(impl FromStrRadixHelper for $t {
         #[inline]
-        const fn min_value() -> Self { Self::min_value() }
+        fn min_value() -> Self { Self::min_value() }
         #[inline]
-        const fn max_value() -> Self { Self::max_value() }
+        fn max_value() -> Self { Self::max_value() }
         #[inline]
-        const fn from_u32(u: u32) -> Self { u as Self }
+        fn from_u32(u: u32) -> Self { u as Self }
         #[inline]
-        const fn checked_mul(&self, other: u32) -> Option<Self> {
+        fn checked_mul(&self, other: u32) -> Option<Self> {
             Self::checked_mul(*self, other as Self)
         }
         #[inline]
-        const fn checked_sub(&self, other: u32) -> Option<Self> {
+        fn checked_sub(&self, other: u32) -> Option<Self> {
             Self::checked_sub(*self, other as Self)
         }
         #[inline]
-        const fn checked_add(&self, other: u32) -> Option<Self> {
+        fn checked_add(&self, other: u32) -> Option<Self> {
             Self::checked_add(*self, other as Self)
         }
     })*)
 }
 doit! { i8 i16 i32 i64 i128 isize u8 u16 u32 u64 u128 usize }
 
-const fn from_str_radix<T: FromStrRadixHelper>(src: &str, radix: u32) -> Result<T, ParseIntError> {
+fn from_str_radix<T: FromStrRadixHelper>(src: &str, radix: u32) -> Result<T, ParseIntError> {
     use self::IntErrorKind::*;
     use self::ParseIntError as PIE;
 
@@ -4472,7 +4472,7 @@ impl ParseIntError {
                          not be exposed publicly",
                issue = "0")]
     #[doc(hidden)]
-    pub const fn __description(&self) -> &str {
+    pub fn __description(&self) -> &str {
         match self.kind {
             IntErrorKind::Empty => "cannot parse integer from empty string",
             IntErrorKind::InvalidDigit => "invalid digit found in string",
@@ -4500,7 +4500,7 @@ macro_rules! impl_from {
         #[$attr]
         impl From<$Small> for $Large {
             #[inline]
-            const fn from(small: $Small) -> $Large {
+            fn from(small: $Small) -> $Large {
                 small as $Large
             }
         }

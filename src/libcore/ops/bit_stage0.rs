@@ -46,9 +46,8 @@ pub trait Not {
     type Output;
 
     /// Performs the unary `!` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn not(self) -> Self::Output;
+    fn not(self) -> Self::Output;
 }
 
 macro_rules! not_impl {
@@ -58,7 +57,7 @@ macro_rules! not_impl {
             type Output = $t;
 
             #[inline]
-            const fn not(self) -> $t { !self }
+            fn not(self) -> $t { !self }
         }
 
         forward_ref_unop! { impl Not, not for $t }
@@ -120,7 +119,6 @@ not_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 /// assert_eq!(bv1 & bv2, expected);
 /// ```
 #[lang = "bitand"]
-#[doc(alias = "&")]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} & {RHS}`",
                          label="no implementation for `{Self} & {RHS}`")]
@@ -130,9 +128,8 @@ pub trait BitAnd<RHS=Self> {
     type Output;
 
     /// Performs the `&` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn bitand(self, rhs: RHS) -> Self::Output;
+    fn bitand(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! bitand_impl {
@@ -142,7 +139,7 @@ macro_rules! bitand_impl {
             type Output = $t;
 
             #[inline]
-            const fn bitand(self, rhs: $t) -> $t { self & rhs }
+            fn bitand(self, rhs: $t) -> $t { self & rhs }
         }
 
         forward_ref_binop! { impl BitAnd, bitand for $t, $t }
@@ -204,7 +201,6 @@ bitand_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 /// assert_eq!(bv1 | bv2, expected);
 /// ```
 #[lang = "bitor"]
-#[doc(alias = "|")]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} | {RHS}`",
                          label="no implementation for `{Self} | {RHS}`")]
@@ -214,9 +210,8 @@ pub trait BitOr<RHS=Self> {
     type Output;
 
     /// Performs the `|` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn bitor(self, rhs: RHS) -> Self::Output;
+    fn bitor(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! bitor_impl {
@@ -226,7 +221,7 @@ macro_rules! bitor_impl {
             type Output = $t;
 
             #[inline]
-            const fn bitor(self, rhs: $t) -> $t { self | rhs }
+            fn bitor(self, rhs: $t) -> $t { self | rhs }
         }
 
         forward_ref_binop! { impl BitOr, bitor for $t, $t }
@@ -291,7 +286,6 @@ bitor_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 /// assert_eq!(bv1 ^ bv2, expected);
 /// ```
 #[lang = "bitxor"]
-#[doc(alias = "^")]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} ^ {RHS}`",
                          label="no implementation for `{Self} ^ {RHS}`")]
@@ -301,9 +295,8 @@ pub trait BitXor<RHS=Self> {
     type Output;
 
     /// Performs the `^` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn bitxor(self, rhs: RHS) -> Self::Output;
+    fn bitxor(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! bitxor_impl {
@@ -313,7 +306,7 @@ macro_rules! bitxor_impl {
             type Output = $t;
 
             #[inline]
-            const fn bitxor(self, other: $t) -> $t { self ^ other }
+            fn bitxor(self, other: $t) -> $t { self ^ other }
         }
 
         forward_ref_binop! { impl BitXor, bitxor for $t, $t }
@@ -322,12 +315,7 @@ macro_rules! bitxor_impl {
 
 bitxor_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 
-/// The left shift operator `<<`. Note that because this trait is implemented
-/// for all integer types with multiple right-hand-side types, Rust's type
-/// checker has special handling for `_ << _`, setting the result type for
-/// integer operations to the type of the left-hand-side operand. This means
-/// that though `a << b` and `a.shl(b)` are one and the same from an evaluation
-/// standpoint, they are different when it comes to type inference.
+/// The left shift operator `<<`.
 ///
 /// # Examples
 ///
@@ -379,19 +367,17 @@ bitxor_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 ///            SpinVector { vec: vec![2, 3, 4, 0, 1] });
 /// ```
 #[lang = "shl"]
-#[doc(alias = "<<")]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} << {RHS}`",
                          label="no implementation for `{Self} << {RHS}`")]
-pub trait Shl<RHS=Self> {
+pub trait Shl<RHS> {
     /// The resulting type after applying the `<<` operator.
     #[stable(feature = "rust1", since = "1.0.0")]
     type Output;
 
     /// Performs the `<<` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn shl(self, rhs: RHS) -> Self::Output;
+    fn shl(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! shl_impl {
@@ -402,7 +388,7 @@ macro_rules! shl_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn shl(self, other: $f) -> $t {
+            fn shl(self, other: $f) -> $t {
                 self << other
             }
         }
@@ -431,12 +417,7 @@ macro_rules! shl_impl_all {
 
 shl_impl_all! { u8 u16 u32 u64 u128 usize i8 i16 i32 i64 isize i128 }
 
-/// The right shift operator `>>`. Note that because this trait is implemented
-/// for all integer types with multiple right-hand-side types, Rust's type
-/// checker has special handling for `_ >> _`, setting the result type for
-/// integer operations to the type of the left-hand-side operand. This means
-/// that though `a >> b` and `a.shr(b)` are one and the same from an evaluation
-/// standpoint, they are different when it comes to type inference.
+/// The right shift operator `>>`.
 ///
 /// # Examples
 ///
@@ -488,19 +469,17 @@ shl_impl_all! { u8 u16 u32 u64 u128 usize i8 i16 i32 i64 isize i128 }
 ///            SpinVector { vec: vec![3, 4, 0, 1, 2] });
 /// ```
 #[lang = "shr"]
-#[doc(alias = ">>")]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} >> {RHS}`",
                          label="no implementation for `{Self} >> {RHS}`")]
-pub trait Shr<RHS=Self> {
+pub trait Shr<RHS> {
     /// The resulting type after applying the `>>` operator.
     #[stable(feature = "rust1", since = "1.0.0")]
     type Output;
 
     /// Performs the `>>` operation.
-    #[must_use]
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn shr(self, rhs: RHS) -> Self::Output;
+    fn shr(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! shr_impl {
@@ -511,7 +490,7 @@ macro_rules! shr_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn shr(self, other: $f) -> $t {
+            fn shr(self, other: $f) -> $t {
                 self >> other
             }
         }
@@ -604,14 +583,13 @@ shr_impl_all! { u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize }
 /// assert_eq!(bv, expected);
 /// ```
 #[lang = "bitand_assign"]
-#[doc(alias = "&=")]
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} &= {Rhs}`",
                          label="no implementation for `{Self} &= {Rhs}`")]
 pub trait BitAndAssign<Rhs=Self> {
     /// Performs the `&=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    const fn bitand_assign(&mut self, rhs: Rhs);
+    fn bitand_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! bitand_assign_impl {
@@ -619,7 +597,7 @@ macro_rules! bitand_assign_impl {
         #[stable(feature = "op_assign_traits", since = "1.8.0")]
         impl BitAndAssign for $t {
             #[inline]
-            const fn bitand_assign(&mut self, other: $t) { *self &= other }
+            fn bitand_assign(&mut self, other: $t) { *self &= other }
         }
 
         forward_ref_op_assign! { impl BitAndAssign, bitand_assign for $t, $t }
@@ -653,14 +631,13 @@ bitand_assign_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 /// assert_eq!(prefs, PersonalPreferences { likes_cats: true, likes_dogs: true });
 /// ```
 #[lang = "bitor_assign"]
-#[doc(alias = "|=")]
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} |= {Rhs}`",
                          label="no implementation for `{Self} |= {Rhs}`")]
 pub trait BitOrAssign<Rhs=Self> {
     /// Performs the `|=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    const fn bitor_assign(&mut self, rhs: Rhs);
+    fn bitor_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! bitor_assign_impl {
@@ -668,7 +645,7 @@ macro_rules! bitor_assign_impl {
         #[stable(feature = "op_assign_traits", since = "1.8.0")]
         impl BitOrAssign for $t {
             #[inline]
-            const fn bitor_assign(&mut self, other: $t) { *self |= other }
+            fn bitor_assign(&mut self, other: $t) { *self |= other }
         }
 
         forward_ref_op_assign! { impl BitOrAssign, bitor_assign for $t, $t }
@@ -702,14 +679,13 @@ bitor_assign_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 /// assert_eq!(personality, Personality { has_soul: true, likes_knitting: false});
 /// ```
 #[lang = "bitxor_assign"]
-#[doc(alias = "^=")]
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} ^= {Rhs}`",
                          label="no implementation for `{Self} ^= {Rhs}`")]
 pub trait BitXorAssign<Rhs=Self> {
     /// Performs the `^=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    const fn bitxor_assign(&mut self, rhs: Rhs);
+    fn bitxor_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! bitxor_assign_impl {
@@ -717,7 +693,7 @@ macro_rules! bitxor_assign_impl {
         #[stable(feature = "op_assign_traits", since = "1.8.0")]
         impl BitXorAssign for $t {
             #[inline]
-            const fn bitxor_assign(&mut self, other: $t) { *self ^= other }
+            fn bitxor_assign(&mut self, other: $t) { *self ^= other }
         }
 
         forward_ref_op_assign! { impl BitXorAssign, bitxor_assign for $t, $t }
@@ -749,14 +725,13 @@ bitxor_assign_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 /// assert_eq!(scalar, Scalar(16));
 /// ```
 #[lang = "shl_assign"]
-#[doc(alias = "<<=")]
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} <<= {Rhs}`",
                          label="no implementation for `{Self} <<= {Rhs}`")]
-pub trait ShlAssign<Rhs=Self> {
+pub trait ShlAssign<Rhs> {
     /// Performs the `<<=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    const fn shl_assign(&mut self, rhs: Rhs);
+    fn shl_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! shl_assign_impl {
@@ -765,7 +740,7 @@ macro_rules! shl_assign_impl {
         impl ShlAssign<$f> for $t {
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn shl_assign(&mut self, other: $f) {
+            fn shl_assign(&mut self, other: $f) {
                 *self <<= other
             }
         }
@@ -817,14 +792,13 @@ shl_assign_impl_all! { u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize }
 /// assert_eq!(scalar, Scalar(4));
 /// ```
 #[lang = "shr_assign"]
-#[doc(alias = ">>=")]
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented(message="no implementation for `{Self} >>= {Rhs}`",
                          label="no implementation for `{Self} >>= {Rhs}`")]
 pub trait ShrAssign<Rhs=Self> {
     /// Performs the `>>=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    const fn shr_assign(&mut self, rhs: Rhs);
+    fn shr_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! shr_assign_impl {
@@ -833,7 +807,7 @@ macro_rules! shr_assign_impl {
         impl ShrAssign<$f> for $t {
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn shr_assign(&mut self, other: $f) {
+            fn shr_assign(&mut self, other: $f) {
                 *self >>= other
             }
         }

@@ -58,7 +58,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn floor(self) -> f32 {
+    pub fn floor(self) -> f32 {
         // On MSVC LLVM will lower many math intrinsics to a call to the
         // corresponding function. On MSVC, however, many of these functions
         // aren't actually available as symbols to call, but rather they are all
@@ -89,7 +89,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn ceil(self) -> f32 {
+    pub fn ceil(self) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).ceil() as f32;
@@ -109,7 +109,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn round(self) -> f32 {
+    pub fn round(self) -> f32 {
         unsafe { intrinsics::roundf32(self) }
     }
 
@@ -124,7 +124,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn trunc(self) -> f32 {
+    pub fn trunc(self) -> f32 {
         unsafe { intrinsics::truncf32(self) }
     }
 
@@ -143,7 +143,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn fract(self) -> f32 { self - self.trunc() }
+    pub fn fract(self) -> f32 { self - self.trunc() }
 
     /// Computes the absolute value of `self`. Returns `NAN` if the
     /// number is `NAN`.
@@ -164,7 +164,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn abs(self) -> f32 {
+    pub fn abs(self) -> f32 {
         unsafe { intrinsics::fabsf32(self) }
     }
 
@@ -186,7 +186,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn signum(self) -> f32 {
+    pub fn signum(self) -> f32 {
         if self.is_nan() {
             NAN
         } else {
@@ -212,7 +212,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn mul_add(self, a: f32, b: f32) -> f32 {
+    pub fn mul_add(self, a: f32, b: f32) -> f32 {
         unsafe { intrinsics::fmaf32(self, a, b) }
     }
 
@@ -281,7 +281,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn powi(self, n: i32) -> f32 {
+    pub fn powi(self, n: i32) -> f32 {
         unsafe { intrinsics::powif32(self, n) }
     }
 
@@ -297,7 +297,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn powf(self, n: f32) -> f32 {
+    pub fn powf(self, n: f32) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).powf(n as f64) as f32;
@@ -322,7 +322,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn sqrt(self) -> f32 {
+    pub fn sqrt(self) -> f32 {
         if self < 0.0 {
             NAN
         } else {
@@ -346,7 +346,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn exp(self) -> f32 {
+    pub fn exp(self) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).exp() as f32;
@@ -368,7 +368,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn exp2(self) -> f32 {
+    pub fn exp2(self) -> f32 {
         unsafe { intrinsics::exp2f32(self) }
     }
 
@@ -388,7 +388,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn ln(self) -> f32 {
+    pub fn ln(self) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).ln() as f32;
@@ -414,7 +414,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn log(self, base: f32) -> f32 { self.ln() / base.ln() }
+    pub fn log(self, base: f32) -> f32 { self.ln() / base.ln() }
 
     /// Returns the base 2 logarithm of the number.
     ///
@@ -430,7 +430,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn log2(self) -> f32 {
+    pub fn log2(self) -> f32 {
         #[cfg(target_os = "android")]
         return ::sys::android::log2f32(self);
         #[cfg(not(target_os = "android"))]
@@ -451,7 +451,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn log10(self) -> f32 {
+    pub fn log10(self) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).log10() as f32;
@@ -485,7 +485,7 @@ impl f32 {
                                  difference, consider using that expression or the C function \
                                  `fdimf`, depending on how you wish to handle NaN (please consider \
                                  filing an issue describing your use-case too).")]
-    pub const fn abs_sub(self, other: f32) -> f32 {
+    pub fn abs_sub(self, other: f32) -> f32 {
         unsafe { cmath::fdimf(self, other) }
     }
 
@@ -503,7 +503,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn cbrt(self) -> f32 {
+    pub fn cbrt(self) -> f32 {
         unsafe { cmath::cbrtf(self) }
     }
 
@@ -523,7 +523,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn hypot(self, other: f32) -> f32 {
+    pub fn hypot(self, other: f32) -> f32 {
         unsafe { cmath::hypotf(self, other) }
     }
 
@@ -540,7 +540,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn sin(self) -> f32 {
+    pub fn sin(self) -> f32 {
         // see notes in `core::f32::Float::floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).sin() as f32;
@@ -561,7 +561,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn cos(self) -> f32 {
+    pub fn cos(self) -> f32 {
         // see notes in `core::f32::Float::floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).cos() as f32;
@@ -581,7 +581,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn tan(self) -> f32 {
+    pub fn tan(self) -> f32 {
         unsafe { cmath::tanf(self) }
     }
 
@@ -601,7 +601,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn asin(self) -> f32 {
+    pub fn asin(self) -> f32 {
         unsafe { cmath::asinf(self) }
     }
 
@@ -621,7 +621,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn acos(self) -> f32 {
+    pub fn acos(self) -> f32 {
         unsafe { cmath::acosf(self) }
     }
 
@@ -640,7 +640,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn atan(self) -> f32 {
+    pub fn atan(self) -> f32 {
         unsafe { cmath::atanf(self) }
     }
 
@@ -673,7 +673,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn atan2(self, other: f32) -> f32 {
+    pub fn atan2(self, other: f32) -> f32 {
         unsafe { cmath::atan2f(self, other) }
     }
 
@@ -694,7 +694,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn sin_cos(self) -> (f32, f32) {
+    pub fn sin_cos(self) -> (f32, f32) {
         (self.sin(), self.cos())
     }
 
@@ -713,7 +713,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn exp_m1(self) -> f32 {
+    pub fn exp_m1(self) -> f32 {
         unsafe { cmath::expm1f(self) }
     }
 
@@ -732,7 +732,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn ln_1p(self) -> f32 {
+    pub fn ln_1p(self) -> f32 {
         unsafe { cmath::log1pf(self) }
     }
 
@@ -753,7 +753,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn sinh(self) -> f32 {
+    pub fn sinh(self) -> f32 {
         unsafe { cmath::sinhf(self) }
     }
 
@@ -774,7 +774,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn cosh(self) -> f32 {
+    pub fn cosh(self) -> f32 {
         unsafe { cmath::coshf(self) }
     }
 
@@ -795,7 +795,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn tanh(self) -> f32 {
+    pub fn tanh(self) -> f32 {
         unsafe { cmath::tanhf(self) }
     }
 
@@ -813,7 +813,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn asinh(self) -> f32 {
+    pub fn asinh(self) -> f32 {
         if self == NEG_INFINITY {
             NEG_INFINITY
         } else {
@@ -835,7 +835,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn acosh(self) -> f32 {
+    pub fn acosh(self) -> f32 {
         match self {
             x if x < 1.0 => ::f32::NAN,
             x => (x + ((x * x) - 1.0).sqrt()).ln(),
@@ -856,7 +856,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn atanh(self) -> f32 {
+    pub fn atanh(self) -> f32 {
         0.5 * ((2.0 * self) / (1.0 - self)).ln_1p()
     }
 }

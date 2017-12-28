@@ -149,32 +149,32 @@ impl Float for f32 {
 
     /// Returns `true` if the number is NaN.
     #[inline]
-    const fn is_nan(self) -> bool {
+    fn is_nan(self) -> bool {
         self != self
     }
 
     /// Returns `true` if the number is infinite.
     #[inline]
-    const fn is_infinite(self) -> bool {
+    fn is_infinite(self) -> bool {
         self == INFINITY || self == NEG_INFINITY
     }
 
     /// Returns `true` if the number is neither infinite or NaN.
     #[inline]
-    const fn is_finite(self) -> bool {
+    fn is_finite(self) -> bool {
         !(self.is_nan() || self.is_infinite())
     }
 
     /// Returns `true` if the number is neither zero, infinite, subnormal or NaN.
     #[inline]
-    const fn is_normal(self) -> bool {
+    fn is_normal(self) -> bool {
         self.classify() == Fp::Normal
     }
 
     /// Returns the floating point category of the number. If only one property
     /// is going to be tested, it is generally faster to use the specific
     /// predicate instead.
-    const fn classify(self) -> Fp {
+    fn classify(self) -> Fp {
         const EXP_MASK: u32 = 0x7f800000;
         const MAN_MASK: u32 = 0x007fffff;
 
@@ -191,14 +191,14 @@ impl Float for f32 {
     /// Returns `true` if and only if `self` has a positive sign, including `+0.0`, `NaN`s with
     /// positive sign bit and positive infinity.
     #[inline]
-    const fn is_sign_positive(self) -> bool {
+    fn is_sign_positive(self) -> bool {
         !self.is_sign_negative()
     }
 
     /// Returns `true` if and only if `self` has a negative sign, including `-0.0`, `NaN`s with
     /// negative sign bit and negative infinity.
     #[inline]
-    const fn is_sign_negative(self) -> bool {
+    fn is_sign_negative(self) -> bool {
         // IEEE754 says: isSignMinus(x) is true if and only if x has negative sign. isSignMinus
         // applies to zeros and NaNs as well.
         self.to_bits() & 0x8000_0000 != 0
@@ -206,7 +206,7 @@ impl Float for f32 {
 
     /// Returns the reciprocal (multiplicative inverse) of the number.
     #[inline]
-    const fn recip(self) -> f32 {
+    fn recip(self) -> f32 {
         1.0 / self
     }
 
@@ -220,14 +220,14 @@ impl Float for f32 {
 
     /// Converts to radians, assuming the number is in degrees.
     #[inline]
-    const fn to_radians(self) -> f32 {
+    fn to_radians(self) -> f32 {
         let value: f32 = consts::PI;
         self * (value / 180.0f32)
     }
 
     /// Returns the maximum of the two numbers.
     #[inline]
-    const fn max(self, other: f32) -> f32 {
+    fn max(self, other: f32) -> f32 {
         // IEEE754 says: maxNum(x, y) is the canonicalized number y if x < y, x if y < x, the
         // canonicalized number if one operand is a number and the other a quiet NaN. Otherwise it
         // is either x or y, canonicalized (this means results might differ among implementations).
@@ -241,7 +241,7 @@ impl Float for f32 {
 
     /// Returns the minimum of the two numbers.
     #[inline]
-    const fn min(self, other: f32) -> f32 {
+    fn min(self, other: f32) -> f32 {
         // IEEE754 says: minNum(x, y) is the canonicalized number x if x < y, y if y < x, the
         // canonicalized number if one operand is a number and the other a quiet NaN. Otherwise it
         // is either x or y, canonicalized (this means results might differ among implementations).
@@ -285,7 +285,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn is_nan(self) -> bool { Float::is_nan(self) }
+    pub fn is_nan(self) -> bool { Float::is_nan(self) }
 
     /// Returns `true` if this value is positive infinity or negative infinity and
     /// false otherwise.
@@ -306,7 +306,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn is_infinite(self) -> bool { Float::is_infinite(self) }
+    pub fn is_infinite(self) -> bool { Float::is_infinite(self) }
 
     /// Returns `true` if this number is neither infinite nor `NaN`.
     ///
@@ -326,7 +326,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn is_finite(self) -> bool { Float::is_finite(self) }
+    pub fn is_finite(self) -> bool { Float::is_finite(self) }
 
     /// Returns `true` if the number is neither zero, infinite,
     /// [subnormal][subnormal], or `NaN`.
@@ -351,7 +351,7 @@ macro_rules! f32_core_methods { () => {
     /// [subnormal]: https://en.wikipedia.org/wiki/Denormal_number
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn is_normal(self) -> bool { Float::is_normal(self) }
+    pub fn is_normal(self) -> bool { Float::is_normal(self) }
 
     /// Returns the floating point category of the number. If only one property
     /// is going to be tested, it is generally faster to use the specific
@@ -369,7 +369,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn classify(self) -> FpCategory { Float::classify(self) }
+    pub fn classify(self) -> FpCategory { Float::classify(self) }
 
     /// Returns `true` if and only if `self` has a positive sign, including `+0.0`, `NaN`s with
     /// positive sign bit and positive infinity.
@@ -383,7 +383,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn is_sign_positive(self) -> bool { Float::is_sign_positive(self) }
+    pub fn is_sign_positive(self) -> bool { Float::is_sign_positive(self) }
 
     /// Returns `true` if and only if `self` has a negative sign, including `-0.0`, `NaN`s with
     /// negative sign bit and negative infinity.
@@ -397,7 +397,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn is_sign_negative(self) -> bool { Float::is_sign_negative(self) }
+    pub fn is_sign_negative(self) -> bool { Float::is_sign_negative(self) }
 
     /// Takes the reciprocal (inverse) of a number, `1/x`.
     ///
@@ -411,7 +411,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn recip(self) -> f32 { Float::recip(self) }
+    pub fn recip(self) -> f32 { Float::recip(self) }
 
     /// Converts radians to degrees.
     ///
@@ -426,7 +426,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "f32_deg_rad_conversions", since="1.7.0")]
     #[inline]
-    pub const fn to_degrees(self) -> f32 { Float::to_degrees(self) }
+    pub fn to_degrees(self) -> f32 { Float::to_degrees(self) }
 
     /// Converts degrees to radians.
     ///
@@ -441,7 +441,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "f32_deg_rad_conversions", since="1.7.0")]
     #[inline]
-    pub const fn to_radians(self) -> f32 { Float::to_radians(self) }
+    pub fn to_radians(self) -> f32 { Float::to_radians(self) }
 
     /// Returns the maximum of the two numbers.
     ///
@@ -455,7 +455,7 @@ macro_rules! f32_core_methods { () => {
     /// If one of the arguments is NaN, then the other argument is returned.
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn max(self, other: f32) -> f32 {
+    pub fn max(self, other: f32) -> f32 {
         Float::max(self, other)
     }
 
@@ -471,7 +471,7 @@ macro_rules! f32_core_methods { () => {
     /// If one of the arguments is NaN, then the other argument is returned.
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn min(self, other: f32) -> f32 {
+    pub fn min(self, other: f32) -> f32 {
         Float::min(self, other)
     }
 
@@ -494,7 +494,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "float_bits_conv", since = "1.20.0")]
     #[inline]
-    pub const fn to_bits(self) -> u32 {
+    pub fn to_bits(self) -> u32 {
         Float::to_bits(self)
     }
 
@@ -538,7 +538,7 @@ macro_rules! f32_core_methods { () => {
     /// ```
     #[stable(feature = "float_bits_conv", since = "1.20.0")]
     #[inline]
-    pub const fn from_bits(v: u32) -> Self {
+    pub fn from_bits(v: u32) -> Self {
         Float::from_bits(v)
     }
 }}

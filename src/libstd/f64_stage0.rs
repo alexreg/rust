@@ -58,7 +58,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn floor(self) -> f64 {
+    pub fn floor(self) -> f64 {
         unsafe { intrinsics::floorf64(self) }
     }
 
@@ -73,7 +73,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn ceil(self) -> f64 {
+    pub fn ceil(self) -> f64 {
         unsafe { intrinsics::ceilf64(self) }
     }
 
@@ -89,7 +89,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn round(self) -> f64 {
+    pub fn round(self) -> f64 {
         unsafe { intrinsics::roundf64(self) }
     }
 
@@ -104,7 +104,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn trunc(self) -> f64 {
+    pub fn trunc(self) -> f64 {
         unsafe { intrinsics::truncf64(self) }
     }
 
@@ -121,7 +121,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn fract(self) -> f64 { self - self.trunc() }
+    pub fn fract(self) -> f64 { self - self.trunc() }
 
     /// Computes the absolute value of `self`. Returns `NAN` if the
     /// number is `NAN`.
@@ -142,7 +142,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn abs(self) -> f64 {
+    pub fn abs(self) -> f64 {
         unsafe { intrinsics::fabsf64(self) }
     }
 
@@ -164,7 +164,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn signum(self) -> f64 {
+    pub fn signum(self) -> f64 {
         if self.is_nan() {
             NAN
         } else {
@@ -188,7 +188,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn mul_add(self, a: f64, b: f64) -> f64 {
+    pub fn mul_add(self, a: f64, b: f64) -> f64 {
         unsafe { intrinsics::fmaf64(self, a, b) }
     }
 
@@ -254,7 +254,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn powi(self, n: i32) -> f64 {
+    pub fn powi(self, n: i32) -> f64 {
         unsafe { intrinsics::powif64(self, n) }
     }
 
@@ -268,7 +268,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn powf(self, n: f64) -> f64 {
+    pub fn powf(self, n: f64) -> f64 {
         unsafe { intrinsics::powf64(self, n) }
     }
 
@@ -287,7 +287,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn sqrt(self) -> f64 {
+    pub fn sqrt(self) -> f64 {
         if self < 0.0 {
             NAN
         } else {
@@ -309,7 +309,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn exp(self) -> f64 {
+    pub fn exp(self) -> f64 {
         unsafe { intrinsics::expf64(self) }
     }
 
@@ -325,7 +325,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn exp2(self) -> f64 {
+    pub fn exp2(self) -> f64 {
         unsafe { intrinsics::exp2f64(self) }
     }
 
@@ -343,7 +343,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn ln(self) -> f64 {
+    pub fn ln(self) -> f64 {
         self.log_wrapper(|n| { unsafe { intrinsics::logf64(n) } })
     }
 
@@ -363,7 +363,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn log(self, base: f64) -> f64 { self.ln() / base.ln() }
+    pub fn log(self, base: f64) -> f64 { self.ln() / base.ln() }
 
     /// Returns the base 2 logarithm of the number.
     ///
@@ -377,7 +377,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn log2(self) -> f64 {
+    pub fn log2(self) -> f64 {
         self.log_wrapper(|n| {
             #[cfg(target_os = "android")]
             return ::sys::android::log2f64(n);
@@ -398,7 +398,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn log10(self) -> f64 {
+    pub fn log10(self) -> f64 {
         self.log_wrapper(|n| { unsafe { intrinsics::log10f64(n) } })
     }
 
@@ -426,7 +426,7 @@ impl f64 {
                                  difference, consider using that expression or the C function \
                                  `fdim`, depending on how you wish to handle NaN (please consider \
                                  filing an issue describing your use-case too).")]
-     pub const fn abs_sub(self, other: f64) -> f64 {
+     pub fn abs_sub(self, other: f64) -> f64 {
          unsafe { cmath::fdim(self, other) }
      }
 
@@ -442,7 +442,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn cbrt(self) -> f64 {
+    pub fn cbrt(self) -> f64 {
         unsafe { cmath::cbrt(self) }
     }
 
@@ -477,7 +477,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn sin(self) -> f64 {
+    pub fn sin(self) -> f64 {
         unsafe { intrinsics::sinf64(self) }
     }
 
@@ -494,7 +494,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn cos(self) -> f64 {
+    pub fn cos(self) -> f64 {
         unsafe { intrinsics::cosf64(self) }
     }
 
@@ -510,7 +510,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn tan(self) -> f64 {
+    pub fn tan(self) -> f64 {
         unsafe { cmath::tan(self) }
     }
 
@@ -530,7 +530,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn asin(self) -> f64 {
+    pub fn asin(self) -> f64 {
         unsafe { cmath::asin(self) }
     }
 
@@ -550,7 +550,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn acos(self) -> f64 {
+    pub fn acos(self) -> f64 {
         unsafe { cmath::acos(self) }
     }
 
@@ -567,7 +567,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn atan(self) -> f64 {
+    pub fn atan(self) -> f64 {
         unsafe { cmath::atan(self) }
     }
 
@@ -600,7 +600,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn atan2(self, other: f64) -> f64 {
+    pub fn atan2(self, other: f64) -> f64 {
         unsafe { cmath::atan2(self, other) }
     }
 
@@ -621,7 +621,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn sin_cos(self) -> (f64, f64) {
+    pub fn sin_cos(self) -> (f64, f64) {
         (self.sin(), self.cos())
     }
 
@@ -638,7 +638,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn exp_m1(self) -> f64 {
+    pub fn exp_m1(self) -> f64 {
         unsafe { cmath::expm1(self) }
     }
 
@@ -657,7 +657,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn ln_1p(self) -> f64 {
+    pub fn ln_1p(self) -> f64 {
         unsafe { cmath::log1p(self) }
     }
 
@@ -678,7 +678,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn sinh(self) -> f64 {
+    pub fn sinh(self) -> f64 {
         unsafe { cmath::sinh(self) }
     }
 
@@ -699,7 +699,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn cosh(self) -> f64 {
+    pub fn cosh(self) -> f64 {
         unsafe { cmath::cosh(self) }
     }
 
@@ -720,7 +720,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn tanh(self) -> f64 {
+    pub fn tanh(self) -> f64 {
         unsafe { cmath::tanh(self) }
     }
 
@@ -736,7 +736,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn asinh(self) -> f64 {
+    pub fn asinh(self) -> f64 {
         if self == NEG_INFINITY {
             NEG_INFINITY
         } else {
@@ -756,7 +756,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn acosh(self) -> f64 {
+    pub fn acosh(self) -> f64 {
         match self {
             x if x < 1.0 => NAN,
             x => (x + ((x * x) - 1.0).sqrt()).ln(),
@@ -777,14 +777,14 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    pub const fn atanh(self) -> f64 {
+    pub fn atanh(self) -> f64 {
         0.5 * ((2.0 * self) / (1.0 - self)).ln_1p()
     }
 
     // Solaris/Illumos requires a wrapper around log, log2, and log10 functions
     // because of their non-standard behavior (e.g. log(-n) returns -Inf instead
     // of expected NaN).
-    const fn log_wrapper<F: Fn(f64) -> f64>(self, log_fn: F) -> f64 {
+    fn log_wrapper<F: Fn(f64) -> f64>(self, log_fn: F) -> f64 {
         if !cfg!(target_os = "solaris") {
             log_fn(self)
         } else {
