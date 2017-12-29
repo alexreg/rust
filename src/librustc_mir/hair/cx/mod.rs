@@ -26,6 +26,7 @@ use rustc::ty::subst::Subst;
 use rustc::ty::{self, Ty, TyCtxt};
 use rustc::ty::subst::Substs;
 use syntax::ast::{self, LitKind};
+use syntax::attr;
 use syntax::symbol::Symbol;
 use rustc::hir;
 use rustc_const_math::{ConstUsize, ConstFloat};

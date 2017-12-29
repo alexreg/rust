@@ -47,8 +47,7 @@ pub trait Not {
 
     /// Performs the unary `!` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    #[rustc_const_unstable(feature = "const_int_not")]
-    const fn not(self) -> Self::Output;
+    fn not(self) -> Self::Output;
 }
 
 macro_rules! not_impl {
@@ -58,7 +57,7 @@ macro_rules! not_impl {
             type Output = $t;
 
             #[inline]
-            const fn not(self) -> $t { !self }
+            fn not(self) -> $t { !self }
         }
 
         forward_ref_unop! { impl Not, not for $t }
@@ -129,8 +128,7 @@ pub trait BitAnd<RHS=Self> {
 
     /// Performs the `&` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    #[rustc_const_unstable(feature = "const_int_bitand")]
-    const fn bitand(self, rhs: RHS) -> Self::Output;
+    fn bitand(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! bitand_impl {
@@ -140,7 +138,7 @@ macro_rules! bitand_impl {
             type Output = $t;
 
             #[inline]
-            const fn bitand(self, rhs: $t) -> $t { self & rhs }
+            fn bitand(self, rhs: $t) -> $t { self & rhs }
         }
 
         forward_ref_binop! { impl BitAnd, bitand for $t, $t }
@@ -211,8 +209,7 @@ pub trait BitOr<RHS=Self> {
 
     /// Performs the `|` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    #[rustc_const_unstable(feature = "const_int_bitor")]
-    const fn bitor(self, rhs: RHS) -> Self::Output;
+    fn bitor(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! bitor_impl {
@@ -222,7 +219,7 @@ macro_rules! bitor_impl {
             type Output = $t;
 
             #[inline]
-            const fn bitor(self, rhs: $t) -> $t { self | rhs }
+            fn bitor(self, rhs: $t) -> $t { self | rhs }
         }
 
         forward_ref_binop! { impl BitOr, bitor for $t, $t }
@@ -296,8 +293,7 @@ pub trait BitXor<RHS=Self> {
 
     /// Performs the `^` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    #[rustc_const_unstable(feature = "const_int_bitxor")]
-    const fn bitxor(self, rhs: RHS) -> Self::Output;
+    fn bitxor(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! bitxor_impl {
@@ -307,7 +303,7 @@ macro_rules! bitxor_impl {
             type Output = $t;
 
             #[inline]
-            const fn bitxor(self, other: $t) -> $t { self ^ other }
+            fn bitxor(self, other: $t) -> $t { self ^ other }
         }
 
         forward_ref_binop! { impl BitXor, bitxor for $t, $t }
@@ -377,8 +373,7 @@ pub trait Shl<RHS> {
 
     /// Performs the `<<` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    #[rustc_const_unstable(feature = "const_int_shl")]
-    const fn shl(self, rhs: RHS) -> Self::Output;
+    fn shl(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! shl_impl {
@@ -389,7 +384,7 @@ macro_rules! shl_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn shl(self, other: $f) -> $t {
+            fn shl(self, other: $f) -> $t {
                 self << other
             }
         }
@@ -479,8 +474,7 @@ pub trait Shr<RHS> {
 
     /// Performs the `>>` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    #[rustc_const_unstable(feature = "const_int_shr")]
-    const fn shr(self, rhs: RHS) -> Self::Output;
+    fn shr(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! shr_impl {
@@ -491,7 +485,7 @@ macro_rules! shr_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn shr(self, other: $f) -> $t {
+            fn shr(self, other: $f) -> $t {
                 self >> other
             }
         }
@@ -589,8 +583,7 @@ shr_impl_all! { u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize }
 pub trait BitAndAssign<Rhs=Self> {
     /// Performs the `&=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    #[rustc_const_unstable(feature = "const_int_bitand_assign")]
-    const fn bitand_assign(&mut self, rhs: Rhs);
+    fn bitand_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! bitand_assign_impl {
@@ -598,7 +591,7 @@ macro_rules! bitand_assign_impl {
         #[stable(feature = "op_assign_traits", since = "1.8.0")]
         impl BitAndAssign for $t {
             #[inline]
-            const fn bitand_assign(&mut self, other: $t) { *self &= other }
+            fn bitand_assign(&mut self, other: $t) { *self &= other }
         }
 
         forward_ref_op_assign! { impl BitAndAssign, bitand_assign for $t, $t }
@@ -637,8 +630,7 @@ bitand_assign_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 pub trait BitOrAssign<Rhs=Self> {
     /// Performs the `|=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    #[rustc_const_unstable(feature = "const_int_bitor_assign")]
-    const fn bitor_assign(&mut self, rhs: Rhs);
+    fn bitor_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! bitor_assign_impl {
@@ -646,7 +638,7 @@ macro_rules! bitor_assign_impl {
         #[stable(feature = "op_assign_traits", since = "1.8.0")]
         impl BitOrAssign for $t {
             #[inline]
-            const fn bitor_assign(&mut self, other: $t) { *self |= other }
+            fn bitor_assign(&mut self, other: $t) { *self |= other }
         }
 
         forward_ref_op_assign! { impl BitOrAssign, bitor_assign for $t, $t }
@@ -685,8 +677,7 @@ bitor_assign_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 pub trait BitXorAssign<Rhs=Self> {
     /// Performs the `^=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    #[rustc_const_unstable(feature = "const_int_bitxor_assign")]
-    const fn bitxor_assign(&mut self, rhs: Rhs);
+    fn bitxor_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! bitxor_assign_impl {
@@ -694,7 +685,7 @@ macro_rules! bitxor_assign_impl {
         #[stable(feature = "op_assign_traits", since = "1.8.0")]
         impl BitXorAssign for $t {
             #[inline]
-            const fn bitxor_assign(&mut self, other: $t) { *self ^= other }
+            fn bitxor_assign(&mut self, other: $t) { *self ^= other }
         }
 
         forward_ref_op_assign! { impl BitXorAssign, bitxor_assign for $t, $t }
@@ -728,11 +719,10 @@ bitxor_assign_impl! { bool usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 #[lang = "shl_assign"]
 #[stable(feature = "op_assign_traits", since = "1.8.0")]
 #[rustc_on_unimplemented = "no implementation for `{Self} <<= {Rhs}`"]
-#[rustc_const_unstable(feature = "const_int_shl_assign")]
 pub trait ShlAssign<Rhs> {
     /// Performs the `<<=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    const fn shl_assign(&mut self, rhs: Rhs);
+    fn shl_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! shl_assign_impl {
@@ -741,7 +731,7 @@ macro_rules! shl_assign_impl {
         impl ShlAssign<$f> for $t {
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn shl_assign(&mut self, other: $f) {
+            fn shl_assign(&mut self, other: $f) {
                 *self <<= other
             }
         }
@@ -798,8 +788,7 @@ shl_assign_impl_all! { u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize }
 pub trait ShrAssign<Rhs=Self> {
     /// Performs the `>>=` operation.
     #[stable(feature = "op_assign_traits", since = "1.8.0")]
-    #[rustc_const_unstable(feature = "const_int_shr_assign")]
-    const fn shr_assign(&mut self, rhs: Rhs);
+    fn shr_assign(&mut self, rhs: Rhs);
 }
 
 macro_rules! shr_assign_impl {
@@ -808,7 +797,7 @@ macro_rules! shr_assign_impl {
         impl ShrAssign<$f> for $t {
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn shr_assign(&mut self, other: $f) {
+            fn shr_assign(&mut self, other: $f) {
                 *self >>= other
             }
         }

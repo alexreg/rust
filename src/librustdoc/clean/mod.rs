@@ -41,7 +41,6 @@ use rustc_typeck::hir_ty_to_ty;
 
 use rustc::hir;
 
-use rustc_const_math::ConstInt;
 use std::default::Default;
 use std::{mem, slice, vec};
 use std::iter::FromIterator;
@@ -2064,9 +2063,7 @@ impl Clean<Type> for hir::Ty {
                 let param_env = cx.tcx.param_env(def_id);
                 let substs = Substs::identity_for_item(cx.tcx, def_id);
                 let n = cx.tcx.const_eval(param_env.and((def_id, substs))).unwrap();
-                let n = if let ConstVal::Integral(ConstInt::Usize(n)) = n.val {
-                    n.to_string()
-                } else if let ConstVal::Unevaluated(def_id, _) = n.val {
+                let n = if let ConstVal::Unevaluated(def_id, _) = n.val {
                     if let Some(node_id) = cx.tcx.hir.as_local_node_id(def_id) {
                         print_const_expr(cx, cx.tcx.hir.body_owned_by(node_id))
                     } else {
@@ -2195,9 +2192,7 @@ impl<'tcx> Clean<Type> for Ty<'tcx> {
                     let param_env = cx.tcx.param_env(def_id);
                     n = cx.tcx.const_eval(param_env.and((def_id, substs))).unwrap()
                 };
-                let n = if let ConstVal::Integral(ConstInt::Usize(n)) = n.val {
-                    n.to_string()
-                } else if let ConstVal::Unevaluated(def_id, _) = n.val {
+                let n = if let ConstVal::Unevaluated(def_id, _) = n.val {
                     if let Some(node_id) = cx.tcx.hir.as_local_node_id(def_id) {
                         print_const_expr(cx, cx.tcx.hir.body_owned_by(node_id))
                     } else {

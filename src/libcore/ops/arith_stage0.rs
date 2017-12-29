@@ -83,7 +83,7 @@ pub trait Add<RHS=Self> {
 
     /// Performs the `+` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn add(self, rhs: RHS) -> Self::Output;
+    fn add(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! add_impl {
@@ -94,7 +94,7 @@ macro_rules! add_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn add(self, other: $t) -> $t { self + other }
+            fn add(self, other: $t) -> $t { self + other }
         }
 
         forward_ref_binop! { impl Add, add for $t, $t }
@@ -178,7 +178,7 @@ pub trait Sub<RHS=Self> {
 
     /// Performs the `-` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn sub(self, rhs: RHS) -> Self::Output;
+    fn sub(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! sub_impl {
@@ -189,7 +189,7 @@ macro_rules! sub_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn sub(self, other: $t) -> $t { self - other }
+            fn sub(self, other: $t) -> $t { self - other }
         }
 
         forward_ref_binop! { impl Sub, sub for $t, $t }
@@ -295,7 +295,7 @@ pub trait Mul<RHS=Self> {
 
     /// Performs the `*` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn mul(self, rhs: RHS) -> Self::Output;
+    fn mul(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! mul_impl {
@@ -306,7 +306,7 @@ macro_rules! mul_impl {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn mul(self, other: $t) -> $t { self * other }
+            fn mul(self, other: $t) -> $t { self * other }
         }
 
         forward_ref_binop! { impl Mul, mul for $t, $t }
@@ -416,7 +416,7 @@ pub trait Div<RHS=Self> {
 
     /// Performs the `/` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn div(self, rhs: RHS) -> Self::Output;
+    fn div(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! div_impl_integer {
@@ -428,7 +428,7 @@ macro_rules! div_impl_integer {
             type Output = $t;
 
             #[inline]
-            const fn div(self, other: $t) -> $t { self / other }
+            fn div(self, other: $t) -> $t { self / other }
         }
 
         forward_ref_binop! { impl Div, div for $t, $t }
@@ -444,7 +444,7 @@ macro_rules! div_impl_float {
             type Output = $t;
 
             #[inline]
-            const fn div(self, other: $t) -> $t { self / other }
+            fn div(self, other: $t) -> $t { self / other }
         }
 
         forward_ref_binop! { impl Div, div for $t, $t }
@@ -498,7 +498,7 @@ pub trait Rem<RHS=Self> {
 
     /// Performs the `%` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn rem(self, rhs: RHS) -> Self::Output;
+    fn rem(self, rhs: RHS) -> Self::Output;
 }
 
 macro_rules! rem_impl_integer {
@@ -510,7 +510,7 @@ macro_rules! rem_impl_integer {
             type Output = $t;
 
             #[inline]
-            const fn rem(self, other: $t) -> $t { self % other }
+            fn rem(self, other: $t) -> $t { self % other }
         }
 
         forward_ref_binop! { impl Rem, rem for $t, $t }
@@ -527,7 +527,7 @@ macro_rules! rem_impl_float {
             type Output = $t;
 
             #[inline]
-            const fn rem(self, other: $t) -> $t { self % other }
+            fn rem(self, other: $t) -> $t { self % other }
         }
 
         forward_ref_binop! { impl Rem, rem for $t, $t }
@@ -581,7 +581,7 @@ pub trait Neg {
 
     /// Performs the unary `-` operation.
     #[stable(feature = "rust1", since = "1.0.0")]
-    const fn neg(self) -> Self::Output;
+    fn neg(self) -> Self::Output;
 }
 
 
@@ -594,7 +594,7 @@ macro_rules! neg_impl_core {
 
             #[inline]
             #[rustc_inherit_overflow_checks]
-            const fn neg(self) -> $t { let $id = self; $body }
+            fn neg(self) -> $t { let $id = self; $body }
         }
 
         forward_ref_unop! { impl Neg, neg for $t }

@@ -169,8 +169,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_count_ones")]
-        pub const fn count_ones(self) -> u32 { (self as $UnsignedT).count_ones() }
+        pub fn count_ones(self) -> u32 { (self as $UnsignedT).count_ones() }
 
         /// Returns the number of zeros in the binary representation of `self`.
         ///
@@ -185,8 +184,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_count_zeros")]
-        pub const fn count_zeros(self) -> u32 {
+        pub fn count_zeros(self) -> u32 {
             (!self).count_ones()
         }
 
@@ -204,8 +202,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_leading_zeros")]
-        pub const fn leading_zeros(self) -> u32 {
+        pub fn leading_zeros(self) -> u32 {
             (self as $UnsignedT).leading_zeros()
         }
 
@@ -223,8 +220,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_trailing_zeros")]
-        pub const fn trailing_zeros(self) -> u32 {
+        pub fn trailing_zeros(self) -> u32 {
             (self as $UnsignedT).trailing_zeros()
         }
 
@@ -245,8 +241,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_rotate_left")]
-        pub const fn rotate_left(self, n: u32) -> Self {
+        pub fn rotate_left(self, n: u32) -> Self {
             (self as $UnsignedT).rotate_left(n) as Self
         }
 
@@ -268,8 +263,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_rotate_right")]
-        pub const fn rotate_right(self, n: u32) -> Self {
+        pub fn rotate_right(self, n: u32) -> Self {
             (self as $UnsignedT).rotate_right(n) as Self
         }
 
@@ -290,8 +284,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_swap_bytes")]
-        pub const fn swap_bytes(self) -> Self {
+        pub fn swap_bytes(self) -> Self {
             (self as $UnsignedT).swap_bytes() as Self
         }
 
@@ -315,8 +308,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_from_be")]
-        pub const fn from_be(x: Self) -> Self {
+        pub fn from_be(x: Self) -> Self {
             if cfg!(target_endian = "big") { x } else { x.swap_bytes() }
         }
 
@@ -340,8 +332,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_from_le")]
-        pub const fn from_le(x: Self) -> Self {
+        pub fn from_le(x: Self) -> Self {
             if cfg!(target_endian = "little") { x } else { x.swap_bytes() }
         }
 
@@ -365,8 +356,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_to_be")]
-        pub const fn to_be(self) -> Self { // or not to be?
+        pub fn to_be(self) -> Self { // or not to be?
             if cfg!(target_endian = "big") { self } else { self.swap_bytes() }
         }
 
@@ -390,8 +380,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_to_le")]
-        pub const fn to_le(self) -> Self {
+        pub fn to_le(self) -> Self {
             if cfg!(target_endian = "little") { self } else { self.swap_bytes() }
         }
 
@@ -408,8 +397,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_add")]
-        pub const fn checked_add(self, rhs: Self) -> Option<Self> {
+        pub fn checked_add(self, rhs: Self) -> Option<Self> {
             let (a, b) = self.overflowing_add(rhs);
             if b {None} else {Some(a)}
         }
@@ -427,8 +415,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_sub")]
-        pub const fn checked_sub(self, rhs: Self) -> Option<Self> {
+        pub fn checked_sub(self, rhs: Self) -> Option<Self> {
             let (a, b) = self.overflowing_sub(rhs);
             if b {None} else {Some(a)}
         }
@@ -446,8 +433,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_mul")]
-        pub const fn checked_mul(self, rhs: Self) -> Option<Self> {
+        pub fn checked_mul(self, rhs: Self) -> Option<Self> {
             let (a, b) = self.overflowing_mul(rhs);
             if b {None} else {Some(a)}
         }
@@ -466,8 +452,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_div")]
-        pub const fn checked_div(self, rhs: Self) -> Option<Self> {
+        pub fn checked_div(self, rhs: Self) -> Option<Self> {
             if rhs == 0 || (self == Self::min_value() && rhs == -1) {
                 None
             } else {
@@ -491,8 +476,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_rem")]
-        pub const fn checked_rem(self, rhs: Self) -> Option<Self> {
+        pub fn checked_rem(self, rhs: Self) -> Option<Self> {
             if rhs == 0 || (self == Self::min_value() && rhs == -1) {
                 None
             } else {
@@ -515,8 +499,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_neg")]
-        pub const fn checked_neg(self) -> Option<Self> {
+        pub fn checked_neg(self) -> Option<Self> {
             let (a, b) = self.overflowing_neg();
             if b {None} else {Some(a)}
         }
@@ -534,8 +517,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_shl")]
-        pub const fn checked_shl(self, rhs: u32) -> Option<Self> {
+        pub fn checked_shl(self, rhs: u32) -> Option<Self> {
             let (a, b) = self.overflowing_shl(rhs);
             if b {None} else {Some(a)}
         }
@@ -553,8 +535,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_shr")]
-        pub const fn checked_shr(self, rhs: u32) -> Option<Self> {
+        pub fn checked_shr(self, rhs: u32) -> Option<Self> {
             let (a, b) = self.overflowing_shr(rhs);
             if b {None} else {Some(a)}
         }
@@ -574,8 +555,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "no_panic_abs", since = "1.13.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_abs")]
-        pub const fn checked_abs(self) -> Option<Self> {
+        pub fn checked_abs(self) -> Option<Self> {
             if self.is_negative() {
                 self.checked_neg()
             } else {
@@ -596,8 +576,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_saturating_add")]
-        pub const fn saturating_add(self, rhs: Self) -> Self {
+        pub fn saturating_add(self, rhs: Self) -> Self {
             match self.checked_add(rhs) {
                 Some(x) => x,
                 None if rhs >= 0 => Self::max_value(),
@@ -618,8 +597,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_saturating_sub")]
-        pub const fn saturating_sub(self, rhs: Self) -> Self {
+        pub fn saturating_sub(self, rhs: Self) -> Self {
             match self.checked_sub(rhs) {
                 Some(x) => x,
                 None if rhs >= 0 => Self::min_value(),
@@ -643,8 +621,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_saturating_mul")]
-        pub const fn saturating_mul(self, rhs: Self) -> Self {
+        pub fn saturating_mul(self, rhs: Self) -> Self {
             self.checked_mul(rhs).unwrap_or_else(|| {
                 if (self < 0 && rhs < 0) || (self > 0 && rhs > 0) {
                     Self::max_value()
@@ -667,8 +644,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_add")]
-        pub const fn wrapping_add(self, rhs: Self) -> Self {
+        pub fn wrapping_add(self, rhs: Self) -> Self {
             unsafe {
                 intrinsics::overflowing_add(self, rhs)
             }
@@ -687,8 +663,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_sub")]
-        pub const fn wrapping_sub(self, rhs: Self) -> Self {
+        pub fn wrapping_sub(self, rhs: Self) -> Self {
             unsafe {
                 intrinsics::overflowing_sub(self, rhs)
             }
@@ -707,8 +682,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_mul")]
-        pub const fn wrapping_mul(self, rhs: Self) -> Self {
+        pub fn wrapping_mul(self, rhs: Self) -> Self {
             unsafe {
                 intrinsics::overflowing_mul(self, rhs)
             }
@@ -738,8 +712,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_div")]
-        pub const fn wrapping_div(self, rhs: Self) -> Self {
+        pub fn wrapping_div(self, rhs: Self) -> Self {
             self.overflowing_div(rhs).0
         }
 
@@ -765,8 +738,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_rem")]
-        pub const fn wrapping_rem(self, rhs: Self) -> Self {
+        pub fn wrapping_rem(self, rhs: Self) -> Self {
             self.overflowing_rem(rhs).0
         }
 
@@ -789,8 +761,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_neg")]
-        pub const fn wrapping_neg(self) -> Self {
+        pub fn wrapping_neg(self) -> Self {
             self.overflowing_neg().0
         }
 
@@ -815,8 +786,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_shl")]
-        pub const fn wrapping_shl(self, rhs: u32) -> Self {
+        pub fn wrapping_shl(self, rhs: u32) -> Self {
             unsafe {
                 intrinsics::unchecked_shl(self, (rhs & ($BITS - 1)) as $SelfT)
             }
@@ -843,8 +813,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_shr")]
-        pub const fn wrapping_shr(self, rhs: u32) -> Self {
+        pub fn wrapping_shr(self, rhs: u32) -> Self {
             unsafe {
                 intrinsics::unchecked_shr(self, (rhs & ($BITS - 1)) as $SelfT)
             }
@@ -870,8 +839,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "no_panic_abs", since = "1.13.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_abs")]
-        pub const fn wrapping_abs(self) -> Self {
+        pub fn wrapping_abs(self) -> Self {
             if self.is_negative() {
                 self.wrapping_neg()
             } else {
@@ -895,10 +863,9 @@ macro_rules! int_impl {
         /// assert_eq!(5i32.overflowing_add(2), (7, false));
         /// assert_eq!(i32::MAX.overflowing_add(1), (i32::MIN, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_add")]
-        pub const fn overflowing_add(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_add(self, rhs: Self) -> (Self, bool) {
             let (a, b) = unsafe {
                 intrinsics::add_with_overflow(self as $ActualT,
                                               rhs as $ActualT)
@@ -922,10 +889,9 @@ macro_rules! int_impl {
         /// assert_eq!(5i32.overflowing_sub(2), (3, false));
         /// assert_eq!(i32::MIN.overflowing_sub(1), (i32::MAX, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_sub")]
-        pub const fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
             let (a, b) = unsafe {
                 intrinsics::sub_with_overflow(self as $ActualT,
                                               rhs as $ActualT)
@@ -947,10 +913,9 @@ macro_rules! int_impl {
         /// assert_eq!(5i32.overflowing_mul(2), (10, false));
         /// assert_eq!(1_000_000_000i32.overflowing_mul(10), (1410065408, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_mul")]
-        pub const fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
             let (a, b) = unsafe {
                 intrinsics::mul_with_overflow(self as $ActualT,
                                               rhs as $ActualT)
@@ -978,10 +943,9 @@ macro_rules! int_impl {
         /// assert_eq!(5i32.overflowing_div(2), (2, false));
         /// assert_eq!(i32::MIN.overflowing_div(-1), (i32::MIN, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_div")]
-        pub const fn overflowing_div(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_div(self, rhs: Self) -> (Self, bool) {
             if self == Self::min_value() && rhs == -1 {
                 (self, true)
             } else {
@@ -1009,10 +973,9 @@ macro_rules! int_impl {
         /// assert_eq!(5i32.overflowing_rem(2), (1, false));
         /// assert_eq!(i32::MIN.overflowing_rem(-1), (0, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_rem")]
-        pub const fn overflowing_rem(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_rem(self, rhs: Self) -> (Self, bool) {
             if self == Self::min_value() && rhs == -1 {
                 (0, true)
             } else {
@@ -1038,10 +1001,9 @@ macro_rules! int_impl {
         /// assert_eq!(2i32.overflowing_neg(), (-2, false));
         /// assert_eq!(i32::MIN.overflowing_neg(), (i32::MIN, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_neg")]
-        pub const fn overflowing_neg(self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_neg(self) -> (Self, bool) {
             if self == Self::min_value() {
                 (Self::min_value(), true)
             } else {
@@ -1065,10 +1027,9 @@ macro_rules! int_impl {
         /// assert_eq!(0x10i32.overflowing_shl(4), (0x100, false));
         /// assert_eq!(0x10i32.overflowing_shl(36), (0x100, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_shl")]
-        pub const fn overflowing_shl(self, rhs: u32) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_shl(self, rhs: u32) -> (Self, bool) {
             (self.wrapping_shl(rhs), (rhs > ($BITS - 1)))
         }
 
@@ -1088,10 +1049,9 @@ macro_rules! int_impl {
         /// assert_eq!(0x10i32.overflowing_shr(4), (0x1, false));
         /// assert_eq!(0x10i32.overflowing_shr(36), (0x1, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_shr")]
-        pub const fn overflowing_shr(self, rhs: u32) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_shr(self, rhs: u32) -> (Self, bool) {
             (self.wrapping_shr(rhs), (rhs > ($BITS - 1)))
         }
 
@@ -1114,8 +1074,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "no_panic_abs", since = "1.13.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_abs")]
-        pub const fn overflowing_abs(self) -> (Self, bool) {
+        pub fn overflowing_abs(self) -> (Self, bool) {
             if self.is_negative() {
                 self.overflowing_neg()
             } else {
@@ -1137,8 +1096,7 @@ macro_rules! int_impl {
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
         #[rustc_inherit_overflow_checks]
-        #[rustc_const_unstable(feature = "const_int_pow")]
-        pub const fn pow(self, mut exp: u32) -> Self {
+        pub fn pow(self, mut exp: u32) -> Self {
             let mut base = self;
             let mut acc = 1;
 
@@ -1180,8 +1138,7 @@ macro_rules! int_impl {
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
         #[rustc_inherit_overflow_checks]
-        #[rustc_const_unstable(feature = "const_int_abs")]
-        pub const fn abs(self) -> Self {
+        pub fn abs(self) -> Self {
             if self.is_negative() {
                 // Note that the #[inline] above means that the overflow
                 // semantics of this negation depend on the crate we're being
@@ -1209,8 +1166,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_signum")]
-        pub const fn signum(self) -> Self {
+        pub fn signum(self) -> Self {
             match self {
                 n if n > 0 =>  1,
                 0          =>  0,
@@ -1231,8 +1187,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_is_positive")]
-        pub const fn is_positive(self) -> bool { self > 0 }
+        pub fn is_positive(self) -> bool { self > 0 }
 
         /// Returns `true` if `self` is negative and `false` if the number
         /// is zero or positive.
@@ -1247,8 +1202,7 @@ macro_rules! int_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_is_negative")]
-        pub const fn is_negative(self) -> bool { self < 0 }
+        pub fn is_negative(self) -> bool { self < 0 }
     }
 }
 
@@ -1364,8 +1318,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_count_ones")]
-        pub const fn count_ones(self) -> u32 {
+        pub fn count_ones(self) -> u32 {
             unsafe { intrinsics::ctpop(self as $ActualT) as u32 }
         }
 
@@ -1382,8 +1335,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_count_zeros")]
-        pub const fn count_zeros(self) -> u32 {
+        pub fn count_zeros(self) -> u32 {
             (!self).count_ones()
         }
 
@@ -1401,8 +1353,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_leading_zeros")]
-        pub const fn leading_zeros(self) -> u32 {
+        pub fn leading_zeros(self) -> u32 {
             unsafe { intrinsics::ctlz(self as $ActualT) as u32 }
         }
 
@@ -1420,8 +1371,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_trailing_zeros")]
-        pub const fn trailing_zeros(self) -> u32 {
+        pub fn trailing_zeros(self) -> u32 {
             // As of LLVM 3.6 the codegen for the zero-safe cttz8 intrinsic
             // emits two conditional moves on x86_64. By promoting the value to
             // u16 and setting bit 8, we get better code without any conditional
@@ -1455,8 +1405,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_rotate_left")]
-        pub const fn rotate_left(self, n: u32) -> Self {
+        pub fn rotate_left(self, n: u32) -> Self {
             // Protect against undefined behaviour for over-long bit shifts
             let n = n % $BITS;
             (self << n) | (self >> (($BITS - n) % $BITS))
@@ -1480,8 +1429,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_rotate_right")]
-        pub const fn rotate_right(self, n: u32) -> Self {
+        pub fn rotate_right(self, n: u32) -> Self {
             // Protect against undefined behaviour for over-long bit shifts
             let n = n % $BITS;
             (self >> n) | (self << (($BITS - n) % $BITS))
@@ -1504,8 +1452,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_swap_bytes")]
-        pub const fn swap_bytes(self) -> Self {
+        pub fn swap_bytes(self) -> Self {
             unsafe { intrinsics::bswap(self as $ActualT) as Self }
         }
 
@@ -1529,8 +1476,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_from_be")]
-        pub const fn from_be(x: Self) -> Self {
+        pub fn from_be(x: Self) -> Self {
             if cfg!(target_endian = "big") { x } else { x.swap_bytes() }
         }
 
@@ -1554,8 +1500,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_from_le")]
-        pub const fn from_le(x: Self) -> Self {
+        pub fn from_le(x: Self) -> Self {
             if cfg!(target_endian = "little") { x } else { x.swap_bytes() }
         }
 
@@ -1579,8 +1524,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_to_be")]
-        pub const fn to_be(self) -> Self { // or not to be?
+        pub fn to_be(self) -> Self { // or not to be?
             if cfg!(target_endian = "big") { self } else { self.swap_bytes() }
         }
 
@@ -1604,8 +1548,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_to_le")]
-        pub const fn to_le(self) -> Self {
+        pub fn to_le(self) -> Self {
             if cfg!(target_endian = "little") { self } else { self.swap_bytes() }
         }
 
@@ -1622,8 +1565,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_add")]
-        pub const fn checked_add(self, rhs: Self) -> Option<Self> {
+        pub fn checked_add(self, rhs: Self) -> Option<Self> {
             let (a, b) = self.overflowing_add(rhs);
             if b {None} else {Some(a)}
         }
@@ -1641,8 +1583,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_sub")]
-        pub const fn checked_sub(self, rhs: Self) -> Option<Self> {
+        pub fn checked_sub(self, rhs: Self) -> Option<Self> {
             let (a, b) = self.overflowing_sub(rhs);
             if b {None} else {Some(a)}
         }
@@ -1660,8 +1601,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_mul")]
-        pub const fn checked_mul(self, rhs: Self) -> Option<Self> {
+        pub fn checked_mul(self, rhs: Self) -> Option<Self> {
             let (a, b) = self.overflowing_mul(rhs);
             if b {None} else {Some(a)}
         }
@@ -1679,8 +1619,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_div")]
-        pub const fn checked_div(self, rhs: Self) -> Option<Self> {
+        pub fn checked_div(self, rhs: Self) -> Option<Self> {
             match rhs {
                 0 => None,
                 rhs => Some(unsafe { intrinsics::unchecked_div(self, rhs) }),
@@ -1700,8 +1639,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_rem")]
-        pub const fn checked_rem(self, rhs: Self) -> Option<Self> {
+        pub fn checked_rem(self, rhs: Self) -> Option<Self> {
             if rhs == 0 {
                 None
             } else {
@@ -1724,8 +1662,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_neg")]
-        pub const fn checked_neg(self) -> Option<Self> {
+        pub fn checked_neg(self) -> Option<Self> {
             let (a, b) = self.overflowing_neg();
             if b {None} else {Some(a)}
         }
@@ -1743,8 +1680,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_shl")]
-        pub const fn checked_shl(self, rhs: u32) -> Option<Self> {
+        pub fn checked_shl(self, rhs: u32) -> Option<Self> {
             let (a, b) = self.overflowing_shl(rhs);
             if b {None} else {Some(a)}
         }
@@ -1762,8 +1698,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_checked_shr")]
-        pub const fn checked_shr(self, rhs: u32) -> Option<Self> {
+        pub fn checked_shr(self, rhs: u32) -> Option<Self> {
             let (a, b) = self.overflowing_shr(rhs);
             if b {None} else {Some(a)}
         }
@@ -1781,8 +1716,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_saturating_add")]
-        pub const fn saturating_add(self, rhs: Self) -> Self {
+        pub fn saturating_add(self, rhs: Self) -> Self {
             match self.checked_add(rhs) {
                 Some(x) => x,
                 None => Self::max_value(),
@@ -1802,8 +1736,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_saturating_sub")]
-        pub const fn saturating_sub(self, rhs: Self) -> Self {
+        pub fn saturating_sub(self, rhs: Self) -> Self {
             match self.checked_sub(rhs) {
                 Some(x) => x,
                 None => Self::min_value(),
@@ -1825,8 +1758,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_saturating_mul")]
-        pub const fn saturating_mul(self, rhs: Self) -> Self {
+        pub fn saturating_mul(self, rhs: Self) -> Self {
             self.checked_mul(rhs).unwrap_or(Self::max_value())
         }
 
@@ -1843,8 +1775,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_add")]
-        pub const fn wrapping_add(self, rhs: Self) -> Self {
+        pub fn wrapping_add(self, rhs: Self) -> Self {
             unsafe {
                 intrinsics::overflowing_add(self, rhs)
             }
@@ -1863,8 +1794,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_sub")]
-        pub const fn wrapping_sub(self, rhs: Self) -> Self {
+        pub fn wrapping_sub(self, rhs: Self) -> Self {
             unsafe {
                 intrinsics::overflowing_sub(self, rhs)
             }
@@ -1883,8 +1813,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_mul")]
-        pub const fn wrapping_mul(self, rhs: Self) -> Self {
+        pub fn wrapping_mul(self, rhs: Self) -> Self {
             unsafe {
                 intrinsics::overflowing_mul(self, rhs)
             }
@@ -1905,8 +1834,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_div")]
-        pub const fn wrapping_div(self, rhs: Self) -> Self {
+        pub fn wrapping_div(self, rhs: Self) -> Self {
             self / rhs
         }
 
@@ -1926,8 +1854,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_rem")]
-        pub const fn wrapping_rem(self, rhs: Self) -> Self {
+        pub fn wrapping_rem(self, rhs: Self) -> Self {
             self % rhs
         }
 
@@ -1953,8 +1880,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_neg")]
-        pub const fn wrapping_neg(self) -> Self {
+        pub fn wrapping_neg(self) -> Self {
             self.overflowing_neg().0
         }
 
@@ -1979,8 +1905,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_shl")]
-        pub const fn wrapping_shl(self, rhs: u32) -> Self {
+        pub fn wrapping_shl(self, rhs: u32) -> Self {
             unsafe {
                 intrinsics::unchecked_shl(self, (rhs & ($BITS - 1)) as $SelfT)
             }
@@ -2007,8 +1932,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "num_wrapping", since = "1.2.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_wrapping_shr")]
-        pub const fn wrapping_shr(self, rhs: u32) -> Self {
+        pub fn wrapping_shr(self, rhs: u32) -> Self {
             unsafe {
                 intrinsics::unchecked_shr(self, (rhs & ($BITS - 1)) as $SelfT)
             }
@@ -2030,10 +1954,9 @@ macro_rules! uint_impl {
         /// assert_eq!(5u32.overflowing_add(2), (7, false));
         /// assert_eq!(u32::MAX.overflowing_add(1), (0, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_add")]
-        pub const fn overflowing_add(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_add(self, rhs: Self) -> (Self, bool) {
             let (a, b) = unsafe {
                 intrinsics::add_with_overflow(self as $ActualT,
                                               rhs as $ActualT)
@@ -2057,10 +1980,9 @@ macro_rules! uint_impl {
         /// assert_eq!(5u32.overflowing_sub(2), (3, false));
         /// assert_eq!(0u32.overflowing_sub(1), (u32::MAX, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_sub")]
-        pub const fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
             let (a, b) = unsafe {
                 intrinsics::sub_with_overflow(self as $ActualT,
                                               rhs as $ActualT)
@@ -2082,10 +2004,9 @@ macro_rules! uint_impl {
         /// assert_eq!(5u32.overflowing_mul(2), (10, false));
         /// assert_eq!(1_000_000_000u32.overflowing_mul(10), (1410065408, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_mul")]
-        pub const fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_mul(self, rhs: Self) -> (Self, bool) {
             let (a, b) = unsafe {
                 intrinsics::mul_with_overflow(self as $ActualT,
                                               rhs as $ActualT)
@@ -2111,10 +2032,9 @@ macro_rules! uint_impl {
         /// ```
         /// assert_eq!(5u32.overflowing_div(2), (2, false));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_div")]
-        pub const fn overflowing_div(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_div(self, rhs: Self) -> (Self, bool) {
             (self / rhs, false)
         }
 
@@ -2136,10 +2056,9 @@ macro_rules! uint_impl {
         /// ```
         /// assert_eq!(5u32.overflowing_rem(2), (1, false));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_rem")]
-        pub const fn overflowing_rem(self, rhs: Self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_rem(self, rhs: Self) -> (Self, bool) {
             (self % rhs, false)
         }
 
@@ -2158,10 +2077,9 @@ macro_rules! uint_impl {
         /// assert_eq!(0u32.overflowing_neg(), (0, false));
         /// assert_eq!(2u32.overflowing_neg(), (-2i32 as u32, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_neg")]
-        pub const fn overflowing_neg(self) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_neg(self) -> (Self, bool) {
             ((!self).wrapping_add(1), self != 0)
         }
 
@@ -2181,10 +2099,9 @@ macro_rules! uint_impl {
         /// assert_eq!(0x10u32.overflowing_shl(4), (0x100, false));
         /// assert_eq!(0x10u32.overflowing_shl(36), (0x100, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_shl")]
-        pub const fn overflowing_shl(self, rhs: u32) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_shl(self, rhs: u32) -> (Self, bool) {
             (self.wrapping_shl(rhs), (rhs > ($BITS - 1)))
         }
 
@@ -2204,10 +2121,9 @@ macro_rules! uint_impl {
         /// assert_eq!(0x10u32.overflowing_shr(4), (0x1, false));
         /// assert_eq!(0x10u32.overflowing_shr(36), (0x1, true));
         /// ```
-        #[stable(feature = "wrapping", since = "1.7.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_overflowing_shr")]
-        pub const fn overflowing_shr(self, rhs: u32) -> (Self, bool) {
+        #[stable(feature = "wrapping", since = "1.7.0")]
+        pub fn overflowing_shr(self, rhs: u32) -> (Self, bool) {
             (self.wrapping_shr(rhs), (rhs > ($BITS - 1)))
 
         }
@@ -2224,8 +2140,7 @@ macro_rules! uint_impl {
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
         #[rustc_inherit_overflow_checks]
-        #[rustc_const_unstable(feature = "const_int_pow")]
-        pub const fn pow(self, mut exp: u32) -> Self {
+        pub fn pow(self, mut exp: u32) -> Self {
             let mut base = self;
             let mut acc = 1;
 
@@ -2259,8 +2174,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_is_power_of_two")]
-        pub const fn is_power_of_two(self) -> bool {
+        pub fn is_power_of_two(self) -> bool {
             (self.wrapping_sub(1)) & self == 0 && !(self == 0)
         }
 
@@ -2274,7 +2188,7 @@ macro_rules! uint_impl {
         // overflow cases it instead ends up returning the maximum value
         // of the type, and can return 0 for 0.
         #[inline]
-        const fn one_less_than_next_power_of_two(self) -> Self {
+        fn one_less_than_next_power_of_two(self) -> Self {
             if self <= 1 { return 0; }
 
             // Because `p > 0`, it cannot consist entirely of leading zeros.
@@ -2302,8 +2216,7 @@ macro_rules! uint_impl {
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
-        #[rustc_const_unstable(feature = "const_int_next_power_of_two")]
-        pub const fn next_power_of_two(self) -> Self {
+        pub fn next_power_of_two(self) -> Self {
             // Call the trait to get overflow checks
             ops::Add::add(self.one_less_than_next_power_of_two(), 1)
         }
@@ -2322,8 +2235,7 @@ macro_rules! uint_impl {
         /// assert_eq!(200u8.checked_next_power_of_two(), None);
         /// ```
         #[stable(feature = "rust1", since = "1.0.0")]
-        #[rustc_const_unstable(feature = "const_int_checked_next_power_of_two")]
-        pub const fn checked_next_power_of_two(self) -> Option<Self> {
+        pub fn checked_next_power_of_two(self) -> Option<Self> {
             self.one_less_than_next_power_of_two().checked_add(1)
         }
     }
@@ -2347,8 +2259,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii")]
-    pub const fn is_ascii(&self) -> bool {
+    pub fn is_ascii(&self) -> bool {
         *self & 128 == 0
     }
 
@@ -2370,8 +2281,7 @@ impl u8 {
     /// [`make_ascii_uppercase`]: #method.make_ascii_uppercase
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_to_ascii_uppercase")]
-    pub const fn to_ascii_uppercase(&self) -> u8 {
+    pub fn to_ascii_uppercase(&self) -> u8 {
         ASCII_UPPERCASE_MAP[*self as usize]
     }
 
@@ -2393,8 +2303,7 @@ impl u8 {
     /// [`make_ascii_lowercase`]: #method.make_ascii_lowercase
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_to_ascii_lowercase")]
-    pub const fn to_ascii_lowercase(&self) -> u8 {
+    pub fn to_ascii_lowercase(&self) -> u8 {
         ASCII_LOWERCASE_MAP[*self as usize]
     }
 
@@ -2412,8 +2321,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_eq_ignore_ascii_case")]
-    pub const fn eq_ignore_ascii_case(&self, other: &u8) -> bool {
+    pub fn eq_ignore_ascii_case(&self, other: &u8) -> bool {
         self.to_ascii_lowercase() == other.to_ascii_lowercase()
     }
 
@@ -2438,8 +2346,7 @@ impl u8 {
     /// [`to_ascii_uppercase`]: #method.to_ascii_uppercase
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_make_ascii_uppercase")]
-    pub const fn make_ascii_uppercase(&mut self) {
+    pub fn make_ascii_uppercase(&mut self) {
         *self = self.to_ascii_uppercase();
     }
 
@@ -2464,8 +2371,7 @@ impl u8 {
     /// [`to_ascii_lowercase`]: #method.to_ascii_lowercase
     #[stable(feature = "ascii_methods_on_intrinsics", since = "1.23.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_make_ascii_lowercase")]
-    pub const fn make_ascii_lowercase(&mut self) {
+    pub fn make_ascii_lowercase(&mut self) {
         *self = self.to_ascii_lowercase();
     }
 
@@ -2501,8 +2407,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_alphabetic")]
-    pub const fn is_ascii_alphabetic(&self) -> bool {
+    pub fn is_ascii_alphabetic(&self) -> bool {
         if *self >= 0x80 { return false; }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             L | Lx | U | Ux => true,
@@ -2540,8 +2445,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_uppercase")]
-    pub const fn is_ascii_uppercase(&self) -> bool {
+    pub fn is_ascii_uppercase(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             U | Ux => true,
@@ -2579,8 +2483,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_lowercase")]
-    pub const fn is_ascii_lowercase(&self) -> bool {
+    pub fn is_ascii_lowercase(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             L | Lx => true,
@@ -2621,8 +2524,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_alphanumeric")]
-    pub const fn is_ascii_alphanumeric(&self) -> bool {
+    pub fn is_ascii_alphanumeric(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             D | L | Lx | U | Ux => true,
@@ -2660,8 +2562,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_digit")]
-    pub const fn is_ascii_digit(&self) -> bool {
+    pub fn is_ascii_digit(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             D => true,
@@ -2702,8 +2603,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_hexdigit")]
-    pub const fn is_ascii_hexdigit(&self) -> bool {
+    pub fn is_ascii_hexdigit(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             D | Lx | Ux => true,
@@ -2745,8 +2645,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_punctuation")]
-    pub const fn is_ascii_punctuation(&self) -> bool {
+    pub fn is_ascii_punctuation(&self) -> bool {
         if *self >= 0x80 { return false }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             P => true,
@@ -2784,8 +2683,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_graphic")]
-    pub const fn is_ascii_graphic(&self) -> bool {
+    pub fn is_ascii_graphic(&self) -> bool {
         if *self >= 0x80 { return false; }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             Ux | U | Lx | L | D | P => true,
@@ -2840,8 +2738,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_whitespace")]
-    pub const fn is_ascii_whitespace(&self) -> bool {
+    pub fn is_ascii_whitespace(&self) -> bool {
         if *self >= 0x80 { return false; }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             Cw | W => true,
@@ -2881,8 +2778,7 @@ impl u8 {
     /// ```
     #[stable(feature = "ascii_ctype_on_intrinsics", since = "1.24.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_int_is_ascii_control")]
-    pub const fn is_ascii_control(&self) -> bool {
+    pub fn is_ascii_control(&self) -> bool {
         if *self >= 0x80 { return false; }
         match ASCII_CHARACTER_CLASS[*self as usize] {
             C | Cw => true,
@@ -2986,65 +2882,65 @@ pub enum FpCategory {
 pub trait Float: Sized {
     /// Returns `true` if this value is NaN and false otherwise.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn is_nan(self) -> bool;
+    fn is_nan(self) -> bool;
     /// Returns `true` if this value is positive infinity or negative infinity and
     /// false otherwise.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn is_infinite(self) -> bool;
+    fn is_infinite(self) -> bool;
     /// Returns `true` if this number is neither infinite nor NaN.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn is_finite(self) -> bool;
+    fn is_finite(self) -> bool;
     /// Returns `true` if this number is neither zero, infinite, denormal, or NaN.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn is_normal(self) -> bool;
+    fn is_normal(self) -> bool;
     /// Returns the category that this number falls into.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn classify(self) -> FpCategory;
+    fn classify(self) -> FpCategory;
 
     /// Computes the absolute value of `self`. Returns `Float::nan()` if the
     /// number is `Float::nan()`.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn abs(self) -> Self;
+    fn abs(self) -> Self;
     /// Returns a number that represents the sign of `self`.
     ///
     /// - `1.0` if the number is positive, `+0.0` or `Float::infinity()`
     /// - `-1.0` if the number is negative, `-0.0` or `Float::neg_infinity()`
     /// - `Float::nan()` if the number is `Float::nan()`
     #[stable(feature = "core", since = "1.6.0")]
-    const fn signum(self) -> Self;
+    fn signum(self) -> Self;
 
     /// Returns `true` if `self` is positive, including `+0.0` and
     /// `Float::infinity()`.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn is_sign_positive(self) -> bool;
+    fn is_sign_positive(self) -> bool;
     /// Returns `true` if `self` is negative, including `-0.0` and
     /// `Float::neg_infinity()`.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn is_sign_negative(self) -> bool;
+    fn is_sign_negative(self) -> bool;
 
     /// Take the reciprocal (inverse) of a number, `1/x`.
     #[stable(feature = "core", since = "1.6.0")]
-    const fn recip(self) -> Self;
+    fn recip(self) -> Self;
 
     /// Raise a number to an integer power.
     ///
     /// Using this function is generally faster than using `powf`
     #[stable(feature = "core", since = "1.6.0")]
-    const fn powi(self, n: i32) -> Self;
+    fn powi(self, n: i32) -> Self;
 
     /// Convert radians to degrees.
     #[stable(feature = "deg_rad_conversions", since="1.7.0")]
-    const fn to_degrees(self) -> Self;
+    fn to_degrees(self) -> Self;
     /// Convert degrees to radians.
     #[stable(feature = "deg_rad_conversions", since="1.7.0")]
-    const fn to_radians(self) -> Self;
+    fn to_radians(self) -> Self;
 
     /// Returns the maximum of the two numbers.
     #[stable(feature = "core_float_min_max", since="1.20.0")]
-    const fn max(self, other: Self) -> Self;
+    fn max(self, other: Self) -> Self;
     /// Returns the minimum of the two numbers.
     #[stable(feature = "core_float_min_max", since="1.20.0")]
-    const fn min(self, other: Self) -> Self;
+    fn min(self, other: Self) -> Self;
 }
 
 macro_rules! from_str_radix_int_impl {
@@ -3503,7 +3399,7 @@ impl_from! { u32, f64, #[stable(feature = "lossless_float_conv", since = "1.6.0"
 // Float -> Float
 impl_from! { f32, f64, #[stable(feature = "lossless_float_conv", since = "1.6.0")] }
 
-const ASCII_LOWERCASE_MAP: [u8; 256] = [
+static ASCII_LOWERCASE_MAP: [u8; 256] = [
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
@@ -3542,7 +3438,7 @@ const ASCII_LOWERCASE_MAP: [u8; 256] = [
     0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
 ];
 
-const ASCII_UPPERCASE_MAP: [u8; 256] = [
+static ASCII_UPPERCASE_MAP: [u8; 256] = [
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,

@@ -54,8 +54,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_nan")]
-    pub const fn is_nan(self) -> bool { num::Float::is_nan(self) }
+    pub fn is_nan(self) -> bool { num::Float::is_nan(self) }
 
     /// Returns `true` if this value is positive infinity or negative infinity and
     /// false otherwise.
@@ -76,8 +75,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_infinite")]
-    pub const fn is_infinite(self) -> bool { num::Float::is_infinite(self) }
+    pub fn is_infinite(self) -> bool { num::Float::is_infinite(self) }
 
     /// Returns `true` if this number is neither infinite nor `NaN`.
     ///
@@ -97,8 +95,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_finite")]
-    pub const fn is_finite(self) -> bool { num::Float::is_finite(self) }
+    pub fn is_finite(self) -> bool { num::Float::is_finite(self) }
 
     /// Returns `true` if the number is neither zero, infinite,
     /// [subnormal][subnormal], or `NaN`.
@@ -123,8 +120,7 @@ impl f32 {
     /// [subnormal]: https://en.wikipedia.org/wiki/Denormal_number
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_classify")]
-    pub const fn is_normal(self) -> bool { num::Float::is_normal(self) }
+    pub fn is_normal(self) -> bool { num::Float::is_normal(self) }
 
     /// Returns the floating point category of the number. If only one property
     /// is going to be tested, it is generally faster to use the specific
@@ -142,7 +138,6 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_classify")]
     pub fn classify(self) -> FpCategory { num::Float::classify(self) }
 
     /// Returns the largest integer less than or equal to a number.
@@ -156,8 +151,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_floor")]
-    pub const fn floor(self) -> f32 {
+    pub fn floor(self) -> f32 {
         // On MSVC LLVM will lower many math intrinsics to a call to the
         // corresponding function. On MSVC, however, many of these functions
         // aren't actually available as symbols to call, but rather they are all
@@ -188,8 +182,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_ceil")]
-    pub const fn ceil(self) -> f32 {
+    pub fn ceil(self) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).ceil() as f32;
@@ -209,8 +202,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_round")]
-    pub const fn round(self) -> f32 {
+    pub fn round(self) -> f32 {
         unsafe { intrinsics::roundf32(self) }
     }
 
@@ -225,8 +217,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_trunc")]
-    pub const fn trunc(self) -> f32 {
+    pub fn trunc(self) -> f32 {
         unsafe { intrinsics::truncf32(self) }
     }
 
@@ -245,8 +236,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_fract")]
-    pub const fn fract(self) -> f32 { self - self.trunc() }
+    pub fn fract(self) -> f32 { self - self.trunc() }
 
     /// Computes the absolute value of `self`. Returns `NAN` if the
     /// number is `NAN`.
@@ -267,8 +257,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_abs")]
-    pub const fn abs(self) -> f32 { num::Float::abs(self) }
+    pub fn abs(self) -> f32 { num::Float::abs(self) }
 
     /// Returns a number that represents the sign of `self`.
     ///
@@ -288,8 +277,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_signum")]
-    pub const fn signum(self) -> f32 { num::Float::signum(self) }
+    pub fn signum(self) -> f32 { num::Float::signum(self) }
 
     /// Returns `true` if and only if `self` has a positive sign, including `+0.0`, `NaN`s with
     /// positive sign bit and positive infinity.
@@ -303,8 +291,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_sign_positive")]
-    pub const fn is_sign_positive(self) -> bool { num::Float::is_sign_positive(self) }
+    pub fn is_sign_positive(self) -> bool { num::Float::is_sign_positive(self) }
 
     /// Returns `true` if and only if `self` has a negative sign, including `-0.0`, `NaN`s with
     /// negative sign bit and negative infinity.
@@ -318,8 +305,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_sign_negative")]
-    pub const fn is_sign_negative(self) -> bool { num::Float::is_sign_negative(self) }
+    pub fn is_sign_negative(self) -> bool { num::Float::is_sign_negative(self) }
 
     /// Fused multiply-add. Computes `(self * a) + b` with only one rounding
     /// error. This produces a more accurate result with better performance than
@@ -339,8 +325,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_mul_add")]
-    pub const fn mul_add(self, a: f32, b: f32) -> f32 {
+    pub fn mul_add(self, a: f32, b: f32) -> f32 {
         unsafe { intrinsics::fmaf32(self, a, b) }
     }
 
@@ -356,8 +341,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_recip")]
-    pub const fn recip(self) -> f32 { num::Float::recip(self) }
+    pub fn recip(self) -> f32 { num::Float::recip(self) }
 
     /// Raises a number to an integer power.
     ///
@@ -373,8 +357,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_powi")]
-    pub const fn powi(self, n: i32) -> f32 { num::Float::powi(self, n) }
+    pub fn powi(self, n: i32) -> f32 { num::Float::powi(self, n) }
 
     /// Raises a number to a floating point power.
     ///
@@ -388,8 +371,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_powf")]
-    pub const fn powf(self, n: f32) -> f32 {
+    pub fn powf(self, n: f32) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).powf(n as f64) as f32;
@@ -414,8 +396,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_sqrt")]
-    pub const fn sqrt(self) -> f32 {
+    pub fn sqrt(self) -> f32 {
         if self < 0.0 {
             NAN
         } else {
@@ -439,8 +420,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_exp")]
-    pub const fn exp(self) -> f32 {
+    pub fn exp(self) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).exp() as f32;
@@ -462,8 +442,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_exp2")]
-    pub const fn exp2(self) -> f32 {
+    pub fn exp2(self) -> f32 {
         unsafe { intrinsics::exp2f32(self) }
     }
 
@@ -483,8 +462,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_ln")]
-    pub const fn ln(self) -> f32 {
+    pub fn ln(self) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).ln() as f32;
@@ -511,8 +489,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_log")]
-    pub const fn log(self, base: f32) -> f32 { self.ln() / base.ln() }
+    pub fn log(self, base: f32) -> f32 { self.ln() / base.ln() }
 
     /// Returns the base 2 logarithm of the number.
     ///
@@ -528,8 +505,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_log2")]
-    pub const fn log2(self) -> f32 {
+    pub fn log2(self) -> f32 {
         #[cfg(target_os = "android")]
         return ::sys::android::log2f32(self);
         #[cfg(not(target_os = "android"))]
@@ -550,8 +526,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_log10")]
-    pub const fn log10(self) -> f32 {
+    pub fn log10(self) -> f32 {
         // see notes above in `floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).log10() as f32;
@@ -572,8 +547,7 @@ impl f32 {
     /// ```
     #[stable(feature = "f32_deg_rad_conversions", since="1.7.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_to_degrees")]
-    pub const fn to_degrees(self) -> f32 { num::Float::to_degrees(self) }
+    pub fn to_degrees(self) -> f32 { num::Float::to_degrees(self) }
 
     /// Converts degrees to radians.
     ///
@@ -588,8 +562,7 @@ impl f32 {
     /// ```
     #[stable(feature = "f32_deg_rad_conversions", since="1.7.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_to_radians")]
-    pub const fn to_radians(self) -> f32 { num::Float::to_radians(self) }
+    pub fn to_radians(self) -> f32 { num::Float::to_radians(self) }
 
     /// Returns the maximum of the two numbers.
     ///
@@ -603,8 +576,7 @@ impl f32 {
     /// If one of the arguments is NaN, then the other argument is returned.
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_max")]
-    pub const fn max(self, other: f32) -> f32 {
+    pub fn max(self, other: f32) -> f32 {
         num::Float::max(self, other)
     }
 
@@ -620,8 +592,7 @@ impl f32 {
     /// If one of the arguments is NaN, then the other argument is returned.
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_min")]
-    pub const fn min(self, other: f32) -> f32 {
+    pub fn min(self, other: f32) -> f32 {
         num::Float::min(self, other)
     }
 
@@ -644,7 +615,6 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_abs_sub")]
     #[rustc_deprecated(since = "1.10.0",
                        reason = "you probably meant `(self - other).abs()`: \
                                  this operation is `(self - other).max(0.0)` (also \
@@ -652,7 +622,7 @@ impl f32 {
                                  difference, consider using that expression or the C function \
                                  `fdimf`, depending on how you wish to handle NaN (please consider \
                                  filing an issue describing your use-case too).")]
-    pub const fn abs_sub(self, other: f32) -> f32 {
+    pub fn abs_sub(self, other: f32) -> f32 {
         unsafe { cmath::fdimf(self, other) }
     }
 
@@ -670,8 +640,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_cbrt")]
-    pub const fn cbrt(self) -> f32 {
+    pub fn cbrt(self) -> f32 {
         unsafe { cmath::cbrtf(self) }
     }
 
@@ -691,8 +660,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_hypot")]
-    pub const fn hypot(self, other: f32) -> f32 {
+    pub fn hypot(self, other: f32) -> f32 {
         unsafe { cmath::hypotf(self, other) }
     }
 
@@ -709,8 +677,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_sin")]
-    pub const fn sin(self) -> f32 {
+    pub fn sin(self) -> f32 {
         // see notes in `core::f32::Float::floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).sin() as f32;
@@ -731,8 +698,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_cos")]
-    pub const fn cos(self) -> f32 {
+    pub fn cos(self) -> f32 {
         // see notes in `core::f32::Float::floor`
         #[cfg(target_env = "msvc")]
         return (self as f64).cos() as f32;
@@ -752,8 +718,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_tan")]
-    pub const fn tan(self) -> f32 {
+    pub fn tan(self) -> f32 {
         unsafe { cmath::tanf(self) }
     }
 
@@ -773,8 +738,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_asin")]
-    pub const fn asin(self) -> f32 {
+    pub fn asin(self) -> f32 {
         unsafe { cmath::asinf(self) }
     }
 
@@ -794,8 +758,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_acos")]
-    pub const fn acos(self) -> f32 {
+    pub fn acos(self) -> f32 {
         unsafe { cmath::acosf(self) }
     }
 
@@ -814,8 +777,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_atan")]
-    pub const fn atan(self) -> f32 {
+    pub fn atan(self) -> f32 {
         unsafe { cmath::atanf(self) }
     }
 
@@ -847,8 +809,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_atan2")]
-    pub const fn atan2(self, other: f32) -> f32 {
+    pub fn atan2(self, other: f32) -> f32 {
         unsafe { cmath::atan2f(self, other) }
     }
 
@@ -869,8 +830,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_sin_cos")]
-    pub const fn sin_cos(self) -> (f32, f32) {
+    pub fn sin_cos(self) -> (f32, f32) {
         (self.sin(), self.cos())
     }
 
@@ -889,8 +849,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_exp_m1")]
-    pub const fn exp_m1(self) -> f32 {
+    pub fn exp_m1(self) -> f32 {
         unsafe { cmath::expm1f(self) }
     }
 
@@ -909,8 +868,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_ln_1p")]
-    pub const fn ln_1p(self) -> f32 {
+    pub fn ln_1p(self) -> f32 {
         unsafe { cmath::log1pf(self) }
     }
 
@@ -931,8 +889,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_sinh")]
-    pub const fn sinh(self) -> f32 {
+    pub fn sinh(self) -> f32 {
         unsafe { cmath::sinhf(self) }
     }
 
@@ -953,8 +910,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_cosh")]
-    pub const fn cosh(self) -> f32 {
+    pub fn cosh(self) -> f32 {
         unsafe { cmath::coshf(self) }
     }
 
@@ -975,8 +931,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_tanh")]
-    pub const fn tanh(self) -> f32 {
+    pub fn tanh(self) -> f32 {
         unsafe { cmath::tanhf(self) }
     }
 
@@ -994,8 +949,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_asinh")]
-    pub const fn asinh(self) -> f32 {
+    pub fn asinh(self) -> f32 {
         if self == NEG_INFINITY {
             NEG_INFINITY
         } else {
@@ -1017,8 +971,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_acosh")]
-    pub const fn acosh(self) -> f32 {
+    pub fn acosh(self) -> f32 {
         match self {
             x if x < 1.0 => ::f32::NAN,
             x => (x + ((x * x) - 1.0).sqrt()).ln(),
@@ -1039,8 +992,7 @@ impl f32 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_atanh")]
-    pub const fn atanh(self) -> f32 {
+    pub fn atanh(self) -> f32 {
         0.5 * ((2.0 * self) / (1.0 - self)).ln_1p()
     }
 
@@ -1063,8 +1015,7 @@ impl f32 {
     /// ```
     #[stable(feature = "float_bits_conv", since = "1.20.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_to_bits")]
-    pub const fn to_bits(self) -> u32 {
+    pub fn to_bits(self) -> u32 {
         unsafe { ::mem::transmute(self) }
     }
 
@@ -1108,8 +1059,7 @@ impl f32 {
     /// ```
     #[stable(feature = "float_bits_conv", since = "1.20.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_from_bits")]
-    pub const fn from_bits(v: u32) -> Self {
+    pub fn from_bits(v: u32) -> Self {
         // It turns out the safety issues with sNaN were overblown! Hooray!
         unsafe { ::mem::transmute(v) }
     }

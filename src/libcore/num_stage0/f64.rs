@@ -147,32 +147,32 @@ pub mod consts {
 impl Float for f64 {
     /// Returns `true` if the number is NaN.
     #[inline]
-    const fn is_nan(self) -> bool {
+    fn is_nan(self) -> bool {
         self != self
     }
 
     /// Returns `true` if the number is infinite.
     #[inline]
-    const fn is_infinite(self) -> bool {
+    fn is_infinite(self) -> bool {
         self == INFINITY || self == NEG_INFINITY
     }
 
     /// Returns `true` if the number is neither infinite or NaN.
     #[inline]
-    const fn is_finite(self) -> bool {
+    fn is_finite(self) -> bool {
         !(self.is_nan() || self.is_infinite())
     }
 
     /// Returns `true` if the number is neither zero, infinite, subnormal or NaN.
     #[inline]
-    const fn is_normal(self) -> bool {
+    fn is_normal(self) -> bool {
         self.classify() == Fp::Normal
     }
 
     /// Returns the floating point category of the number. If only one property
     /// is going to be tested, it is generally faster to use the specific
     /// predicate instead.
-    const fn classify(self) -> Fp {
+    fn classify(self) -> Fp {
         const EXP_MASK: u64 = 0x7ff0000000000000;
         const MAN_MASK: u64 = 0x000fffffffffffff;
 
@@ -189,7 +189,7 @@ impl Float for f64 {
     /// Computes the absolute value of `self`. Returns `Float::nan()` if the
     /// number is `Float::nan()`.
     #[inline]
-    const fn abs(self) -> f64 {
+    fn abs(self) -> f64 {
         unsafe { intrinsics::fabsf64(self) }
     }
 
@@ -199,7 +199,7 @@ impl Float for f64 {
     /// - `-1.0` if the number is negative, `-0.0` or `Float::neg_infinity()`
     /// - `Float::nan()` if the number is `Float::nan()`
     #[inline]
-    const fn signum(self) -> f64 {
+    fn signum(self) -> f64 {
         if self.is_nan() {
             NAN
         } else {
@@ -210,14 +210,14 @@ impl Float for f64 {
     /// Returns `true` if and only if `self` has a positive sign, including `+0.0`, `NaN`s with
     /// positive sign bit and positive infinity.
     #[inline]
-    const fn is_sign_positive(self) -> bool {
+    fn is_sign_positive(self) -> bool {
         !self.is_sign_negative()
     }
 
     /// Returns `true` if and only if `self` has a negative sign, including `-0.0`, `NaN`s with
     /// negative sign bit and negative infinity.
     #[inline]
-    const fn is_sign_negative(self) -> bool {
+    fn is_sign_negative(self) -> bool {
         #[repr(C)]
         union F64Bytes {
             f: f64,
@@ -228,31 +228,31 @@ impl Float for f64 {
 
     /// Returns the reciprocal (multiplicative inverse) of the number.
     #[inline]
-    const fn recip(self) -> f64 {
+    fn recip(self) -> f64 {
         1.0 / self
     }
 
     #[inline]
-    const fn powi(self, n: i32) -> f64 {
+    fn powi(self, n: i32) -> f64 {
         unsafe { intrinsics::powif64(self, n) }
     }
 
     /// Converts to degrees, assuming the number is in radians.
     #[inline]
-    const fn to_degrees(self) -> f64 {
+    fn to_degrees(self) -> f64 {
         self * (180.0f64 / consts::PI)
     }
 
     /// Converts to radians, assuming the number is in degrees.
     #[inline]
-    const fn to_radians(self) -> f64 {
+    fn to_radians(self) -> f64 {
         let value: f64 = consts::PI;
         self * (value / 180.0)
     }
 
     /// Returns the maximum of the two numbers.
     #[inline]
-    const fn max(self, other: f64) -> f64 {
+    fn max(self, other: f64) -> f64 {
         // IEEE754 says: maxNum(x, y) is the canonicalized number y if x < y, x if y < x, the
         // canonicalized number if one operand is a number and the other a quiet NaN. Otherwise it
         // is either x or y, canonicalized (this means results might differ among implementations).
@@ -261,12 +261,12 @@ impl Float for f64 {
         // Since we do not support sNaN in Rust yet, we do not need to handle them.
         // FIXME(nagisa): due to https://bugs.llvm.org/show_bug.cgi?id=33303 we canonicalize by
         // multiplying by 1.0. Should switch to the `canonicalize` when it works.
-        (if self.is_nan() || self < other { other } else { self }) * 1.0
+        (if self < other || self.is_nan() { other } else { self }) * 1.0
     }
 
     /// Returns the minimum of the two numbers.
     #[inline]
-    const fn min(self, other: f64) -> f64 {
+    fn min(self, other: f64) -> f64 {
         // IEEE754 says: minNum(x, y) is the canonicalized number x if x < y, y if y < x, the
         // canonicalized number if one operand is a number and the other a quiet NaN. Otherwise it
         // is either x or y, canonicalized (this means results might differ among implementations).
@@ -275,6 +275,6 @@ impl Float for f64 {
         // Since we do not support sNaN in Rust yet, we do not need to handle them.
         // FIXME(nagisa): due to https://bugs.llvm.org/show_bug.cgi?id=33303 we canonicalize by
         // multiplying by 1.0. Should switch to the `canonicalize` when it works.
-        (if other.is_nan() || self < other { self } else { other }) * 1.0
+        (if self < other || other.is_nan() { self } else { other }) * 1.0
     }
 }

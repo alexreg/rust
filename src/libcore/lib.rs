@@ -73,6 +73,7 @@
 #![feature(concat_idents)]
 #![feature(const_fn)]
 #![feature(custom_attribute)]
+#![feature(doc_spotlight)]
 #![feature(fundamental)]
 #![feature(i128_type)]
 #![feature(inclusive_range_syntax)]
@@ -85,12 +86,89 @@
 #![feature(prelude_import)]
 #![feature(repr_simd, platform_intrinsics)]
 #![feature(rustc_attrs)]
+#![feature(rustc_const_unstable)]
 #![feature(specialization)]
 #![feature(staged_api)]
 #![feature(unboxed_closures)]
 #![feature(untagged_unions)]
 #![feature(unwind_attributes)]
-#![feature(doc_spotlight)]
+
+#![cfg_attr(not(stage0), feature(const_int_count_ones))]
+#![cfg_attr(not(stage0), feature(const_int_count_zeros))]
+#![cfg_attr(not(stage0), feature(const_int_leading_zeros))]
+#![cfg_attr(not(stage0), feature(const_int_trailing_zeros))]
+#![cfg_attr(not(stage0), feature(const_int_rotate_left))]
+#![cfg_attr(not(stage0), feature(const_int_rotate_right))]
+#![cfg_attr(not(stage0), feature(const_int_swap_bytes))]
+#![cfg_attr(not(stage0), feature(const_int_from_be))]
+#![cfg_attr(not(stage0), feature(const_int_from_le))]
+#![cfg_attr(not(stage0), feature(const_int_to_be))]
+#![cfg_attr(not(stage0), feature(const_int_to_le))]
+#![cfg_attr(not(stage0), feature(const_int_checked_add))]
+#![cfg_attr(not(stage0), feature(const_int_checked_sub))]
+#![cfg_attr(not(stage0), feature(const_int_checked_mul))]
+#![cfg_attr(not(stage0), feature(const_int_checked_div))]
+#![cfg_attr(not(stage0), feature(const_int_checked_rem))]
+#![cfg_attr(not(stage0), feature(const_int_checked_neg))]
+#![cfg_attr(not(stage0), feature(const_int_checked_shl))]
+#![cfg_attr(not(stage0), feature(const_int_checked_shr))]
+#![cfg_attr(not(stage0), feature(const_int_checked_abs))]
+#![cfg_attr(not(stage0), feature(const_int_saturating_add))]
+#![cfg_attr(not(stage0), feature(const_int_saturating_sub))]
+#![cfg_attr(not(stage0), feature(const_int_saturating_mul))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_add))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_sub))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_mul))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_div))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_rem))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_neg))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_shl))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_shr))]
+#![cfg_attr(not(stage0), feature(const_int_wrapping_abs))]
+#![cfg_attr(not(stage0), feature(const_int_overflowing_add))]
+#![cfg_attr(not(stage0), feature(const_int_overflowing_sub))]
+#![cfg_attr(not(stage0), feature(const_int_overflowing_mul))]
+#![cfg_attr(not(stage0), feature(const_int_overflowing_div))]
+#![cfg_attr(not(stage0), feature(const_int_overflowing_rem))]
+#![cfg_attr(not(stage0), feature(const_int_overflowing_neg))]
+#![cfg_attr(not(stage0), feature(const_int_overflowing_shl))]
+#![cfg_attr(not(stage0), feature(const_int_overflowing_shr))]
+#![cfg_attr(not(stage0), feature(const_int_pow))]
+#![cfg_attr(not(stage0), feature(const_int_is_power_of_two))]
+#![cfg_attr(not(stage0), feature(const_int_next_power_of_two))]
+#![cfg_attr(not(stage0), feature(const_int_checked_next_power_of_two))]
+#![cfg_attr(not(stage0), feature(const_int_abs))]
+#![cfg_attr(not(stage0), feature(const_int_signum))]
+#![cfg_attr(not(stage0), feature(const_int_is_positive))]
+#![cfg_attr(not(stage0), feature(const_int_is_negative))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii))]
+#![cfg_attr(not(stage0), feature(const_int_to_ascii_uppercase))]
+#![cfg_attr(not(stage0), feature(const_int_to_ascii_lowercase))]
+#![cfg_attr(not(stage0), feature(const_int_eq_ignore_ascii_case))]
+#![cfg_attr(not(stage0), feature(const_int_make_ascii_uppercase))]
+#![cfg_attr(not(stage0), feature(const_int_make_ascii_lowercase))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_alphabetic))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_uppercase))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_lowercase))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_alphanumeric))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_digit))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_hexdigit))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_punctuation))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_graphic))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_whitespace))]
+#![cfg_attr(not(stage0), feature(const_int_is_ascii_control))]
+
+#![cfg_attr(not(stage0), feature(const_int_not))]
+#![cfg_attr(not(stage0), feature(const_int_bitand))]
+#![cfg_attr(not(stage0), feature(const_int_bitor))]
+#![cfg_attr(not(stage0), feature(const_int_bitxor))]
+#![cfg_attr(not(stage0), feature(const_int_shl))]
+#![cfg_attr(not(stage0), feature(const_int_shr))]
+#![cfg_attr(not(stage0), feature(const_int_bitand_assign))]
+#![cfg_attr(not(stage0), feature(const_int_bitor_assign))]
+#![cfg_attr(not(stage0), feature(const_int_bitxor_assign))]
+#![cfg_attr(not(stage0), feature(const_int_shl_assign))]
+#![cfg_attr(not(stage0), feature(const_int_shr_assign))]
 
 #[prelude_import]
 #[allow(unused)]
@@ -110,24 +188,41 @@ mod int_macros;
 #[macro_use]
 mod uint_macros;
 
-#[path = "num/isize.rs"] pub mod isize;
-#[path = "num/i8.rs"]    pub mod i8;
-#[path = "num/i16.rs"]   pub mod i16;
-#[path = "num/i32.rs"]   pub mod i32;
-#[path = "num/i64.rs"]   pub mod i64;
-#[path = "num/i128.rs"]   pub mod i128;
+#[path = "num/isize.rs"]
+pub mod isize;
+#[path = "num/i8.rs"]
+pub mod i8;
+#[path = "num/i16.rs"]
+pub mod i16;
+#[path = "num/i32.rs"]
+pub mod i32;
+#[path = "num/i64.rs"]
+pub mod i64;
+#[path = "num/i128.rs"]
+pub mod i128;
 
-#[path = "num/usize.rs"] pub mod usize;
-#[path = "num/u8.rs"]    pub mod u8;
-#[path = "num/u16.rs"]   pub mod u16;
-#[path = "num/u32.rs"]   pub mod u32;
-#[path = "num/u64.rs"]   pub mod u64;
-#[path = "num/u128.rs"]   pub mod u128;
+#[path = "num/usize.rs"]
+pub mod usize;
+#[path = "num/u8.rs"]
+pub mod u8;
+#[path = "num/u16.rs"]
+pub mod u16;
+#[path = "num/u32.rs"]
+pub mod u32;
+#[path = "num/u64.rs"]
+pub mod u64;
+#[path = "num/u128.rs"]
+pub mod u128;
 
-#[path = "num/f32.rs"]   pub mod f32;
-#[path = "num/f64.rs"]   pub mod f64;
+#[cfg_attr(not(stage0), path = "num/f32.rs")]
+#[cfg_attr(stage0, path = "num_stage0/f32.rs")]
+pub mod f32;
+#[cfg_attr(not(stage0), path = "num/f64.rs")]
+#[cfg_attr(stage0, path = "num_stage0/f64.rs")]
+pub mod f64;
 
 #[macro_use]
+#[cfg_attr(stage0, path = "num_stage0/mod.rs")]
 pub mod num;
 
 /* The libcore prelude, not as all-encompassing as the libstd prelude */

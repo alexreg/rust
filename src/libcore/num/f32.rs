@@ -147,32 +147,32 @@ pub mod consts {
 impl Float for f32 {
     /// Returns `true` if the number is NaN.
     #[inline]
-    fn is_nan(self) -> bool {
+    const fn is_nan(self) -> bool {
         self != self
     }
 
     /// Returns `true` if the number is infinite.
     #[inline]
-    fn is_infinite(self) -> bool {
+    const fn is_infinite(self) -> bool {
         self == INFINITY || self == NEG_INFINITY
     }
 
     /// Returns `true` if the number is neither infinite or NaN.
     #[inline]
-    fn is_finite(self) -> bool {
+    const fn is_finite(self) -> bool {
         !(self.is_nan() || self.is_infinite())
     }
 
     /// Returns `true` if the number is neither zero, infinite, subnormal or NaN.
     #[inline]
-    fn is_normal(self) -> bool {
+    const fn is_normal(self) -> bool {
         self.classify() == Fp::Normal
     }
 
     /// Returns the floating point category of the number. If only one property
     /// is going to be tested, it is generally faster to use the specific
     /// predicate instead.
-    fn classify(self) -> Fp {
+    const fn classify(self) -> Fp {
         const EXP_MASK: u32 = 0x7f800000;
         const MAN_MASK: u32 = 0x007fffff;
 
@@ -189,7 +189,7 @@ impl Float for f32 {
     /// Computes the absolute value of `self`. Returns `Float::nan()` if the
     /// number is `Float::nan()`.
     #[inline]
-    fn abs(self) -> f32 {
+    const fn abs(self) -> f32 {
         unsafe { intrinsics::fabsf32(self) }
     }
 
@@ -199,7 +199,7 @@ impl Float for f32 {
     /// - `-1.0` if the number is negative, `-0.0` or `Float::neg_infinity()`
     /// - `Float::nan()` if the number is `Float::nan()`
     #[inline]
-    fn signum(self) -> f32 {
+    const fn signum(self) -> f32 {
         if self.is_nan() {
             NAN
         } else {
@@ -210,14 +210,14 @@ impl Float for f32 {
     /// Returns `true` if and only if `self` has a positive sign, including `+0.0`, `NaN`s with
     /// positive sign bit and positive infinity.
     #[inline]
-    fn is_sign_positive(self) -> bool {
+    const fn is_sign_positive(self) -> bool {
         !self.is_sign_negative()
     }
 
     /// Returns `true` if and only if `self` has a negative sign, including `-0.0`, `NaN`s with
     /// negative sign bit and negative infinity.
     #[inline]
-    fn is_sign_negative(self) -> bool {
+    const fn is_sign_negative(self) -> bool {
         // IEEE754 says: isSignMinus(x) is true if and only if x has negative sign. isSignMinus
         // applies to zeros and NaNs as well.
         #[repr(C)]
@@ -230,31 +230,31 @@ impl Float for f32 {
 
     /// Returns the reciprocal (multiplicative inverse) of the number.
     #[inline]
-    fn recip(self) -> f32 {
+    const fn recip(self) -> f32 {
         1.0 / self
     }
 
     #[inline]
-    fn powi(self, n: i32) -> f32 {
+    const fn powi(self, n: i32) -> f32 {
         unsafe { intrinsics::powif32(self, n) }
     }
 
     /// Converts to degrees, assuming the number is in radians.
     #[inline]
-    fn to_degrees(self) -> f32 {
+    const fn to_degrees(self) -> f32 {
         self * (180.0f32 / consts::PI)
     }
 
     /// Converts to radians, assuming the number is in degrees.
     #[inline]
-    fn to_radians(self) -> f32 {
+    const fn to_radians(self) -> f32 {
         let value: f32 = consts::PI;
         self * (value / 180.0f32)
     }
 
     /// Returns the maximum of the two numbers.
     #[inline]
-    fn max(self, other: f32) -> f32 {
+    const fn max(self, other: f32) -> f32 {
         // IEEE754 says: maxNum(x, y) is the canonicalized number y if x < y, x if y < x, the
         // canonicalized number if one operand is a number and the other a quiet NaN. Otherwise it
         // is either x or y, canonicalized (this means results might differ among implementations).
@@ -268,7 +268,7 @@ impl Float for f32 {
 
     /// Returns the minimum of the two numbers.
     #[inline]
-    fn min(self, other: f32) -> f32 {
+    const fn min(self, other: f32) -> f32 {
         // IEEE754 says: minNum(x, y) is the canonicalized number x if x < y, y if y < x, the
         // canonicalized number if one operand is a number and the other a quiet NaN. Otherwise it
         // is either x or y, canonicalized (this means results might differ among implementations).

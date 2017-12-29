@@ -54,8 +54,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_nan")]
-    pub const fn is_nan(self) -> bool { num::Float::is_nan(self) }
+    pub fn is_nan(self) -> bool { num::Float::is_nan(self) }
 
     /// Returns `true` if this value is positive infinity or negative infinity and
     /// false otherwise.
@@ -76,8 +75,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_infinite")]
-    pub const fn is_infinite(self) -> bool { num::Float::is_infinite(self) }
+    pub fn is_infinite(self) -> bool { num::Float::is_infinite(self) }
 
     /// Returns `true` if this number is neither infinite nor `NaN`.
     ///
@@ -97,8 +95,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_finite")]
-    pub const fn is_finite(self) -> bool { num::Float::is_finite(self) }
+    pub fn is_finite(self) -> bool { num::Float::is_finite(self) }
 
     /// Returns `true` if the number is neither zero, infinite,
     /// [subnormal][subnormal], or `NaN`.
@@ -123,8 +120,7 @@ impl f64 {
     /// [subnormal]: https://en.wikipedia.org/wiki/Denormal_number
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_normal")]
-    pub const fn is_normal(self) -> bool { num::Float::is_normal(self) }
+    pub fn is_normal(self) -> bool { num::Float::is_normal(self) }
 
     /// Returns the floating point category of the number. If only one property
     /// is going to be tested, it is generally faster to use the specific
@@ -142,8 +138,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_classify")]
-    pub const fn classify(self) -> FpCategory { num::Float::classify(self) }
+    pub fn classify(self) -> FpCategory { num::Float::classify(self) }
 
     /// Returns the largest integer less than or equal to a number.
     ///
@@ -156,8 +151,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_floor")]
-    pub const fn floor(self) -> f64 {
+    pub fn floor(self) -> f64 {
         unsafe { intrinsics::floorf64(self) }
     }
 
@@ -172,8 +166,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_ceil")]
-    pub const fn ceil(self) -> f64 {
+    pub fn ceil(self) -> f64 {
         unsafe { intrinsics::ceilf64(self) }
     }
 
@@ -189,8 +182,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_round")]
-    pub const fn round(self) -> f64 {
+    pub fn round(self) -> f64 {
         unsafe { intrinsics::roundf64(self) }
     }
 
@@ -205,8 +197,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_trunc")]
-    pub const fn trunc(self) -> f64 {
+    pub fn trunc(self) -> f64 {
         unsafe { intrinsics::truncf64(self) }
     }
 
@@ -223,8 +214,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_frac")]
-    pub const fn fract(self) -> f64 { self - self.trunc() }
+    pub fn fract(self) -> f64 { self - self.trunc() }
 
     /// Computes the absolute value of `self`. Returns `NAN` if the
     /// number is `NAN`.
@@ -245,8 +235,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_abs")]
-    pub const fn abs(self) -> f64 { num::Float::abs(self) }
+    pub fn abs(self) -> f64 { num::Float::abs(self) }
 
     /// Returns a number that represents the sign of `self`.
     ///
@@ -266,8 +255,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_signum")]
-    pub const fn signum(self) -> f64 { num::Float::signum(self) }
+    pub fn signum(self) -> f64 { num::Float::signum(self) }
 
     /// Returns `true` if and only if `self` has a positive sign, including `+0.0`, `NaN`s with
     /// positive sign bit and positive infinity.
@@ -281,14 +269,12 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_sign_positive")]
-    pub const fn is_sign_positive(self) -> bool { num::Float::is_sign_positive(self) }
+    pub fn is_sign_positive(self) -> bool { num::Float::is_sign_positive(self) }
 
     #[stable(feature = "rust1", since = "1.0.0")]
-    #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_positive")]
     #[rustc_deprecated(since = "1.0.0", reason = "renamed to is_sign_positive")]
-    pub const fn is_positive(self) -> bool { num::Float::is_sign_positive(self) }
+    #[inline]
+    pub fn is_positive(self) -> bool { num::Float::is_sign_positive(self) }
 
     /// Returns `true` if and only if `self` has a negative sign, including `-0.0`, `NaN`s with
     /// negative sign bit and negative infinity.
@@ -302,14 +288,12 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_sign_negative")]
-    pub const fn is_sign_negative(self) -> bool { num::Float::is_sign_negative(self) }
+    pub fn is_sign_negative(self) -> bool { num::Float::is_sign_negative(self) }
 
     #[stable(feature = "rust1", since = "1.0.0")]
-    #[inline]
-    #[rustc_const_unstable(feature = "const_float_is_negative")]
     #[rustc_deprecated(since = "1.0.0", reason = "renamed to is_sign_negative")]
-    pub const fn is_negative(self) -> bool { num::Float::is_sign_negative(self) }
+    #[inline]
+    pub fn is_negative(self) -> bool { num::Float::is_sign_negative(self) }
 
     /// Fused multiply-add. Computes `(self * a) + b` with only one rounding
     /// error. This produces a more accurate result with better performance than
@@ -327,8 +311,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_mul_add")]
-    pub const fn mul_add(self, a: f64, b: f64) -> f64 {
+    pub fn mul_add(self, a: f64, b: f64) -> f64 {
         unsafe { intrinsics::fmaf64(self, a, b) }
     }
 
@@ -342,8 +325,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_recip")]
-    pub const fn recip(self) -> f64 { num::Float::recip(self) }
+    pub fn recip(self) -> f64 { num::Float::recip(self) }
 
     /// Raises a number to an integer power.
     ///
@@ -357,8 +339,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_powi")]
-    pub const fn powi(self, n: i32) -> f64 { num::Float::powi(self, n) }
+    pub fn powi(self, n: i32) -> f64 { num::Float::powi(self, n) }
 
     /// Raises a number to a floating point power.
     ///
@@ -370,8 +351,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_powf")]
-    pub const fn powf(self, n: f64) -> f64 {
+    pub fn powf(self, n: f64) -> f64 {
         unsafe { intrinsics::powf64(self, n) }
     }
 
@@ -390,8 +370,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_sqrt")]
-    pub const fn sqrt(self) -> f64 {
+    pub fn sqrt(self) -> f64 {
         if self < 0.0 {
             NAN
         } else {
@@ -413,8 +392,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_exp")]
-    pub const fn exp(self) -> f64 {
+    pub fn exp(self) -> f64 {
         unsafe { intrinsics::expf64(self) }
     }
 
@@ -430,8 +408,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_exp2")]
-    pub const fn exp2(self) -> f64 {
+    pub fn exp2(self) -> f64 {
         unsafe { intrinsics::exp2f64(self) }
     }
 
@@ -449,8 +426,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_ln")]
-    pub const fn ln(self) -> f64 {
+    pub fn ln(self) -> f64 {
         self.log_wrapper(|n| { unsafe { intrinsics::logf64(n) } })
     }
 
@@ -471,8 +447,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_log")]
-    pub const fn log(self, base: f64) -> f64 { self.ln() / base.ln() }
+    pub fn log(self, base: f64) -> f64 { self.ln() / base.ln() }
 
     /// Returns the base 2 logarithm of the number.
     ///
@@ -486,8 +461,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_log2")]
-    pub const fn log2(self) -> f64 {
+    pub fn log2(self) -> f64 {
         self.log_wrapper(|n| {
             #[cfg(target_os = "android")]
             return ::sys::android::log2f64(n);
@@ -508,8 +482,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_log10")]
-    pub const fn log10(self) -> f64 {
+    pub fn log10(self) -> f64 {
         self.log_wrapper(|n| { unsafe { intrinsics::log10f64(n) } })
     }
 
@@ -526,8 +499,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_to_degrees")]
-    pub const fn to_degrees(self) -> f64 { num::Float::to_degrees(self) }
+    pub fn to_degrees(self) -> f64 { num::Float::to_degrees(self) }
 
     /// Converts degrees to radians.
     ///
@@ -542,8 +514,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_to_radians")]
-    pub const fn to_radians(self) -> f64 { num::Float::to_radians(self) }
+    pub fn to_radians(self) -> f64 { num::Float::to_radians(self) }
 
     /// Returns the maximum of the two numbers.
     ///
@@ -557,8 +528,7 @@ impl f64 {
     /// If one of the arguments is NaN, then the other argument is returned.
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_max")]
-    pub const fn max(self, other: f64) -> f64 {
+    pub fn max(self, other: f64) -> f64 {
         num::Float::max(self, other)
     }
 
@@ -574,8 +544,7 @@ impl f64 {
     /// If one of the arguments is NaN, then the other argument is returned.
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_min")]
-    pub const fn min(self, other: f64) -> f64 {
+    pub fn min(self, other: f64) -> f64 {
         num::Float::min(self, other)
     }
 
@@ -596,7 +565,6 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_abs_sub")]
     #[rustc_deprecated(since = "1.10.0",
                        reason = "you probably meant `(self - other).abs()`: \
                                  this operation is `(self - other).max(0.0)` (also \
@@ -604,7 +572,7 @@ impl f64 {
                                  difference, consider using that expression or the C function \
                                  `fdim`, depending on how you wish to handle NaN (please consider \
                                  filing an issue describing your use-case too).")]
-     pub const fn abs_sub(self, other: f64) -> f64 {
+     pub fn abs_sub(self, other: f64) -> f64 {
          unsafe { cmath::fdim(self, other) }
      }
 
@@ -620,8 +588,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_cbrt")]
-    pub const fn cbrt(self) -> f64 {
+    pub fn cbrt(self) -> f64 {
         unsafe { cmath::cbrt(self) }
     }
 
@@ -656,8 +623,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_sin")]
-    pub const fn sin(self) -> f64 {
+    pub fn sin(self) -> f64 {
         unsafe { intrinsics::sinf64(self) }
     }
 
@@ -674,8 +640,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_cos")]
-    pub const fn cos(self) -> f64 {
+    pub fn cos(self) -> f64 {
         unsafe { intrinsics::cosf64(self) }
     }
 
@@ -691,8 +656,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_tan")]
-    pub const fn tan(self) -> f64 {
+    pub fn tan(self) -> f64 {
         unsafe { cmath::tan(self) }
     }
 
@@ -712,8 +676,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_asin")]
-    pub const fn asin(self) -> f64 {
+    pub fn asin(self) -> f64 {
         unsafe { cmath::asin(self) }
     }
 
@@ -733,8 +696,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_acos")]
-    pub const fn acos(self) -> f64 {
+    pub fn acos(self) -> f64 {
         unsafe { cmath::acos(self) }
     }
 
@@ -751,8 +713,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_atan")]
-    pub const fn atan(self) -> f64 {
+    pub fn atan(self) -> f64 {
         unsafe { cmath::atan(self) }
     }
 
@@ -784,8 +745,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_atan2")]
-    pub const fn atan2(self, other: f64) -> f64 {
+    pub fn atan2(self, other: f64) -> f64 {
         unsafe { cmath::atan2(self, other) }
     }
 
@@ -806,8 +766,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_sin_cos")]
-    pub const fn sin_cos(self) -> (f64, f64) {
+    pub fn sin_cos(self) -> (f64, f64) {
         (self.sin(), self.cos())
     }
 
@@ -824,8 +783,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_exp_m1")]
-    pub const fn exp_m1(self) -> f64 {
+    pub fn exp_m1(self) -> f64 {
         unsafe { cmath::expm1(self) }
     }
 
@@ -844,8 +802,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_ln_1p")]
-    pub const fn ln_1p(self) -> f64 {
+    pub fn ln_1p(self) -> f64 {
         unsafe { cmath::log1p(self) }
     }
 
@@ -866,8 +823,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_sinh")]
-    pub const fn sinh(self) -> f64 {
+    pub fn sinh(self) -> f64 {
         unsafe { cmath::sinh(self) }
     }
 
@@ -888,8 +844,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_cosh")]
-    pub const fn cosh(self) -> f64 {
+    pub fn cosh(self) -> f64 {
         unsafe { cmath::cosh(self) }
     }
 
@@ -910,8 +865,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_tanh")]
-    pub const fn tanh(self) -> f64 {
+    pub fn tanh(self) -> f64 {
         unsafe { cmath::tanh(self) }
     }
 
@@ -927,8 +881,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_asinh")]
-    pub const fn asinh(self) -> f64 {
+    pub fn asinh(self) -> f64 {
         if self == NEG_INFINITY {
             NEG_INFINITY
         } else {
@@ -948,8 +901,7 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_acosh")]
-    pub const fn acosh(self) -> f64 {
+    pub fn acosh(self) -> f64 {
         match self {
             x if x < 1.0 => NAN,
             x => (x + ((x * x) - 1.0).sqrt()).ln(),
@@ -970,15 +922,14 @@ impl f64 {
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_atanh")]
-    pub const fn atanh(self) -> f64 {
+    pub fn atanh(self) -> f64 {
         0.5 * ((2.0 * self) / (1.0 - self)).ln_1p()
     }
 
     // Solaris/Illumos requires a wrapper around log, log2, and log10 functions
     // because of their non-standard behavior (e.g. log(-n) returns -Inf instead
     // of expected NaN).
-    const fn log_wrapper<F: Fn(f64) -> f64>(self, log_fn: F) -> f64 {
+    fn log_wrapper<F: Fn(f64) -> f64>(self, log_fn: F) -> f64 {
         if !cfg!(target_os = "solaris") {
             log_fn(self)
         } else {
@@ -1019,8 +970,7 @@ impl f64 {
     /// ```
     #[stable(feature = "float_bits_conv", since = "1.20.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_to_bits")]
-    pub const fn to_bits(self) -> u64 {
+    pub fn to_bits(self) -> u64 {
         unsafe { ::mem::transmute(self) }
     }
 
@@ -1064,8 +1014,7 @@ impl f64 {
     /// ```
     #[stable(feature = "float_bits_conv", since = "1.20.0")]
     #[inline]
-    #[rustc_const_unstable(feature = "const_float_from_bits")]
-    pub const fn from_bits(v: u64) -> Self {
+    pub fn from_bits(v: u64) -> Self {
         // It turns out the safety issues with sNaN were overblown! Hooray!
         unsafe { ::mem::transmute(v) }
     }

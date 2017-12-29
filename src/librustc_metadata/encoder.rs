@@ -16,7 +16,7 @@ use schema::*;
 use rustc::middle::cstore::{LinkMeta, LinkagePreference, NativeLibrary,
                             EncodedMetadata};
 use rustc::hir::def::CtorKind;
-use rustc::hir::def_id::{CrateNum, CRATE_DEF_INDEX, DefIndex, DefId, LOCAL_CRATE};
+use rustc::hir::def_id::{CrateNum, CRATE_DEF_INDEX, DefIndex, DefId, LocalDefId, LOCAL_CRATE};
 use rustc::hir::map::definitions::DefPathTable;
 use rustc::middle::dependency_format::Linkage;
 use rustc::middle::lang_items;
@@ -138,6 +138,13 @@ impl<'a, 'tcx> SpecializedEncoder<DefIndex> for EncodeContext<'a, 'tcx> {
     #[inline]
     fn specialized_encode(&mut self, def_index: &DefIndex) -> Result<(), Self::Error> {
         self.emit_u32(def_index.as_u32())
+    }
+}
+
+impl<'a, 'tcx> SpecializedEncoder<LocalDefId> for EncodeContext<'a, 'tcx> {
+    #[inline]
+    fn specialized_encode(&mut self, def_id: &LocalDefId) -> Result<(), Self::Error> {
+        self.specialized_encode(&def_id.to_def_id())
     }
 }
 

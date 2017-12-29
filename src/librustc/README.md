@@ -55,7 +55,7 @@ rustc_trans    rustc_borrowck   ...  rustc_metadata
                     /    \
                   /       \
            syntax_pos  syntax_ext
-```                    
+```
 
 The `rustc_driver` crate, at the top of this lattice, is effectively
 the "main" function for the rust compiler. It doesn't have much "real
@@ -147,7 +147,7 @@ take:
 4. **Lowering to MIR and post-processing**
     - Once type-checking is done, we can lower the HIR into MIR ("middle IR"), which
       is a **very** desugared version of Rust, well suited to the borrowck but also
-      certain high-level optimizations. 
+      certain high-level optimizations.
 5. **Translation to LLVM and LLVM optimizations**
     - From MIR, we can produce LLVM IR.
     - LLVM then runs its various optimizations, which produces a number of `.o` files
@@ -163,10 +163,10 @@ things. This glossary attempts to list them and give you a few
 pointers for understanding them better.
 
 - AST -- the **abstract syntax tree** produced by the `syntax` crate; reflects user syntax
-  very closely. 
+  very closely.
 - codegen unit -- when we produce LLVM IR, we group the Rust code into a number of codegen
   units. Each of these units is processed by LLVM independently from one another,
-  enabling parallelism. They are also the unit of incremental re-use. 
+  enabling parallelism. They are also the unit of incremental re-use.
 - cx -- we tend to use "cx" as an abbrevation for context. See also tcx, infcx, etc.
 - `DefId` -- an index identifying a **definition** (see `librustc/hir/def_id.rs`). Uniquely
   identifies a `DefPath`.

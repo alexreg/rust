@@ -30,7 +30,6 @@ use rustc::mir::visit::{PlaceContext, Visitor};
 use rustc::middle::lang_items;
 use syntax::abi::Abi;
 use syntax::attr;
-use syntax::feature_gate::UnstableFeatures;
 use syntax_pos::{Span, DUMMY_SP};
 
 use std::fmt;
@@ -167,12 +166,12 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
 
     /// Error about extra statements in a constant.
     fn statement_like(&mut self) {
-        self.add(Qualif::NOT_CONST);
-        if self.mode != Mode::Fn {
-            span_err!(self.tcx.sess, self.span, E0016,
-                      "blocks in {}s are limited to items and tail expressions",
-                      self.mode);
-        }
+        // self.add(Qualif::NOT_CONST);
+        // if self.mode != Mode::Fn {
+        //     span_err!(self.tcx.sess, self.span, E0016,
+        //               "blocks in {}s are limited to items and tail expressions",
+        //               self.mode);
+        // }
     }
 
     /// Add the given qualification to self.qualif.
@@ -378,7 +377,7 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
                     bb = target;
                 }
                 _ => {
-                    self.not_const();
+                    // self.not_const();
                     break;
                 }
             }
@@ -693,13 +692,13 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
             }
 
             Rvalue::NullaryOp(NullOp::Box, _) => {
-                self.add(Qualif::NOT_CONST);
-                if self.mode != Mode::Fn {
-                    struct_span_err!(self.tcx.sess, self.span, E0010,
-                                     "allocations are not allowed in {}s", self.mode)
-                        .span_label(self.span, format!("allocation not allowed in {}s", self.mode))
-                        .emit();
-                }
+                // self.add(Qualif::NOT_CONST);
+                // if self.mode != Mode::Fn {
+                //     struct_span_err!(self.tcx.sess, self.span, E0010,
+                //                      "allocations are not allowed in {}s", self.mode)
+                //         .span_label(self.span, format!("allocation not allowed in {}s", self.mode))
+                //         .emit();
+                // }
             }
 
             Rvalue::Aggregate(ref kind, _) => {
@@ -802,27 +801,27 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
             } else {
                 self.qualif = Qualif::NOT_CONST;
                 if self.mode != Mode::Fn {
-                    // FIXME(#24111) Remove this check when const fn stabilizes
-                    let (msg, note) = if let UnstableFeatures::Disallow =
-                            self.tcx.sess.opts.unstable_features {
-                        (format!("calls in {}s are limited to \
-                                  struct and enum constructors",
-                                 self.mode),
-                         Some("a limited form of compile-time function \
-                               evaluation is available on a nightly \
-                               compiler via `const fn`"))
-                    } else {
-                        (format!("calls in {}s are limited \
-                                  to constant functions, \
-                                  struct and enum constructors",
-                                 self.mode),
-                         None)
-                    };
-                    let mut err = struct_span_err!(self.tcx.sess, self.span, E0015, "{}", msg);
-                    if let Some(note) = note {
-                        err.span_note(self.span, note);
-                    }
-                    err.emit();
+                    // // FIXME(#24111) Remove this check when const fn stabilizes
+                    // let (msg, note) = if let UnstableFeatures::Disallow =
+                    //         self.tcx.sess.opts.unstable_features {
+                    //     (format!("calls in {}s are limited to \
+                    //               struct and enum constructors",
+                    //              self.mode),
+                    //      Some("a limited form of compile-time function \
+                    //            evaluation is available on a nightly \
+                    //            compiler via `const fn`"))
+                    // } else {
+                    //     (format!("calls in {}s are limited \
+                    //               to constant functions, \
+                    //               struct and enum constructors",
+                    //              self.mode),
+                    //      None)
+                    // };
+                    // let mut err = struct_span_err!(self.tcx.sess, self.span, E0015, "{}", msg);
+                    // if let Some(note) = note {
+                    //     err.span_note(self.span, note);
+                    // }
+                    // err.emit();
                 }
             }
 
@@ -893,14 +892,14 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                     _ => {}
                 }
 
-                // Avoid a generic error for other uses of arguments.
-                if self.qualif.intersects(Qualif::FN_ARGUMENT) {
-                    let decl = &self.mir.local_decls[index];
-                    span_err!(self.tcx.sess, decl.source_info.span, E0022,
-                              "arguments of constant functions can only \
-                               be immutable by-value bindings");
-                    return;
-                }
+                // // Avoid a generic error for other uses of arguments.
+                // if self.qualif.intersects(Qualif::FN_ARGUMENT) {
+                //     let decl = &self.mir.local_decls[index];
+                //     span_err!(self.tcx.sess, decl.source_info.span, E0022,
+                //               "arguments of constant functions can only \
+                //                be immutable by-value bindings");
+                //     return;
+                // }
             }
         }
 
