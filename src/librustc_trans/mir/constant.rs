@@ -17,8 +17,8 @@ use rustc::traits;
 use rustc::mir;
 use rustc::mir::interpret::{Value as MiriValue, PrimVal};
 use rustc::mir::tcx::PlaceTy;
-use rustc::ty::{self, Ty, TyCtxt, TypeFoldable};
-use rustc::ty::layout::{self, LayoutOf, Size};
+use rustc::ty::{self, Ty, TyCtxt};
+use rustc::ty::layout::{self, HasDataLayout, LayoutOf, Size};
 use rustc::ty::cast::{CastTy, IntTy};
 use rustc::ty::subst::{Kind, Substs};
 use rustc_apfloat::{ieee, Float, Status};
@@ -28,8 +28,8 @@ use abi::{self, Abi};
 use callee;
 use builder::Builder;
 use common::{self, CrateContext, const_get_elt, val_ty};
-use common::{C_array, C_bool, C_bytes, C_int, C_uint, C_uint_big, C_u32, C_u64};
-use common::{C_null, C_struct, C_str_slice, C_undef, C_usize, C_vector, C_fat_ptr};
+use common::{C_array, C_bool, C_bytes, C_int, C_uint_big, C_u32};
+use common::{C_null, C_struct, C_undef, C_usize, C_vector, C_fat_ptr};
 use common::const_to_opt_u128;
 use consts;
 use type_of::LayoutLlvmExt;
@@ -37,8 +37,6 @@ use type_::Type;
 use value::Value;
 
 use syntax_pos::Span;
-use syntax::ast;
-use syntax::symbol::Symbol;
 
 use std::fmt;
 use std::ptr;
@@ -63,88 +61,38 @@ impl<'a, 'tcx> Const<'tcx> {
         }
     }
 
-    pub fn from_bytes(ccx: &CrateContext<'a, 'tcx>, b: u128, ty: Ty<'tcx>) -> Const<'tcx> {
-        let llval = match ty.sty {
-            ty::TyInt(ast::IntTy::I128) |
-            ty::TyUint(ast::UintTy::U128) => C_uint_big(Type::i128(ccx), b),
-            ty::TyInt(i) => C_int(Type::int_from_ty(ccx, i), b as i128 as i64),
-            ty::TyUint(u) => C_uint(Type::uint_from_ty(ccx, u), b as u64),
-            ty::TyBool => {
-                assert!(b <= 1);
-                C_bool(ccx, b == 1)
-            },
-            ty::TyChar => {
-                assert_eq!(b as u32 as u128, b);
-                let c = b as u32;
-                assert!(::std::char::from_u32(c).is_some());
-                C_uint(Type::char(ccx), c as u64)
-            },
-            ty::TyFloat(fty) => {
-                let llty = ccx.layout_of(ty).llvm_type(ccx);
-                let bits = match fty {
-                    ast::FloatTy::F32 => C_u32(ccx, b as u32),
-                    ast::FloatTy::F64 => C_u64(ccx, b as u64),
-                };
+    pub fn primval_to_llvm(ccx: &CrateContext<'a, 'tcx>,
+                           cv: PrimVal,
+                           size: Size,
+                           llty: Type) -> ValueRef {
+        match cv {
+            PrimVal::Undef => C_undef(llty),
+            PrimVal::Bytes(b) => {
+                let bits = C_uint_big(Type::ix(ccx, size.bits()), b);
                 consts::bitcast(bits, llty)
             },
-            ty::TyAdt(adt, _) if adt.is_enum() => {
-                use rustc::ty::util::IntTypeExt;
-                Const::from_bytes(ccx, b, adt.repr.discr_type().to_ty(ccx.tcx())).llval
-            },
-            _ => bug!("from_bytes({}, {})", b, ty),
-        };
-        Const { llval, ty }
+            PrimVal::Ptr(ptr) => {
+                let alloc = ccx
+                    .tcx()
+                    .interpret_interner
+                    .borrow()
+                    .get_alloc(ptr.alloc_id.0)
+                    .expect("miri alloc not found");
+                let base_addr = consts::addr_of(ccx, C_bytes(ccx, &alloc.bytes), alloc.align, "byte_str");
+                let addr = unsafe { llvm::LLVMConstInBoundsGEP(consts::bitcast(base_addr, Type::i8p(ccx)), &C_usize(ccx, ptr.offset), 1) };
+                consts::bitcast(addr, llty)
+            }
+        }
     }
 
-    /// Translate ConstVal into a LLVM constant value.
-    pub fn from_constval(ccx: &CrateContext<'a, 'tcx>,
-                         cv: &ConstVal,
-                         ty: Ty<'tcx>)
-                         -> Const<'tcx> {
-        let llty = ccx.layout_of(ty).llvm_type(ccx);
-        trace!("from_constval: {:#?}: {}", cv, ty);
-        let val = match *cv {
-            ConstVal::Unevaluated(..) => unimplemented!("const val `{:?}`", cv),
-            ConstVal::Value(MiriValue::ByRef(..)) => unimplemented!("{:#?}:{}", cv, ty),
-            ConstVal::Value(MiriValue::ByValPair(PrimVal::Ptr(ptr), PrimVal::Bytes(len))) => {
-                match ty.sty {
-                    ty::TyRef(_, ref tam) => match tam.ty.sty {
-                        ty::TyStr => {},
-                        _ => unimplemented!("non-str fat pointer: {:?}: {:?}", ptr, ty),
-                    },
-                    _ => unimplemented!("non-str fat pointer: {:?}: {:?}", ptr, ty),
-                }
-                let alloc = ccx
-                    .tcx()
-                    .interpret_interner
-                    .borrow()
-                    .get_alloc(ptr.alloc_id.0)
-                    .expect("miri alloc not found");
-                assert_eq!(len as usize as u128, len);
-                let slice = &alloc.bytes[(ptr.offset as usize)..][..(len as usize)];
-                let s = ::std::str::from_utf8(slice)
-                    .expect("non utf8 str from miri");
-                C_str_slice(ccx, Symbol::intern(s).as_str())
-            },
-            ConstVal::Value(MiriValue::ByValPair(..)) => unimplemented!(),
-            ConstVal::Value(MiriValue::ByVal(PrimVal::Bytes(b))) =>
-                return Const::from_bytes(ccx, b, ty),
-            ConstVal::Value(MiriValue::ByVal(PrimVal::Undef)) => C_undef(llty),
-            ConstVal::Value(MiriValue::ByVal(PrimVal::Ptr(ptr))) => {
-                let alloc = ccx
-                    .tcx()
-                    .interpret_interner
-                    .borrow()
-                    .get_alloc(ptr.alloc_id.0)
-                    .expect("miri alloc not found");
-                let data = &alloc.bytes[(ptr.offset as usize)..];
-                consts::addr_of(ccx, C_bytes(ccx, data), ccx.align_of(ty), "byte_str")
-            }
-        };
-
-        assert!(!ty.has_erasable_regions());
-
-        Const::new(val, ty)
+    pub fn from_bytes(ccx: &CrateContext<'a, 'tcx>, b: u128, ty: Ty<'tcx>) -> Const<'tcx> {
+        let layout = ccx.layout_of(ty);
+        let llval = Self::primval_to_llvm(ccx, PrimVal::Bytes(b), layout.size,
+            layout.immediate_llvm_type(ccx));
+        Const {
+            llval,
+            ty
+        }
     }
 
     fn get_field(&self, ccx: &CrateContext<'a, 'tcx>, i: usize) -> ValueRef {
@@ -170,7 +118,7 @@ impl<'a, 'tcx> Const<'tcx> {
                     assert_eq!(field.size, b.value.size(ccx));
                     const_get_elt(self.llval, 1)
                 }
-            }
+            },
             _ => {
                 const_get_elt(self.llval, layout.llvm_field_index(i))
             }
@@ -195,6 +143,7 @@ impl<'a, 'tcx> Const<'tcx> {
         }
     }
 
+    /// Translate ConstVal into a LLVM constant value.
     pub fn to_operand(&self, ccx: &CrateContext<'a, 'tcx>) -> OperandRef<'tcx> {
         let layout = ccx.layout_of(self.ty);
         let llty = layout.immediate_llvm_type(ccx);
@@ -219,6 +168,66 @@ impl<'a, 'tcx> Const<'tcx> {
         OperandRef {
             val,
             layout
+        }
+    }
+
+    pub fn from_constval(ccx: &CrateContext<'a, 'tcx>,
+                         cv: &ConstVal<'tcx>,
+                         ty: Ty<'tcx>)
+                         -> Result<Const<'tcx>, ConstEvalErr<'tcx>> {
+        let op = Const::constval_to_operand(ccx, cv, ty)?;
+
+        let llval = match op.val {
+            OperandValue::Immediate(val) => val,
+            OperandValue::Pair(a_val, b_val) => C_struct(ccx, &[a_val, b_val], false),
+            OperandValue::Ref(..) => bug!("from_constval: cannot convert ByRef operand to Const"),
+        };
+
+        Ok(Const {
+            llval,
+            ty
+        })
+    }
+
+    pub fn constval_to_operand(ccx: &CrateContext<'a, 'tcx>,
+                               cv: &ConstVal<'tcx>,
+                               ty: Ty<'tcx>)
+                               -> Result<OperandRef<'tcx>, ConstEvalErr<'tcx>> {
+        match *cv {
+            ConstVal::Unevaluated(def_id, ref substs) => {
+                let tcx = ccx.tcx();
+                let param_env = ty::ParamEnv::empty(traits::Reveal::All);
+                let c = tcx.const_eval(param_env.and((def_id, substs)))?;
+                Const::constval_to_operand(ccx, &c.val, c.ty)
+            },
+            ConstVal::Value(miri_val) => {
+                let layout = ccx.layout_of(ty);
+
+                let val = match miri_val {
+                    MiriValue::ByVal(a) => {
+                        let value = Const::primval_to_llvm(ccx, a, layout.size, layout.immediate_llvm_type(ccx));
+                        OperandValue::Immediate(value)
+                    },
+                    MiriValue::ByValPair(a_val, b_val) => {
+                        let (a, b) = match layout.abi {
+                            layout::Abi::ScalarPair(ref a, ref b) => (&a.value, &b.value),
+                            _ => bug!("constval_to_operand: invalid ByValPair layout: {:#?}", layout)
+                        };
+                        let a_val = Const::primval_to_llvm(ccx, a_val, a.size(ccx), layout.scalar_pair_element_llvm_type(ccx, 0));
+                        let b_val = Const::primval_to_llvm(ccx, b_val, b.size(ccx), layout.scalar_pair_element_llvm_type(ccx, 1));
+                        OperandValue::Pair(a_val, b_val)
+                    },
+                    MiriValue::ByRef(ptr, align) => {
+                        let value = Const::primval_to_llvm(ccx, ptr.into_inner_primval(), ccx.data_layout().pointer_size, layout.llvm_type(ccx).ptr_to());
+                        OperandValue::Ref(value, align)
+                    },
+                };
+
+                Ok(OperandRef {
+                    val,
+                    layout
+                })
+            },
         }
     }
 }
@@ -420,7 +429,6 @@ impl<'a, 'tcx> MirConstContext<'a, 'tcx> {
                         _ => span_bug!(span, "calling {:?} (of type {}) in constant",
                                        func, fn_ty)
                     };
-                    trace!("trans const fn call {:?}, {:?}, {:#?}", func, fn_ty, args);
 
                     let mut arg_vals = IndexVec::with_capacity(args.len());
                     for arg in args {
@@ -607,6 +615,7 @@ impl<'a, 'tcx> MirConstContext<'a, 'tcx> {
     fn const_operand(&self, operand: &mir::Operand<'tcx>, span: Span)
                      -> Result<Const<'tcx>, ConstEvalErr<'tcx>> {
         debug!("const_operand({:?} @ {:?})", operand, span);
+
         let result = match *operand {
             mir::Operand::Copy(ref place) |
             mir::Operand::Move(ref place) => {
@@ -621,16 +630,13 @@ impl<'a, 'tcx> MirConstContext<'a, 'tcx> {
                         MirConstContext::new(self.ccx, mir, self.substs, IndexVec::new()).trans()
                     }
                     mir::Literal::Value { value } => {
-                        if let ConstVal::Unevaluated(def_id, substs) = value.val {
-                            let substs = self.monomorphize(&substs);
-                            MirConstContext::trans_def(self.ccx, def_id, substs, IndexVec::new())
-                        } else {
-                            Ok(Const::from_constval(self.ccx, &value.val, ty))
-                        }
+                        let value = self.monomorphize(&value);
+                        Const::from_constval(self.ccx, &value.val, ty)
                     }
                 }
             }
         };
+
         debug!("const_operand({:?} @ {:?}) = {:?}", operand, span,
                result.as_ref().ok());
         result
@@ -1124,6 +1130,7 @@ impl<'a, 'tcx> MirContext<'a, 'tcx> {
                           -> Const<'tcx>
     {
         debug!("trans_constant({:?})", constant);
+
         let ty = self.monomorphize(&constant.ty);
         let result = match constant.literal.clone() {
             mir::Literal::Promoted { index } => {
@@ -1131,12 +1138,8 @@ impl<'a, 'tcx> MirContext<'a, 'tcx> {
                 MirConstContext::new(bcx.ccx, mir, self.param_substs, IndexVec::new()).trans()
             }
             mir::Literal::Value { value } => {
-                if let ConstVal::Unevaluated(def_id, substs) = value.val {
-                    let substs = self.monomorphize(&substs);
-                    MirConstContext::trans_def(bcx.ccx, def_id, substs, IndexVec::new())
-                } else {
-                    Ok(Const::from_constval(bcx.ccx, &value.val, ty))
-                }
+                let value = self.monomorphize(&value);
+                Const::from_constval(bcx.ccx, &value.val, ty)
             }
         };
 
@@ -1147,6 +1150,35 @@ impl<'a, 'tcx> MirContext<'a, 'tcx> {
         });
 
         debug!("trans_constant({:?}) = {:?}", constant, result);
+        result
+    }
+
+    pub fn constant_to_operand(&mut self,
+                               bcx: &Builder<'a, 'tcx>,
+                               constant: &mir::Constant<'tcx>)
+                               -> OperandRef<'tcx>
+    {
+        debug!("constant_to_operand({:?})", constant);
+
+        let ty = self.monomorphize(&constant.ty);
+        let result = match constant.literal.clone() {
+            mir::Literal::Promoted { index } => {
+                let mir = &self.mir.promoted[index];
+                MirConstContext::new(bcx.ccx, mir, self.param_substs, IndexVec::new()).trans()
+                    .map(|c| c.to_operand(bcx.ccx))
+            }
+            mir::Literal::Value { value } => {
+                let value = self.monomorphize(&value);
+                Const::constval_to_operand(bcx.ccx, &value.val, ty)
+            }
+        };
+
+        let result = result.unwrap_or_else(|_| {
+            // We've errored, so we don't have to produce working code.
+            OperandRef::new_zst(bcx.ccx, bcx.ccx.layout_of(ty))
+        });
+
+        debug!("constant_to_operand({:?}) = {:?}", constant, result);
         result
     }
 }

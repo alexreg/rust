@@ -328,8 +328,7 @@ impl<'a, 'tcx> MirContext<'a, 'tcx> {
             }
 
             mir::Operand::Constant(ref constant) => {
-                let val = self.trans_constant(&bcx, constant);
-                let operand = val.to_operand(bcx.ccx);
+                let operand = self.constant_to_operand(&bcx, constant);
                 if let OperandValue::Ref(ptr, align) = operand.val {
                     // If this is a OperandValue::Ref to an immediate constant, load it.
                     PlaceRef::new_sized(ptr, operand.layout, align).load(bcx)
