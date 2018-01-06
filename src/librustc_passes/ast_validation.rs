@@ -89,18 +89,6 @@ impl<'a> AstValidator<'a> {
         }
     }
 
-    fn check_trait_fn_not_const(&self, constness: Spanned<Constness>) {
-        match constness.node {
-            Constness::Const => {
-                struct_span_err!(self.session, constness.span, E0379,
-                                 "trait fns cannot be declared const")
-                    .span_label(constness.span, "trait fns cannot be const")
-                    .emit();
-            }
-            _ => {}
-        }
-    }
-
     fn no_questions_in_bounds(&self, bounds: &TyParamBounds, where_: &str, is_trait: bool) {
         for bound in bounds {
             if let TraitTyParamBound(ref poly, TraitBoundModifier::Maybe) = *bound {
@@ -258,9 +246,6 @@ impl<'a> Visitor<'a> for AstValidator<'a> {
                 }
                 for impl_item in impl_items {
                     self.invalid_visibility(&impl_item.vis, None);
-                    if let ImplItemKind::Method(ref sig, _) = impl_item.node {
-                        self.check_trait_fn_not_const(sig.constness);
-                    }
                 }
             }
             ItemKind::Impl(unsafety, polarity, defaultness, _, None, _, _) => {
@@ -311,7 +296,6 @@ impl<'a> Visitor<'a> for AstValidator<'a> {
                 self.no_questions_in_bounds(bounds, "supertraits", true);
                 for trait_item in trait_items {
                     if let TraitItemKind::Method(ref sig, ref block) = trait_item.node {
-                        self.check_trait_fn_not_const(sig.constness);
                         if block.is_none() {
                             self.check_decl_no_pat(&sig.decl, |span, mut_ident| {
                                 if mut_ident {
