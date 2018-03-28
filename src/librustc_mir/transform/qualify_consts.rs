@@ -37,7 +37,6 @@ use syntax_pos::{Span, DUMMY_SP};
 
 use std::fmt;
 use rustc_data_structures::sync::Lrc;
-use std::usize;
 
 use transform::{MirPass, MirSource};
 use super::promote_consts::{self, Candidate, TempState};
@@ -53,22 +52,19 @@ bitflags! {
         // Constant containing an ADT that implements Drop.
         const NEEDS_DROP        = 1 << 1;
 
-        // Function argument.
-        const FN_ARGUMENT       = 1 << 2;
-
         // Static place or move from a static.
-        const STATIC            = 1 << 3;
+        const STATIC            = 1 << 2;
 
         // Reference to a static.
-        const STATIC_REF        = 1 << 4;
+        const STATIC_REF        = 1 << 3;
 
         // Not constant at all - non-`const fn` calls, asm!,
         // pointer comparisons, ptr-to-int casts, etc.
-        const NOT_CONST         = 1 << 5;
+        const NOT_CONST         = 1 << 4;
 
         // Refers to temporaries which cannot be promoted as
         // promote_consts decided they weren't simple enough.
-        const NOT_PROMOTABLE    = 1 << 6;
+        const NOT_PROMOTABLE    = 1 << 5;
 
         // Const items can only have MUTABLE_INTERIOR
         // and NOT_PROMOTABLE without producing an error.
@@ -123,7 +119,6 @@ struct Qualifier<'a, 'gcx: 'a+'tcx, 'tcx: 'a> {
     temp_qualif: IndexVec<Local, Option<Qualif>>,
     return_qualif: Option<Qualif>,
     qualif: Qualif,
-    const_fn_arg_vars: BitVector,
     temp_promotion_state: IndexVec<Local, TempState>,
     promotion_candidates: Vec<Candidate>
 }
@@ -158,7 +153,6 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
             temp_qualif,
             return_qualif: None,
             qualif: Qualif::empty(),
-            const_fn_arg_vars: BitVector::new(mir.local_decls.len()),
             temp_promotion_state: temps,
             promotion_candidates: vec![]
         }
@@ -355,43 +349,6 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
                 TerminatorKind::FalseUnwind { .. } => None,
 
                 TerminatorKind::Return => {
-                    // Check for unused values. This usually means
-                    // there are extra statements in the AST.
-                    for temp in mir.temps_iter() {
-                        if self.temp_qualif[temp].is_none() {
-                            continue;
-                        }
-
-                        let state = self.temp_promotion_state[temp];
-                        if let TempState::Defined { location, uses: 0 } = state {
-                            let data = &mir[location.block];
-                            let stmt_idx = location.statement_index;
-
-                            // Get the span for the initialization.
-                            let source_info = if stmt_idx < data.statements.len() {
-                                data.statements[stmt_idx].source_info
-                            } else {
-                                data.terminator().source_info
-                            };
-                            self.span = source_info.span;
-
-                            // Treat this as a statement in the AST.
-                            self.statement_like();
-                        }
-                    }
-
-                    // Make sure there are no extra unassigned variables.
-                    self.qualif = Qualif::NOT_CONST;
-                    for index in mir.vars_iter() {
-                        if !self.const_fn_arg_vars.contains(index.index()) {
-                            debug!("unassigned variable {:?}", index);
-                            self.assign(&Place::Local(index), Location {
-                                block: bb,
-                                statement_index: usize::MAX,
-                            });
-                        }
-                    }
-
                     break;
                 }
             };
@@ -458,10 +415,6 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
             }
             LocalKind::Arg |
             LocalKind::Temp => {
-                if let LocalKind::Arg = kind {
-                    self.add(Qualif::FN_ARGUMENT);
-                }
-
                 if !self.temp_promotion_state[local].is_promotable() {
                     self.add(Qualif::NOT_PROMOTABLE);
                 }
@@ -1038,47 +991,6 @@ This does not pose a problem by itself because they can't be accessed directly."
                     rvalue: &Rvalue<'tcx>,
                     location: Location) {
         self.visit_rvalue(rvalue, location);
-
-        // Check the allowed const fn argument forms.
-        if let (Mode::ConstFn, &Place::Local(index)) = (self.mode, dest) {
-            if self.mir.local_kind(index) == LocalKind::Var &&
-               self.const_fn_arg_vars.insert(index.index()) {
-
-                // Direct use of an argument is permitted.
-                match *rvalue {
-                    Rvalue::Use(Operand::Copy(Place::Local(local))) |
-                    Rvalue::Use(Operand::Move(Place::Local(local))) => {
-                        if self.mir.local_kind(local) == LocalKind::Arg {
-                            return;
-                        }
-                    }
-                    _ => {}
-                }
-
-                // Avoid a generic error for other uses of arguments.
-                if self.qualif.intersects(Qualif::FN_ARGUMENT) {
-                    let decl = &self.mir.local_decls[index];
-                    let mut err = struct_span_err!(
-                        self.tcx.sess,
-                        decl.source_info.span,
-                        E0022,
-                        "arguments of constant functions can only be immutable by-value bindings"
-                    );
-                    if self.tcx.sess.teach(&err.get_code().unwrap()) {
-                        err.note("Constant functions are not allowed to mutate anything. Thus, \
-                                  binding to an argument with a mutable pattern is not allowed.");
-                        err.note("Remove any mutable bindings from the argument list to fix this \
-                                  error. In case you need to mutate the argument, try lazily \
-                                  initializing a global variable instead of using a const fn, or \
-                                  refactoring the code to a functional style to avoid mutation if \
-                                  possible.");
-                    }
-                    err.emit();
-                    return;
-                }
-            }
-        }
-
         self.assign(dest, location);
     }
 

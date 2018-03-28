@@ -14,8 +14,8 @@
 
 // no destructuring
 const fn i((
-            a, //~ ERROR: E0022
-            b  //~ ERROR: E0022
+            a, //~ ERROR: blocks in constant functions are limited to items and tail expressions
+            b  //~ ERROR: blocks in constant functions are limited to items and tail expressions
            ): (u32, u32)) -> u32 {
     a + b
 }

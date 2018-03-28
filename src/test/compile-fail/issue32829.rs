@@ -14,7 +14,7 @@
 
 const bad : u32 = {
     {
-        5; //~ ERROR: blocks in constants are limited to items and tail expressions
+        5;
         0
     }
 };
@@ -22,8 +22,7 @@ const bad : u32 = {
 const bad_two : u32 = {
     {
         invalid();
-        //~^ ERROR: blocks in constants are limited to items and tail expressions
-        //~^^ ERROR: calls in constants are limited to constant functions, tuple structs and tuple variants
+        //~^ ERROR: calls in constants are limited to constant functions, struct and enum constructors
         0
     }
 };
@@ -31,14 +30,13 @@ const bad_two : u32 = {
 const bad_three : u32 = {
     {
         valid();
-        //~^ ERROR: blocks in constants are limited to items and tail expressions
         0
     }
 };
 
 static bad_four : u32 = {
     {
-        5; //~ ERROR: blocks in statics are limited to items and tail expressions
+        5;
         0
     }
 };
@@ -46,8 +44,7 @@ static bad_four : u32 = {
 static bad_five : u32 = {
     {
         invalid();
-        //~^ ERROR: blocks in statics are limited to items and tail expressions
-        //~^^ ERROR: calls in statics are limited to constant functions, tuple structs and tuple variants
+        //~^ ERROR: calls in statics are limited to constant functions, struct and enum constructors
         0
     }
 };
@@ -55,14 +52,13 @@ static bad_five : u32 = {
 static bad_six : u32 = {
     {
         valid();
-        //~^ ERROR: blocks in statics are limited to items and tail expressions
         0
     }
 };
 
 static mut bad_seven : u32 = {
     {
-        5; //~ ERROR: blocks in statics are limited to items and tail expressions
+        5;
         0
     }
 };
@@ -70,8 +66,7 @@ static mut bad_seven : u32 = {
 static mut bad_eight : u32 = {
     {
         invalid();
-        //~^ ERROR: blocks in statics are limited to items and tail expressions
-        //~^^ ERROR: calls in statics are limited to constant functions, tuple structs and tuple variants
+        //~^ ERROR: calls in statics are limited to constant functions, struct and enum constructors
         0
     }
 };
@@ -79,7 +74,6 @@ static mut bad_eight : u32 = {
 static mut bad_nine : u32 = {
     {
         valid();
-        //~^ ERROR: blocks in statics are limited to items and tail expressions
         0
     }
 };

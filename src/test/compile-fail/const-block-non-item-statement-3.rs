@@ -10,6 +10,5 @@
 
 type Array = [u32; {  let x = 2; 5 }];
 //~^ ERROR: blocks in constants are limited to items and tail expressions
-//~^^ ERROR: blocks in constants are limited to items and tail expressions
 
 pub fn main() {}
