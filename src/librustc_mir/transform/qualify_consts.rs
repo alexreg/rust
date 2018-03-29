@@ -51,12 +51,9 @@ bitflags! {
         // Constant containing an ADT that implements Drop.
         const NEEDS_DROP        = 1 << 1;
 
-        // Static place or move from a static.
-        const STATIC            = 1 << 2;
-
         // Not constant or not promotable - non-`const fn` calls, asm!,
         // pointer comparisons, ptr-to-int casts, etc.
-        const NOT_CONST         = 1 << 3;
+        const NOT_CONST         = 1 << 2;
     }
 }
 
@@ -207,16 +204,6 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
         self.qualif = Qualif::empty();
         f(self);
         self.add(original);
-    }
-
-    /// Check if a Place with the current qualifications could
-    /// be consumed, by either an operand or a Deref projection.
-    fn try_consume(&mut self) {
-        if self.qualif.intersects(Qualif::STATIC) {
-            // Replace STATIC with NOT_CONST to avoid further errors.
-            self.qualif = self.qualif - Qualif::STATIC;
-            self.add(Qualif::NOT_CONST);
-        }
     }
 
     /// Assign the current qualification to the given destination.
@@ -387,7 +374,9 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
         match *place {
             Place::Local(ref local) => self.visit_local(local, context, location),
             Place::Static(ref global) => {
-                self.add(Qualif::STATIC);
+                if self.mode == Mode::ConstFn || self.mode == Mode::Fn {
+                    self.add(Qualif::NOT_CONST);
+                }
 
                 if self.mode != Mode::Fn {
                     for attr in &self.tcx.get_attrs(global.def_id)[..] {
@@ -406,7 +395,6 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                     this.super_place(place, context, location);
                     match proj.elem {
                         ProjectionElem::Deref => {
-                            this.try_consume();
                             this.add(Qualif::NOT_CONST);
 
                             let base_ty = proj.base.ty(this.mir, this.tcx).to_ty(this.tcx);
@@ -458,7 +446,6 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
             Operand::Move(_) => {
                 self.nest(|this| {
                     this.super_operand(operand, location);
-                    this.try_consume();
                 });
 
                 // Mark the consumed locals to indicate later drops are noops.
@@ -510,7 +497,6 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                         region,
                         kind
                     }, location);
-                    this.try_consume();
                 });
             } else {
                 self.super_rvalue(rvalue, location);
@@ -532,17 +518,9 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
             Rvalue::Cast(CastKind::Unsize, ..) |
             Rvalue::Discriminant(..) => {}
 
-            Rvalue::Len(_) => {
-                // Static places in consts would have errored already,
-                // don't treat length checks as reads from statics.
-                self.qualif = self.qualif - Qualif::STATIC;
-            }
+            Rvalue::Len(_) => {}
 
             Rvalue::Ref(_, kind, ref place) => {
-                // Static places in consts would have errored already,
-                // only keep track of references to them here.
-                self.qualif = self.qualif - Qualif::STATIC;
-
                 let ty = place.ty(self.mir, self.tcx).to_ty(self.tcx);
                 if let BorrowKind::Mut { .. } = kind {
                     // In theory, any zero-sized value could be borrowed
