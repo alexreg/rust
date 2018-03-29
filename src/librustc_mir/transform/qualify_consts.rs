@@ -101,8 +101,9 @@ struct Qualifier<'a, 'gcx: 'a+'tcx, 'tcx: 'a> {
     rpo: ReversePostorder<'a, 'tcx>,
     tcx: TyCtxt<'a, 'gcx, 'tcx>,
     param_env: ty::ParamEnv<'tcx>,
-    temp_qualif: IndexVec<Local, Option<Qualif>>,
-    return_qualif: Option<Qualif>,
+    local_mut_interior: IndexVec<Local, bool>,
+    local_needs_drop: IndexVec<Local, bool>,
+    local_not_const: IndexVec<Local, bool>,
     qualif: Qualif,
     temp_promotion_state: IndexVec<Local, TempState>,
     promotion_candidates: Vec<Candidate>
@@ -120,11 +121,11 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
 
         let param_env = tcx.param_env(def_id);
 
-        let mut temp_qualif = IndexVec::from_elem(None, &mir.local_decls);
+        let mut local_needs_drop = IndexVec::from_elem(false, &mir.local_decls);
+        let mut local_not_const = IndexVec::from_elem(true, &mir.local_decls);
         for arg in mir.args_iter() {
-            let mut qualif = Qualif::NEEDS_DROP;
-            qualif.restrict(mir.local_decls[arg].ty, tcx, param_env);
-            temp_qualif[arg] = Some(qualif);
+            local_needs_drop[arg] = mir.local_decls[arg].ty.needs_drop(tcx, param_env);
+            local_not_const[arg] = false;
         }
 
         Qualifier {
@@ -135,8 +136,9 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
             rpo,
             tcx,
             param_env,
-            temp_qualif,
-            return_qualif: None,
+            local_mut_interior: IndexVec::from_elem(false, &mir.local_decls),
+            local_needs_drop,
+            local_not_const,
             qualif: Qualif::empty(),
             temp_promotion_state: temps,
             promotion_candidates: vec![]
@@ -208,13 +210,10 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
 
     /// Assign the current qualification to the given destination.
     fn assign(&mut self, dest: &Place<'tcx>, location: Location) {
-        let qualif = self.qualif;
-        let span = self.span;
-        let store = |slot: &mut Option<Qualif>| {
-            if slot.is_some() {
-                span_bug!(span, "multiple assignments to {:?}", dest);
-            }
-            *slot = Some(qualif);
+        let store = |this: &mut Self, index| {
+            this.local_mut_interior[index] = this.qualif.contains(Qualif::MUTABLE_INTERIOR);
+            this.local_needs_drop[index] = this.qualif.contains(Qualif::NEEDS_DROP);
+            this.local_not_const[index] = this.qualif.contains(Qualif::NOT_CONST);
         };
 
         // Only handle promotable temps in non-const functions.
@@ -223,7 +222,7 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
                 if self.mir.local_kind(index) == LocalKind::Temp
                 && self.temp_promotion_state[index].is_promotable() {
                     debug!("store to promotable temp {:?}", index);
-                    store(&mut self.temp_qualif[index]);
+                    store(self, index)
                 }
             }
             return;
@@ -232,11 +231,11 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
         match *dest {
             Place::Local(index) if self.mir.local_kind(index) == LocalKind::Temp => {
                 debug!("store to temp {:?}", index);
-                store(&mut self.temp_qualif[index])
+                store(self, index)
             }
             Place::Local(index) if self.mir.local_kind(index) == LocalKind::ReturnPointer => {
                 debug!("store to return place {:?}", index);
-                store(&mut self.return_qualif)
+                store(self, index)
             }
 
             Place::Projection(box Projection {
@@ -244,9 +243,7 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
                 elem: ProjectionElem::Deref
             }) if self.mir.local_kind(index) == LocalKind::Temp
                && self.mir.local_decls[index].ty.is_box()
-               && self.temp_qualif[index].map_or(false, |qualif| {
-                    qualif.intersects(Qualif::NOT_CONST)
-               }) => {
+               && self.local_not_const[index] => {
                 // Part of `box expr`, we should've errored
                 // already for the Box allocation Rvalue.
             }
@@ -313,7 +310,9 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
             }
         }
 
-        self.qualif = self.return_qualif.unwrap_or(Qualif::NOT_CONST);
+        self.qualif.set(Qualif::MUTABLE_INTERIOR, self.local_mut_interior[RETURN_PLACE]);
+        self.qualif.set(Qualif::NEEDS_DROP, self.local_needs_drop[RETURN_PLACE]);
+        self.qualif.set(Qualif::NOT_CONST, self.local_not_const[RETURN_PLACE]);
 
         // Collect all the temps we need to promote.
         let mut promoted_temps = IdxSetBuf::new_empty(self.temp_promotion_state.len());
@@ -358,19 +357,19 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                     self.add(Qualif::NOT_CONST);
                 }
 
-                if let Some(qualif) = self.temp_qualif[local] {
-                    self.add(qualif);
-                } else {
-                    self.not_const();
-                }
+                let mut qualif = Qualif::empty();
+                qualif.set(Qualif::MUTABLE_INTERIOR, self.local_mut_interior[local]);
+                qualif.set(Qualif::NEEDS_DROP, self.local_needs_drop[local]);
+                qualif.set(Qualif::NOT_CONST, self.local_not_const[local]);
+                self.add(qualif);
             }
         }
     }
 
     fn visit_place(&mut self,
-                    place: &Place<'tcx>,
-                    context: PlaceContext<'tcx>,
-                    location: Location) {
+                   place: &Place<'tcx>,
+                   context: PlaceContext<'tcx>,
+                   location: Location) {
         match *place {
             Place::Local(ref local) => self.visit_local(local, context, location),
             Place::Static(ref global) => {
@@ -450,9 +449,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
 
                 // Mark the consumed locals to indicate later drops are noops.
                 if let Operand::Move(Place::Local(local)) = *operand {
-                    self.temp_qualif[local] = self.temp_qualif[local].map(|q|
-                        q - Qualif::NEEDS_DROP
-                    );
+                    self.local_needs_drop[local] = false;
                 }
             }
             Operand::Constant(ref constant) => {
@@ -533,8 +530,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                             _ => false
                         }
                     } else if let ty::TyArray(_, len) = ty.sty {
-                        len.val.unwrap_u64() == 0 &&
-                            self.mode == Mode::Fn
+                        len.val.unwrap_u64() == 0 && self.mode == Mode::Fn
                     } else {
                         false
                     };
@@ -564,7 +560,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                     // Constants cannot be borrowed if they contain interior mutability as
                     // it means that our "silent insertion of statics" could change
                     // initializer values (very bad).
-                    if self.qualif.intersects(Qualif::MUTABLE_INTERIOR) {
+                    if self.qualif.contains(Qualif::MUTABLE_INTERIOR) {
                         // Replace MUTABLE_INTERIOR with NOT_CONST to avoid
                         // duplicate errors (from reborrowing, for example).
                         self.qualif = self.qualif - Qualif::MUTABLE_INTERIOR;
@@ -688,7 +684,7 @@ This does not pose a problem by itself because they can't be accessed directly."
                     if Some(def.did) == self.tcx.lang_items().unsafe_cell_type() {
                         let ty = rvalue.ty(self.mir, self.tcx);
                         self.restrict_to_type(ty);
-                        assert!(self.qualif.intersects(Qualif::MUTABLE_INTERIOR));
+                        assert!(self.qualif.contains(Qualif::MUTABLE_INTERIOR));
                     }
                 }
             }
@@ -841,7 +837,7 @@ This does not pose a problem by itself because they can't be accessed directly."
                 // HACK(eddyb) Emulate a bit of dataflow analysis,
                 // conservatively, that drop elaboration will do.
                 let needs_drop = if let Place::Local(local) = *place {
-                    if self.temp_qualif[local].map_or(true, |q| q.intersects(Qualif::NEEDS_DROP)) {
+                    if self.local_needs_drop[local] {
                         Some(self.mir.local_decls[local].source_info.span)
                     } else {
                         None
