@@ -43,8 +43,7 @@ use super::promote_consts::{self, Candidate, TempState};
 
 bitflags! {
     // Borrows of temporaries can be promoted only if
-    // they have none of these qualifications, with
-    // the exception of `STATIC_REF` (in statics only).
+    // they have none of these qualifications.
     struct Qualif: u8 {
         // Constant containing interior mutability (UnsafeCell).
         const MUTABLE_INTERIOR  = 1 << 0;
@@ -55,12 +54,9 @@ bitflags! {
         // Static place or move from a static.
         const STATIC            = 1 << 2;
 
-        // Reference to a static.
-        const STATIC_REF        = 1 << 3;
-
         // Not constant or not promotable - non-`const fn` calls, asm!,
         // pointer comparisons, ptr-to-int casts, etc.
-        const NOT_CONST         = 1 << 4;
+        const NOT_CONST         = 1 << 3;
     }
 }
 
@@ -213,39 +209,13 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
         self.add(original);
     }
 
-    /// Check if a Local with the current qualifications is promotable.
-    fn can_promote(&mut self) -> bool {
-        // References to statics are allowed, but only in other statics.
-        if self.mode == Mode::Static || self.mode == Mode::StaticMut {
-            (self.qualif - Qualif::STATIC_REF).is_empty()
-        } else {
-            self.qualif.is_empty()
-        }
-    }
-
     /// Check if a Place with the current qualifications could
     /// be consumed, by either an operand or a Deref projection.
-    fn try_consume(&mut self) -> bool {
-        if self.qualif.intersects(Qualif::STATIC) && self.mode != Mode::Fn {
-            let msg = if self.mode == Mode::Static ||
-                         self.mode == Mode::StaticMut {
-                "cannot refer to other statics by value, use the \
-                 address-of operator or a constant instead"
-            } else {
-                "cannot refer to statics by value, use a constant instead"
-            };
-            struct_span_err!(self.tcx.sess, self.span, E0394, "{}", msg)
-                .span_label(self.span, "referring to another static by value")
-                .note("use the address-of operator or a constant instead")
-                .emit();
-
+    fn try_consume(&mut self) {
+        if self.qualif.intersects(Qualif::STATIC) {
             // Replace STATIC with NOT_CONST to avoid further errors.
             self.qualif = self.qualif - Qualif::STATIC;
             self.add(Qualif::NOT_CONST);
-
-            false
-        } else {
-            true
         }
     }
 
@@ -430,37 +400,13 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                         }
                     }
                 }
-
-                if self.mode == Mode::Const || self.mode == Mode::ConstFn {
-                    let mut err = struct_span_err!(self.tcx.sess, self.span, E0013,
-                                                   "{}s cannot refer to statics, use \
-                                                    a constant instead", self.mode);
-                    if self.tcx.sess.teach(&err.get_code().unwrap()) {
-                        err.note(
-                            "Static and const variables can refer to other const variables. But a \
-                             const variable cannot refer to a static variable."
-                        );
-                        err.help(
-                            "To fix this, the value can be extracted as a const and then used."
-                        );
-                    }
-                    err.emit()
-                }
             }
             Place::Projection(ref proj) => {
                 self.nest(|this| {
                     this.super_place(place, context, location);
                     match proj.elem {
                         ProjectionElem::Deref => {
-                            if !this.try_consume() {
-                                return;
-                            }
-
-                            if this.qualif.intersects(Qualif::STATIC_REF) {
-                                this.qualif = this.qualif - Qualif::STATIC_REF;
-                                this.add(Qualif::STATIC);
-                            }
-
+                            this.try_consume();
                             this.add(Qualif::NOT_CONST);
 
                             let base_ty = proj.base.ty(this.mir, this.tcx).to_ty(this.tcx);
@@ -491,12 +437,6 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
 
                         ProjectionElem::Field(..) |
                         ProjectionElem::Index(_) => {
-                            if this.mode != Mode::Fn &&
-                               this.qualif.intersects(Qualif::STATIC) {
-                                span_err!(this.tcx.sess, this.span, E0494,
-                                          "cannot refer to the interior of another \
-                                           static, use a constant instead");
-                            }
                             let ty = place.ty(this.mir, this.tcx).to_ty(this.tcx);
                             this.qualif.restrict(ty, this.tcx, this.param_env);
                         }
@@ -570,14 +510,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                         region,
                         kind
                     }, location);
-                    if !this.try_consume() {
-                        return;
-                    }
-
-                    if this.qualif.intersects(Qualif::STATIC_REF) {
-                        this.qualif = this.qualif - Qualif::STATIC_REF;
-                        this.add(Qualif::STATIC);
-                    }
+                    this.try_consume();
                 });
             } else {
                 self.super_rvalue(rvalue, location);
@@ -608,10 +541,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
             Rvalue::Ref(_, kind, ref place) => {
                 // Static places in consts would have errored already,
                 // only keep track of references to them here.
-                if self.qualif.intersects(Qualif::STATIC) {
-                    self.qualif = self.qualif - Qualif::STATIC;
-                    self.add(Qualif::STATIC_REF);
-                }
+                self.qualif = self.qualif - Qualif::STATIC;
 
                 let ty = place.ty(self.mir, self.tcx).to_ty(self.tcx);
                 if let BorrowKind::Mut { .. } = kind {
@@ -671,7 +601,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
 
                 // We might have a candidate for promotion.
                 let candidate = Candidate::Ref(location);
-                if self.can_promote() {
+                if self.qualif.is_empty() {
                     // We can only promote direct borrows of temps.
                     if let Place::Local(local) = *place {
                         if self.mir.local_kind(local) == LocalKind::Temp {
@@ -832,7 +762,7 @@ This does not pose a problem by itself because they can't be accessed directly."
                     }
                     let candidate = Candidate::Argument { bb, index: i };
                     if is_shuffle && i == 2 {
-                        if this.can_promote() {
+                        if this.qualif.is_empty() {
                             this.promotion_candidates.push(candidate);
                         } else {
                             span_err!(this.tcx.sess, this.span, E0526,
@@ -848,7 +778,7 @@ This does not pose a problem by itself because they can't be accessed directly."
                     if !constant_arguments.contains(&i) {
                         return
                     }
-                    if this.can_promote() {
+                    if this.qualif.is_empty() {
                         this.promotion_candidates.push(candidate);
                     } else {
                         this.tcx.sess.span_err(this.span,

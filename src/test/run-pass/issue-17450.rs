@@ -13,7 +13,6 @@
 static mut x: isize = 3;
 static mut y: isize = unsafe {
     x
-//~^ ERROR cannot refer to other statics by value, use the address-of operator or a constant instea
 };
 
 fn main() {}

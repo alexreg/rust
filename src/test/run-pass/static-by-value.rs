@@ -8,14 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![allow(dead_code)]
+#![allow(warnings)]
 
-struct A {
-    a: &'static (),
-}
-
-static B: &'static A = &A { a: &() };
-static C: &'static A = &B;
-//~^ ERROR cannot refer to other statics by value
+static A: u32 = 0;
+static B: u32 = A;
 
 fn main() {}

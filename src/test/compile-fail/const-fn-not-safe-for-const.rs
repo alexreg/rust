@@ -28,13 +28,10 @@ static Y: u32 = 0;
 
 const fn get_Y() -> u32 {
     Y
-        //~^ ERROR E0013
-        //~| ERROR cannot refer to statics by value
 }
 
 const fn get_Y_addr() -> &'static u32 {
     &Y
-        //~^ ERROR E0013
 }
 
 const fn get() -> u32 {
@@ -43,5 +40,4 @@ const fn get() -> u32 {
     x + y
 }
 
-fn main() {
-}
+fn main() {}

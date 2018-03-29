@@ -8,10 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-pub fn main() {
-    const z: &'static isize = {
-        static p: isize = 3;
-        &p
-        //~^ ERROR constants cannot refer to statics, use a constant instead
-    };
-}
+static x: &'static usize = &1;
+static y: usize = *x;
+
+fn main() {}
