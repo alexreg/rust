@@ -209,6 +209,16 @@ impl<T: Idx> IdxSet<T> {
     pub fn add(&mut self, elem: &T) -> bool {
         self.bits.set_bit(elem.index())
     }
+    
+    /// Adds `elem` to the set `self` if `member` is `true`, otherwise removes `elem` from the set;
+    /// returns true iff this changed `self`.
+    pub fn set_member(&mut self, elem: &T, member: bool) -> bool {
+        if member {
+            self.add(elem)
+        } else {
+            self.remove(elem)
+        }
+    }
 
     pub fn range(&self, elems: &Range<T>) -> &Self {
         let elems = elems.start.index()..elems.end.index();
