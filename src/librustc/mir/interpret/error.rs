@@ -1,5 +1,6 @@
 use std::{fmt, env};
 
+use hir::def_id::DefId;
 use mir;
 use ty::{FnSig, Ty, layout};
 
@@ -39,6 +40,7 @@ pub enum EvalErrorKind<'tcx, O> {
     NoMirFor(String),
     UnterminatedCString(MemoryPointer),
     DanglingPointerDeref,
+    ExternStaticRead(DefId),
     DoubleFree,
     InvalidMemoryAccess,
     InvalidFunctionPointer,
@@ -139,6 +141,8 @@ impl<'tcx, O> EvalErrorKind<'tcx, O> {
                 "tried to access memory through an invalid pointer",
             DanglingPointerDeref =>
                 "dangling pointer was dereferenced",
+            ExternStaticRead(_) =>
+                "cannot read from extern static",
             DoubleFree =>
                 "tried to deallocate dangling pointer",
             InvalidFunctionPointer =>

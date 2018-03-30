@@ -13,6 +13,8 @@
 extern {
     pub static symbol: ();
 }
-static CRASH: () = symbol; //~ constant evaluation error
+static CRASH: () = symbol;
+//~^ ERROR constant evaluation error
+//~| cannot read from extern static
 
 fn main() {}

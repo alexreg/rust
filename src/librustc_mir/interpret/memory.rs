@@ -286,7 +286,10 @@ impl<'a, 'mir, 'tcx, M: Machine<'mir, 'tcx>> Memory<'a, 'mir, 'tcx, M> {
                         .ok_or_else(|| if self.tcx.interpret_interner.get_fn(id).is_some() {
                             EvalErrorKind::DerefFunctionPointer.into()
                         } else {
-                            EvalErrorKind::DanglingPointerDeref.into()
+                            self.tcx.interpret_interner.get_static(id).map_or_else(
+                                || EvalErrorKind::DanglingPointerDeref,
+                                |def_id| EvalErrorKind::ExternStaticRead(def_id)
+                            ).into()
                         })
                 },
             },
@@ -310,7 +313,10 @@ impl<'a, 'mir, 'tcx, M: Machine<'mir, 'tcx>> Memory<'a, 'mir, 'tcx, M> {
                     } else if self.tcx.interpret_interner.get_fn(id).is_some() {
                         err!(DerefFunctionPointer)
                     } else {
-                        err!(DanglingPointerDeref)
+                        Err(self.tcx.interpret_interner.get_static(id).map_or_else(
+                            || EvalErrorKind::DanglingPointerDeref,
+                            |def_id| EvalErrorKind::ExternStaticRead(def_id)
+                        ).into())
                     }
                 },
             },

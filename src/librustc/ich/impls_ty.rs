@@ -581,6 +581,7 @@ for ::mir::interpret::EvalErrorKind<'gcx, O> {
             GeneratorResumedAfterReturn |
             GeneratorResumedAfterPanic |
             ReferencedConstant => {}
+            ExternStaticRead(def_id) => def_id.hash_stable(hcx, hasher),
             MachineError(ref err) => err.hash_stable(hcx, hasher),
             FunctionPointerTyMismatch(a, b) => {
                 a.hash_stable(hcx, hasher);

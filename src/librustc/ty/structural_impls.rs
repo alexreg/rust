@@ -494,6 +494,7 @@ impl<'a, 'tcx, O: Lift<'tcx>> Lift<'tcx> for interpret::EvalErrorKind<'a, O> {
             NoMirFor(ref s) => NoMirFor(s.clone()),
             UnterminatedCString(ptr) => UnterminatedCString(ptr),
             DanglingPointerDeref => DanglingPointerDeref,
+            ExternStaticRead(def_id) => ExternStaticRead(def_id),
             DoubleFree => DoubleFree,
             InvalidMemoryAccess => InvalidMemoryAccess,
             InvalidFunctionPointer => InvalidFunctionPointer,
