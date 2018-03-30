@@ -13,6 +13,6 @@
 extern {
     pub static symbol: ();
 }
-static CRASH: () = symbol; //~ cannot refer to other statics by value
+static CRASH: () = symbol; //~ constant evaluation error
 
 fn main() {}

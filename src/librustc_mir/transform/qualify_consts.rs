@@ -41,34 +41,42 @@ use rustc_data_structures::sync::Lrc;
 use transform::{MirPass, MirSource};
 use super::promote_consts::{self, Candidate, TempState};
 
-bitflags! {
-    // Borrows of temporaries can be promoted only if
-    // they have none of these qualifications.
-    struct Qualif: u8 {
-        // Constant containing interior mutability (`UnsafeCell`).
-        const MUTABLE_INTERIOR  = 1 << 0;
+// Borrows of temporaries can be promoted only if
+// they have none of these qualifications.
+#[derive(Clone, Copy, Default, Eq, PartialEq)]
+struct Qualif {
+    // Constant containing interior mutability (`UnsafeCell`).
+    mut_interior: bool,
 
-        // Constant containing an ADT that implements Drop.
-        const NEEDS_DROP        = 1 << 1;
+    // Constant containing an ADT that implements Drop.
+    needs_drop: bool,
 
-        // Not constant or not promotable - non-`const fn` calls, asm!,
-        // pointer comparisons, ptr-to-int casts, etc.
-        const NOT_CONST         = 1 << 2;
-    }
+    // Not constant or not promotable - non-`const fn` calls, asm!,
+    // pointer comparisons, ptr-to-int casts, etc.
+    not_const: bool,
 }
 
-impl<'a, 'tcx> Qualif {
-    /// Remove flags which are impossible for the given type.
-    fn restrict(&mut self, ty: Ty<'tcx>,
-                tcx: TyCtxt<'a, 'tcx, 'tcx>,
-                param_env: ty::ParamEnv<'tcx>) {
-        self.insert(Qualif::MUTABLE_INTERIOR | Qualif::NEEDS_DROP);
-        if ty.is_freeze(tcx, param_env, DUMMY_SP) {
-            self.remove(Qualif::MUTABLE_INTERIOR);
+impl Qualif {
+    fn from_bits(bits: u8) -> Self {
+        Self {
+            mut_interior: bits & (1 << 0) != 0,
+            needs_drop: bits & (1 << 1) != 0,
+            not_const: bits & (1 << 2) != 0,
         }
-        if !ty.needs_drop(tcx, param_env) {
-            self.remove(Qualif::NEEDS_DROP);
+    }
+
+    fn bits(&self) -> u8 {
+        let mut bits = 0;
+        if self.mut_interior {
+            bits |= 1 << 0;
         }
+        if self.needs_drop {
+            bits |= 1 << 1;
+        }
+        if self.not_const {
+            bits |= 1 << 2;
+        }
+        bits
     }
 }
 
@@ -139,7 +147,7 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
             local_mut_interior: IndexVec::from_elem(false, &mir.local_decls),
             local_needs_drop,
             local_not_const,
-            qualif: Qualif::empty(),
+            qualif: Qualif::default(),
             temp_promotion_state: temps,
             promotion_candidates: vec![]
         }
@@ -149,7 +157,7 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
     // categories, but enabling full miri would make that
     // slightly pointless (even with feature-gating).
     fn not_const(&mut self) {
-        self.add(Qualif::NOT_CONST);
+        self.qualif.not_const = true;
         if self.mode != Mode::Fn {
             let mut err = struct_span_err!(
                 self.tcx.sess,
@@ -170,7 +178,7 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
 
     /// Error about extra statements in a constant.
     fn statement_like(&mut self) {
-        self.add(Qualif::NOT_CONST);
+        self.qualif.not_const = true;
         if self.mode != Mode::Fn {
             let mut err = struct_span_err!(
                 self.tcx.sess,
@@ -190,12 +198,15 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
 
     /// Add the given qualification to `self.qualif`.
     fn add(&mut self, qualif: Qualif) {
-        self.qualif = self.qualif | qualif;
+        self.qualif.mut_interior |= qualif.mut_interior;
+        self.qualif.needs_drop |= qualif.needs_drop;
+        self.qualif.not_const |= qualif.not_const;
     }
 
     /// Restrict `self.qualif` by the given type's qualification.
     fn restrict_to_type(&mut self, ty: Ty<'tcx>) {
-        self.qualif.restrict(ty, self.tcx, self.param_env);
+        self.qualif.mut_interior = !ty.is_freeze(self.tcx, self.param_env, DUMMY_SP);
+        self.qualif.needs_drop = ty.needs_drop(self.tcx, self.param_env);
     }
 
     /// Within the provided closure, `self.qualif` will start
@@ -203,7 +214,7 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
     /// be combined with the value before the call to nest.
     fn nest<F: FnOnce(&mut Self)>(&mut self, f: F) {
         let original = self.qualif;
-        self.qualif = Qualif::empty();
+        self.qualif = Qualif::default();
         f(self);
         self.add(original);
     }
@@ -211,9 +222,9 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
     /// Assign the current qualification to the given destination.
     fn assign(&mut self, dest: &Place<'tcx>, location: Location) {
         let store = |this: &mut Self, index| {
-            this.local_mut_interior[index] = this.qualif.contains(Qualif::MUTABLE_INTERIOR);
-            this.local_needs_drop[index] = this.qualif.contains(Qualif::NEEDS_DROP);
-            this.local_not_const[index] = this.qualif.contains(Qualif::NOT_CONST);
+            this.local_mut_interior[index] = this.qualif.mut_interior;
+            this.local_needs_drop[index] = this.qualif.needs_drop;
+            this.local_not_const[index] = this.qualif.not_const;
         };
 
         // Only handle promotable temps in non-const functions.
@@ -310,9 +321,9 @@ impl<'a, 'tcx> Qualifier<'a, 'tcx, 'tcx> {
             }
         }
 
-        self.qualif.set(Qualif::MUTABLE_INTERIOR, self.local_mut_interior[RETURN_PLACE]);
-        self.qualif.set(Qualif::NEEDS_DROP, self.local_needs_drop[RETURN_PLACE]);
-        self.qualif.set(Qualif::NOT_CONST, self.local_not_const[RETURN_PLACE]);
+        self.qualif.mut_interior = self.local_mut_interior[RETURN_PLACE];
+        self.qualif.needs_drop = self.local_needs_drop[RETURN_PLACE];
+        self.qualif.not_const = self.local_not_const[RETURN_PLACE];
 
         // Collect all the temps we need to promote.
         let mut promoted_temps = IdxSetBuf::new_empty(self.temp_promotion_state.len());
@@ -349,18 +360,18 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                 self.not_const();
             }
             LocalKind::Var => {
-                self.add(Qualif::NOT_CONST);
+                self.qualif.not_const = true;
             }
             LocalKind::Arg |
             LocalKind::Temp => {
                 if !self.temp_promotion_state[local].is_promotable() {
-                    self.add(Qualif::NOT_CONST);
+                    self.qualif.not_const = true;
                 }
 
-                let mut qualif = Qualif::empty();
-                qualif.set(Qualif::MUTABLE_INTERIOR, self.local_mut_interior[local]);
-                qualif.set(Qualif::NEEDS_DROP, self.local_needs_drop[local]);
-                qualif.set(Qualif::NOT_CONST, self.local_not_const[local]);
+                let mut qualif = Qualif::default();
+                qualif.mut_interior = self.local_mut_interior[local];
+                qualif.needs_drop = self.local_needs_drop[local];
+                qualif.not_const = self.local_not_const[local];
                 self.add(qualif);
             }
         }
@@ -374,7 +385,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
             Place::Local(ref local) => self.visit_local(local, context, location),
             Place::Static(ref global) => {
                 if self.mode == Mode::ConstFn || self.mode == Mode::Fn {
-                    self.add(Qualif::NOT_CONST);
+                    self.qualif.not_const = true;
                 }
 
                 if self.mode != Mode::Fn {
@@ -383,7 +394,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                             span_err!(self.tcx.sess, self.span, E0625,
                                       "thread-local statics cannot be \
                                        accessed at compile-time");
-                            self.add(Qualif::NOT_CONST);
+                            self.qualif.not_const = true;
                             return;
                         }
                     }
@@ -394,7 +405,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                     this.super_place(place, context, location);
                     match proj.elem {
                         ProjectionElem::Deref => {
-                            this.add(Qualif::NOT_CONST);
+                            this.qualif.not_const = true;
 
                             let base_ty = proj.base.ty(this.mir, this.tcx).to_ty(this.tcx);
                             if let ty::TyRawPtr(_) = base_ty.sty {
@@ -462,13 +473,13 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                     } else {
                         let (bits, _) = self.tcx.at(constant.span).mir_const_qualif(def_id);
 
-                        let qualif = Qualif::from_bits(bits).expect("invalid mir_const_qualif");
+                        let qualif = Qualif::from_bits(bits);
                         self.add(qualif);
 
                         // Just in case the type is more specific than
                         // the definition, e.g. impl associated const
                         // with type parameters, take it into account.
-                        self.qualif.restrict(ty, self.tcx, self.param_env);
+                        self.restrict_to_type(ty);
                     }
                 }
             }
@@ -536,7 +547,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                     };
 
                     if !allow {
-                        self.add(Qualif::NOT_CONST);
+                        self.qualif.not_const = true;
                         if self.mode != Mode::Fn {
                             let mut err = struct_span_err!(self.tcx.sess,  self.span, E0017,
                                                            "references in {}s may only refer \
@@ -560,11 +571,11 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                     // Constants cannot be borrowed if they contain interior mutability as
                     // it means that our "silent insertion of statics" could change
                     // initializer values (very bad).
-                    if self.qualif.contains(Qualif::MUTABLE_INTERIOR) {
+                    if self.qualif.mut_interior {
                         // Replace MUTABLE_INTERIOR with NOT_CONST to avoid
                         // duplicate errors (from reborrowing, for example).
-                        self.qualif = self.qualif - Qualif::MUTABLE_INTERIOR;
-                        self.add(Qualif::NOT_CONST);
+                        self.qualif.mut_interior = false;
+                        self.qualif.not_const = true;
                         if self.mode != Mode::Fn {
                             span_err!(self.tcx.sess, self.span, E0492,
                                       "cannot borrow a constant which may contain \
@@ -575,7 +586,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
 
                 // We might have a candidate for promotion.
                 let candidate = Candidate::Ref(location);
-                if self.qualif.is_empty() {
+                if self.qualif == Default::default() {
                     // We can only promote direct borrows of temps.
                     if let Place::Local(local) = *place {
                         if self.mir.local_kind(local) == LocalKind::Temp {
@@ -592,7 +603,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Qualifier<'a, 'tcx, 'tcx> {
                 match (cast_in, cast_out) {
                     (CastTy::Ptr(_), CastTy::Int(_)) |
                     (CastTy::FnPtr, CastTy::Int(_)) => {
-                        self.add(Qualif::NOT_CONST);
+                        self.qualif.not_const = true;
                         if self.mode != Mode::Fn {
                             let mut err = struct_span_err!(
                                 self.tcx.sess,
@@ -643,7 +654,7 @@ This does not pose a problem by itself because they can't be accessed directly."
                             op == BinOp::Ge || op == BinOp::Gt ||
                             op == BinOp::Offset);
 
-                    self.add(Qualif::NOT_CONST);
+                    self.qualif.not_const = true;
                     if self.mode != Mode::Fn {
                         struct_span_err!(
                             self.tcx.sess, self.span, E0395,
@@ -658,7 +669,7 @@ This does not pose a problem by itself because they can't be accessed directly."
             }
 
             Rvalue::NullaryOp(NullOp::Box, _) => {
-                self.add(Qualif::NOT_CONST);
+                self.qualif.not_const = true;
                 if self.mode != Mode::Fn {
                     let mut err = struct_span_err!(self.tcx.sess, self.span, E0010,
                                                    "allocations are not allowed in {}s", self.mode);
@@ -678,13 +689,13 @@ This does not pose a problem by itself because they can't be accessed directly."
             Rvalue::Aggregate(ref kind, _) => {
                 if let AggregateKind::Adt(def, ..) = **kind {
                     if def.has_dtor(self.tcx) {
-                        self.add(Qualif::NEEDS_DROP);
+                        self.qualif.needs_drop = true;
                     }
 
                     if Some(def.did) == self.tcx.lang_items().unsafe_cell_type() {
                         let ty = rvalue.ty(self.mir, self.tcx);
                         self.restrict_to_type(ty);
-                        assert!(self.qualif.contains(Qualif::MUTABLE_INTERIOR));
+                        assert!(self.qualif.mut_interior);
                     }
                 }
             }
@@ -736,7 +747,7 @@ This does not pose a problem by itself because they can't be accessed directly."
                     }
                     let candidate = Candidate::Argument { bb, index: i };
                     if is_shuffle && i == 2 {
-                        if this.qualif.is_empty() {
+                        if this.qualif == Default::default() {
                             this.promotion_candidates.push(candidate);
                         } else {
                             span_err!(this.tcx.sess, this.span, E0526,
@@ -752,7 +763,7 @@ This does not pose a problem by itself because they can't be accessed directly."
                     if !constant_arguments.contains(&i) {
                         return
                     }
-                    if this.qualif.is_empty() {
+                    if this.qualif == Default::default() {
                         this.promotion_candidates.push(candidate);
                     } else {
                         this.tcx.sess.span_err(this.span,
@@ -797,7 +808,7 @@ This does not pose a problem by itself because they can't be accessed directly."
                     }
                 }
             } else {
-                self.qualif = Qualif::NOT_CONST;
+                self.qualif.not_const = true;
                 if self.mode != Mode::Fn {
                     // FIXME(#24111) Remove this check when const fn stabilizes
                     let (msg, note) = if let UnstableFeatures::Disallow =
@@ -922,7 +933,7 @@ fn mir_const_qualif<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
 
     if mir.return_ty().references_error() {
         tcx.sess.delay_span_bug(mir.span, "mir_const_qualif: Mir had errors");
-        return (Qualif::NOT_CONST.bits(), Lrc::new(IdxSetBuf::new_empty(0)));
+        return (Qualif {not_const: true, ..Default::default()}.bits(), Lrc::new(IdxSetBuf::new_empty(0)));
     }
 
     let mut qualifier = Qualifier::new(tcx, def_id, mir, Mode::Const);
