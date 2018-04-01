@@ -65,7 +65,6 @@ enum Mode {
     Const,
     Static,
     StaticMut,
-    ConstFn,
     Fn
 }
 
@@ -74,7 +73,6 @@ impl fmt::Display for Mode {
         match *self {
             Mode::Const => write!(f, "constant"),
             Mode::Static | Mode::StaticMut => write!(f, "static"),
-            Mode::ConstFn => write!(f, "constant function"),
             Mode::Fn => write!(f, "function")
         }
     }
@@ -391,8 +389,7 @@ impl<'a, 'tcx> ConstChecker<'a, 'tcx, 'tcx> {
             };
 
             match target {
-                // No loops allowed.
-                Some(target) if !seen_blocks.contains(target.index()) => {
+                Some(target) => {
                     bb = target;
                 }
                 _ => {
@@ -841,7 +838,7 @@ impl<'a, 'tcx> Visitor<'tcx> for ConstChecker<'a, 'tcx, 'tcx> {
         match *place {
             Place::Local(ref local) => self.visit_local(local, context, location),
             Place::Static(ref global) => {
-                if self.mode == Mode::ConstFn || self.mode == Mode::Fn {
+                if self.mode == Mode::Fn {
                     self.not_const = true;
                 }
 
@@ -1411,11 +1408,7 @@ impl MirPass for QualifyAndPromoteConstants {
         let mut const_promoted_temps = None;
         let mode = match tcx.hir.body_owner_kind(id) {
             hir::BodyOwnerKind::Fn => {
-                if tcx.is_const_fn(def_id) {
-                    Mode::ConstFn
-                } else {
-                    Mode::Fn
-                }
+                Mode::Fn
             }
             hir::BodyOwnerKind::Const => {
                 const_promoted_temps = Some(tcx.mir_const_qualif(def_id).1);
@@ -1425,18 +1418,13 @@ impl MirPass for QualifyAndPromoteConstants {
             hir::BodyOwnerKind::Static(hir::MutMutable) => Mode::StaticMut,
         };
 
-        if mode == Mode::Fn || mode == Mode::ConstFn {
+        if mode == Mode::Fn {
             // This is ugly because `ConstChecker` holds onto mir,
             // which can't be mutated until its scope ends.
             let (temps, candidates) = {
                 let mut checker = ConstChecker::new(tcx, def_id, mir, mode);
-                if mode == Mode::ConstFn {
-                    // Enforce a constant-like CFG for `const fn`.
-                    checker.qualify_const();
-                } else {
-                    while let Some((bb, data)) = checker.rpo.next() {
-                        checker.visit_basic_block_data(bb, data);
-                    }
+                while let Some((bb, data)) = checker.rpo.next() {
+                    checker.visit_basic_block_data(bb, data);
                 }
 
                 (checker.temp_promotion_state, checker.promotion_candidates)
