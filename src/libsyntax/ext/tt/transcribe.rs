@@ -272,11 +272,6 @@ fn lockstep_iter_size(tree: &quoted::TokenTree,
 pub struct Escaper(pub SyntaxContext);
 
 impl Folder for Escaper {
-    fn fold_ident(&mut self, mut ident: Ident) -> Ident {
-        ident.span = ident.span.with_ctxt(self.0);
-        ident
-    }
-
     fn new_span(&mut self, span: Span) -> Span {
         span.with_ctxt(self.0)
     }
