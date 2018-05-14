@@ -174,11 +174,14 @@ pub enum TokenHygiene {
 /// # Parameters
 ///
 /// - `input`: a token stream to read from, the contents of which we are parsing.
+/// - `expect_hygiene_optout`: it only makes sense for hygiene opt-out syntax to appear on the RHSs
+///   of macro bodies. Thus this will be `true` when parsing RHSs, but false otherwise.
 /// - `expect_matchers`: `parse` can be used to parse either the "patterns" or the "body" of a
-///   macro. Both take roughly the same form _except_ that in a pattern, metavars are declared with
+///   macro. Both takeb roughly the same form _except_ that in a pattern, metavars are declared with
 ///   their "matcher" type. For example `$var:expr` or `$id:ident`. In this example, `expr` and
 ///   `ident` are "matchers". They are not present in the body of a macro rule -- just in the
 ///   pattern, so we pass a parameter to indicate whether to expect them or not.
+/// - `legacy`: whether we are parsing a legacy macro.
 /// - `sess`: the parsing session. Any errors will be emitted to this session.
 /// - `features`, `attrs`: language feature flags and attributes so that we know whether to use
 ///   unstable features or not.
@@ -188,8 +191,9 @@ pub enum TokenHygiene {
 /// A collection of `self::TokenTree`. There may also be some errors emitted to `sess`.
 pub fn parse(
     input: tokenstream::TokenStream,
-    hygiene_optout: bool,
+    expect_hygiene_optout: bool,
     expect_matchers: bool,
+    legacy: bool,
     sess: &ParseSess,
     features: &Features,
     attrs: &[ast::Attribute],
@@ -205,8 +209,9 @@ pub fn parse(
         // parse out the matcher (i.e. in `$id:ident` this would parse the `:` and `ident`).
         let tree = parse_tree(tree,
                               &mut trees,
-                              hygiene_optout,
+                              expect_hygiene_optout,
                               expect_matchers,
+                              legacy,
                               sess,
                               features,
                               attrs);
@@ -256,15 +261,18 @@ pub fn parse(
 /// - `tree`: the tree we wish to convert.
 /// - `trees`: an iterator over trees. We may need to read more tokens from it in order to finish
 ///   converting `tree`
+/// - `expect_hygiene_optout`: same as for `parse` (see above).
 /// - `expect_matchers`: same as for `parse` (see above).
+/// - `legacy`: whether we are parsing a legacy macro.
 /// - `sess`: the parsing session. Any errors will be emitted to this session.
 /// - `features`, `attrs`: language feature flags and attributes so that we know whether to use
 ///   unstable features or not.
 fn parse_tree<I>(
     tree: tokenstream::TokenTree,
     trees: &mut Peekable<I>,
-    hygiene_optout: bool,
+    expect_hygiene_optout: bool,
     expect_matchers: bool,
+    legacy: bool,
     sess: &ParseSess,
     features: &Features,
     attrs: &[ast::Attribute],
@@ -272,56 +280,108 @@ fn parse_tree<I>(
 where
     I: Iterator<Item = tokenstream::TokenTree>,
 {
-    // Depending on what `tree` is, we could be parsing different parts of a macro
+    let hygiene_optout_enabled = !legacy && features.macro_hygiene_optout;
+
+    // Depending on what `tree` is, we could be parsing different parts of a macro.
     match tree {
-        // `tree` is `#` token and hygiene opt-out syntax is on. Look at the next token in `trees`.
-        tokenstream::TokenTree::Token(span, token::Pound) if hygiene_optout => match trees.peek() {
-            Some(tokenstream::TokenTree::Token(_, token::Dollar)) => {
-                if let tokenstream::TokenTree::Token(span, token::Dollar) = trees.next().unwrap() {
-                    parse_meta_var(span,
-                                   TokenHygiene::CallSite,
+        // `tree` is `#` token, and hygiene opt-out syntax is enabled.
+        // Look at the next token in `trees`.
+        tokenstream::TokenTree::Token(span, token::Pound) if hygiene_optout_enabled =>
+            match trees.peek() {
+                Some(tokenstream::TokenTree::Token(_, token::Dollar)) => {
+                    parse_meta_var(trees.next().unwrap(),
                                    trees,
-                                   hygiene_optout,
+                                   TokenHygiene::CallSite,
+                                   expect_hygiene_optout,
                                    expect_matchers,
+                                   legacy,
                                    sess,
                                    features,
                                    attrs)
-                } else {
-                    unreachable!();
                 }
-            }
 
-            Some(tokenstream::TokenTree::Token(_, token::Ident(..))) => {
-                if let tokenstream::TokenTree::Token(span, tok @ token::Ident(..)) =
+                Some(tokenstream::TokenTree::Token(_, token::Ident(..))) => {
+                    if !expect_hygiene_optout {
+                        sess.span_diagnostic.span_err(
+                            span,
+                            "hygiene opt-out syntax is not allowed here"
+                        );
+
+                        return TokenTree::Token(span, token::Pound, TokenHygiene::DefSite);
+                    }
+
+                    if let tokenstream::TokenTree::Token(span, tok @ token::Ident(..)) =
                     trees.next().unwrap() {
-                    TokenTree::Token(span, tok, TokenHygiene::CallSite)
-                } else {
-                    unreachable!();
+                        TokenTree::Token(span, tok, TokenHygiene::CallSite)
+                    } else {
+                        unreachable!();
+                    }
                 }
-            }
 
-            Some(tokenstream::TokenTree::Token(_, token::Lifetime(..))) => {
-                if let tokenstream::TokenTree::Token(span, tok @ token::Lifetime(..)) =
+                Some(tokenstream::TokenTree::Token(_, token::Lifetime(..))) => {
+                    if !expect_hygiene_optout {
+                        sess.span_diagnostic.span_err(
+                            span,
+                            "hygiene opt-out syntax is not allowed here"
+                        );
+
+                        return TokenTree::Token(span, token::Pound, TokenHygiene::DefSite);
+                    }
+
+                    if let tokenstream::TokenTree::Token(span, tok @ token::Lifetime(..)) =
                     trees.next().unwrap() {
-                    TokenTree::Token(span, tok, TokenHygiene::CallSite)
-                } else {
-                    unreachable!();
+                        TokenTree::Token(span, tok, TokenHygiene::CallSite)
+                    } else {
+                        unreachable!();
+                    }
                 }
+
+                Some(tokenstream::TokenTree::Token(_, token::Interpolated(..))) => {
+                    if !expect_hygiene_optout {
+                        sess.span_diagnostic.span_err(
+                            span,
+                            "hygiene opt-out syntax is not allowed here"
+                        );
+                    } else {
+                        sess.span_diagnostic.span_err(
+                            span,
+                            "hygiene opt-out syntax is not allowed for substituted parameters"
+                        );
+                    }
+
+                    return TokenTree::Token(span, token::Pound, TokenHygiene::DefSite);
+                }
+
+                _ => TokenTree::Token(span, token::Pound, TokenHygiene::DefSite),
             }
 
-            _ => TokenTree::Token(span, token::Pound, TokenHygiene::DefSite),
-        }
+        // `tree` is a `$` token.
+        // Look at the next token in `trees`.
+        tokenstream::TokenTree::Token(span, token::Dollar) => {
+            match trees.peek() {
+                Some(tokenstream::TokenTree::Token(pound_span, token::Pound))
+                if hygiene_optout_enabled => {
+                    // Always disallow `$#ident` syntax. (This may change in the future.)
+                    sess.span_diagnostic.span_err(
+                        *pound_span,
+                        "hygiene opt-out syntax of the form `$#ident` is not allowed"
+                    );
 
-        // `tree` is a `$` token. Look at the next token in `trees`.
-        tokenstream::TokenTree::Token(span, token::Dollar) =>
-            parse_meta_var(span,
-                           TokenHygiene::DefSite,
+                    return TokenTree::Token(span, token::Dollar, TokenHygiene::DefSite);
+                }
+                _ => (),
+            };
+
+            parse_meta_var(tree,
                            trees,
-                           hygiene_optout,
+                           TokenHygiene::DefSite,
+                           expect_hygiene_optout,
                            expect_matchers,
+                           legacy,
                            sess,
                            features,
-                           attrs),
+                           attrs)
+        }
 
         // `tree` is an arbitrary token. Keep it.
         tokenstream::TokenTree::Token(span, tok) =>
@@ -334,8 +394,9 @@ where
             Lrc::new(Delimited {
                 delim: delimited.delim,
                 tts: parse(delimited.tts.into(),
-                           hygiene_optout,
+                           expect_hygiene_optout,
                            expect_matchers,
+                           legacy,
                            sess,
                            features,
                            attrs),
@@ -345,12 +406,26 @@ where
 }
 
 /// Attempt to parse a single meta variable or meta variable sequence.
+///
+/// # Parameters
+///
+/// - `tree`: the tree we wish to convert.
+/// - `trees`: an iterator over trees. We may need to read more tokens from it in order to finish
+///   converting `tree`
+/// - `hygiene`: the hygiene that the token just parsed should be assigned.
+/// - `expect_hygiene_optout`: same as for `parse` (see above).
+/// - `expect_matchers`: same as for `parse` (see above).
+/// - `legacy`: whether we are parsing a legacy macro.
+/// - `sess`: the parsing session. Any errors will be emitted to this session.
+/// - `features`, `attrs`: language feature flags and attributes so that we know whether to use
+///   unstable features or not.
 fn parse_meta_var<I>(
-    span: Span,
-    token_hygiene: TokenHygiene,
+    tree: tokenstream::TokenTree,
     trees: &mut Peekable<I>,
-    hygiene_optout: bool,
+    hygiene: TokenHygiene,
+    expect_hygiene_optout: bool,
     expect_matchers: bool,
+    legacy: bool,
     sess: &ParseSess,
     features: &Features,
     attrs: &[ast::Attribute],
@@ -358,21 +433,30 @@ fn parse_meta_var<I>(
 where
     I: Iterator<Item = tokenstream::TokenTree>,
 {
+    let (span, tok) = if let tokenstream::TokenTree::Token(span, tok) = tree {
+        (span, tok)
+    } else {
+        unreachable!();
+    };
+
     match trees.next() {
         // `tree` is followed by a delimited set of token trees. This indicates the beginning
         // of a repetition sequence in the macro (e.g. `$(pat)*`).
         Some(tokenstream::TokenTree::Delimited(span, delimited)) => {
             // Must have `(` not `{` or `[`
             if delimited.delim != token::Paren {
-                let tok = pprust::token_to_string(&token::OpenDelim(delimited.delim));
-                let msg = format!("expected `(`, found `{}`", tok);
+                let msg = format!(
+                    "expected `(`, found `{}`",
+                    pprust::token_to_string(&token::OpenDelim(delimited.delim))
+                );
                 sess.span_diagnostic.span_err(span, &msg);
             }
             // Parse the contents of the sequence itself
             let sequence = parse(
                 delimited.tts.into(),
-                hygiene_optout,
+                expect_hygiene_optout,
                 expect_matchers,
+                legacy,
                 sess,
                 features,
                 attrs
@@ -399,9 +483,9 @@ where
             let span = ident_span.with_lo(span.lo());
             if ident.name == keywords::Crate.name() && !is_raw {
                 let ident = ast::Ident::new(keywords::DollarCrate.name(), ident.span);
-                TokenTree::Token(span, token::Ident(ident, is_raw), token_hygiene)
+                TokenTree::Token(span, token::Ident(ident, is_raw), hygiene)
             } else {
-                TokenTree::MetaVar(span, ident, token_hygiene)
+                TokenTree::MetaVar(span, ident, hygiene)
             }
         }
 
@@ -412,11 +496,11 @@ where
                 pprust::token_to_string(&tok)
             );
             sess.span_diagnostic.span_err(span, &msg);
-            TokenTree::MetaVar(span, keywords::Invalid.ident(), token_hygiene)
+            TokenTree::MetaVar(span, keywords::Invalid.ident(), hygiene)
         }
 
-        // There are no more tokens. Just return the `$` we already have.
-        None => TokenTree::Token(span, token::Dollar, TokenHygiene::DefSite),
+        // There are no more tokens. Just keep the token we already have.
+        None => TokenTree::Token(span, tok, TokenHygiene::DefSite),
     }
 }
 
