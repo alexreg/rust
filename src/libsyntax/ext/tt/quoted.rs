@@ -289,15 +289,20 @@ where
         tokenstream::TokenTree::Token(span, token::Pound) if hygiene_optout_enabled =>
             match trees.peek() {
                 Some(tokenstream::TokenTree::Token(_, token::Dollar)) => {
-                    parse_meta_var(trees.next().unwrap(),
-                                   trees,
-                                   TokenHygiene::CallSite,
-                                   expect_hygiene_optout,
-                                   expect_matchers,
-                                   legacy,
-                                   sess,
-                                   features,
-                                   attrs)
+                    if !expect_hygiene_optout {
+                        sess.span_diagnostic.span_err(
+                            span,
+                            "hygiene opt-out syntax is not allowed here"
+                        );
+                    } else {
+                        // Always disallow `#$ident` syntax. (This may change in the future.)
+                        sess.span_diagnostic.span_err(
+                            span,
+                            "hygiene opt-out syntax of the form `#$ident` is not allowed"
+                        );
+                    }
+
+                    return TokenTree::Token(span, token::Pound, TokenHygiene::DefSite);
                 }
 
                 Some(tokenstream::TokenTree::Token(_, token::Ident(..))) => {
@@ -336,22 +341,6 @@ where
                     }
                 }
 
-                Some(tokenstream::TokenTree::Token(_, token::Interpolated(..))) => {
-                    if !expect_hygiene_optout {
-                        sess.span_diagnostic.span_err(
-                            span,
-                            "hygiene opt-out syntax is not allowed here"
-                        );
-                    } else {
-                        sess.span_diagnostic.span_err(
-                            span,
-                            "hygiene opt-out syntax is not allowed for substituted parameters"
-                        );
-                    }
-
-                    return TokenTree::Token(span, token::Pound, TokenHygiene::DefSite);
-                }
-
                 _ => TokenTree::Token(span, token::Pound, TokenHygiene::DefSite),
             }
 
@@ -359,16 +348,28 @@ where
         // Look at the next token in `trees`.
         tokenstream::TokenTree::Token(span, token::Dollar) => {
             match trees.peek() {
-                Some(tokenstream::TokenTree::Token(pound_span, token::Pound))
+                Some(tokenstream::TokenTree::Token(_, token::Pound))
                 if hygiene_optout_enabled => {
-                    // Always disallow `$#ident` syntax. (This may change in the future.)
-                    sess.span_diagnostic.span_err(
-                        *pound_span,
-                        "hygiene opt-out syntax of the form `$#ident` is not allowed"
-                    );
+                    if let Some(tokenstream::TokenTree::Token(pound_span, token::Pound))
+                    = trees.next() {
+                        if !expect_hygiene_optout {
+                            sess.span_diagnostic.span_err(
+                                span,
+                                "hygiene opt-out syntax is not allowed here"
+                            );
+                        } else {
+                            // Always disallow `$#ident` syntax. (This may change in the future.)
+                            sess.span_diagnostic.span_err(
+                                pound_span,
+                                "hygiene opt-out syntax of the form `$#ident` is not allowed"
+                            );
+                        }
 
-                    return TokenTree::Token(span, token::Dollar, TokenHygiene::DefSite);
-                }
+                        return TokenTree::Token(span, token::Dollar, TokenHygiene::DefSite);
+                    } else {
+                        unreachable!();
+                    }
+                },
                 _ => (),
             };
 

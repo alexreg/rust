@@ -150,7 +150,7 @@ pub fn transcribe(cx: &ExtCtxt,
                 }
             }
             // FIXME #2887: think about span stuff here
-            quoted::TokenTree::MetaVar(mut sp, ident, _escape_hygiene) => {
+            quoted::TokenTree::MetaVar(mut sp, ident, _hygiene) => {
                 if let Some(cur_matched) = lookup_cur_matched(ident, &interpolations, &repeats) {
                     if let MatchedNonterminal(ref nt) = *cur_matched {
                         if let NtTT(ref tt) = **nt {
