@@ -1,4 +1,4 @@
-error[E0080]: this constant likely exhibits undefined behavior
+error[E0080]: it is undefined behavior to use this value
   --> $DIR/ub-uninhabit.rs:19:1
    |
 LL | const BAD_BAD_BAD: Bar = unsafe { Foo { a: 1 }.b};

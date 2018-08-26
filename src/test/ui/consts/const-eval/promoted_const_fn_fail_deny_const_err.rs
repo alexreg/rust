@@ -8,11 +8,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-// compile-pass
-
 #![feature(const_fn, const_fn_union)]
 
-#![allow(const_err)]
+#![deny(const_err)]
 
 union Bar {
     a: &'static u8,

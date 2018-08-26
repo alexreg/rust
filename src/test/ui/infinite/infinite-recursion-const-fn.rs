@@ -11,8 +11,8 @@
 //https://github.com/rust-lang/rust/issues/31364
 
 #![feature(min_const_fn)]
-const fn a() -> usize { b() }
+const fn a() -> usize { b() } //~ ERROR evaluation of constant value failed
 const fn b() -> usize { a() }
-const ARR: [i32; a()] = [5; 6]; //~ ERROR could not evaluate constant expression
+const ARR: [i32; a()] = [5; 6];
 
 fn main(){}

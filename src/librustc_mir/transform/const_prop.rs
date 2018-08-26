@@ -18,7 +18,7 @@ use rustc::mir::{NullOp, UnOp, StatementKind, Statement, BasicBlock, LocalKind};
 use rustc::mir::{TerminatorKind, ClearCrossCrate, SourceInfo, BinOp, ProjectionElem};
 use rustc::mir::visit::{Visitor, PlaceContext};
 use rustc::mir::interpret::{
-    ConstEvalErr, EvalErrorKind, ScalarMaybeUndef, Scalar, GlobalId, EvalResult
+    ConstEvalErr, EvalErrorKind, ScalarMaybeUndef, Scalar, GlobalId, EvalResult,
 };
 use rustc::ty::{TyCtxt, self, Instance};
 use interpret::{EvalContext, CompileTimeEvaluator, eval_promoted, mk_borrowck_eval_cx};
@@ -45,12 +45,17 @@ impl MirPass for ConstProp {
             return;
         }
         match tcx.describe_def(source.def_id) {
-            // skip statics/consts because they'll be evaluated by miri anyway
-            Some(Def::Const(..)) |
-            Some(Def::Static(..)) => return,
-            // we still run on associated constants, because they might not get evaluated
-            // within the current crate
-            _ => {},
+            // Only run const prop on functions, methods, closures and associated constants
+            | Some(Def::Fn(_))
+            | Some(Def::Method(_))
+            | Some(Def::AssociatedConst(_))
+            | Some(Def::Closure(_))
+            => {}
+            // skip anon_const/statics/consts because they'll be evaluated by miri anyway
+            def => {
+                trace!("ConstProp skipped for {:?} ({:?})", source.def_id, def);
+                return
+            },
         }
         trace!("ConstProp starting for {:?}", source.def_id);
 
@@ -144,8 +149,8 @@ impl<'b, 'a, 'tcx:'b> ConstPropagator<'b, 'a, 'tcx> {
         let r = match f(self) {
             Ok(val) => Some(val),
             Err(error) => {
-                let (stacktrace, span) = self.ecx.generate_stacktrace(None);
-                let diagnostic = ConstEvalErr { span, error, stacktrace };
+                let stacktrace = self.ecx.generate_stacktrace(None);
+                let diagnostic = ConstEvalErr { span: source_info.span, error, stacktrace };
                 use rustc::mir::interpret::EvalErrorKind::*;
                 match diagnostic.error.kind {
                     // don't report these, they make no sense in a const prop context
@@ -207,7 +212,7 @@ impl<'b, 'a, 'tcx:'b> ConstPropagator<'b, 'a, 'tcx> {
                     | ReadFromReturnPointer
                     | GeneratorResumedAfterReturn
                     | GeneratorResumedAfterPanic
-                    | ReferencedConstant(_)
+                    | ReferencedConstant
                     | InfiniteLoop
                     => {
                         // FIXME: report UB here
@@ -222,7 +227,6 @@ impl<'b, 'a, 'tcx:'b> ConstPropagator<'b, 'a, 'tcx> {
                     | UnimplementedTraitSelection
                     | TypeckError
                     | TooGeneric
-                    | CheckMatchError
                     // these are just noise
                     => {},
 
@@ -263,16 +267,11 @@ impl<'b, 'a, 'tcx:'b> ConstPropagator<'b, 'a, 'tcx> {
                 Some((op, c.span))
             },
             Err(error) => {
-                let (stacktrace, span) = self.ecx.generate_stacktrace(None);
-                let err = ConstEvalErr {
-                    span,
-                    error,
-                    stacktrace,
+                let stacktrace = self.ecx.generate_stacktrace(None);
+                let err = ::rustc::mir::interpret::ConstEvalErr {
+                    error, stacktrace, span: source_info.span,
                 };
-                err.report_as_error(
-                    self.tcx.at(source_info.span),
-                    "could not evaluate constant",
-                );
+                err.report_as_error(self.ecx.tcx, "erroneous constant used");
                 None
             },
         }

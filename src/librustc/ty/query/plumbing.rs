@@ -1051,6 +1051,7 @@ pub fn force_from_dep_node<'a, 'gcx, 'lcx>(tcx: TyCtxt<'a, 'gcx, 'lcx>,
         DepKind::NeedsDrop |
         DepKind::Layout |
         DepKind::ConstEval |
+        DepKind::ConstEvalRaw |
         DepKind::InstanceSymbolName |
         DepKind::MirShim |
         DepKind::BorrowCheckKrate |

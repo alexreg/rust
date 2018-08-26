@@ -71,6 +71,7 @@ pub enum Def {
     VariantCtor(DefId, CtorKind), // DefId refers to the enum variant
     Method(DefId),
     AssociatedConst(DefId),
+    Closure(hir::BodyId),
 
     Local(ast::NodeId),
     Upvar(ast::NodeId,  // node id of closed over local
@@ -276,6 +277,7 @@ impl Def {
                 id
             }
 
+            Def::Closure(_) |
             Def::Local(..) |
             Def::Upvar(..) |
             Def::Label(..)  |
@@ -313,6 +315,7 @@ impl Def {
             Def::Trait(..) => "trait",
             Def::ForeignTy(..) => "foreign type",
             Def::Method(..) => "method",
+            Def::Closure(_) => "closure",
             Def::Const(..) => "constant",
             Def::AssociatedConst(..) => "associated constant",
             Def::TyParam(..) => "type parameter",

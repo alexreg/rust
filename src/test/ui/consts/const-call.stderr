@@ -4,7 +4,7 @@ error[E0015]: calls in constants are limited to constant functions, tuple struct
 LL |     let _ = [0; f(2)];
    |                 ^^^^
 
-error[E0080]: could not evaluate repeat length
+error[E0080]: evaluation of constant value failed
   --> $DIR/const-call.rs:16:17
    |
 LL |     let _ = [0; f(2)];

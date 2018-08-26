@@ -94,6 +94,7 @@ pub fn provide(providers: &mut Providers) {
     shim::provide(providers);
     transform::provide(providers);
     providers.const_eval = interpret::const_eval_provider;
+    providers.const_eval_raw = interpret::const_eval_raw_provider;
     providers.check_match = hair::pattern::check_match;
 }
 

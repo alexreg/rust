@@ -840,15 +840,8 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
                                                     violations)
             }
 
-            ConstEvalFailure(ref err) => {
-                match err.struct_error(
-                    self.tcx.at(span),
-                    "could not evaluate constant expression",
-                ) {
-                    Some(err) => err,
-                    None => return,
-                }
-            }
+            // already reported in the query
+            ConstEvalFailure => return,
 
             Overflow => {
                 bug!("overflow should be handled before the `report_selection_error` path");

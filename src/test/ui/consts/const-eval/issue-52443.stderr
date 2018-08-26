@@ -37,13 +37,11 @@ error[E0019]: constant contains unimplemented expression type
 LL |     [(); { for _ in 0usize.. {}; 0}]; //~ ERROR calls in constants are limited to constant functions
    |                     ^^^^^^^^
 
-error[E0080]: could not evaluate repeat length
-  --> $DIR/issue-52443.rs:15:10
+error[E0080]: evaluation of constant value failed
+  --> $DIR/issue-52443.rs:15:21
    |
 LL |     [(); { for _ in 0usize.. {}; 0}]; //~ ERROR calls in constants are limited to constant functions
-   |          ^^^^^^^^^^^--------^^^^^^^
-   |                     |
-   |                     calling non-const fn `<I as std::iter::IntoIterator><std::ops::RangeFrom<usize>>::into_iter`
+   |                     ^^^^^^^^ calling non-const fn `<I as std::iter::IntoIterator><std::ops::RangeFrom<usize>>::into_iter`
 
 error: aborting due to 6 previous errors
 
