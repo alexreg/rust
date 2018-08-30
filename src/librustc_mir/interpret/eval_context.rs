@@ -25,6 +25,7 @@ use rustc::ty::query::TyCtxtAt;
 use rustc_data_structures::indexed_vec::IndexVec;
 use rustc_data_structures::stable_hasher::{HashStable, StableHasher, StableHasherResult};
 use rustc::mir::interpret::{
+    ErrorHandled,
     GlobalId, Scalar, FrameInfo, AllocId,
     EvalResult, EvalErrorKind,
     ScalarMaybeUndef,
@@ -595,8 +596,11 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M
         } else {
             self.param_env
         };
-        self.tcx.const_eval(param_env.and(gid)).map_err(|_| {
-            EvalErrorKind::ReferencedConstant.into()
+        self.tcx.const_eval(param_env.and(gid)).map_err(|err| {
+            match err {
+                ErrorHandled::Reported => EvalErrorKind::ReferencedConstant.into(),
+                ErrorHandled::TooGeneric => EvalErrorKind::TooGeneric.into(),
+            }
         })
     }
 
