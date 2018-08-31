@@ -23,7 +23,7 @@ use rustc::ty::{self, Instance, query::TyCtxtAt};
 use rustc::ty::layout::{self, Align, TargetDataLayout, Size, HasDataLayout};
 use rustc::mir::interpret::{Pointer, AllocId, Allocation, ConstValue, ScalarMaybeUndef, GlobalId,
                             EvalResult, Scalar, EvalErrorKind, AllocType, PointerArithmetic,
-                            truncate};
+                            truncate, ErrorHandled};
 pub use rustc::mir::interpret::{write_target_uint, read_target_uint};
 use rustc_data_structures::fx::{FxHashSet, FxHashMap};
 
@@ -288,7 +288,10 @@ impl<'a, 'mir, 'tcx, M: Machine<'mir, 'tcx>> Memory<'a, 'mir, 'tcx, M> {
         tcx.const_eval_raw(ty::ParamEnv::reveal_all().and(gid)).map_err(|err| {
             // no need to report anything, the const_eval call takes care of that for statics
             assert!(tcx.is_static(def_id).is_some());
-            EvalErrorKind::ReferencedConstant(err).into()
+            match err {
+                ErrorHandled::Reported => EvalErrorKind::ReferencedConstant.into(),
+                ErrorHandled::TooGeneric => EvalErrorKind::TooGeneric.into(),
+            }
         }).map(|const_val| {
             if let ConstValue::ByRef(_, allocation, _) = const_val.val {
                 allocation
