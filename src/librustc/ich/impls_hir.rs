@@ -1023,7 +1023,6 @@ impl_stable_hash_for!(enum hir::def::Def {
     StructCtor(def_id, ctor_kind),
     VariantCtor(def_id, ctor_kind),
     Method(def_id),
-    Closure(body_id),
     AssociatedConst(def_id),
     Local(def_id),
     Upvar(def_id, index, expr_id),
