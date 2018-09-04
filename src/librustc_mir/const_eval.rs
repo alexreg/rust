@@ -485,8 +485,10 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
     }).map_err(|error| {
         let stacktrace = ecx.generate_stacktrace(None);
         let err = ConstEvalErr { error, stacktrace, span: ecx.tcx.span };
+        // errors in statics are always emitted as fatal errors
         if tcx.is_static(def_id).is_some() {
             let err = err.report_as_error(ecx.tcx, "could not evaluate static initializer");
+            // check that a static never produces `TooGeneric`
             if tcx.sess.err_count() == 0 {
                 span_bug!(ecx.tcx.span, "static eval failure didn't emit an error: {:#?}", err);
             }
@@ -494,6 +496,8 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
         } else if def_id.is_local() {
             // constant defined in this crate, we can figure out a lint level!
             match tcx.describe_def(def_id) {
+                // constants never produce a hard error at the definition site. Anything else is
+                // a backwards compatibility hazard (and will break old versions of winapi for sure)
                 Some(Def::Const(_)) | Some(Def::AssociatedConst(_)) => {
                     let node_id = tcx.hir.as_local_node_id(def_id).unwrap();
                     err.report_as_lint(
@@ -502,6 +506,8 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
                         node_id,
                     )
                 },
+                // promoting runtime code is only allowed to error if it references broken constants
+                // any other kind of error will be reported to the user as a deny-by-default lint
                 _ => if let Some(p) = cid.promoted {
                     let span = tcx.optimized_mir(def_id).promoted[p].span;
                     if let EvalErrorKind::ReferencedConstant = err.error.kind {
@@ -516,6 +522,8 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
                             tcx.hir.as_local_node_id(def_id).unwrap(),
                         )
                     }
+                // anything else (array lengths, enum initializers, constant patterns) are reported
+                // as hard errors
                 } else {
                     err.report_as_error(
                         ecx.tcx,
@@ -524,7 +532,7 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
                 },
             }
         } else {
-            // use of constant from other crate
+            // use of broken constant from other crate
             err.report_as_error(ecx.tcx, "could not evaluate constant")
         }
     })
