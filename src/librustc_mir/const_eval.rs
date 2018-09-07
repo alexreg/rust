@@ -22,7 +22,7 @@ use rustc::ty::layout::{LayoutOf, TyLayout};
 use rustc::ty::subst::Subst;
 use rustc::traits::Reveal;
 use rustc::util::nodemap::FxHashSet;
-use rustc_data_structures::indexed_vec::{IndexVec, Idx};
+use rustc_data_structures::indexed_vec::IndexVec;
 use rustc::util::common::ErrorReported;
 
 use syntax::ast::Mutability;
