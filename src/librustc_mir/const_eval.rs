@@ -1,4 +1,4 @@
-// Not in interpret to make sure we do not use private implementation details
+// This is not in `interpret` to make sure we do not use private implementation details.
 
 use std::fmt;
 use std::error::Error;
@@ -563,7 +563,7 @@ pub fn const_eval_provider<'a, 'tcx>(
     tcx: TyCtxt<'a, 'tcx, 'tcx>,
     key: ty::ParamEnvAnd<'tcx, GlobalId<'tcx>>,
 ) -> ::rustc::mir::interpret::ConstEvalResult<'tcx> {
-    // see comment in const_eval_provider for what we're doing here
+    // See comment in `const_eval_provider` for what we're doing here.
     if key.param_env.reveal == Reveal::All {
         let mut key = key.clone();
         key.param_env.reveal = Reveal::UserFacing;

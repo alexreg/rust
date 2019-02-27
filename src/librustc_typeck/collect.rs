@@ -252,8 +252,8 @@ fn type_param_predicates<'a, 'tcx>(
     use rustc::hir::*;
 
     // In the AST, bounds can derive from two places. Either
-    // written inline like `<T : Foo>` or in a where clause like
-    // `where T : Foo`.
+    // written inline like `<T: Foo>` or in a `where` clause like
+    // `where T: Foo`.
 
     let param_id = tcx.hir().as_local_node_id(def_id).unwrap();
     let param_owner = tcx.hir().ty_param_owner(param_id);
@@ -715,9 +715,9 @@ fn super_predicates_of<'a, 'tcx>(
 
     let superbounds1 = superbounds1.predicates(tcx, self_param_ty);
 
-    // Convert any explicit superbounds in the where clause,
-    // e.g., `trait Foo where Self : Bar`.
-    // In the case of trait aliases, however, we include all bounds in the where clause,
+    // Convert any explicit superbounds in the `where` clause,
+    // e.g., `trait Foo where Self: Bar`.
+    // In the case of trait aliases, however, we include all bounds in the `where` clause,
     // so e.g., `trait Foo = where u32: PartialEq<Self>` would include `u32: PartialEq<Self>`
     // as one of its "superpredicates".
     let is_trait_alias = tcx.is_trait_alias(trait_def_id);
@@ -935,8 +935,8 @@ fn generics_of<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> &'tcx ty
                 | ItemKind::TraitAlias(ref generics, ..) => {
                     // Add in the self type parameter.
                     //
-                    // Something of a hack: use the node id for the trait, also as
-                    // the node id for the Self type parameter.
+                    // Something of a hack: use the `NodeId` for the trait, also as
+                    // the `NodeId` for the Self type parameter.
                     let param_id = item.id;
 
                     opt_self = Some(ty::GenericParamDef {
@@ -1205,7 +1205,7 @@ fn type_of<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> Ty<'tcx> {
                     impl_trait_fn: None,
                     ..
                 }) => find_existential_constraints(tcx, def_id),
-                // existential types desugared from impl Trait
+                // Existential types desugared from `impl Trait`.
                 ItemKind::Existential(hir::ExistTy {
                     impl_trait_fn: Some(owner),
                     ..
@@ -1640,7 +1640,7 @@ fn impl_polarity<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> hir::I
     }
 }
 
-// Is it marked with ?Sized
+// Returns whether the given bounds include `?Sized`.
 fn is_unsized<'gcx: 'tcx, 'tcx>(
     astconv: &dyn AstConv<'gcx, 'tcx>,
     ast_bounds: &[hir::GenericBound],
@@ -1694,7 +1694,7 @@ fn is_unsized<'gcx: 'tcx, 'tcx>(
 /// Returns the early-bound lifetimes declared in this generics
 /// listing. For anything other than fns/methods, this is just all
 /// the lifetimes that are declared. For fns or methods, we have to
-/// screen out those that do not appear in any where-clauses etc using
+/// screen out those that do not appear in any `where` clauses etc using
 /// `resolve_lifetime::early_bound_lifetimes`.
 fn early_bound_lifetimes_from_generics<'a, 'tcx>(
     tcx: TyCtxt<'a, 'tcx, 'tcx>,
@@ -1917,7 +1917,7 @@ fn explicit_predicates_of<'a, 'tcx>(
     let has_own_self = generics.has_self && parent_count == 0;
 
     // Below we'll consider the bounds on the type parameters (including `Self`)
-    // and the explicit where-clauses, but to get the full set of predicates
+    // and the explicit `where` clauses, but to get the full set of predicates
     // on a trait we need to add in the supertrait bounds and bounds found on
     // associated types.
     if let Some((_trait_ref, _)) = is_trait {
@@ -1929,7 +1929,7 @@ fn explicit_predicates_of<'a, 'tcx>(
     //
     //     default impl Foo for Bar { .. }
     //
-    // we add a default where clause `Foo: Bar`. We do a similar thing for traits
+    // we add a default `where` clause `Foo: Bar`. We do a similar thing for traits
     // (see below). Recall that a default impl is not itself an impl, but rather a
     // set of defaults that can be incorporated into another impl.
     if let Some(trait_ref) = is_default_impl_trait {
@@ -1977,7 +1977,7 @@ fn explicit_predicates_of<'a, 'tcx>(
         }
     }
 
-    // Add in the bounds that appear in the where-clause
+    // Add in the bounds that appear in the `where` clause.
     let where_clause = &ast_generics.where_clause;
     for predicate in &where_clause.predicates {
         match predicate {

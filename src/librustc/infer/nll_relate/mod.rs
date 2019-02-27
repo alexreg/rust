@@ -219,8 +219,8 @@ where
         first_free_index: ty::DebruijnIndex,
         scopes: &[BoundRegionScope<'tcx>],
     ) -> ty::Region<'tcx> {
-        // The debruijn index is a "reverse index" into the
-        // scopes listing. So when we have INNERMOST (0), we
+        // The De Bruijn index is a "reverse index" into the
+        // scopes listing. So when we have `INNERMOST` (`0`), we
         // want the *last* scope pushed, and so forth.
         let debruijn_index = debruijn.index() - first_free_index.index();
         let scope = &scopes[scopes.len() - debruijn_index - 1];

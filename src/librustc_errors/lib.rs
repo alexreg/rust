@@ -559,7 +559,7 @@ impl Handler {
     }
     pub fn delay_span_bug<S: Into<MultiSpan>>(&self, sp: S, msg: &str) {
         if self.flags.treat_err_as_bug {
-            // FIXME: don't abort here if report_delayed_bugs is off
+            // FIXME: don't abort here if `report_delayed_bugs` is off.
             self.span_bug(sp, msg);
         }
         let mut diagnostic = Diagnostic::new(Level::Bug, msg);

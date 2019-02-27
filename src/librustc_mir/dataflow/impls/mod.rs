@@ -472,10 +472,10 @@ impl<'a, 'gcx, 'tcx> BitDenotation<'tcx> for EverInitializedPlaces<'a, 'gcx, 'tc
         match stmt.kind {
             mir::StatementKind::StorageDead(local) |
             mir::StatementKind::StorageLive(local) => {
-                // End inits for StorageDead and StorageLive, so that an immutable
+                // End inits for `StorageDead` and `StorageLive`, so that an immutable
                 // variable can be reinitialized on the next iteration of the loop.
                 //
-                // FIXME(#46525): We *need* to do this for StorageLive as well as
+                // FIXME(#46525): We *need* to do this for `StorageLive` as well as
                 // StorageDead, because lifetimes of match bindings with guards are
                 // weird - i.e., this code
                 //

@@ -80,7 +80,7 @@ fn compare_predicate_entailment<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                           -> Result<(), ErrorReported> {
     let trait_to_impl_substs = impl_trait_ref.substs;
 
-    // This node-id should be used for the `body_id` field on each
+    // This `NodeId` should be used for the `body_id` field on each
     // `ObligationCause` (and the `FnCtxt`). This is what
     // `regionck_item` expects.
     let impl_m_node_id = tcx.hir().as_local_node_id(impl_m.def_id).unwrap();
@@ -133,8 +133,8 @@ fn compare_predicate_entailment<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     //
     // We now want to extract and substitute the type of the *trait*
     // method and compare it. To do so, we must create a compound
-    // substitution by combining trait_to_impl_substs and
-    // impl_to_skol_substs, and also adding a mapping for the method
+    // substitution by combining `trait_to_impl_substs` and
+    // `impl_to_skol_substs`, and also adding a mapping for the method
     // type parameters. We extend the mapping to also include
     // the method parameters.
     //
@@ -144,20 +144,20 @@ fn compare_predicate_entailment<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     //
     //     <'a> fn(t: &'i0 U0, m: &'a) -> Foo
     //
-    // This type is also the same but the name of the bound region ('a
-    // vs 'b).  However, the normal subtyping rules on fn types handle
+    // This type is also the same but the name of the bound region (`'a`
+    // vs. `'b`).  However, the normal subtyping rules on fn types handle
     // this kind of equivalency just fine.
     //
     // We now use these substitutions to ensure that all declared bounds are
     // satisfied by the implementation's method.
     //
     // We do this by creating a parameter environment which contains a
-    // substitution corresponding to impl_to_skol_substs. We then build
-    // trait_to_skol_substs and use it to convert the predicates contained
-    // in the trait_m.generics to the placeholder form.
+    // substitution corresponding to `impl_to_skol_substs`. We then build
+    // `trait_to_skol_substs` and use it to convert the predicates contained
+    // in the `trait_m.generics` to the placeholder form.
     //
     // Finally we register each of these predicates as an obligation in
-    // a fresh FulfillmentCtxt, and invoke select_all_or_error.
+    // a fresh `FulfillmentCtxt`, and invoke `select_all_or_error`.
 
     // Create mapping from impl to placeholder.
     let impl_to_skol_substs = InternalSubsts::identity_for_item(tcx, impl_m.def_id);
@@ -204,7 +204,7 @@ fn compare_predicate_entailment<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         trait_m_predicates.instantiate_own(tcx, trait_to_skol_substs).predicates);
 
     // Construct trait parameter environment and then shift it into the placeholder viewpoint.
-    // The key step here is to update the caller_bounds's predicates to be
+    // The key step here is to update the `caller_bounds`'s predicates to be
     // the new hybrid bounds we computed.
     let normalize_cause = traits::ObligationCause::misc(impl_m_span, impl_m_hir_id);
     let param_env = ty::ParamEnv::new(
@@ -715,11 +715,11 @@ fn compare_synthetic_generics<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                         impl_m: &ty::AssociatedItem,
                                         trait_m: &ty::AssociatedItem)
                                         -> Result<(), ErrorReported> {
-    // FIXME(chrisvittal) Clean up this function, list of FIXME items:
-    //     1. Better messages for the span labels
-    //     2. Explanation as to what is going on
-    // If we get here, we already have the same number of generics, so the zip will
-    // be okay.
+    // FIXME(chrisvittal): clean up this function.
+    //     1. Better messages for the span labels.
+    //     2. Explanation as to what is going on.
+    // If we get here, we already have the same number of generics, so the `zip` will
+    // be ok.
     let mut error_found = false;
     let impl_m_generics = tcx.generics_of(impl_m.def_id);
     let trait_m_generics = tcx.generics_of(trait_m.def_id);
@@ -951,7 +951,7 @@ pub fn compare_const_impl<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
 
             let trait_c_node_id = tcx.hir().as_local_node_id(trait_c.def_id);
             let trait_c_span = trait_c_node_id.map(|trait_c_node_id| {
-                // Add a label to the Span containing just the type of the const
+                // Add a label to the `Span` containing just the type of the const.
                 match tcx.hir().expect_trait_item(trait_c_node_id).node {
                     TraitItemKind::Const(ref ty, _) => ty.span,
                     _ => bug!("{:?} is not a trait const", trait_c),

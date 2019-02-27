@@ -1094,7 +1094,7 @@ fn external_generic_args(cx: &DocContext<'_, '_, '_>, trait_did: Option<DefId>, 
     let types = substs.types().skip(has_self as usize).collect::<Vec<_>>();
 
     match trait_did {
-        // Attempt to sugar an external path like Fn<(A, B,), C> to Fn(A, B) -> C
+        // Attempt to sugar an external path like `Fn<(A, B,), C>` to `Fn(A, B) -> C`.
         Some(did) if cx.tcx.lang_items().fn_trait_kind(did).is_some() => {
             assert_eq!(types.len(), 1);
             let inputs = match types[0].sty {
@@ -1477,7 +1477,7 @@ impl<'tcx> Clean<GenericParamDef> for ty::GenericParamDef {
                 };
                 (self.name.clean(cx), GenericParamDefKind::Type {
                     did: self.def_id,
-                    bounds: vec![], // These are filled in from the where-clauses.
+                    bounds: vec![], // These are filled in from the `where` clauses.
                     default,
                     synthetic: None,
                 })

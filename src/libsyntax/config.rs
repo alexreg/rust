@@ -261,13 +261,13 @@ impl<'a> StripUnconfigured<'a> {
     pub fn configure_expr(&mut self, expr: &mut P<ast::Expr>) {
         self.visit_expr_attrs(expr.attrs());
 
-        // If an expr is valid to cfg away it will have been removed by the
-        // outer stmt or expression folder before descending in here.
-        // Anything else is always required, and thus has to error out
-        // in case of a cfg attr.
+        // If an expr is valid to `cfg` away, it will have been removed by the
+        // outer statement or expression folder before descending into here.
+        // Anything else is always required, and thus has to error out in case
+        // of a `cfg` attr.
         //
-        // N.B., this is intentionally not part of the visit_expr() function
-        //     in order for filter_map_expr() to be able to avoid this check
+        // N.B., this is intentionally not part of the `visit_expr()` function
+        // in order for `filter_map_expr()` to be able to avoid this check.
         if let Some(attr) = expr.attrs().iter().find(|a| is_cfg(a)) {
             let msg = "removing an expression is not supported in this position";
             self.sess.span_diagnostic.span_err(attr.span, msg);

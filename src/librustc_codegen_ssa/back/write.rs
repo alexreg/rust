@@ -560,8 +560,8 @@ fn produce_final_output_artifacts(sess: &Session,
         match *output_type {
             OutputType::Bitcode => {
                 user_wants_bitcode = true;
-                // Copy to .bc, but always keep the .0.bc.  There is a later
-                // check to figure out if we should delete .0.bc files, or keep
+                // Copy to `.bc`, but always keep the `.0.bc`. There is a later
+                // check to figure out if we should delete `.0.bc` files or keep
                 // them for making an rlib.
                 copy_if_one_unit(OutputType::Bitcode, true);
             }
@@ -585,30 +585,30 @@ fn produce_final_output_artifacts(sess: &Session,
     // Clean up unwanted temporary files.
 
     // We create the following files by default:
-    //  - #crate#.#module-name#.bc
-    //  - #crate#.#module-name#.o
-    //  - #crate#.crate.metadata.bc
-    //  - #crate#.crate.metadata.o
-    //  - #crate#.o (linked from crate.##.o)
-    //  - #crate#.bc (copied from crate.##.bc)
+    //  - `#crate#.#module-name#.bc`
+    //  - `#crate#.#module-name#.o`
+    //  - `#crate#.crate.metadata.bc`
+    //  - `#crate#.crate.metadata.o`
+    //  - `#crate#.o` (linked from `crate.##.o`)
+    //  - `#crate#.bc` (copied from `crate.##.bc`)
     // We may create additional files if requested by the user (through
     // `-C save-temps` or `--emit=` flags).
 
     if !sess.opts.cg.save_temps {
-        // Remove the temporary .#module-name#.o objects.  If the user didn't
-        // explicitly request bitcode (with --emit=bc), and the bitcode is not
-        // needed for building an rlib, then we must remove .#module-name#.bc as
+        // Remove the temporary `.#module-name#.o` objects.  If the user didn't
+        // explicitly request bitcode (with `--emit=bc`), and the bitcode is not
+        // needed for building an rlib, then we must remove `.#module-name#.bc` as
         // well.
 
         // Specific rules for keeping .#module-name#.bc:
         //  - If the user requested bitcode (`user_wants_bitcode`), and
-        //    codegen_units > 1, then keep it.
-        //  - If the user requested bitcode but codegen_units == 1, then we
-        //    can toss .#module-name#.bc because we copied it to .bc earlier.
+        //    `codegen_units > 1`, then keep it.
+        //  - If the user requested bitcode but `codegen_units == 1`, then we
+        //    can toss `.#module-name#.bc` because we copied it to .bc earlier.
         //  - If we're not building an rlib and the user didn't request
-        //    bitcode, then delete .#module-name#.bc.
-        // If you change how this works, also update back::link::link_rlib,
-        // where .#module-name#.bc files are (maybe) deleted after making an
+        //    bitcode, then delete `.#module-name#.bc`.
+        // If you change how this works, also update `back::link::link_rlib`,
+        // where `.#module-name#.bc` files are (maybe) deleted after making an
         // rlib.
         let needs_crate_object = crate_output.outputs.contains_key(&OutputType::Exe);
 
@@ -645,9 +645,9 @@ fn produce_final_output_artifacts(sess: &Session,
     }
 
     // We leave the following files around by default:
-    //  - #crate#.o
-    //  - #crate#.crate.metadata.o
-    //  - #crate#.bc
+    //  - `#crate#.o`
+    //  - `#crate#.crate.metadata.o`
+    //  - `#crate#.bc`
     // These are used in linking steps and will be cleaned up afterward.
 }
 

@@ -125,7 +125,7 @@ pub enum ScopeData {
     // (they outlive its body).
     Arguments,
 
-    // Scope of destructors for temporaries of node-id.
+    // Scope of destructors for temporaries of `NodeId`.
     Destruction,
 
     // Scope following a `let id = expr;` binding in a block.
@@ -922,7 +922,7 @@ fn resolve_expr<'a, 'tcx>(visitor: &mut RegionResolutionVisitor<'a, 'tcx>, expr:
                 // The idea is that call.callee_id represents *the time when
                 // the invoked function is actually running* and call.id
                 // represents *the time to prepare the arguments and make the
-                // call*.  See the section "Borrows in Calls" borrowck/README.md
+                // call*. See the section "Borrows in Calls" in `borrowck/README.md`
                 // for an extended explanation of why this distinction is
                 // important.
                 //
@@ -1043,7 +1043,7 @@ fn resolve_local<'a, 'tcx>(visitor: &mut RegionResolutionVisitor<'a, 'tcx>,
         }
     }
 
-    // Make sure we visit the initializer first, so expr_and_pat_count remains correct
+    // Make sure we visit the initializer first, so `expr_and_pat_count` remains correct.
     if let Some(expr) = init {
         visitor.visit_expr(expr);
     }

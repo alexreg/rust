@@ -47,7 +47,7 @@ pub fn insert_outlives_predicate<'tcx>(
                         // Here `outlived_region = 'a` and `kind = &'b
                         // u32`.  Decomposing `&'b u32` into
                         // components would yield `'b`, and we add the
-                        // where clause that `'b: 'a`.
+                        // `where` clause that `'b: 'a`.
                         insert_outlives_predicate(
                             tcx,
                             r.into(),
@@ -69,7 +69,7 @@ pub fn insert_outlives_predicate<'tcx>(
                         // Here `outlived_region = 'a` and `kind =
                         // Vec<U>`.  Decomposing `Vec<U>` into
                         // components would yield `U`, and we add the
-                        // where clause that `U: 'a`.
+                        // `where` clause that `U: 'a`.
                         let ty: Ty<'tcx> = param_ty.to_ty(tcx);
                         required_predicates
                             .insert(ty::OutlivesPredicate(ty.into(), outlived_region));

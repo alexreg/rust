@@ -715,11 +715,11 @@ impl<'o, 'gcx: 'tcx, 'tcx> dyn AstConv<'gcx, 'tcx> + 'o {
 
         let mut dup_bindings = FxHashMap::default();
         poly_projections.extend(assoc_bindings.iter().filter_map(|binding| {
-            // specify type to assert that error was already reported in Err case:
+            // Specify type to assert that error was already reported in `Err` case.
             let predicate: Result<_, ErrorReported> =
                 self.ast_type_binding_to_poly_projection_predicate(
                     trait_ref.ref_id, poly_trait_ref, binding, speculative, &mut dup_bindings);
-            // okay to ignore Err because of ErrorReported (see above)
+            // Okay to ignore `Err` because of `ErrorReported` (see above).
             Some((predicate.ok()?, binding.span))
         }));
 

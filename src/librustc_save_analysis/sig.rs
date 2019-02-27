@@ -23,7 +23,7 @@
 // Signatures do not include visibility info. I'm not sure if this is a feature
 // or an ommission (FIXME).
 //
-// FIXME where clauses need implementing, defs/refs in generics are mostly missing.
+// FIXME: `where` clauses need implementing, defs/refs in generics are mostly missing.
 
 use crate::{id_from_def_id, id_from_node_id, SaveContext};
 
@@ -495,7 +495,7 @@ impl Sig for ast::Item {
                     sig.text.push_str(": ");
                     sig.text.push_str(&pprust::bounds_to_string(bounds));
                 }
-                // FIXME where clause
+                // FIXME: `where` clause
                 sig.text.push_str(" {}");
 
                 Ok(sig)
@@ -514,7 +514,7 @@ impl Sig for ast::Item {
                     sig.text.push_str(" = ");
                     sig.text.push_str(&pprust::bounds_to_string(bounds));
                 }
-                // FIXME where clause
+                // FIXME: `where` clause
                 sig.text.push_str(";");
 
                 Ok(sig)
@@ -561,7 +561,7 @@ impl Sig for ast::Item {
 
                 Ok(merge_sigs(text, vec![generics_sig, trait_sig, ty_sig]))
 
-                // FIXME where clause
+                // FIXME: `where` clause
             }
             ast::ItemKind::ForeignMod(_) => Err("extern mod"),
             ast::ItemKind::GlobalAsm(_) => Err("glboal asm"),
@@ -614,7 +614,7 @@ impl Sig for ast::Path {
     }
 }
 
-// This does not cover the where clause, which must be processed separately.
+// This does not cover the `where` clause, which must be processed separately.
 impl Sig for ast::Generics {
     fn make(&self, offset: usize, _parent_id: Option<NodeId>, scx: &SaveContext<'_, '_>) -> Result {
         if self.params.is_empty() {
@@ -851,7 +851,7 @@ fn name_and_generics(
     };
     text.push_str(&name);
     let generics: Signature = generics.make(offset + text.len(), Some(id), scx)?;
-    // FIXME where clause
+    // FIXME: `where` clause
     let text = format!("{}{}", text, generics.text);
     Ok(extend_sig(generics, text, vec![def], vec![]))
 }

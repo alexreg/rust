@@ -255,8 +255,8 @@ impl<'a, 'gcx, 'tcx> ConfirmContext<'a, 'gcx, 'tcx> {
             }
 
             probe::WhereClausePick(ref poly_trait_ref) => {
-                // Where clauses can have bound regions in them. We need to instantiate
-                // those to convert from a poly-trait-ref to a trait-ref.
+                // `where` clauses can have bound regions in them. We need to instantiate
+                // those to convert from a `PolyTraitRef` to a `TraitRef`.
                 self.replace_bound_vars_with_fresh_vars(&poly_trait_ref).substs
             }
         }

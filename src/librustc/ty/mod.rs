@@ -154,7 +154,7 @@ impl AssociatedItemContainer {
 
 /// The "header" of an impl is everything outside the body: a Self type, a trait
 /// ref (in the case of a trait impl), and a set of predicates (from the
-/// bounds / where-clauses).
+/// bounds / `where` clauses).
 #[derive(Clone, PartialEq, Eq, Hash, Debug)]
 pub struct ImplHeader<'tcx> {
     pub impl_def_id: DefId,
@@ -196,7 +196,7 @@ impl AssociatedItem {
     }
 
     /// Tests whether the associated item admits a non-trivial implementation
-    /// for !
+    /// for `!`.
     pub fn relevant_for_never<'tcx>(&self) -> bool {
         match self.kind {
             AssociatedKind::Existential |
@@ -302,7 +302,7 @@ impl Visibility {
         self.is_accessible_from(vis_restriction, tree)
     }
 
-    // Returns `true` if this item is visible anywhere in the local crate.
+    // Returns whether this item is visible anywhere in the local crate.
     pub fn is_visible_locally(self) -> bool {
         match self {
             Visibility::Public => true,
@@ -1094,8 +1094,8 @@ impl<'tcx> AsRef<Predicate<'tcx>> for Predicate<'tcx> {
 
 impl<'a, 'gcx, 'tcx> Predicate<'tcx> {
     /// Performs a substitution suitable for going from a
-    /// poly-trait-ref to supertraits that must hold if that
-    /// poly-trait-ref holds. This is slightly different from a normal
+    /// `PolyTraitRef` to supertraits that must hold if that
+    /// `PolyTraitRef` holds. This is slightly different from a normal
     /// substitution in terms of what happens with bound regions. See
     /// lengthy comment below for details.
     pub fn subst_supertrait(&self, tcx: TyCtxt<'a, 'gcx, 'tcx>,
@@ -1209,7 +1209,7 @@ impl<'tcx> TraitPredicate<'tcx> {
 
 impl<'tcx> PolyTraitPredicate<'tcx> {
     pub fn def_id(&self) -> DefId {
-        // ok to skip binder since trait def-id does not care about regions
+        // Ok to skip binder since trait `DefId` does not care about regions.
         self.skip_binder().def_id()
     }
 }
@@ -1277,7 +1277,7 @@ impl<'tcx> PolyProjectionPredicate<'tcx> {
     /// Note that this is not the `DefId` of the `TraitRef` containing this
     /// associated type, which is in `tcx.associated_item(projection_def_id()).container`.
     pub fn projection_def_id(&self) -> DefId {
-        // okay to skip binder since trait def-id does not care about regions
+        // ok to skip binder since trait `DefId` does not care about regions
         self.skip_binder().projection_ty.item_def_id
     }
 }
@@ -1457,7 +1457,7 @@ impl<'tcx> Predicate<'tcx> {
 
 /// Represents the bounds declared on a particular set of type
 /// parameters. Should eventually be generalized into a flag list of
-/// where-clauses. You can obtain a `InstantiatedPredicates` list from a
+/// `where` clauses. You can obtain a `InstantiatedPredicates` list from a
 /// `GenericPredicates` by using the `instantiate` method. Note that this method
 /// reflects an important semantic invariant of `InstantiatedPredicates`: while
 /// the `GenericPredicates` are expressed in terms of the bound type
@@ -1597,7 +1597,7 @@ pub type PlaceholderRegion = Placeholder<BoundRegion>;
 pub type PlaceholderType = Placeholder<BoundVar>;
 
 /// When type checking, we use the `ParamEnv` to track
-/// details about the set of where-clauses that are in scope at this
+/// details about the set of `where` clauses that are in scope at this
 /// particular point.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ParamEnv<'tcx> {
@@ -1619,7 +1619,7 @@ pub struct ParamEnv<'tcx> {
 
 impl<'tcx> ParamEnv<'tcx> {
     /// Construct a trait environment suitable for contexts where
-    /// there are no where-clauses in scope. Hidden types (like `impl
+    /// there are no `where` clauses in scope. Hidden types (like `impl
     /// Trait`) are left hidden, so this is suitable for ordinary
     /// type-checking.
     #[inline]
@@ -1627,7 +1627,7 @@ impl<'tcx> ParamEnv<'tcx> {
         Self::new(List::empty(), Reveal::UserFacing, None)
     }
 
-    /// Construct a trait environment with no where-clauses in scope
+    /// Construct a trait environment with no `where` clauses in scope
     /// where the values of all `impl Trait` and other hidden types
     /// are revealed. This is suitable for monomorphized, post-typeck
     /// environments like codegen or doing optimizations.
@@ -1672,7 +1672,7 @@ impl<'tcx> ParamEnv<'tcx> {
     /// invisible.
     ///
     /// N.B., we preserve the environment when type-checking because it
-    /// is possible for the user to have wacky where-clauses like
+    /// is possible for the user to have wacky `where` clauses like
     /// `where Box<u32>: Copy`, which are clearly never
     /// satisfiable. We generally want to behave as if they were true,
     /// although the surrounding function is never reachable.
@@ -2476,9 +2476,9 @@ impl<'a, 'gcx, 'tcx> FieldDef {
 /// `tcx.closure_env_ty()`.
 #[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq, Hash, Debug, RustcEncodable, RustcDecodable)]
 pub enum ClosureKind {
-    // Warning: Ordering is significant here! The ordering is chosen
-    // because the trait Fn is a subtrait of FnMut and so in turn, and
-    // hence we order it so that Fn < FnMut < FnOnce.
+    // Warning: ordering is significant here! The ordering is chosen
+    // because the trait `Fn` is a subtrait of `FnMut` and so in turn, and
+    // hence we order it so that `Fn < FnMut < FnOnce`.
     Fn,
     FnMut,
     FnOnce,
@@ -2647,7 +2647,7 @@ pub enum ImplOverlapKind {
     /// 2. The trait-ref of both impls must be equal.
     /// 3. The trait-ref of both impls must be a trait object type consisting only of
     /// marker traits.
-    /// 4. Neither of the impls can have any where-clauses.
+    /// 4. Neither of the impls can have any `where` clauses.
     ///
     /// Once `traitobject` 0.1.0 is no longer an active concern, this hack can be removed.
     Issue33140
@@ -2871,16 +2871,16 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         }
     }
 
-    /// Given a `VariantDef`, returns the def-id of the `AdtDef` of which it is a part.
+    /// Given a `VariantDef`, returns the `DefId` of the `AdtDef` of which it is a part.
     pub fn adt_def_id_of_variant(self, variant_def: &'tcx VariantDef) -> DefId {
         let def_key = self.def_key(variant_def.did);
         match def_key.disambiguated_data.data {
-            // for enum variants and tuple structs, the def-id of the ADT itself
-            // is the *parent* of the variant
+            // For enum variants and tuple structs, the `DefId` of the ADT itself
+            // is the *parent* of the variant.
             DefPathData::EnumVariant(..) | DefPathData::StructCtor =>
                 DefId { krate: variant_def.did.krate, index: def_key.parent.unwrap() },
 
-            // otherwise, for structs and unions, they share a def-id
+            // Otherwise, for structs and unions, they share a `DefId`.
             _ => variant_def.did,
         }
     }
@@ -2890,7 +2890,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
             self.original_crate_name(id.krate).as_interned_str()
         } else {
             let def_key = self.def_key(id);
-            // The name of a StructCtor is that of its struct parent.
+            // The name of a `StructCtor` is that of its struct parent.
             if let hir_map::DefPathData::StructCtor = def_key.disambiguated_data.data {
                 self.item_name(DefId {
                     krate: id.krate,
@@ -3155,7 +3155,7 @@ fn param_env<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                        def_id: DefId)
                        -> ParamEnv<'tcx>
 {
-    // The param_env of an impl Trait type is its defining function's param_env
+    // The `ParamEnv` of an `impl Trait` type is its defining function's `ParamEnv`.
     if let Some(parent) = is_impl_trait_defn(tcx, def_id) {
         return param_env(tcx, parent);
     }

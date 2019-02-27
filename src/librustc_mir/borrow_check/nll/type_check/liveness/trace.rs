@@ -98,7 +98,7 @@ where
     /// Map tracking which variables need liveness computation.
     liveness_map: &'me NllLivenessMap,
 
-    /// Maps between a MIR Location and a LocationIndex
+    /// Maps between a MIR `Location` and a `LocationIndex`.
     location_table: &'me LocationTable,
 }
 
@@ -128,7 +128,7 @@ where
     /// there is a future drop.
     drop_live_at: HybridBitSet<PointIndex>,
 
-    /// Locations where drops may occur.
+    /// The `Location`s where drops may occur.
     drop_locations: Vec<Location>,
 
     /// Stack used when doing (reverse) DFS.

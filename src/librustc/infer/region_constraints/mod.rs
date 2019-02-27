@@ -206,9 +206,9 @@ pub enum VerifyBound<'tcx> {
     /// This is used when we have something in the environment that
     /// may or may not be relevant, depending on the region inference
     /// results. For example, we may have `where <T as
-    /// Trait<'a>>::Item: 'b` in our where-clauses. If we are
+    /// Trait<'a>>::Item: 'b` in our `where` clauses. If we are
     /// generating the verify-bound for `<T as Trait<'0>>::Item`, then
-    /// this where-clause is only relevant if `'0` winds up inferred
+    /// this `where` clause is only relevant if `'0` winds up inferred
     /// to `'a`.
     ///
     /// So we would compile to a verify-bound like

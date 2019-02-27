@@ -192,7 +192,7 @@ impl<'a, 'tcx, V> TypeVisitor<'tcx> for DefIdVisitorSkeleton<'_, 'a, 'tcx, V>
                 // Skip repeated `Opaque`s to avoid infinite recursion.
                 if self.visited_opaque_tys.insert(def_id) {
                     // The intent is to treat `impl Trait1 + Trait2` identically to
-                    // `dyn Trait1 + Trait2`. Therefore we ignore def-id of the opaque type itself
+                    // `dyn Trait1 + Trait2`. Therefore, we ignore `DefId` of the opaque type itself
                     // (it either has no visibility, or its visibility is insignificant, like
                     // visibilities of type aliases) and recurse into predicates instead to go
                     // through the trait list (default type visitor doesn't visit those traits).
@@ -203,8 +203,8 @@ impl<'a, 'tcx, V> TypeVisitor<'tcx> for DefIdVisitorSkeleton<'_, 'a, 'tcx, V>
                     }
                 }
             }
-            // These types don't have their own def-ids (but may have subcomponents
-            // with def-ids that should be visited recursively).
+            // These types don't have their own `DefId`s (but may have subcomponents
+            // with `DefId`s that should be visited recursively).
             ty::Bool | ty::Char | ty::Int(..) | ty::Uint(..) |
             ty::Float(..) | ty::Str | ty::Never |
             ty::Array(..) | ty::Slice(..) | ty::Tuple(..) |
@@ -934,7 +934,7 @@ impl<'a, 'tcx> TypePrivacyVisitor<'a, 'tcx> {
         def_id_visibility(self.tcx, did).0.is_accessible_from(self.current_item, self.tcx)
     }
 
-    // Take node-id of an expression or pattern and check its type for privacy.
+    // Take `NodeId` of an expression or pattern and check its type for privacy.
     fn check_expr_pat_type(&mut self, id: hir::HirId, span: Span) -> bool {
         self.span = span;
         if self.visit(self.tables.node_type(id)) || self.visit(self.tables.node_substs(id)) {

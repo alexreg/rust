@@ -176,7 +176,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         let source_info = self.source_info(test.span);
         match test.kind {
             TestKind::Switch { adt_def, ref variants } => {
-                // Variants is a BitVec of indexes into adt_def.variants.
+                // Variants is a `BitVec` of indexes into `adt_def.variants`.
                 let num_enum_variants = adt_def.variants.len();
                 let used_variants = variants.count();
                 let mut otherwise_block = None;
@@ -309,17 +309,17 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     };
                     let ref_ty = self.hir.tcx().mk_ref(re_erased, tam);
 
-                    // let lhs_ref_place = &lhs;
+                    // `let lhs_ref_place = &lhs;`
                     let ref_rvalue = Rvalue::Ref(re_erased, BorrowKind::Shared, place);
                     let lhs_ref_place = self.temp(ref_ty, test.span);
                     self.cfg.push_assign(block, source_info, &lhs_ref_place, ref_rvalue);
                     let val = Operand::Move(lhs_ref_place);
 
-                    // let rhs_place = rhs;
+                    // `let rhs_place = rhs;`
                     let rhs_place = self.temp(ty, test.span);
                     self.cfg.push_assign(block, source_info, &rhs_place, Rvalue::Use(expect));
 
-                    // let rhs_ref_place = &rhs_place;
+                    // `let rhs_ref_place = &rhs_place;`
                     let ref_rvalue = Rvalue::Ref(re_erased, BorrowKind::Shared, rhs_place);
                     let rhs_ref_place = self.temp(ref_ty, test.span);
                     self.cfg.push_assign(block, source_info, &rhs_ref_place, ref_rvalue);
@@ -384,14 +384,14 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 let (actual, result) = (self.temp(usize_ty, test.span),
                                         self.temp(bool_ty, test.span));
 
-                // actual = len(place)
+                // `actual == len(place)`
                 self.cfg.push_assign(block, source_info,
                                      &actual, Rvalue::Len(place.clone()));
 
-                // expected = <N>
+                // `expected == <N>`
                 let expected = self.push_usize(block, source_info, len);
 
-                // result = actual == expected OR result = actual < expected
+                // `result == actual == expected` OR `result == actual < expected`
                 self.cfg.push_assign(block, source_info, &result,
                                      Rvalue::BinaryOp(op,
                                                       Operand::Move(actual),
@@ -418,7 +418,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         let bool_ty = self.hir.bool_ty();
         let result = self.temp(bool_ty, span);
 
-        // result = op(left, right)
+        // `result == op(left, right)`
         let source_info = self.source_info(span);
         self.cfg.push_assign(block, source_info, &result,
                              Rvalue::BinaryOp(op, left, right));
@@ -494,7 +494,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             // If we are performing a switch over integers, then this informs integer
             // equality, but nothing else.
             //
-            // FIXME(#29623) we could use PatternKind::Range to rule
+            // FIXME(#29623): we could use `PatternKind::Range` to rule
             // things out here, in some cases.
             (&TestKind::SwitchInt { switch_ty: _, options: _, ref indices },
              &PatternKind::Constant { ref value })
@@ -527,8 +527,8 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 let pat_len = (prefix.len() + suffix.len()) as u64;
                 match (test_len.cmp(&pat_len), slice) {
                     (Ordering::Equal, &None) => {
-                        // on true, min_len = len = $actual_length,
-                        // on false, len != $actual_length
+                        // On true, `min_len == len == $actual_length`.
+                        // On false, `len != $actual_length`.
                         self.candidate_after_slice_test(match_pair_index,
                                                         candidate,
                                                         prefix,
@@ -537,19 +537,19 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                         Some(0)
                     }
                     (Ordering::Less, _) => {
-                        // test_len < pat_len. If $actual_len = test_len,
-                        // then $actual_len < pat_len and we don't have
+                        // `test_len < pat_len`. If `$actual_len == test_len`,
+                        // then also`$actual_len < pat_len`, and we don't have
                         // enough elements.
                         Some(1)
                     }
                     (Ordering::Equal, &Some(_)) | (Ordering::Greater, &Some(_)) => {
-                        // This can match both if $actual_len = test_len >= pat_len,
-                        // and if $actual_len > test_len. We can't advance.
+                        // This can match both if `$actual_len == test_len >= pat_len`,
+                        // and if `$actual_len > test_len`. We can't advance.
                         None
                     }
                     (Ordering::Greater, &None) => {
-                        // test_len != pat_len, so if $actual_len = test_len, then
-                        // $actual_len != pat_len.
+                        // `test_len != pat_len`, so if `$actual_len == test_len`, then
+                        // `$actual_len != pat_len`.
                         Some(1)
                     }
                 }
@@ -561,7 +561,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 let pat_len = (prefix.len() + suffix.len()) as u64;
                 match (test_len.cmp(&pat_len), slice) {
                     (Ordering::Equal, &Some(_))  => {
-                        // $actual_len >= test_len = pat_len,
+                        // `$actual_len >= test_len == pat_len`,
                         // so we can match.
                         self.candidate_after_slice_test(match_pair_index,
                                                         candidate,
@@ -571,18 +571,18 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                         Some(0)
                     }
                     (Ordering::Less, _) | (Ordering::Equal, &None) => {
-                        // test_len <= pat_len. If $actual_len < test_len,
-                        // then it is also < pat_len, so the test passing is
+                        // `test_len <= pat_len`. If `$actual_len < test_len`,
+                        // then it is also `< pat_len`, so the test passing is
                         // necessary (but insufficient).
                         Some(0)
                     }
                     (Ordering::Greater, &None) => {
-                        // test_len > pat_len. If $actual_len >= test_len > pat_len,
+                        // `test_len > pat_len`. If `$actual_len >= test_len > pat_len`,
                         // then we know we won't have a match.
                         Some(1)
                     }
                     (Ordering::Greater, &Some(_)) => {
-                        // test_len < pat_len, and is therefore less
+                        // `test_len < pat_len`, and is therefore less
                         // strict. This can still go both ways.
                         None
                     }
@@ -610,10 +610,10 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     let hi = compare_const_vals(tcx, test.hi, pat.lo, param_env)?;
 
                     match (test.end, pat.end, lo, hi) {
-                        // pat < test
+                        // `pat < test`
                         (_, _, Greater, _) |
                         (_, Excluded, Equal, _) |
-                        // pat > test
+                        // `pat > test`
                         (_, _, _, Less) |
                         (Excluded, _, _, Equal) => Some(true),
                         _ => Some(false),

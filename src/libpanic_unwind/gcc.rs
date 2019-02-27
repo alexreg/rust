@@ -99,11 +99,11 @@ fn rust_exception_class() -> uw::_Unwind_Exception_Class {
 }
 
 
-// Register ids were lifted from LLVM's TargetLowering::getExceptionPointerRegister()
-// and TargetLowering::getExceptionSelectorRegister() for each architecture,
+// Register IDs were lifted from LLVM's `TargetLowering::getExceptionPointerRegister()`
+// and `TargetLowering::getExceptionSelectorRegister()` for each architecture,
 // then mapped to DWARF register numbers via register definition tables
-// (typically <arch>RegisterInfo.td, search for "DwarfRegNum").
-// See also http://llvm.org/docs/WritingAnLLVMBackend.html#defining-a-register.
+// (typically `<arch>RegisterInfo.td`; search for "DwarfRegNum").
+// See also <http://llvm.org/docs/WritingAnLLVMBackend.html#defining-a-register>.
 
 #[cfg(target_arch = "x86")]
 const UNWIND_DATA_REG: (i32, i32) = (0, 2); // EAX, EDX

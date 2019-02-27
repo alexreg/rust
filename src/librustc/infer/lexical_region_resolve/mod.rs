@@ -581,8 +581,8 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
         }
 
         // We place free regions first because we are special casing
-        // SubSupConflict(ReFree, ReFree) when reporting error, and so
-        // the user will more likely get a specific suggestion.
+        // `SubSupConflict(ReFree, ReFree)` when reporting error, and so
+        // the user will more likely get a specific suggestion..
         fn region_order_key(x: &RegionAndOrigin<'_>) -> u8 {
             match *x.region {
                 ReEarlyBound(_) => 0,

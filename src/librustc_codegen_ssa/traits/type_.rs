@@ -111,7 +111,7 @@ pub trait DerivedTypeMethods<'tcx>: BaseTypeMethods<'tcx> + MiscMethods<'tcx> {
     }
 
     fn type_pointee_for_align(&self, align: Align) -> Self::Type {
-        // FIXME(eddyb) We could find a better approximation if ity.align < align.
+        // FIXME(eddyb): we could find a better approximation if `ity.align < align`.
         let ity = layout::Integer::approximate_align(self, align);
         self.type_from_integer(ity)
     }

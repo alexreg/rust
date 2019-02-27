@@ -810,13 +810,13 @@ pub fn provide(providers: &mut Providers<'_>) {
     providers.lint_levels = lint_levels;
 }
 
-/// Returns whether `span` originates in a foreign crate's external macro.
+/// Returns `true` if `span` originates in a foreign crate's external macro.
 ///
 /// This is used to test whether a lint should be entirely aborted above.
 pub fn in_external_macro(sess: &Session, span: Span) -> bool {
     let info = match span.ctxt().outer().expn_info() {
         Some(info) => info,
-        // no ExpnInfo means this span doesn't come from a macro
+        // No `ExpnInfo` means this span doesn't come from a macro.
         None => return false,
     };
 
@@ -828,7 +828,7 @@ pub fn in_external_macro(sess: &Session, span: Span) -> bool {
 
     let def_site = match info.def_site {
         Some(span) => span,
-        // no span for the def_site means it's an external macro
+        // No span for the `def_site` means it's an external macro.
         None => return true,
     };
 

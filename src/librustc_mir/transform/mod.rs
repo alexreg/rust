@@ -253,11 +253,10 @@ fn optimized_mir<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> &'tcx 
         &add_call_guards::CriticalCallEdges,
         &elaborate_drops::ElaborateDrops,
         &no_landing_pads::NoLandingPads,
-        // AddMovesForPackedDrops needs to run after drop
-        // elaboration.
+        // `AddMovesForPackedDrops` needs to run after drop elaboration.
         &add_moves_for_packed_drops::AddMovesForPackedDrops,
-        // AddRetag needs to run after ElaborateDrops, and it needs
-        // an AllCallEdges pass right before it.  Otherwise it should
+        // `AddRetag` needs to run after `ElaborateDrops`, and it needs
+        // an `AllCallEdges` pass right before it. Otherwise it should
         // run fairly late, but before optimizations begin.
         &add_call_guards::AllCallEdges,
         &add_retag::AddRetag,

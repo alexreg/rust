@@ -1086,7 +1086,7 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
         mode: MutateMode,
         flow_state: &Flows<'cx, 'gcx, 'tcx>,
     ) {
-        // Write of P[i] or *P, or WriteAndRead of any P, requires P init'd.
+        // Write of `P[i]` or `*P`, or `WriteAndRead` of any `P` requires `P` to be initialized.
         match mode {
             MutateMode::WriteAndRead => {
                 self.check_if_path_or_subpath_is_moved(
@@ -1602,7 +1602,7 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
     }
 
     fn move_path_for_place(&mut self, place: &Place<'tcx>) -> Option<MovePathIndex> {
-        // If returns None, then there is no move path corresponding
+        // If it returns `None`, then there is no move path corresponding
         // to a direct owner of `place` (which means there is nothing
         // that borrowck tracks for its analysis).
 
@@ -1725,13 +1725,13 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
             //
             // 3. `let mut s = ...; drop(s); s.x=Val;`
             //
-            // This does not use check_if_path_or_subpath_is_moved,
+            // This does not use `check_if_path_or_subpath_is_moved`,
             // because we want to *allow* reinitializations of fields:
             // e.g., want to allow
             //
             // `let mut s = ...; drop(s.x); s.x=Val;`
             //
-            // This does not use check_if_full_path_is_moved on
+            // This does not use `check_if_full_path_is_moved` on
             // `base`, because that would report an error about the
             // `base` as a whole, but in this scenario we *really*
             // want to report an error about the actual thing that was
@@ -1742,7 +1742,7 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
             let maybe_uninits = &flow_state.uninits;
 
             // Find the shortest uninitialized prefix you can reach
-            // without going over a Deref.
+            // without going over a `Deref`.
             let mut shortest_uninit_seen = None;
             for prefix in this.prefixes(base, PrefixSet::Shallow) {
                 let mpi = match this.move_path_for_place(prefix) {

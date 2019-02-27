@@ -111,7 +111,7 @@ fn with_fresh_ty_vars<'cx, 'gcx, 'tcx>(selcx: &mut SelectionContext<'cx, 'gcx, '
 }
 
 /// Can both impl `a` and impl `b` be satisfied by a common type (including
-/// where-clauses)? If so, returns an `ImplHeader` that unifies the two impls.
+/// `where` clauses)? If so, returns an `ImplHeader` that unifies the two impls.
 fn overlap<'cx, 'gcx, 'tcx>(
     selcx: &mut SelectionContext<'cx, 'gcx, 'tcx>,
     a_def_id: DefId,
@@ -272,7 +272,7 @@ pub fn orphan_check<'a, 'gcx, 'tcx>(tcx: TyCtxt<'a, 'gcx, 'tcx>,
 ///
 /// The current rule is that a trait-ref orphan checks in a crate C:
 ///
-/// 1. Order the parameters in the trait-ref in subst order - Self first,
+/// 1. Order the parameters in the trait ref in subst order -- `Self` first,
 ///    others linearly (e.g., `<U as Foo<V, W>>` is U < V < W).
 /// 2. Of these type parameters, there is at least one type parameter
 ///    in which, walking the type as a tree, you can reach a type local
@@ -328,7 +328,7 @@ pub fn orphan_check<'a, 'gcx, 'tcx>(tcx: TyCtxt<'a, 'gcx, 'tcx>,
 ///
 ///    For that, we only allow negative reasoning if, for every assignment to the
 ///    inference variables, every unknown crate would get an orphan error if they
-///    try to implement this trait-ref. To check for this, we use InCrate::Remote
+///    try to implement this trait ref. To check for this, we use `InCrate::Remote`
 ///    mode. That is sound because we already know all the impls from known crates.
 ///
 /// 3. For non-#[fundamental] traits, they guarantee that parent crates can
@@ -368,16 +368,15 @@ fn orphan_check_trait_ref<'tcx>(tcx: TyCtxt<'_, '_, '_>,
     }
 
     if tcx.features().re_rebalance_coherence {
-        // Given impl<P1..=Pn> Trait<T1..=Tn> for T0, an impl is valid only
+        // Given `impl<P1..=Pn> Trait<T1..=Tn> for T0`, an impl is valid only
         // if at least one of the following is true:
         //
         // - Trait is a local trait
         // (already checked in orphan_check prior to calling this function)
-        // - All of
-        //     - At least one of the types T0..=Tn must be a local type.
-        //      Let Ti be the first such type.
-        //     - No uncovered type parameters P1..=Pn may appear in T0..Ti (excluding Ti)
-        //
+        // - All of:
+        //     - At least one of the types `T0..=Tn` must be a local type.
+        //       Let `Ti` be the first such type.
+        //     - No uncovered type parameters `P1..=Pn` may appear in `T0..Ti` (excluding `Ti`).
         for input_ty in trait_ref.input_types() {
             debug!("orphan_check_trait_ref: check ty `{:?}`", input_ty);
             if ty_is_local(tcx, input_ty, in_crate) {

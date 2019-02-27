@@ -436,7 +436,7 @@ impl<'a, 'gcx, 'tcx> RegionCtxt<'a, 'gcx, 'tcx> {
 }
 
 impl<'a, 'gcx, 'tcx> Visitor<'gcx> for RegionCtxt<'a, 'gcx, 'tcx> {
-    // (..) FIXME(#3238) should use visit_pat, not visit_arm/visit_local,
+    // (..) FIXME(#3238): should use `visit_pat`, not `visit_arm`/`visit_local`,
     // However, right now we run into an issue whereby some free
     // regions are not properly related if they appear within the
     // types of arguments that must be inferred. This could be
@@ -795,7 +795,7 @@ impl<'a, 'gcx, 'tcx> RegionCtxt<'a, 'gcx, 'tcx> {
         // `callee_region` is the scope representing the time in which the
         // call occurs.
         //
-        // FIXME(#6268) to support nested method calls, should be callee_id
+        // FIXME(#6268): to support nested method calls, should be `callee_id`.
         let callee_scope = region::Scope {
             id: call_expr.hir_id.local_id,
             data: region::ScopeData::Node,
@@ -891,7 +891,7 @@ impl<'a, 'gcx, 'tcx> RegionCtxt<'a, 'gcx, 'tcx> {
                     &cmt,
                 );
 
-                // Specialized version of constrain_call.
+                // Specialized version of `constrain_call`.
                 self.type_must_outlive(infer::CallRcvr(expr.span), input, expr_region);
                 self.type_must_outlive(infer::CallReturn(expr.span), output, expr_region);
             }

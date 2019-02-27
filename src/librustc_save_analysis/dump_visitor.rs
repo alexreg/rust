@@ -1199,7 +1199,7 @@ impl<'l, 'tcx: 'l, 'll, O: DumpOutput + 'll> DumpVisitor<'l, 'tcx, 'll, O> {
         // (since nested trees don't have their own visibility).
         let access = access_from!(self.save_ctxt, root_item.vis, id);
 
-        // The parent def id of a given use tree is always the enclosing item.
+        // The parent `DefId` of a given use tree is always the enclosing item.
         let parent = self.save_ctxt.tcx.hir().opt_local_def_id(id)
             .and_then(|id| self.save_ctxt.tcx.parent_def_id(id))
             .map(id_from_def_id);

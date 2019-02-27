@@ -68,8 +68,8 @@ impl<T: 'static> P<T> {
     {
         let p: *mut T = &mut *self.ptr;
 
-        // Leak self in case of panic.
-        // FIXME(eddyb) Use some sort of "free guard" that
+        // Leak `self` in case of panic.
+        // FIXME(eddyb): use some sort of "free guard" that
         // only deallocates, without dropping the pointee,
         // in case the call the `f` below ends in a panic.
         mem::forget(self);
@@ -88,8 +88,8 @@ impl<T: 'static> P<T> {
     {
         let p: *mut T = &mut *self.ptr;
 
-        // Leak self in case of panic.
-        // FIXME(eddyb) Use some sort of "free guard" that
+        // Leak `self` in case of panic.
+        // FIXME(eddyb): use some sort of "free guard" that
         // only deallocates, without dropping the pointee,
         // in case the call the `f` below ends in a panic.
         mem::forget(self);

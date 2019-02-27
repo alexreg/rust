@@ -116,10 +116,10 @@ struct RegionDefinition<'tcx> {
 /// reorder willy nilly.
 #[derive(Copy, Clone, Debug, PartialOrd, Ord, PartialEq, Eq)]
 pub(crate) enum Cause {
-    /// point inserted because Local was live at the given Location
+    /// The point inserted because the `Local` was live at the given `Location`.
     LiveVar(Local, Location),
 
-    /// point inserted because Local was dropped at the given Location
+    /// THe point inserted because the `Local` was dropped at the given `Location`.
     DropVar(Local, Location),
 }
 
@@ -286,7 +286,7 @@ impl<'tcx> RegionInferenceContext<'tcx> {
     /// Initializes the region variables for each universally
     /// quantified region (lifetime parameter). The first N variables
     /// always correspond to the regions appearing in the function
-    /// signature (both named and anonymous) and where-clauses. This
+    /// signature (both named and anonymous) and `where` clauses. This
     /// function iterates over those regions and initializes them with
     /// minimum values.
     ///
@@ -1007,7 +1007,7 @@ impl<'tcx> RegionInferenceContext<'tcx> {
     /// environment. In this case, if we can show that `'0 == 'a`,
     /// and that `'b: '1`, then we know that the clause is
     /// satisfied. In such cases, particularly due to limitations of
-    /// the trait solver =), we usually wind up with a where-clause like
+    /// the trait solver, we usually wind up with a `where` clause like
     /// `T: Foo<'a>` in scope, which thus forces `'0 == 'a` to be added as
     /// a constraint, and thus ensures that they are in the same SCC.
     ///

@@ -241,7 +241,7 @@ impl LintPass for UnsafeCode {
 
 impl UnsafeCode {
     fn report_unsafe(&self, cx: &EarlyContext<'_>, span: Span, desc: &'static str) {
-        // This comes from a macro that has #[allow_internal_unsafe].
+        // This comes from a macro that has `#[allow_internal_unsafe]`.
         if span.allows_unsafe() {
             return;
         }
@@ -378,7 +378,7 @@ impl MissingDoc {
 
         // Only check publicly-visible items, using the result from the privacy pass.
         // It's an option so the crate root can also use this function (it doesn't
-        // have a NodeId).
+        // have a `NodeId`).
         if let Some(id) = id {
             if !cx.access_levels.is_exported(id) {
                 return;
@@ -454,7 +454,7 @@ impl<'a, 'tcx> LateLintPass<'a, 'tcx> for MissingDoc {
             }
             hir::ItemKind::Ty(..) => "a type alias",
             hir::ItemKind::Impl(.., Some(ref trait_ref), _, ref impl_item_refs) => {
-                // If the trait is private, add the impl items to private_traits so they don't get
+                // If the trait is private, add the impl items to `private_traits` so they don't get
                 // reported for missing docs.
                 let real_trait = trait_ref.path.def.def_id();
                 if let Some(node_id) = cx.tcx.hir().as_local_node_id(real_trait) {
@@ -936,7 +936,7 @@ impl<'a, 'tcx> LateLintPass<'a, 'tcx> for InvalidNoMangleItems {
                     let msg = "const items should never be #[no_mangle]";
                     let mut err = cx.struct_span_lint(NO_MANGLE_CONST_ITEMS, it.span, msg);
 
-                    // account for "pub const" (#45562)
+                    // Account for `pub const` (#45562).
                     let start = cx.tcx.sess.source_map().span_to_snippet(it.span)
                         .map(|snippet| snippet.find("const").unwrap_or(0))
                         .unwrap_or(0) as u32;
@@ -1240,7 +1240,7 @@ impl<'a, 'tcx> LateLintPass<'a, 'tcx> for TypeAliasBounds {
             _ => return,
         };
         let mut suggested_changing_assoc_types = false;
-        // There must not be a where clause
+        // There must not be a `where` clause.
         if !type_alias_generics.where_clause.predicates.is_empty() {
             let spans : Vec<_> = type_alias_generics.where_clause.predicates.iter()
                 .map(|pred| pred.span()).collect();
@@ -1492,7 +1492,8 @@ declare_lint! {
 }
 
 pub struct UnnameableTestItems {
-    boundary: ast::NodeId, // NodeId of the item under which things are not nameable
+    // `NodeId` of the item under which things are not nameable.
+    boundary: ast::NodeId,
     items_nameable: bool,
 }
 
@@ -1713,7 +1714,8 @@ impl ExplicitOutlivesRequirements {
                     _ => false
                 };
                 if is_static && !infer_static {
-                    // infer-outlives for 'static is still feature-gated (tracking issue #44493)
+                    // `infer-outlives` for `'static` is still feature-gated
+                    // (tracking issue #44493).
                     continue;
                 }
 

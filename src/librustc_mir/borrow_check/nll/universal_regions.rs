@@ -319,7 +319,7 @@ impl<'tcx> UniversalRegions<'tcx> {
 
                 // FIXME: It'd be nice to print the late-bound regions
                 // here, but unfortunately these wind up stored into
-                // tests, and the resulting print-outs include def-ids
+                // tests, and the resulting print-outs include `DefId`s
                 // and other things that are not stable across tests!
                 // So we just include the region-vid. Annoying.
                 let closure_base_def_id = tcx.closure_base_def_id(def_id);

@@ -170,7 +170,7 @@ struct TransformVisitor<'a, 'tcx: 'a> {
     // A list of suspension points, generated during the transform
     suspension_points: Vec<SuspensionPoint>,
 
-    // The original RETURN_PLACE local
+    // The original `RETURN_PLACE` local.
     new_ret_local: Local,
 }
 

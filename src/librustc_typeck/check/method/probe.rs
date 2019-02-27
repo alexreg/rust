@@ -281,8 +281,8 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             self.tcx.method_autoderef_steps(param_env_and_self_ty)
         } else {
             self.infcx.probe(|_| {
-                // Mode::Path - the deref steps is "trivial". This turns
-                // our CanonicalQuery into a "trivial" QueryResponse. This
+                // `Mode::Path` -- the deref steps is "trivial". This turns
+                // our `CanonicalQuery` into a "trivial" `QueryResponse`. This
                 // is a bit inefficient, but I don't think that writing
                 // special handling for this "trivial case" is a good idea.
 
@@ -787,7 +787,7 @@ impl<'a, 'gcx, 'tcx> ProbeContext<'a, 'gcx, 'tcx> {
             let (xform_self_ty, xform_ret_ty) =
                 this.xform_self_ty(&item, trait_ref.self_ty(), trait_ref.substs);
 
-            // Because this trait derives from a where-clause, it
+            // Because this trait derives from a `where` clause, it
             // should not contain any inference variables or other
             // artifacts. This means it is safe to put into the
             // `WhereClauseCandidate` and (eventually) into the
@@ -1189,10 +1189,9 @@ impl<'a, 'gcx, 'tcx> ProbeContext<'a, 'gcx, 'tcx> {
             "a method with this name may be added to the standard library in the future",
         );
 
-        // FIXME: This should be a `span_suggestion` instead of `help`
-        // However `self.span` only
-        // highlights the method name, so we can't use it. Also consider reusing the code from
-        // `report_method_error()`.
+        // FIXME: this should be a `span_suggestion` instead of `help`.
+        // However, `self.span` only highlights the method name, so we can't use it.
+        // Also consider reusing the code from `report_method_error()`.
         diag.help(&format!(
             "call with fully qualified syntax `{}(...)` to keep using the current method",
             self.tcx.item_path_str(stable_pick.item.def_id),
@@ -1361,7 +1360,7 @@ impl<'a, 'gcx, 'tcx> ProbeContext<'a, 'gcx, 'tcx> {
     /// Sometimes we get in a situation where we have multiple probes that are all impls of the
     /// same trait, but we don't know which impl to use. In this case, since in all cases the
     /// external interface of the method can be determined from the trait, it's ok not to decide.
-    /// We can basically just collapse all of the probes for various impls into one where-clause
+    /// We can basically just collapse all of the probes for various impls into one `where` clause
     /// probe. This will result in a pending obligation so when more type-info is available we can
     /// make the final decision.
     ///
@@ -1610,7 +1609,7 @@ impl<'tcx> Candidate<'tcx> {
                 ObjectCandidate => ObjectPick,
                 TraitCandidate(_) => TraitPick,
                 WhereClauseCandidate(ref trait_ref) => {
-                    // Only trait derived from where-clauses should
+                    // Only trait derived from `where` clauses should
                     // appear here, so they should not contain any
                     // inference variables or other artifacts. This
                     // means they are safe to put into the

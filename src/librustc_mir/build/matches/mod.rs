@@ -122,7 +122,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         // HACK(eddyb) Work around the above issue by adding a dummy inspection
         // of `scrutinee_place`, specifically by applying `ReadForMatch`.
         //
-        // NOTE: ReadForMatch also checks that the scrutinee is initialized.
+        // NOTE: `ReadForMatch` also checks that the scrutinee is initialized.
         // This is currently needed to not allow matching on an uninitialized,
         // uninhabited value. If we get never patterns, those will check that
         // the place is initialized, and so this read would only be used to
@@ -214,8 +214,8 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             .flat_map(|(_, candidates)| candidates)
             .collect::<Vec<_>>();
 
-        // this will generate code to test scrutinee_place and
-        // branch to the appropriate arm block
+        // This will generate code to test `scrutinee_place` and
+        // branch to the appropriate arm block.
         let otherwise = self.match_candidates(
             scrutinee_span,
             candidates,
@@ -388,9 +388,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                             // ascription applies rather to the type of the binding. e.g., in this
                             // example:
                             //
-                            // ```
-                            // let x: T = <expr>
-                            // ```
+                            //     let x: T = <expr>
                             //
                             // We are creating an ascription that defines the type of `x` to be
                             // exactly `T` (i.e., with invariance). The variance field, in
@@ -638,9 +636,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             } => {
                 // This corresponds to something like
                 //
-                // ```
-                // let A::<'a>(_): A<'static> = ...;
-                // ```
+                //     let A::<'a>(_): A<'static> = ...;
                 //
                 // Note that the variance doesn't apply here, as we are tracking the effect
                 // of `user_ty` on any bindings contained with subpattern.
@@ -722,10 +718,10 @@ struct Ascription<'tcx> {
 
 #[derive(Clone, Debug)]
 pub struct MatchPair<'pat, 'tcx: 'pat> {
-    // this place...
+    /// The place to matched by `pattern.
     place: Place<'tcx>,
 
-    // ... must match this pattern.
+    /// The pattern to match against `place`.
     pattern: &'pat Pattern<'tcx>,
 }
 
@@ -1080,8 +1076,8 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// In that case, after we test on `x`, there are 2 overlapping candidate
     /// sets:
     ///
-    /// - If the outcome is that `x` is true, candidates 0, 1, and 3
-    /// - If the outcome is that `x` is false, candidates 1 and 2
+    /// - If the outcome is that `x` is `true`, candidates 0, 1, and 3.
+    /// - If the outcome is that `x` is `false`, candidates 1 and 2.
     ///
     /// Here, the traditional "decision tree" method would generate 2
     /// separate code-paths for the 2 separate cases.
@@ -1128,7 +1124,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// of tests.
     ///
     /// To avoid these kinds of problems, our algorithm tries to ensure
-    /// the amount of generated tests is linear. When we do a k-way test,
+    /// the amount of generated tests is linear. When we do a `k`-way test,
     /// we return an additional "unmatched" set alongside the obvious `k`
     /// sets. When we encounter a candidate that would be present in more
     /// than one of the sets, we put it and all candidates below it into the
@@ -1154,13 +1150,13 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         block: BasicBlock,
         fake_borrows: &mut Option<FxHashSet<Place<'tcx>>>,
     ) -> (Vec<BasicBlock>, &'b mut [&'c mut Candidate<'pat, 'tcx>]) {
-        // extract the match-pair from the highest priority candidate
+        // Extract the `MatchPair` from the highest-priority candidate.
         let match_pair = &candidates.first().unwrap().match_pairs[0];
         let mut test = self.test(match_pair);
         let match_place = match_pair.place.clone();
 
-        // most of the time, the test to perform is simply a function
-        // of the main candidate; but for a test like SwitchInt, we
+        // Most of the time, the test to perform is simply a function
+        // of the main candidate, but for a test like `SwitchInt`, we
         // may want to add cases based on the candidates that are
         // available
         match test.kind {
@@ -1194,13 +1190,13 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             _ => {}
         }
 
-        // Insert a Shallow borrow of any places that is switched on.
+        // Insert a `Shallow` borrow of any places that is switched on.
         fake_borrows.as_mut().map(|fb| {
             fb.insert(match_place.clone())
         });
 
-        // perform the test, branching to one of N blocks. For each of
-        // those N possible outcomes, create a (initially empty)
+        // Perform the test, branching to one of `N` blocks. For each of
+        // those `N` possible outcomes, create a (initially empty)
         // vector of candidates. Those are the candidates that still
         // apply if the test has that particular outcome.
         debug!(
@@ -1309,11 +1305,11 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// the guard fails.
     ///
     /// Note: we check earlier that if there is a guard, there cannot be move
-    /// bindings (unless feature(bind_by_move_pattern_guards) is used). This
+    /// bindings (unless the `bind_by_move_pattern_guards` feature is used). This
     /// isn't really important for the self-consistency of this fn, but the
     /// reason for it should be clear: after we've done the assignments, if
     /// there were move bindings, further tests would be a use-after-move.
-    /// bind_by_move_pattern_guards avoids this by only moving the binding once
+    /// `bind_by_move_pattern_guards` avoids this by only moving the binding once
     /// the guard has evaluated to true (see below).
     fn bind_and_guard_matched_candidate<'pat>(
         &mut self,
@@ -1599,7 +1595,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         }
     }
 
-    // Only called when all_pat_vars_are_implicit_refs_within_guards,
+    // Only called when `all_pat_vars_are_implicit_refs_within_guards` is `true`,
     // and thus all code/comments assume we are in that context.
     fn bind_matched_candidate_for_guard(
         &mut self,
@@ -1615,16 +1611,16 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         for binding in bindings {
             let source_info = self.source_info(binding.span);
 
-            // For each pattern ident P of type T, `ref_for_guard` is
-            // a reference R: &T pointing to the location matched by
-            // the pattern, and every occurrence of P within a guard
-            // denotes *R.
+            // For each pattern ident `P` of type `T`, `ref_for_guard` is
+            // a reference `R: &T` pointing to the location matched by
+            // the pattern, and every occurrence of `P` within a guard
+            // denotes `*R`.
             let ref_for_guard =
                 self.storage_live_binding(block, binding.var_id, binding.span, RefWithinGuard);
             // Question: Why schedule drops if bindings are all
-            // shared-&'s?
-            // Answer: Because schedule_drop_for_binding also emits
-            // StorageDead's for those locals.
+            // shared-`&`s?
+            // Answer: Because `schedule_drop_for_binding` also emits
+            // `StorageDead`s for those locals.
             self.schedule_drop_for_binding(binding.var_id, binding.span, RefWithinGuard);
             match binding.binding_mode {
                 BindingMode::ByValue => {
@@ -1724,9 +1720,9 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             is_block_tail: None,
             is_user_variable: Some(ClearCrossCrate::Set(BindingForm::Var(VarBindingForm {
                 binding_mode,
-                // hypothetically, `visit_bindings` could try to unzip
-                // an outermost hir::Ty as we descend, matching up
-                // idents in pat; but complex w/ unclear UI payoff.
+                // Hypothetically, `visit_bindings` could try to unzip
+                // an outermost `hir::Ty` as we descend, matching up
+                // idents in pat, but complex with unclear UI payoff.
                 // Instead, just abandon providing diagnostic info.
                 opt_ty_info: None,
                 opt_match_place,

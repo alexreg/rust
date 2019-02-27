@@ -37,7 +37,7 @@ impl<'tcx> fmt::Display for Discr<'tcx> {
                     Integer::from_attr(&tcx, SignedInt(ity)).size()
                 });
                 let x = self.val;
-                // sign extend the raw representation to be an i128
+                // Sign-extend the raw representation to be an `i128`.
                 let x = sign_extend(x, size) as i128;
                 write!(fmt, "{}", x)
             },
@@ -232,8 +232,8 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
         let mut hasher = StableHasher::new();
         let mut hcx = self.create_stable_hashing_context();
 
-        // We want the type_id be independent of the types free regions, so we
-        // erase them. The erase_regions() call will also anonymize bound
+        // We want the `type_id` to be independent of the types free regions, so we
+        // erase them. The `erase_regions()` call will also anonymize bound
         // regions, which is desirable too.
         let ty = self.erase_regions(&ty);
 
@@ -370,9 +370,9 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
                         None
                     }
                     ty::Predicate::TypeOutlives(predicate) => {
-                        // Search for a bound of the form `erased_self_ty
-                        // : 'a`, but be wary of something like `for<'a>
-                        // erased_self_ty : 'a` (we interpret a
+                        // Search for a bound of the form `erased_self_ty: 'a`,
+                        // but be wary of something like `for<'a>
+                        // erased_self_ty: 'a` (we interpret a
                         // higher-ranked bound like that as 'static,
                         // though at present the code in `fulfill.rs`
                         // considers such bounds to be unsatisfiable, so
@@ -453,8 +453,8 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         let impl_def_id = self.associated_item(dtor).container.id();
         let impl_generics = self.generics_of(impl_def_id);
 
-        // We have a destructor - all the parameters that are not
-        // pure_wrt_drop (i.e, don't have a #[may_dangle] attribute)
+        // We have a destructor -- all the parameters that are not
+        // pure_wrt_drop (i.e, don't have a `#[may_dangle]` attribute)
         // must be live.
 
         // We need to return the list of parameters from the ADTs
@@ -881,9 +881,10 @@ impl<'a, 'tcx> ty::TyS<'tcx> {
                         let mut iter = seen.iter();
 
                         // The first item in `seen` is the type we are actually curious about.
-                        // We want to return SelfRecursive if this type contains itself.
-                        // It is important that we DON'T take generic parameters into account
-                        // for this check, so that Bar<T> in this example counts as SelfRecursive:
+                        // We want to return `SelfRecursive` if this type contains itself.
+                        // It is important that we *don't* take generic parameters into account
+                        // for this check, so that `Bar<T>` in this example counts as
+                        // `SelfRecursive`:
                         //
                         // struct Foo;
                         // struct Bar<T> { x: Bar<Foo> }
@@ -1040,7 +1041,7 @@ fn needs_drop_raw<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         ty::Adt(def, _) if def.has_dtor(tcx) => true,
 
         // Can refer to a type which may drop.
-        // FIXME(eddyb) check this against a ParamEnv.
+        // FIXME(eddyb): check this against a `ParamEnv`.
         ty::Dynamic(..) | ty::Projection(..) | ty::Param(_) | ty::Bound(..) |
         ty::Placeholder(..) | ty::Opaque(..) | ty::Infer(_) | ty::Error => true,
 

@@ -411,7 +411,7 @@ impl<'a, 'mir, 'tcx: 'a + 'mir> EvalSnapshot<'a, 'mir, 'tcx>
 impl<'a, 'mir, 'tcx> Hash for EvalSnapshot<'a, 'mir, 'tcx>
 {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        // Implement in terms of hash stable, so that k1 == k2 -> hash(k1) == hash(k2)
+        // Implement in terms of hash stable, so that `k1 == k2` -> `hash(k1) == hash(k2)`.
         let mut hcx = self.memory.tcx.get_stable_hashing_context();
         let mut hasher = StableHasher::<u64>::new();
         self.hash_stable(&mut hcx, &mut hasher);

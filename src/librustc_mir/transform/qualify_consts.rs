@@ -1,7 +1,7 @@
 //! A pass that qualifies constness of temporaries in constants,
 //! static initializers and functions and also drives promotion.
 //!
-//! The Qualif flags below can be used to also provide better
+//! The `Qualif` flags below can be used to also provide better
 //! diagnostics as to why a constant rvalue wasn't promoted.
 
 use rustc_data_structures::bit_set::BitSet;
@@ -281,7 +281,7 @@ trait Qualif {
     }
 }
 
-// Constant containing interior mutability (UnsafeCell).
+// Constant containing interior mutability (i.e., `UnsafeCell`).
 struct HasMutInterior;
 
 impl Qualif for HasMutInterior {
@@ -301,10 +301,10 @@ impl Qualif for HasMutInterior {
 
                 if let BorrowKind::Mut { .. } = kind {
                     // In theory, any zero-sized value could be borrowed
-                    // mutably without consequences. However, only &mut []
+                    // mutably without consequences. However, only `&mut []`
                     // is allowed right now, and only in functions.
                     if cx.mode == Mode::StaticMut {
-                        // Inside a `static mut`, &mut [...] is also allowed.
+                        // Inside a `static mut`, `&mut [...]` is also allowed.
                         match ty.sty {
                             ty::Array(..) | ty::Slice(_) => {}
                             _ => return true,
@@ -338,7 +338,7 @@ impl Qualif for HasMutInterior {
     }
 }
 
-// Constant containing an ADT that implements Drop.
+// Constant containing an ADT that implements `Drop`.
 struct NeedsDrop;
 
 impl Qualif for NeedsDrop {
@@ -361,8 +361,8 @@ impl Qualif for NeedsDrop {
     }
 }
 
-// Not constant at all - non-`const fn` calls, asm!,
-// pointer comparisons, ptr-to-int casts, etc.
+// Not constant at all (e.g., non-`const fn` calls, `asm!`, pointer comparisons,
+// ptr-to-int casts, etc.).
 struct IsNotConst;
 
 impl Qualif for IsNotConst {
@@ -497,8 +497,8 @@ impl Qualif for IsNotConst {
     }
 }
 
-// Refers to temporaries which cannot be promoted as
-// promote_consts decided they weren't simple enough.
+// Refers to temporaries that cannot be promoted because `promote_consts` decided they weren't
+// simple enough.
 struct IsNotPromotable;
 
 impl Qualif for IsNotPromotable {
@@ -793,7 +793,7 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
             }
         }
 
-        // this is overly restrictive, because even full assignments do not clear the qualif
+        // This is overly restrictive, since even full assignments do not clear `qualif`.
         // While we could special case full assignments, this would be inconsistent with
         // aggregates where we overwrite all fields via assignments, which would not get
         // that feature.
@@ -902,11 +902,9 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
     }
 }
 
-/// Checks MIR for const-correctness, using `ConstCx`
-/// for value qualifications, and accumulates writes of
-/// rvalue/call results to locals, in `local_qualif`.
-/// For functions (constant or not), it also records
-/// candidates for promotion in `promotion_candidates`.
+/// Checks MIR for const-correctness, using `ConstCx` for value qualifications, and accumulates
+/// writes of rvalue/call results to locals, in `local_qualif`. For functions (constant or not),
+/// it also records candidates for promotion in `promotion_candidates`.
 impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
     fn visit_place(&mut self,
                     place: &Place<'tcx>,
@@ -1191,9 +1189,9 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                                 // special intrinsic that can be called diretly without an intrinsic
                                 // feature gate needs a language feature gate
                                 "transmute" => {
-                                    // never promote transmute calls
+                                    // Never promote `transmute` calls.
                                     if self.mode != Mode::Fn {
-                                        // const eval transmute calls only with the feature gate
+                                        // Const eval `transmute` calls only with the feature gate.
                                         if !self.tcx.features().const_transmute {
                                             emit_feature_err(
                                                 &self.tcx.sess.parse_sess, "const_transmute",
@@ -1227,7 +1225,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                                     // with their feature gate active
                                     // FIXME(eddyb) move stability checks from `is_const_fn` here.
                                 } else if self.is_const_panic_fn(def_id) {
-                                    // Check the const_panic feature gate.
+                                    // Check the `const_panic` feature gate.
                                     // FIXME: cannot allow this inside `allow_internal_unstable`
                                     // because that would make `panic!` insta stable in constants,
                                     // since the macro is marked with the attribute.
@@ -1469,7 +1467,7 @@ impl MirPass for QualifyAndPromoteConstants {
 
         debug!("run_pass: mode={:?}", mode);
         if mode == Mode::Fn || mode == Mode::ConstFn {
-            // This is ugly because Checker holds onto mir,
+            // This is ugly because `Checker` holds onto MIR,
             // which can't be mutated until its scope ends.
             let (temps, candidates) = {
                 let mut checker = Checker::new(tcx, def_id, mir, mode);
@@ -1577,7 +1575,7 @@ impl MirPass for QualifyAndPromoteConstants {
             }
         }
 
-        // Statics must be Sync.
+        // Statics must be `Sync`.
         if mode == Mode::Static {
             // `#[thread_local]` statics don't have to be `Sync`.
             for attr in &tcx.get_attrs(def_id)[..] {

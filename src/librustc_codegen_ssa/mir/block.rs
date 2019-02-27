@@ -333,8 +333,8 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                 let mut const_cond = bx.const_to_opt_u128(cond, false).map(|c| c == 1);
 
                 // This case can currently arise only from functions marked
-                // with #[rustc_inherit_overflow_checks] and inlined from
-                // another crate (mostly core::num generic/#[inline] fns),
+                // with `#[rustc_inherit_overflow_checks]` and inlined from
+                // another crate (mostly `core::num` generic/inline fns),
                 // while the current crate doesn't use overflow checks.
                 // NOTE: Unlike binops, negation doesn't have its own
                 // checked operation, just a comparison with the minimum
@@ -363,7 +363,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                     bx.cond_br(cond, panic_block.llbb(), lltarget);
                 }
 
-                // After this point, bx is the block for the call to panic.
+                // After this point, `bx` is the block for the call to panic.
                 bx = panic_block;
                 self.set_debug_loc(&mut bx, terminator.source_info);
 
@@ -455,7 +455,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                 );
                 let abi = sig.abi;
 
-                // Handle intrinsics old codegen wants Expr's for, ourselves.
+                // Handle intrinsics old codegen wants `Expr`s for, ourselves.
                 let intrinsic = match def {
                     Some(ty::InstanceDef::Intrinsic(def_id))
                         => Some(bx.tcx().item_name(def_id).as_str()),
@@ -663,9 +663,9 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
 
                     if let (0, Some(ty::InstanceDef::Virtual(_, idx))) = (i, def) {
                         if let Pair(..) = op.val {
-                            // In the case of Rc<Self>, we need to explicitly pass a
-                            // *mut RcBox<Self> with a Scalar (not ScalarPair) ABI. This is a hack
-                            // that is understood elsewhere in the compiler as a method on
+                            // In the case of `Rc<Self>`, we need to explicitly pass a
+                            // `*mut RcBox<Self>` with a `Scalar` (not `ScalarPair`) ABI. This is a
+                            // hack that is understood elsewhere in the compiler as a method on
                             // `dyn Trait`.
                             // To get a `*mut RcBox<Self>`, we just keep unwrapping newtypes until
                             // we get a value of a built-in pointer type
@@ -830,7 +830,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                         bx.range_metadata(llval, 0..2);
                     }
                 }
-                // We store bools as i8 so we need to truncate to i1.
+                // We store bools as `i8` so we need to truncate to `i1`.
                 llval = base::to_immediate(bx, llval, arg.layout);
             }
         }
@@ -960,7 +960,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
         fn_ret: &ArgType<'tcx, Ty<'tcx>>,
         llargs: &mut Vec<Bx::Value>, is_intrinsic: bool
     ) -> ReturnDest<'tcx, Bx::Value> {
-        // If the return is ignored, we can just return a do-nothing ReturnDest
+        // If the return is ignored, we can just return a do-nothing `ReturnDest`.
         if fn_ret.is_ignore() {
             return ReturnDest::Nothing;
         }
@@ -969,8 +969,8 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                 LocalRef::Place(dest) => dest,
                 LocalRef::UnsizedPlace(_) => bug!("return type must be sized"),
                 LocalRef::Operand(None) => {
-                    // Handle temporary places, specifically Operand ones, as
-                    // they don't have allocas
+                    // Handle temporary places, specifically `Operand` ones, as
+                    // they don't have `alloca`s.
                     return if fn_ret.is_indirect() {
                         // Odd, but possible, case, we have an operand temporary,
                         // but the calling convention has an indirect return.

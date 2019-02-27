@@ -134,7 +134,7 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
 
         // Simple cases, which don't need DST adjustment:
         //   * no metadata available - just log the case
-        //   * known alignment - sized types, [T], str or a foreign type
+        //   * known alignment - sized types, `[T]`, `str` or a foreign type
         //   * packed struct - there is no alignment padding
         match field.ty.sty {
             _ if self.llextra.is_none() => {
@@ -156,7 +156,7 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
         }
 
         // We need to get the pointer manually now.
-        // We do this by casting to a *i8, then offsetting it by the appropriate amount.
+        // We do this by casting to a `*i8`, then offsetting it by the appropriate amount.
         // We do this instead of, say, simply adjusting the pointer from the result of a GEP
         // because the field may have an arbitrary alignment in the LLVM representation
         // anyway.
@@ -236,7 +236,7 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
                     // We use `i1` for bytes that are always `0` or `1`,
                     // e.g., `#[repr(i8)] enum E { A, B }`, but we can't
                     // let LLVM interpret the `i1` as signed, because
-                    // then `i1 1` (i.e., E::B) is effectively `i8 -1`.
+                    // then `i1 1` (i.e., `E::B`) is effectively `i8 -1`.
                     layout::Int(_, signed) => !tag.is_bool() && signed,
                     _ => false
                 };
@@ -489,7 +489,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                         }
 
                         // Cast the place pointer type to the new
-                        // array or slice type (*[%_; new_len]).
+                        // array or slice type (`*[%_; new_len]`).
                         subslice.llval = bx.pointercast(subslice.llval,
                             bx.cx().type_ptr_to(bx.cx().backend_type(subslice.layout)));
 

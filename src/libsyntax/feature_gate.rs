@@ -409,7 +409,7 @@ declare_features! (
     // `#[doc(alias = "...")]`
     (active, doc_alias, "1.27.0", Some(50146), None),
 
-    // inconsistent bounds in where clauses
+    // inconsistent bounds in `where` clauses
     (active, trivial_bounds, "1.28.0", Some(48214), None),
 
     // `'a: { break 'a; }`
@@ -788,7 +788,7 @@ pub enum Stability {
     Deprecated(&'static str, Option<&'static str>),
 }
 
-// fn() is not Debug
+// `fn()` is not `Debug`.
 impl std::fmt::Debug for AttributeGate {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
@@ -1270,7 +1270,7 @@ pub const BUILTIN_ATTRIBUTES: &[(&str, AttributeType, AttributeTemplate, Attribu
                     cfg_fn!(custom_test_frameworks))),
 ];
 
-// cfg(...)'s that are feature gated
+// `cfg(...)`s that are feature gated.
 const GATED_CFGS: &[(&str, &str, fn(&Features) -> bool)] = &[
     // (name in cfg, feature, function to check if the feature is enabled)
     ("target_thread_local", "cfg_target_thread_local", cfg_fn!(cfg_target_thread_local)),

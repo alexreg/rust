@@ -44,7 +44,7 @@ impl ObjectSafetyViolation {
                 "the trait cannot require that `Self : Sized`".into(),
             ObjectSafetyViolation::SupertraitSelf =>
                 "the trait cannot use `Self` as a type parameter \
-                 in the supertraits or where-clauses".into(),
+                 in the supertraits or `where` clauses".into(),
             ObjectSafetyViolation::Method(name, MethodViolationCode::StaticMethod) =>
                 format!("method `{}` has no receiver", name).into(),
             ObjectSafetyViolation::Method(name, MethodViolationCode::ReferencesSelf) =>
@@ -221,7 +221,8 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
     fn generics_require_sized_self(self, def_id: DefId) -> bool {
         let sized_def_id = match self.lang_items().sized_trait() {
             Some(def_id) => def_id,
-            None => { return false; /* No Sized trait, can't require it! */ }
+            // No `Sized` trait; can't require it!
+            None => return false,
         };
 
         // Search for a predicate like `Self : Sized` amongst the trait bounds.
@@ -286,7 +287,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
 
     /// Returns `Some(_)` if this method cannot be called on a trait
     /// object; this does not necessarily imply that the enclosing trait
-    /// is not object safe, because the method might have a where clause
+    /// is not object safe, because the method might have a `where` clause
     /// `Self:Sized`.
     fn virtual_call_violation_for_method(self,
                                          trait_def_id: DefId,
@@ -355,7 +356,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
                     }
                 };
 
-                // e.g., Rc<()>
+                // e.g., `Rc<()>`
                 let unit_receiver_ty = self.receiver_for_self_ty(
                     receiver_ty, self.mk_unit(), method.def_id
                 );
@@ -377,7 +378,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
                     trait_def_id, self.mk_region(ty::ReStatic)
                 );
 
-                // e.g., Rc<dyn Trait>
+                // e.g., `Rc<dyn Trait>`
                 let trait_object_receiver = self.receiver_for_self_ty(
                     receiver_ty, trait_object_ty, method.def_id
                 );
@@ -502,10 +503,10 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
     /// by introducing a new type parameter `U` such that `Self: Unsize<U>` and `U: Trait + ?Sized`,
     /// and use `U` in place of `dyn Trait`. Written as a chalk-style query:
     ///
-    ///     forall (U: Trait + ?Sized) {
-    ///         if (Self: Unsize<U>) {
-    ///             Receiver: DispatchFromDyn<Receiver[Self => U]>
-    ///         }
+    /// ```
+    /// forall (U: Trait + ?Sized) {
+    ///     if (Self: Unsize<U>) {
+    ///         Receiver: DispatchFromDyn<Receiver[Self => U]>
     ///     }
     ///
     /// for `self: &'a mut Self`, this means `&'a mut Self: DispatchFromDyn<&'a mut U>`
@@ -532,10 +533,10 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             return false;
         };
 
-        // the type `U` in the query
-        // use a bogus type parameter to mimick a forall(U) query using u32::MAX for now.
-        // FIXME(mikeyhew) this is a total hack, and we should replace it when real forall queries
-        // are implemented
+        // This is the type `U` in the query.
+        // Use a bogus type parameter to mimick a `forall(U)` query using `u32::MAX` for now.
+        // FIXME(mikeyhew): this is a total hack, and we should replace it when real forall queries
+        // are implemented.
         let unsized_self_ty: Ty<'tcx> = self.mk_ty_param(
             ::std::u32::MAX,
             Name::intern("RustaceansAreAwesome").as_interned_str(),
@@ -551,13 +552,13 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
         let param_env = {
             let mut param_env = self.param_env(method.def_id);
 
-            // Self: Unsize<U>
+            // `Self: Unsize<U>`
             let unsize_predicate = ty::TraitRef {
                 def_id: unsize_did,
                 substs: self.mk_substs_trait(self.mk_self_type(), &[unsized_self_ty.into()]),
             }.to_predicate();
 
-            // U: Trait<Arg1, ..., ArgN>
+            // `U: Trait<Arg1, ..., ArgN>`
             let trait_predicate = {
                 let substs = InternalSubsts::for_item(
                     self,
@@ -587,7 +588,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             param_env
         };
 
-        // Receiver: DispatchFromDyn<Receiver[Self => U]>
+        // Receiver: `DispatchFromDyn<Receiver[Self => U]>`
         let obligation = {
             let predicate = ty::TraitRef {
                 def_id: dispatch_from_dyn_did,

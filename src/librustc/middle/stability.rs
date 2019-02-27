@@ -204,7 +204,7 @@ impl<'a, 'tcx: 'a> Annotator<'a, 'tcx> {
             }
 
             // Propagate unstability.  This can happen even for non-staged-api crates in case
-            // -Zforce-unstable-if-unmarked is set.
+            // `-Zforce-unstable-if-unmarked` is set.
             if let Some(stab) = self.parent_stab {
                 if stab.level.is_unstable() {
                     self.index.stab_map.insert(hir_id, stab);

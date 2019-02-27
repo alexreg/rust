@@ -1,26 +1,25 @@
-///////////////////////////////////////////////////////////////////////////
-// # Type combining
-//
-// There are four type combiners: equate, sub, lub, and glb.  Each
-// implements the trait `Combine` and contains methods for combining
-// two instances of various things and yielding a new instance.  These
-// combiner methods always yield a `Result<T>`.  There is a lot of
-// common code for these operations, implemented as default methods on
-// the `Combine` trait.
-//
-// Each operation may have side-effects on the inference context,
-// though these can be unrolled using snapshots. On success, the
-// LUB/GLB operations return the appropriate bound. The Eq and Sub
-// operations generally return the first operand.
-//
-// ## Contravariance
-//
-// When you are relating two things which have a contravariant
-// relationship, you should use `contratys()` or `contraregions()`,
-// rather than inversing the order of arguments!  This is necessary
-// because the order of arguments is not relevant for LUB and GLB.  It
-// is also useful to track which value is the "expected" value in
-// terms of error reporting.
+//! # Type combining
+//!
+//! There are four type combiners: equate, sub, lub, and glb. Each
+//! implements the trait `Combine` and contains methods for combining
+//! two instances of various things and yielding a new instance. These
+//! combiner methods always yield a `Result<T>`. There is a lot of
+//! common code for these operations, implemented as default methods on
+//! the `Combine` trait.
+//!
+//! Each operation may have side-effects on the inference context,
+//! though these can be unrolled using snapshots. On success, the
+//! LUB/GLB operations return the appropriate bound. The Eq and Sub
+//! operations generally return the first operand.
+//!
+//! ## Contravariance
+//!
+//! When you are relating two things that have a contravariant
+//! relationship, you should use `contratys()` or `contraregions()`,
+//! rather than inversing the order of arguments! This is necessary
+//! because the order of arguments is not relevant for LUB and GLB. It
+//! is also useful to track which value is the "expected" value in
+//! terms of error reporting.
 
 use super::equate::Equate;
 use super::glb::Glb;
@@ -327,7 +326,7 @@ struct Generalization<'tcx> {
     /// even if the source type is well-formed, so we should add an
     /// additional check to enforce that it is. This arises in
     /// particular around 'bivariant' type parameters that are only
-    /// constrained by a where-clause. As an example, imagine a type:
+    /// constrained by a `where` clause. As an example, imagine a type:
     ///
     ///     struct Foo<A, B> where A: Iterator<Item = B> {
     ///         data: A
@@ -403,7 +402,8 @@ impl<'cx, 'gcx, 'tcx> TypeRelation<'cx, 'gcx, 'tcx> for Generalizer<'cx, 'gcx, '
     }
 
     fn tys(&mut self, t: Ty<'tcx>, t2: Ty<'tcx>) -> RelateResult<'tcx, Ty<'tcx>> {
-        assert_eq!(t, t2); // we are abusing TypeRelation here; both LHS and RHS ought to be ==
+        // We are abusing `TypeRelation` here; both LHS and RHS ought to be `==`.
+        assert_eq!(t, t2);
 
         debug!("generalize: t={:?}", t);
 
@@ -417,8 +417,7 @@ impl<'cx, 'gcx, 'tcx> TypeRelation<'cx, 'gcx, 'tcx> for Generalizer<'cx, 'gcx, '
                 let vid = variables.root_var(vid);
                 let sub_vid = variables.sub_root_var(vid);
                 if sub_vid == self.for_vid_sub_root {
-                    // If sub-roots are equal, then `for_vid` and
-                    // `vid` are related via subtyping.
+                    // If sub-roots are equal, then `for_vid` and `vid` are related via subtyping.
                     return Err(TypeError::CyclicTy(self.root_ty));
                 } else {
                     match variables.probe(vid) {
@@ -436,10 +435,8 @@ impl<'cx, 'gcx, 'tcx> TypeRelation<'cx, 'gcx, 'tcx> for Generalizer<'cx, 'gcx, '
                                     }
                                 }
 
-                                // Bivariant: make a fresh var, but we
-                                // may need a WF predicate. See
-                                // comment on `needs_wf` field for
-                                // more info.
+                                // Bivariant: make a fresh var, but we may need a WF predicate.
+                                // See comment on `needs_wf` field for more info.
                                 ty::Bivariant => self.needs_wf = true,
 
                                 // Co/contravariant: this will be
@@ -472,7 +469,8 @@ impl<'cx, 'gcx, 'tcx> TypeRelation<'cx, 'gcx, 'tcx> for Generalizer<'cx, 'gcx, '
 
     fn regions(&mut self, r: ty::Region<'tcx>, r2: ty::Region<'tcx>)
                -> RelateResult<'tcx, ty::Region<'tcx>> {
-        assert_eq!(r, r2); // we are abusing TypeRelation here; both LHS and RHS ought to be ==
+        // We are abusing `TypeRelation` here; both LHS and RHS ought to be `==`.
+        assert_eq!(r, r2);
 
         debug!("generalize: regions r={:?}", r);
 

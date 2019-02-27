@@ -42,10 +42,10 @@ pub struct FreeRegion {
 #[derive(Clone, PartialEq, PartialOrd, Eq, Ord, Hash,
          RustcEncodable, RustcDecodable, Copy)]
 pub enum BoundRegion {
-    /// An anonymous region parameter for a given fn (&T)
+    /// An anonymous region parameter for a given fn (`&T`).
     BrAnon(u32),
 
-    /// Named region parameters for functions (a in &'a T)
+    /// Named region parameters for functions (`a` in `&'a T`).
     ///
     /// The `DefId` is needed to distinguish free regions in
     /// the event of shadowing.
@@ -79,8 +79,10 @@ impl BoundRegion {
     }
 }
 
-/// N.B., if you change this, you'll probably want to change the corresponding
-/// AST structure in `libsyntax/ast.rs` as well.
+/// The kind of a [`ty::Ty`].
+//
+// N.B., if you change this, you'll probably want to change the corresponding
+// AST structure in `libsyntax/ast.rs` as well.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, RustcEncodable, RustcDecodable)]
 pub enum TyKind<'tcx> {
     /// The primitive boolean type. Written as `bool`.
@@ -463,9 +465,9 @@ impl<'tcx> GeneratorSubsts<'tcx> {
 }
 
 impl<'a, 'gcx, 'tcx> GeneratorSubsts<'tcx> {
-    /// This returns the types of the MIR locals which had to be stored across suspension points.
-    /// It is calculated in rustc_mir::transform::generator::StateTransform.
-    /// All the types here must be in the tuple in GeneratorInterior.
+    /// Returns the types of the MIR locals which had to be stored across suspension points.
+    /// This is alculated in `rustc_mir::transform::generator::StateTransform`.
+    /// All the types here must be in the tuple in `GeneratorInterior`.
     pub fn state_tys(
         self,
         def_id: DefId,
@@ -475,17 +477,17 @@ impl<'a, 'gcx, 'tcx> GeneratorSubsts<'tcx> {
         state.map(move |d| d.ty.subst(tcx, self.substs))
     }
 
-    /// This is the types of the fields of a generate which
-    /// is available before the generator transformation.
-    /// It includes the upvars and the state discriminant which is u32.
+    /// Returns the types of the fields of a generator that are available before
+    /// the generator transformation.
+    /// This includes the upvars and the state discriminant (a `u32`).
     pub fn pre_transforms_tys(self, def_id: DefId, tcx: TyCtxt<'a, 'gcx, 'tcx>) ->
         impl Iterator<Item=Ty<'tcx>> + 'a
     {
         self.upvar_tys(def_id, tcx).chain(iter::once(tcx.types.u32))
     }
 
-    /// This is the types of all the fields stored in a generator.
-    /// It includes the upvars, state types and the state discriminant which is u32.
+    /// Returns the types of all the fields stored in a generator.
+    /// This includes the upvars, state types and the state discriminant (a `u32`).
     pub fn field_tys(self, def_id: DefId, tcx: TyCtxt<'a, 'gcx, 'tcx>) ->
         impl Iterator<Item=Ty<'tcx>> + Captures<'gcx> + 'a
     {
@@ -570,7 +572,7 @@ impl<'a, 'gcx, 'tcx> Binder<ExistentialPredicate<'tcx>> {
 impl<'tcx> serialize::UseSpecializedDecodable for &'tcx List<ExistentialPredicate<'tcx>> {}
 
 impl<'tcx> List<ExistentialPredicate<'tcx>> {
-    /// Returns the "principal def id" of this set of existential predicates.
+    /// Returns the "principal" `DefId` of this set of existential predicates.
     ///
     /// A Rust trait object type consists (in addition to a lifetime bound)
     /// of a set of trait bounds, which are separated into any number
@@ -655,7 +657,7 @@ impl<'tcx> Binder<&'tcx List<ExistentialPredicate<'tcx>>> {
 }
 
 /// A complete reference to a trait. These take numerous guises in syntax,
-/// but perhaps the most recognizable form is in a where-clause:
+/// but perhaps the most recognizable form is in a `where` clause:
 ///
 ///     T: Foo<U>
 ///
@@ -757,7 +759,7 @@ impl<'a, 'gcx, 'tcx> ExistentialTraitRef<'tcx> {
     pub fn erase_self_ty(tcx: TyCtxt<'a, 'gcx, 'tcx>,
                          trait_ref: ty::TraitRef<'tcx>)
                          -> ty::ExistentialTraitRef<'tcx> {
-        // Assert there is a Self.
+        // Assert there is a `Self`.
         trait_ref.substs.type_at(0);
 
         ty::ExistentialTraitRef {
@@ -802,11 +804,10 @@ impl<'tcx> PolyExistentialTraitRef<'tcx> {
 
 /// Binder is a binder for higher-ranked lifetimes or types. It is part of the
 /// compiler's representation for things like `for<'a> Fn(&'a isize)`
-/// (which would be represented by the type `PolyTraitRef ==
-/// Binder<TraitRef>`). Note that when we instantiate,
-/// erase, or otherwise "discharge" these bound vars, we change the
-/// type from `Binder<T>` to just `T` (see
-/// e.g., `liberate_late_bound_regions`).
+/// (which would be represented by the type `PolyTraitRef == Binder<TraitRef>`).
+/// Note that when we instantiate, erase, or otherwise "discharge" these bound
+/// vars, we change the type from `Binder<T>` to just `T`
+/// (see e.g., `liberate_late_bound_regions`).
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, RustcEncodable, RustcDecodable)]
 pub struct Binder<T>(T);
 
@@ -1192,7 +1193,7 @@ pub enum RegionKind {
     /// A region variable. Should not exist after typeck.
     ReVar(RegionVid),
 
-    /// A placeholder region - basically the higher-ranked version of ReFree.
+    /// A placeholder region - basically the higher-ranked version of `ReFree`.
     /// Should not exist after typeck.
     RePlaceholder(ty::PlaceholderRegion),
 
@@ -1537,7 +1538,7 @@ impl RegionKind {
     ///
     ///     fn bar<'b, 'c>(x: &self, y: &'b u32, z: &'c u64) where 'static: 'c
     ///            ^^  ^^     ^ anonymous, late-bound
-    ///            |   early-bound, appears in where-clauses
+    ///            |   early-bound, appears in `where` clauses
     ///            late-bound, appears only in fn args
     ///     {..}
     /// }

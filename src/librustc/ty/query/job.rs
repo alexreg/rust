@@ -87,9 +87,9 @@ impl<'tcx> QueryJob<'tcx> {
                 condvar: Condvar::new(),
             });
             self.latch.r#await(&waiter);
-            // FIXME: Get rid of this lock. We have ownership of the QueryWaiter
+            // FIXME: get rid of this lock. We have ownership of the `QueryWaiter`.
             // although another thread may still have a Lrc reference so we cannot
-            // use Lrc::get_mut
+            // use `Lrc::get_mut`.
             let mut cycle = waiter.cycle.lock();
             match cycle.take() {
                 None => Ok(()),
@@ -196,7 +196,7 @@ impl<'tcx> QueryLatch<'tcx> {
 
             // If this detects a deadlock and the deadlock handler wants to resume this thread
             // we have to be in the `wait` call. This is ensured by the deadlock handler
-            // getting the self.info lock.
+            // getting the `self.info` lock.
             rayon_core::mark_blocked();
             waiter.condvar.wait(&mut info);
         }
@@ -226,7 +226,8 @@ impl<'tcx> QueryLatch<'tcx> {
     }
 }
 
-/// A resumable waiter of a query. The usize is the index into waiters in the query's latch
+/// Represents a resumable waiter of a query. The `usize` is the index into waiters in the query's
+/// latch.
 #[cfg(parallel_compiler)]
 type Waiter<'tcx> = (Lrc<QueryJob<'tcx>>, usize);
 
@@ -238,7 +239,7 @@ type Waiter<'tcx> = (Lrc<QueryJob<'tcx>>, usize);
 /// For visits of non-resumable waiters it returns the return value of `visit`.
 /// For visits of resumable waiters it returns Some(Some(Waiter)) which has the
 /// required information to resume the waiter.
-/// If all `visit` calls returns None, this function also returns None.
+/// If all `visit` calls return `None`, this function also returns `None`.
 #[cfg(parallel_compiler)]
 fn visit_waiters<'tcx, F>(query: Lrc<QueryJob<'tcx>>, mut visit: F) -> Option<Option<Waiter<'tcx>>>
 where
@@ -275,7 +276,7 @@ fn cycle_check<'tcx>(query: Lrc<QueryJob<'tcx>>,
 ) -> Option<Option<Waiter<'tcx>>> {
     if !visited.insert(query.as_ptr()) {
         return if let Some(p) = stack.iter().position(|q| q.1.as_ptr() == query.as_ptr()) {
-            // We detected a query cycle, fix up the initial span and return Some
+            // We detected a query cycle, fix up the initial span and return `Some`.
 
             // Remove previous stack entries
             stack.drain(0..p);
@@ -316,7 +317,7 @@ fn connected_to_root<'tcx>(
         return false;
     }
 
-    // This query is connected to the root (it has no query parent), return true
+    // This query is connected to the root (it has no query parent); return `true`.
     if query.parent.is_none() {
         return true;
     }

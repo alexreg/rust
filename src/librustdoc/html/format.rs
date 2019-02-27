@@ -61,13 +61,13 @@ pub struct Function<'a> {
     pub asyncness: hir::IsAsync,
 }
 
-/// Wrapper struct for emitting a where-clause from Generics.
+/// Wrapper struct for emitting a `where` clause from Generics.
 pub struct WhereClause<'a>{
-    /// The Generics from which to emit a where-clause.
+    /// The Generics from which to emit a `where` clause.
     pub gens: &'a clean::Generics,
     /// The number of spaces to indent each line with.
     pub indent: usize,
-    /// Whether the where-clause needs to add a comma and newline after the last bound.
+    /// Whether the `where` clause needs to add a comma and newline after the last bound.
     pub end_newline: bool,
 }
 
@@ -587,7 +587,7 @@ fn fmt_type(t: &clean::Type, f: &mut fmt::Formatter<'_>, use_absolute: bool) -> 
                 &[] => primitive_link(f, PrimitiveType::Unit, "()"),
                 &[ref one] => {
                     primitive_link(f, PrimitiveType::Tuple, "(")?;
-                    //carry f.alternate() into this display w/o branching manually
+                    // Carry `f.alternate()` into this display without branching manually.
                     fmt::Display::fmt(one, f)?;
                     primitive_link(f, PrimitiveType::Tuple, ",)")
                 }

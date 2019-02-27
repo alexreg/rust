@@ -331,7 +331,7 @@ pub fn coerce_unsized_info<'a, 'gcx>(gcx: TyCtxt<'a, 'gcx, 'gcx>,
         gcx.sess.fatal(&format!("`CoerceUnsized` implementation {}", err));
     });
 
-    // this provider should only get invoked for local def-ids
+    // This provider should only get invoked for local `DefId`s.
     let impl_hir_id = gcx.hir().as_local_hir_id(impl_did).unwrap_or_else(|| {
         bug!("coerce_unsized_info: invoked for non-local def-id {:?}", impl_did)
     });
@@ -467,7 +467,7 @@ pub fn coerce_unsized_info<'a, 'gcx>(gcx: TyCtxt<'a, 'gcx, 'gcx>,
                         }
 
                         // Collect up all fields that were significantly changed
-                        // i.e., those that contain T in coerce_unsized T -> U
+                        // i.e., those that contain `T` in `coerce_unsized T -> U`.
                         Some((i, a, b))
                     })
                     .collect::<Vec<_>>();

@@ -2708,7 +2708,7 @@ fn item_module(w: &mut fmt::Formatter<'_>, cx: &Context,
     //
     // `Double` will appear twice in the generated docs.
     //
-    // FIXME: This code is quite ugly and could be improved. Small issue: DefId
+    // FIXME: this code is quite ugly and could be improved. Small issue: `DefId`
     // can be identical even if the elements are different (mostly in imports).
     // So in case this is an import, we keep everything by adding a "unique id"
     // (which is the position in the vector).

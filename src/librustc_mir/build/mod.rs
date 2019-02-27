@@ -86,7 +86,7 @@ pub fn mir_build<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> Mir<'t
             let mut abi = fn_sig.abi;
             let implicit_argument = match ty.sty {
                 ty::Closure(..) => {
-                    // HACK(eddyb) Avoid having RustCall on closures,
+                    // HACK(eddyb): avoid having `RustCall` on closures,
                     // as it adds unnecessary (and wrong) auto-tupling.
                     abi = Abi::Rust;
                     Some(ArgInfo(liberated_closure_env_ty(tcx, id, body_id), None, None, None))

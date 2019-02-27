@@ -50,7 +50,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
 
                 // Unsize of a nontrivial struct. I would prefer for
                 // this to be eliminated by MIR building, but
-                // `CoerceUnsized` can be passed by a where-clause,
+                // `CoerceUnsized` can be passed by a `where` clause,
                 // so the (generic) MIR may not be able to expand it.
                 let operand = self.codegen_operand(&mut bx, source);
                 match operand.val {
@@ -234,10 +234,9 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                         assert!(bx.cx().is_backend_scalar_pair(cast));
                         match operand.val {
                             OperandValue::Pair(lldata, llextra) => {
-                                // unsize from a fat pointer - this is a
-                                // "trait-object-to-supertrait" coercion, for
-                                // example,
-                                //   &'a fmt::Debug+Send => &'a fmt::Debug,
+                                // Unsize from a fat pointer -- this is a
+                                // trait-object-to-supertrait coercion (e.g.,
+                                // `&'a fmt::Debug + Send => &'a fmt::Debug`).
 
                                 // HACK(eddyb) have to bitcast pointers
                                 // until LLVM removes pointee types.

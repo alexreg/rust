@@ -111,19 +111,19 @@ pub trait TypeFoldable<'tcx>: fmt::Debug + Clone {
         self.has_type_flags(TypeFlags::HAS_FREE_REGIONS)
     }
 
-    /// True if there are any un-erased free regions.
+    /// Returns `true` if there are any un-erased free regions.
     fn has_erasable_regions(&self) -> bool {
         self.has_type_flags(TypeFlags::HAS_FREE_REGIONS)
     }
 
-    /// Indicates whether this value references only 'global'
+    /// Returns `true` if this value references only 'global'
     /// types/lifetimes that are the same regardless of what fn we are
     /// in. This is used for caching.
     fn is_global(&self) -> bool {
         !self.has_type_flags(TypeFlags::HAS_FREE_LOCAL_NAMES)
     }
 
-    /// True if there are any late-bound regions
+    /// Returns `true` if there are any late-bound regions.
     fn has_late_bound_regions(&self) -> bool {
         self.has_type_flags(TypeFlags::HAS_RE_LATE_BOUND)
     }
@@ -351,7 +351,7 @@ pub struct RegionFolder<'a, 'gcx: 'a+'tcx, 'tcx: 'a> {
     skipped_regions: &'a mut bool,
 
     /// Stores the index of a binder *just outside* the stuff we have
-    /// visited.  So this begins as INNERMOST; when we pass through a
+    /// visited. So this begins as `INNERMOST`; when we pass through a
     /// binder, it is incremented (via `shift_in`).
     current_index: ty::DebruijnIndex,
 
@@ -483,8 +483,8 @@ impl<'a, 'gcx, 'tcx> TypeFolder<'gcx, 'tcx> for BoundVarReplacer<'a, 'gcx, 'tcx>
                 let region = fld_r(br);
                 if let ty::ReLateBound(debruijn1, br) = *region {
                     // If the callback returns a late-bound region,
-                    // that region should always use the INNERMOST
-                    // debruijn index. Then we adjust it to the
+                    // that region should always use the `INNERMOST`
+                    // De Bruijn index. Then we adjust it to the
                     // correct depth.
                     assert_eq!(debruijn1, ty::INNERMOST);
                     self.tcx.mk_region(ty::ReLateBound(debruijn, br))

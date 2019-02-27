@@ -514,7 +514,7 @@ impl Integer {
     pub fn approximate_align<C: HasDataLayout>(cx: &C, wanted: Align) -> Integer {
         let dl = cx.data_layout();
 
-        // FIXME(eddyb) maybe include I128 in the future, when it works everywhere.
+        // FIXME(eddyb): maybe include `I128` in the future, when it works everywhere.
         for &candidate in &[I64, I32, I16] {
             if wanted >= candidate.align(dl).abi && wanted.bytes() >= candidate.size().bytes() {
                 return candidate;

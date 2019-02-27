@@ -2005,7 +2005,7 @@ impl<S: Semantics> IeeeFloat<S> {
             }
         }
 
-        // Calculate pow(5, abs(dec_exp)) into `pow5_full`.
+        // Calculate `pow(5, abs(dec_exp))` into `pow5_full`.
         // The *_calc Vec's are reused scratch space, as an optimization.
         let (pow5_full, mut pow5_calc, mut sig_calc, mut sig_scratch_calc) = {
             let mut power = dec_exp.abs() as usize;
@@ -2421,7 +2421,7 @@ mod sig {
         let _: Loss = shift_right(&mut dst[..dst_limbs], &mut 0, shift);
 
         // We now have (dst_limbs * LIMB_BITS - shift) bits from `src`
-        // in `dst`.  If this is less that src_bits, append the rest, else
+        // in `dst`.  If this is less that `src_bits`, append the rest, else
         // clear the high bits.
         let n = dst_limbs * LIMB_BITS - shift;
         if n < src_bits {

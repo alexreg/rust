@@ -174,7 +174,7 @@ impl<T: Idx> BitSet<T> {
 
     /// Duplicates the set as a hybrid set.
     pub fn to_hybrid(&self) -> HybridBitSet<T> {
-        // Note: we currently don't bother trying to make a Sparse set.
+        // Note: we currently don't bother trying to make a `Sparse` set.
         HybridBitSet::Dense(self.to_owned())
     }
 }

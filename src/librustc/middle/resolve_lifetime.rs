@@ -197,9 +197,9 @@ struct NamedRegionMap {
     // `Region` describing how that region is bound
     pub defs: HirIdMap<Region>,
 
-    // the set of lifetime def ids that are late-bound; a region can
-    // be late-bound if (a) it does NOT appear in a where-clause and
-    // (b) it DOES appear in the arguments.
+    // The set of lifetime `DefId`s that are late-bound; a region can
+    // be late-bound if (a) it *does not* appear in a `where` clause and
+    // (b) it *does* appear in the arguments.
     pub late_bound: HirIdSet,
 
     // For each type and trait definition, maps type parameters
@@ -227,7 +227,7 @@ struct LifetimeContext<'a, 'tcx: 'a> {
     map: &'a mut NamedRegionMap,
     scope: ScopeRef<'a>,
 
-    /// This is slightly complicated. Our representation for poly-trait-refs contains a single
+    /// This is slightly complicated. Our representation for `PolyTraitRef`s contains a single
     /// binder and thus we only allow a single level of quantification. However,
     /// the syntax of Rust permits quantification in two places, e.g., `T: for <'a> Foo<'a>`
     /// and `for <'a, 'b> &'b T: Foo<'a>`. In order to get the De Bruijn indices
@@ -368,7 +368,7 @@ pub fn provide(providers: &mut ty::query::Providers<'_>) {
         ..*providers
     };
 
-    // (*) FIXME the query should be defined to take a LocalDefId
+    // (*) FIXME: the query should be defined to take a `LocalDefId`.
 }
 
 /// Computes the `ResolveLifetimes` map that contains data for the
@@ -486,7 +486,7 @@ impl<'a, 'tcx> Visitor<'tcx> for LifetimeContext<'a, 'tcx> {
                 intravisit::walk_item(self, item);
             }
             hir::ItemKind::Static(..) | hir::ItemKind::Const(..) => {
-                // No lifetime parameters, but implied 'static.
+                // No lifetime parameters, but implied `'static`.
                 let scope = Scope::Elision {
                     elide: Elide::Exact(Region::Static),
                     s: ROOT_SCOPE,
@@ -497,9 +497,8 @@ impl<'a, 'tcx> Visitor<'tcx> for LifetimeContext<'a, 'tcx> {
                 impl_trait_fn: Some(_),
                 ..
             }) => {
-                // currently existential type declarations are just generated from impl Trait
-                // items. doing anything on this node is irrelevant, as we currently don't need
-                // it.
+                // Currently existential type declarations are just generated from `impl Trait`
+                // items. doing anything on this node is irrelevant, as we currently don't need it.
             }
             hir::ItemKind::Ty(_, ref generics)
             | hir::ItemKind::Existential(hir::ExistTy {
@@ -648,7 +647,7 @@ impl<'a, 'tcx> Visitor<'tcx> for LifetimeContext<'a, 'tcx> {
                         intravisit::walk_ty(self, ty);
                         return;
                     }
-                    // RPIT (return position impl trait)
+                    // RPIT (return-position `impl Trait`).
                     hir::ItemKind::Existential(hir::ExistTy {
                         ref generics,
                         ref bounds,
@@ -1312,8 +1311,8 @@ fn compute_object_lifetime_defaults(
     map
 }
 
-/// Scan the bounds and where-clauses on parameters to extract bounds
-/// of the form `T:'a` so as to determine the `ObjectLifetimeDefault`
+/// Scans the bounds and `where` clauses on parameters to extract bounds
+/// of the form `T: 'a` so as to determine the `ObjectLifetimeDefault`
 /// for each type parameter.
 fn object_lifetime_defaults_for_item(
     tcx: TyCtxt<'_, '_, '_>,
@@ -1339,7 +1338,7 @@ fn object_lifetime_defaults_for_item(
 
                 let param_def_id = tcx.hir().local_def_id_from_hir_id(param.hir_id);
                 for predicate in &generics.where_clause.predicates {
-                    // Look for `type: ...` where clauses.
+                    // Look for `type: ...` `where` clauses.
                     let data = match *predicate {
                         hir::WherePredicate::BoundPredicate(ref data) => data,
                         _ => continue,
@@ -2637,9 +2636,8 @@ impl<'a, 'tcx> LifetimeContext<'a, 'tcx> {
                 } => break true,
 
                 // In the return type or other such place, `'_` is not
-                // going to make a fresh name, so we cannot
-                // necessarily replace a single-use lifetime with
-                // `'_`.
+                // going to make a fresh name, so we cannot necessarily
+                // replace a single-use lifetime with `'_`.
                 Scope::Elision {
                     elide: Elide::Exact(_),
                     ..
@@ -2697,21 +2695,20 @@ impl<'a, 'tcx> LifetimeContext<'a, 'tcx> {
         }
     }
 
-    /// Sometimes we resolve a lifetime, but later find that it is an
-    /// error (esp. around impl trait). In that case, we remove the
-    /// entry into `map.defs` so as not to confuse later code.
+    /// Sometimes we resolve a lifetime, but later find that it is an error
+    /// (especially around `impl Trait`). In that case, we remove the entry
+    /// into `map.defs` so as not to confuse later code.
     fn uninsert_lifetime_on_error(&mut self, lifetime_ref: &'tcx hir::Lifetime, bad_def: Region) {
         let old_value = self.map.defs.remove(&lifetime_ref.hir_id);
         assert_eq!(old_value, Some(bad_def));
     }
 }
 
-/// Detects late-bound lifetimes and inserts them into
-/// `map.late_bound`.
+/// Detects late-bound lifetimes and inserts them into `map.late_bound`.
 ///
 /// A region declared on a fn is **late-bound** if:
 /// - it is constrained by an argument type;
-/// - it does not appear in a where-clause.
+/// - it does not appear in a `where` clause.
 ///
 /// "Constrained" basically means that it appears in any type but
 /// not amongst the inputs to a projection. In other words, `<&'a
@@ -2739,7 +2736,7 @@ fn insert_late_bound_lifetimes(
         constrained_by_input.regions
     );
 
-    // Walk the lifetimes that appear in where clauses.
+    // Walk the lifetimes that appear in `where` clauses.
     //
     // Subtle point: because we disallow nested bindings, we can just
     // ignore binders here and scrape up all names we see.
@@ -2762,10 +2759,10 @@ fn insert_late_bound_lifetimes(
         appears_in_where_clause.regions
     );
 
-    // Late bound regions are those that:
-    // - appear in the inputs
-    // - do not appear in the where-clauses
-    // - are not implicitly captured by `impl Trait`
+    // Late-bound regions are those that:
+    // - appear in the inputs,
+    // - do not appear in the `where` clauses,
+    // - are not implicitly captured by `impl Trait`.
     for param in &generics.params {
         match param.kind {
             hir::GenericParamKind::Lifetime { .. } => { /* fall through */ }
@@ -2776,7 +2773,7 @@ fn insert_late_bound_lifetimes(
         }
 
         let lt_name = hir::LifetimeName::Param(param.name.modern());
-        // appears in the where clauses? early-bound.
+        // Appears in the `where` clauses? Must be early-bound.
         if appears_in_where_clause.regions.contains(&lt_name) {
             continue;
         }

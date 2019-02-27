@@ -690,7 +690,7 @@ impl<'l, 'tcx: 'l> SaveContext<'l, 'tcx> {
         path_seg: &ast::PathSegment,
         id: NodeId,
     ) -> Option<Ref> {
-        // Returns true if the path is function type sugar, e.g., `Fn(A) -> B`.
+        // Returns `true` if the path is function type sugar, e.g., `Fn(A) -> B`.
         fn fn_type(seg: &ast::PathSegment) -> bool {
             if let Some(ref generic_args) = seg.args {
                 if let ast::GenericArgs::Parenthesized(_) = **generic_args {
@@ -1099,9 +1099,9 @@ impl<'b> SaveHandler for CallbackHandler<'b> {
         cratename: &str,
         input: &'l Input,
     ) {
-        // We're using the JsonDumper here because it has the format of the
-        // save-analysis results that we will pass to the callback. IOW, we are
-        // using the JsonDumper to collect the save-analysis results, but not
+        // We're using the `JsonDumper` here because it has the format of the
+        // save-analysis results that we will pass to the callback. I.e., we are
+        // using the `JsonDumper` to collect the save-analysis results, but not
         // actually to dump them to a file. This is all a bit convoluted and
         // there is certainly a simpler design here trying to get out (FIXME).
         let mut dumper = JsonDumper::with_callback(self.callback, save_ctxt.config.clone());
@@ -1181,7 +1181,7 @@ fn id_from_node_id(id: NodeId, scx: &SaveContext<'_, '_>) -> rls_data::Id {
     let def_id = scx.tcx.hir().opt_local_def_id(id);
     def_id.map(|id| id_from_def_id(id)).unwrap_or_else(|| {
         // Create a *fake* `DefId` out of a `NodeId` by subtracting the `NodeId`
-        // out of the maximum u32 value. This will work unless you have *billions*
+        // from the maximum `u32` value. This will work unless you have *billions*
         // of definitions in a single crate (very unlikely to actually happen).
         rls_data::Id {
             krate: LOCAL_CRATE.as_u32(),
@@ -1202,9 +1202,9 @@ fn lower_attributes(attrs: Vec<Attribute>, scx: &SaveContext<'_, '_>) -> Vec<rls
     // Only retain real attributes. Doc comments are lowered separately.
     .filter(|attr| attr.path != "doc")
     .map(|mut attr| {
-        // Remove the surrounding '#[..]' or '#![..]' of the pretty printed
-        // attribute. First normalize all inner attribute (#![..]) to outer
-        // ones (#[..]), then remove the two leading and the one trailing character.
+        // Remove the surrounding '#[..]' or '#![..]' of the pretty-printed
+        // attribute. First normalize all inner attribute (`#![..]`) to outer
+        // ones (`#[..]`), then remove the two leading and the one trailing character.
         attr.style = ast::AttrStyle::Outer;
         let value = pprust::attribute_to_string(&attr);
         // This str slicing works correctly, because the leading and trailing characters

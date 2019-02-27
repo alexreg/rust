@@ -186,7 +186,7 @@ fn print_backtrace(backtrace: &mut Backtrace) {
 impl<'tcx> From<EvalErrorKind<'tcx, u64>> for EvalError<'tcx> {
     fn from(kind: EvalErrorKind<'tcx, u64>) -> Self {
         let backtrace = match env::var("RUST_CTFE_BACKTRACE") {
-            // matching RUST_BACKTRACE, we treat "0" the same as "not present".
+            // Matching `RUST_BACKTRACE` -- we treat "0" the same as "not present".
             Ok(ref val) if val != "0" => {
                 let mut backtrace = Backtrace::new_unresolved();
 

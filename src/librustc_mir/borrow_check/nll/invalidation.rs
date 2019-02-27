@@ -388,7 +388,8 @@ impl<'cg, 'cx, 'tcx, 'gcx> InvalidationGenerator<'cx, 'tcx, 'gcx> {
         _is_local_mutation_allowed: LocalMutationIsAllowed,
     ) {
         let (sd, rw) = kind;
-        // note: not doing check_access_permissions checks because they don't generate invalidates
+        // N.B., we don't do `check_access_permissions` checks here because they don't generate
+        // invalidations.
         self.check_access_for_conflict(context, place, sd, rw);
     }
 

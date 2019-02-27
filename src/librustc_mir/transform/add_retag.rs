@@ -136,7 +136,7 @@ impl MirPass for AddRetag {
                     // `Drop` is also a call, but it doesn't return anything so we are good.
                 }
                 _ => {
-                    // Not a block ending in a Call -> ignore.
+                    // Not a block ending in a `Call`, so ignore.
                 }
             }
         }

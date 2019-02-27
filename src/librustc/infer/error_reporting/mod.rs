@@ -133,16 +133,16 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
 
             ty::RePlaceholder(_) => (format!("any other region"), None),
 
-            // FIXME(#13998) RePlaceholder should probably print like
-            // ReFree rather than dumping Debug output on the user.
+            // FIXME(#13998): `RePlaceholder` should probably print like
+            // `ReFree` rather than dumping `Debug` output on the user.
             //
-            // We shouldn't really be having unification failures with ReVar
-            // and ReLateBound though.
+            // We shouldn't really be having unification failures with `ReVar`
+            // and `ReLateBound` though.
             ty::ReVar(_) | ty::ReLateBound(..) | ty::ReErased => {
                 (format!("lifetime {:?}", region), None)
             }
 
-            // We shouldn't encounter an error message with ReClosureBound.
+            // We shouldn't encounter an error message with `ReClosureBound`.
             ty::ReClosureBound(..) => {
                 bug!("encountered unexpected ReClosureBound: {:?}", region,);
             }
@@ -452,8 +452,8 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
                 let found_path = self.tcx.item_path_str(did2);
                 let exp_abs_path = self.tcx.absolute_item_path_str(did1);
                 let found_abs_path = self.tcx.absolute_item_path_str(did2);
-                // We compare strings because DefPath can be different
-                // for imported and non-imported crates
+                // We compare strings because `DefPath` can be different
+                // for imported and non-imported crates.
                 if exp_path == found_path || exp_abs_path == found_abs_path {
                     let crate_name = self.tcx.crate_name(did1.krate);
                     err.span_note(
@@ -914,7 +914,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
                 values
             }
 
-            // When encountering &T != &mut T, highlight only the borrow
+            // When encountering `&T != &mut T`, highlight only the borrow.
             (&ty::Ref(r1, ref_ty1, mutbl1), &ty::Ref(r2, ref_ty2, mutbl2))
                 if equals(&ref_ty1, &ref_ty2) =>
             {
@@ -1161,7 +1161,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         Some(self.cmp(exp_found.expected, exp_found.found))
     }
 
-    /// Returns a string of the form "expected `{}`, found `{}`".
+    /// Returns a string of the form `"expected `{}`, found `{}`"`.
     fn expected_found_str<T: fmt::Display + TypeFoldable<'tcx>>(
         &self,
         exp_found: &ty::error::ExpectedFound<T>,

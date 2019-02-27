@@ -409,7 +409,7 @@ fn check_impl<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     });
 }
 
-/// Checks where-clauses and inline bounds that are declared on `def_id`.
+/// Checks `where` clauses and inline bounds that are declared on `def_id`.
 fn check_where_clauses<'a, 'gcx, 'fcx, 'tcx>(
     tcx: TyCtxt<'a, 'gcx, 'gcx>,
     fcx: &FnCtxt<'fcx, 'gcx, 'tcx>,
@@ -947,7 +947,7 @@ fn reject_shadowing_parameters(tcx: TyCtxt<'_, '_, '_>, def_id: DefId) {
     }).collect();
 
     for method_param in &generics.params {
-        // Shadowing is checked in resolve_lifetime.
+        // Shadowing is checked in `resolve_lifetime`.
         if let GenericParamDefKind::Lifetime = method_param.kind {
             continue
         }

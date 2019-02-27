@@ -1082,7 +1082,7 @@ impl<'a> State<'a> {
         match els {
             Some(_else) => {
                 match _else.node {
-                    // "another else-if"
+                    // Another `else if` block.
                     hir::ExprKind::If(ref i, ref then, ref e) => {
                         self.cbox(indent_unit - 1)?;
                         self.ibox(0)?;
@@ -1092,7 +1092,7 @@ impl<'a> State<'a> {
                         self.print_expr(&then)?;
                         self.print_else(e.as_ref().map(|e| &**e))
                     }
-                    // "final else"
+                    // Final `else` block.
                     hir::ExprKind::Block(ref b, _) => {
                         self.cbox(indent_unit - 1)?;
                         self.ibox(0)?;
@@ -1101,7 +1101,7 @@ impl<'a> State<'a> {
                     }
                     // BLEAH, constraints would be great here
                     _ => {
-                        panic!("print_if saw if with weird alternative");
+                        panic!("`print_if` saw `if` with weird alternative");
                     }
                 }
             }

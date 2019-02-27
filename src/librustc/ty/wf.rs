@@ -32,7 +32,8 @@ pub fn obligations<'a, 'gcx, 'tcx>(infcx: &InferCtxt<'a, 'gcx, 'tcx>,
         debug!("wf::obligations({:?}, body_id={:?}) ~~> {:?}", ty, body_id, result);
         Some(result)
     } else {
-        None // no progress made, return None
+        // No progress made; return `None`.
+        None
     }
 }
 
@@ -121,7 +122,7 @@ struct WfPredicates<'a, 'gcx: 'a+'tcx, 'tcx: 'a> {
 ///
 /// Here, in the `Foo` impl, we will check that `T: Copy` holds -- but
 /// we decide that this is true because `T: Bar` is in the
-/// where-clauses (and we can elaborate that to include `T:
+/// `where` clauses (and we can elaborate that to include `T:
 /// Copy`). This wouldn't be a problem, except that when we check the
 /// `Bar` impl, we decide that `T: Foo` must hold because of the `Foo`
 /// impl. And so nowhere did we check that `T: Copy` holds!
@@ -375,9 +376,9 @@ impl<'a, 'gcx, 'tcx> WfPredicates<'a, 'gcx, 'tcx> {
                     // regions. This is perhaps not ideal.
                     self.from_object_ty(ty, data, r);
 
-                    // FIXME(#27579) RFC also considers adding trait
-                    // obligations that don't refer to Self and
-                    // checking those
+                    // FIXME(#27579): RFC also considers adding trait
+                    // obligations that don't refer to `Self` and
+                    // checking those.
 
                     let cause = self.cause(traits::MiscObligation);
                     let component_traits =

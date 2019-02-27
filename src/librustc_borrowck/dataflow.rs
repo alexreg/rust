@@ -421,7 +421,7 @@ impl<'a, 'tcx, O:DataFlowOperator> DataFlowContext<'a, 'tcx, O> {
                     if (word & bit) != 0 {
                         // N.B., we round up the total number of bits
                         // that we store in any given bit set so that
-                        // it is an even multiple of usize::BITS.  This
+                        // it is an even multiple of `usize::BITS`.  This
                         // means that there may be some stray bits at
                         // the end that do not correspond to any
                         // actual value.  So before we callback, check

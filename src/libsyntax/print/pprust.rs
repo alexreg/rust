@@ -1802,7 +1802,7 @@ impl<'a> State<'a> {
         match els {
             Some(_else) => {
                 match _else.node {
-                    // "another else-if"
+                    // Another `else if` block.
                     ast::ExprKind::If(ref i, ref then, ref e) => {
                         self.cbox(INDENT_UNIT - 1)?;
                         self.ibox(0)?;
@@ -1812,7 +1812,7 @@ impl<'a> State<'a> {
                         self.print_block(then)?;
                         self.print_else(e.as_ref().map(|e| &**e))
                     }
-                    // "another else-if-let"
+                    // Another `else if let` block.
                     ast::ExprKind::IfLet(ref pats, ref expr, ref then, ref e) => {
                         self.cbox(INDENT_UNIT - 1)?;
                         self.ibox(0)?;
@@ -1825,7 +1825,7 @@ impl<'a> State<'a> {
                         self.print_block(then)?;
                         self.print_else(e.as_ref().map(|e| &**e))
                     }
-                    // "final else"
+                    // Final `else` block.
                     ast::ExprKind::Block(ref b, _) => {
                         self.cbox(INDENT_UNIT - 1)?;
                         self.ibox(0)?;

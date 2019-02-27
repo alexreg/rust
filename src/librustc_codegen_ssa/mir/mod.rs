@@ -143,9 +143,9 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
         }
     }
 
-    // DILocations inherit source file name from the parent DIScope.  Due to macro expansions
-    // it may so happen that the current span belongs to a different file than the DIScope
-    // corresponding to span's containing source scope.  If so, we need to create a DIScope
+    // `DILocation`s inherit source file name from the parent `DIScope`.  Due to macro expansions
+    // it may so happen that the current span belongs to a different file than the `DIScope`
+    // corresponding to span's containing source scope.  If so, we need to create a `DIScope`
     // "extension" into that file.
     fn scope_metadata_for_loc(&self, scope_id: mir::SourceScope, pos: BytePos)
                               -> Option<Bx::DIScope> {
@@ -506,8 +506,8 @@ fn arg_local_refs<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
 
         if arg_scope.is_none() && !memory_locals.contains(local) {
             // We don't have to cast or keep the argument in the alloca.
-            // FIXME(eddyb): We should figure out how to use llvm.dbg.value instead
-            // of putting everything in allocas just so we can use llvm.dbg.declare.
+            // FIXME(eddyb): we should figure out how to use `llvm.dbg.value` instead
+            // of putting everything in allocas just so we can use `llvm.dbg.declare`.
             let local = |op| LocalRef::Operand(Some(op));
             match arg.mode {
                 PassMode::Ignore => {

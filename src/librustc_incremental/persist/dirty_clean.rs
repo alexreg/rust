@@ -32,14 +32,15 @@ const EXCEPT: &str = "except";
 const LABEL: &str = "label";
 const CFG: &str = "cfg";
 
-// Base and Extra labels to build up the labels
+// `Base` and `Extra` labels to build up the labels
+// ------------------------------------------------
 
-/// For typedef, constants, and statics
+/// `DepNode`s for typedefs, constants, and statics.
 const BASE_CONST: &[&str] = &[
     label_strs::TypeOfItem,
 ];
 
-/// DepNodes for functions + methods
+/// `DepNode`s for functions and methods.
 const BASE_FN: &[&str] = &[
     // Callers will depend on the signature of these items, so we better test
     label_strs::FnSignature,
@@ -52,28 +53,28 @@ const BASE_FN: &[&str] = &[
     label_strs::TypeckTables,
 ];
 
-/// DepNodes for Hir, which is pretty much everything
+/// `DepNode`s for `Hir`, which is pretty much everything.
 const BASE_HIR: &[&str] = &[
-    // Hir and HirBody should be computed for all nodes
+    // `Hir` and `HirBody` should be computed for all nodes.
     label_strs::Hir,
     label_strs::HirBody,
 ];
 
-/// `impl` implementation of struct/trait
+/// `DepNode`s for `impl` implementations of structs/traits.
 const BASE_IMPL: &[&str] = &[
     label_strs::AssociatedItemDefIds,
     label_strs::GenericsOfItem,
     label_strs::ImplTraitRef,
 ];
 
-/// DepNodes for MirBuilt/Optimized, which is relevant in "executable"
-/// code, i.e., functions+methods
+/// `DepNode`s for `MirValidated`/`MirOptimized`, which is relevant in "executable"
+/// code (i.e., functions and methods).
 const BASE_MIR: &[&str] = &[
     label_strs::MirOptimized,
     label_strs::MirBuilt,
 ];
 
-/// Struct, Enum and Union DepNodes
+/// Struct, enum and union `DepNode`s.
 ///
 /// Note that changing the type of a field does not change the type of the struct or enum, but
 /// adding/removing fields or changing a fields name or visibility does.
@@ -110,14 +111,14 @@ const LABELS_CONST: &[&[&str]] = &[
     BASE_CONST,
 ];
 
-/// Constant/Typedef in an impl
+/// Impl constant/typedef `DepNode`s.
 const LABELS_CONST_IN_IMPL: &[&[&str]] = &[
     BASE_HIR,
     BASE_CONST,
     EXTRA_ASSOCIATED,
 ];
 
-/// Trait-Const/Typedef DepNodes
+/// Trait constant/typedef `DepNode`s.
 const LABELS_CONST_IN_TRAIT: &[&[&str]] = &[
     BASE_HIR,
     BASE_CONST,
@@ -177,9 +178,7 @@ const LABELS_TRAIT: &[&[&str]] = &[
 // FIXME: Struct/Enum/Unions Fields (there is currently no way to attach these)
 //
 // Fields are kind of separate from their containers, as they can change independently from
-// them. We should at least check
-//
-//     TypeOfItem for these.
+// them. We should at least check `TypeOfItem` for these.
 
 type Labels = FxHashSet<String>;
 
@@ -319,8 +318,8 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
         Labels::default()
     }
 
-    /// Return all DepNode labels that should be asserted for this item.
-    /// index=0 is the "name" used for error messages
+    /// Returns all DepNode labels that should be asserted for this item.
+    /// `index = 0` is the "name" used for error messages
     fn auto_labels(&mut self, item_id: ast::NodeId, attr: &Attribute) -> (&'static str, Labels) {
         let node = self.tcx.hir().get(item_id);
         let (name, labels) = match node {
@@ -350,7 +349,7 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
                     // // An external module
                     HirItem::ForeignMod(..) => ("ItemForeignMod", LABELS_HIR_ONLY),
 
-                    // Module-level inline assembly (from global_asm!)
+                    // Module-level inline assembly (from `global_asm!`).
                     HirItem::GlobalAsm(..) => ("ItemGlobalAsm", LABELS_HIR_ONLY),
 
                     // A type alias, e.g., `type Foo = Bar<u8>`

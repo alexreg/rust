@@ -704,7 +704,7 @@ impl<'tcx> Visitor<'tcx> for UsePlacementFinder {
             visit::walk_mod(self, module);
             return;
         }
-        // find a use statement
+        // Find a `use` statement.
         for item in &module.items {
             match item.node {
                 ItemKind::Use(..) => {
@@ -716,7 +716,7 @@ impl<'tcx> Visitor<'tcx> for UsePlacementFinder {
                         return;
                     }
                 },
-                // don't place use before extern crate
+                // Don't place use before `extern crate` ...
                 ItemKind::ExternCrate(_) => {}
                 // but place them before the first other item
                 _ => if self.span.map_or(true, |span| item.span < span ) {
@@ -1082,7 +1082,7 @@ pub struct ModuleData<'a> {
     parent: Option<Module<'a>>,
     kind: ModuleKind,
 
-    // The def id of the closest normal module (`mod`) ancestor (including this module).
+    // The `DefId` of the closest normal module (`mod`) ancestor (including this module).
     normal_ancestor_id: DefId,
 
     resolutions: RefCell<FxHashMap<(Ident, Namespace), &'a RefCell<NameResolution<'a>>>>,
@@ -1424,7 +1424,7 @@ impl<'a> NameBinding<'a> {
     // See more detailed explanation in
     // https://github.com/rust-lang/rust/pull/53778#issuecomment-419224049
     fn may_appear_after(&self, invoc_parent_expansion: Mark, binding: &NameBinding<'_>) -> bool {
-        // self > max(invoc, binding) => !(self <= invoc || self <= binding)
+        // `self > max(invoc, binding) => !(self <= invoc || self <= binding)`
         // Expansions are partially ordered, so "may appear after" is an inversion of
         // "certainly appears before or simultaneously" and includes unordered cases.
         let self_parent_expansion = self.expansion;
@@ -1854,8 +1854,7 @@ impl<'a> Resolver<'a> {
 
             definitions,
 
-            // The outermost module has def ID 0; this is not reflected in the
-            // AST.
+            // The outermost module has `DefId` `0`; this is not reflected in the AST.
             graph_root,
             prelude: None,
             extern_prelude,
@@ -2471,7 +2470,7 @@ impl<'a> Resolver<'a> {
                                         this.visit_ty(ty);
 
                                         // Only impose the restrictions of
-                                        // ConstRibKind for an actual constant
+                                        // `ConstRibKind` for an actual constant
                                         // expression in a provided default.
                                         if let Some(ref expr) = *default{
                                             this.with_constant_rib(|this| {
@@ -2814,7 +2813,7 @@ impl<'a> Resolver<'a> {
     fn check_trait_item<F>(&mut self, ident: Ident, ns: Namespace, span: Span, err: F)
         where F: FnOnce(Name, &str) -> ResolutionError<'_>
     {
-        // If there is a TraitRef in scope for an impl, then the method must be in the
+        // If there is a `TraitRef` in scope for an impl, then the method must be in the
         // trait.
         if let Some((module, _)) = self.current_trait_ref {
             if self.resolve_ident_in_module(
@@ -2884,8 +2883,9 @@ impl<'a> Resolver<'a> {
 
                 let map_j = self.binding_mode_map(&q);
                 for (&key, &binding_i) in &map_i {
-                    if map_j.is_empty() {                   // Account for missing bindings when
-                        let binding_error = missing_vars    // map_j has none.
+                    // Account for missing bindings when `map_j` has none.
+                    if map_j.is_empty() {
+                        let binding_error = missing_vars
                             .entry(key.name)
                             .or_insert(BindingError {
                                 name: key.name,
@@ -2942,7 +2942,7 @@ impl<'a> Resolver<'a> {
             self.resolve_pattern(&pattern, PatternSource::Match, &mut bindings_list);
         }
 
-        // This has to happen *after* we determine which pat_idents are variants.
+        // This has to happen *after* we determine which `pat_idents` are variants.
         self.check_consistent_bindings(&arm.pats);
 
         if let Some(ast::Guard::If(ref expr)) = arm.guard {
@@ -3056,7 +3056,7 @@ impl<'a> Resolver<'a> {
     fn resolve_pattern(&mut self,
                        pat: &Pat,
                        pat_src: PatternSource,
-                       // Maps idents to the node ID for the
+                       // Maps idents to the `NodeId` for the
                        // outermost pattern that binds them.
                        bindings: &mut FxHashMap<Ident, NodeId>) {
         // Visit all direct subpatterns of this pattern.
@@ -3317,7 +3317,7 @@ impl<'a> Resolver<'a> {
         for (i, ns) in [primary_ns, TypeNS, ValueNS, /*MacroNS*/].iter().cloned().enumerate() {
             if i == 0 || ns != primary_ns {
                 match self.resolve_qpath(id, qself, path, ns, span, global_by_default, crate_lint) {
-                    // If defer_to_typeck, then resolution > no resolution,
+                    // If `defer_to_typeck`, then resolution > no resolution,
                     // otherwise full resolution > partial resolution > no resolution.
                     Some(res) if res.unresolved_segments() == 0 || defer_to_typeck =>
                         return Some(res),
@@ -4139,7 +4139,7 @@ impl<'a> Resolver<'a> {
                 for pat in pats {
                     self.resolve_pattern(pat, PatternSource::IfLet, &mut bindings_list);
                 }
-                // This has to happen *after* we determine which pat_idents are variants
+                // This has to happen *after* we determine which `pat_idents` are variants.
                 self.check_consistent_bindings(pats);
                 self.visit_block(if_block);
                 self.ribs[ValueNS].pop();
@@ -4164,7 +4164,7 @@ impl<'a> Resolver<'a> {
                     for pat in pats {
                         this.resolve_pattern(pat, PatternSource::WhileLet, &mut bindings_list);
                     }
-                    // This has to happen *after* we determine which pat_idents are variants.
+                    // This has to happen *after* we determine which `pat_idents` are variants.
                     this.check_consistent_bindings(pats);
                     this.visit_block(block);
                     this.ribs[ValueNS].pop();
@@ -4232,8 +4232,8 @@ impl<'a> Resolver<'a> {
                     self.resolve_pattern(&argument.pat, PatternSource::FnParam, &mut bindings_list);
                     self.visit_ty(&argument.ty);
                 }
-                // No need to resolve return type-- the outer closure return type is
-                // FunctionRetTy::Default
+                // No need to resolve return type -- the outer closure return type is
+                // `FunctionRetTy::Default`.
 
                 // Now resolve the inner closure
                 {
@@ -4505,7 +4505,7 @@ impl<'a> Resolver<'a> {
             self.populate_module_if_necessary(in_module);
 
             in_module.for_each_child_stable(|ident, _, name_binding| {
-                // abort if the module is already found or if name_binding is private external
+                // Abort if the module is already found or if `name_binding` is private external.
                 if result.is_some() || !name_binding.vis.is_visible_locally() {
                     return
                 }

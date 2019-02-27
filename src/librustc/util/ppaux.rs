@@ -1321,7 +1321,7 @@ define_print! {
                             return Ok(());
                         }
                         // Grab the "TraitA + TraitB" from `impl TraitA + TraitB`,
-                        // by looking up the projections associated with the def_id.
+                        // by looking up the projections associated with `def_id`.
                         let predicates_of = tcx.predicates_of(def_id);
                         let substs = tcx.lift(&substs).unwrap_or_else(|| {
                             tcx.intern_substs(&[])
@@ -1532,7 +1532,7 @@ define_print! {
     ('tcx) ty::ProjectionTy<'tcx>, (self, f, cx) {
         display {
             // FIXME(tschottdorf): use something like
-            //   parameterized(f, self.substs, self.item_def_id, &[])
+            // `parameterized(f, self.substs, self.item_def_id, &[])`
             // (which currently ICEs).
             let (trait_ref, item_name) = ty::tls::with(|tcx|
                 (self.trait_ref(tcx), tcx.associated_item(self.item_def_id).ident)

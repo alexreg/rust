@@ -667,8 +667,8 @@ struct Liveness<'a, 'tcx: 'a> {
     successors: Vec<LiveNode>,
     rwu_table: RWUTable,
 
-    // mappings from loop node ID to LiveNode
-    // ("break" label should map to loop node ID,
+    // mappings from loop `NodeId` to LiveNode
+    // ("break" label should map to loop `NodeId`,
     // it probably doesn't now)
     break_ln: NodeMap<LiveNode>,
     cont_ln: NodeMap<LiveNode>,
@@ -937,7 +937,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
 
         let entry_ln = self.propagate_through_expr(body, s.fallthrough_ln);
 
-        // hack to skip the loop unless debug! is enabled:
+        // HACK: skip the loop unless `debug!` is enabled.
         debug!("^^ liveness computation results for body {} (entry={:?})", {
                    for ln_idx in 0..self.ir.num_live_nodes {
                         debug!("{:?}", self.ln_str(LiveNode(ln_idx as u32)));
@@ -970,8 +970,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                 // the live variable as defined if it was initialized, and then we
                 // could check for uninit variables just by scanning what is live
                 // at the start of the function. But that doesn't work so well for
-                // immutable variables defined in a loop:
-                //     loop { let x; x = 5; }
+                // immutable variables defined in a loop (e.g., `loop { let x; x = 5; }`),
                 // because the "assignment" loops back around and generates an error.
                 //
                 // So now we just check that variables defined w/o an
@@ -1104,7 +1103,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             }
 
             hir::ExprKind::Ret(ref o_e) => {
-                // ignore succ and subst exit_ln:
+                // Ignore `succ` and `subst exit_ln`.
                 let exit_ln = self.s.exit_ln;
                 self.propagate_through_opt_expr(o_e.as_ref().map(|e| &**e), exit_ln)
             }
@@ -1137,8 +1136,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             }
 
             hir::ExprKind::Assign(ref l, ref r) => {
-                // see comment on places in
-                // propagate_through_place_components()
+                // See comment on places in `propagate_through_place_components()`.
                 let succ = self.write_place(&l, succ, ACC_WRITE);
                 let succ = self.propagate_through_place_components(&l, succ);
                 self.propagate_through_expr(&r, succ)
@@ -1150,8 +1148,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                     let succ = self.propagate_through_expr(&l, succ);
                     self.propagate_through_expr(&r, succ)
                 } else {
-                    // see comment on places in
-                    // propagate_through_place_components()
+                    // See comment on places in `propagate_through_place_components()`.
                     let succ = self.write_place(&l, succ, ACC_WRITE|ACC_READ);
                     let succ = self.propagate_through_expr(&r, succ);
                     self.propagate_through_place_components(&l, succ)
@@ -1225,8 +1222,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
 
             hir::ExprKind::InlineAsm(ref ia, ref outputs, ref inputs) => {
                 let succ = ia.outputs.iter().zip(outputs).rev().fold(succ, |succ, (o, output)| {
-                // see comment on places
-                // in propagate_through_place_components()
+                // See comment on places in `propagate_through_place_components()`.
                 if o.is_indirect {
                     self.propagate_through_expr(output, succ)
                 } else {
@@ -1287,8 +1283,8 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
         //
         // A tracked place is a local variable/argument `x`.  In
         // these cases, the link_node where the write occurs is linked
-        // to node id of `x`.  The `write_place()` routine generates
-        // the contents of this node.  There are no subcomponents to
+        // to `NodeId` of `x`. The `write_place()` routine generates
+        // the contents of this node. There are no subcomponents to
         // consider.
         //
         // # Non-tracked places
@@ -1312,7 +1308,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
         }
     }
 
-    // see comment on propagate_through_place()
+    // See comment on `propagate_through_place()`.
     fn write_place(&mut self, expr: &Expr, succ: LiveNode, acc: u32) -> LiveNode {
         match expr.node {
             hir::ExprKind::Path(hir::QPath::Resolved(_, ref path)) => {
@@ -1599,7 +1595,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             if let Some(name) = r {
                 // annoying: for parameters in funcs like `fn(x: i32)
                 // {ret}`, there is only one node, so asking about
-                // assigned_on_exit() is not meaningful.
+                // `assigned_on_exit()` is not meaningful.
                 let is_assigned = if ln == self.s.exit_ln {
                     false
                 } else {

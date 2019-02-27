@@ -15,7 +15,7 @@
 //! 'folding' an existing one), then you create a new ID using `next_id()`.
 //!
 //! You must ensure that IDs are unique. That means that you should only use the
-//! ID from an AST node in a single HIR node (you can assume that AST node IDs
+//! ID from an AST node in a single HIR node (you can assume that AST `NodeId`s
 //! are unique). Every new node must have a unique ID. Avoid cloning HIR nodes.
 //! If you do, you must then set the new node's ID to a fresh one.
 //!
@@ -715,7 +715,7 @@ impl<'a> LoweringContext<'a> {
         result
     }
 
-    /// Creates a new hir::GenericParam for every new lifetime and
+    /// Creates a new `hir::GenericParam` for every new lifetime and
     /// type parameter encountered while evaluating `f`. Definitions
     /// are created with the parent provided. If no `parent_id` is
     /// provided, no definitions will be returned.
@@ -2060,15 +2060,15 @@ impl<'a> LoweringContext<'a> {
     // Lowers a function declaration.
     //
     // decl: the unlowered (ast) function declaration.
-    // fn_def_id: if `Some`, impl Trait arguments are lowered into generic parameters on the
+    // `fn_def_id`: if `Some`, impl Trait arguments are lowered into generic parameters on the
     //      given DefId, otherwise impl Trait is disallowed. Must be `Some` if
-    //      make_ret_async is also `Some`.
-    // impl_trait_return_allow: determines whether impl Trait can be used in return position.
-    //      This guards against trait declarations and implementations where impl Trait is
+    //      `make_ret_async` is also `Some`.
+    // `impl_trait_return_allow`: determines whether `impl Trait` can be used in return position.
+    //      This guards against trait declarations and implementations where `impl Trait` is
     //      disallowed.
-    // make_ret_async: if `Some`, converts `-> T` into `-> impl Future<Output = T>` in the
+    // `make_ret_async`: if `Some`, converts `-> T` into `-> impl Future<Output = T>` in the
     //      return type. This is used for `async fn` declarations. The `NodeId` is the id of the
-    //      return type impl Trait item.
+    //      return type `impl Trait` item.
     fn lower_fn_decl(
         &mut self,
         decl: &FnDecl,
@@ -2143,10 +2143,10 @@ impl<'a> LoweringContext<'a> {
 
     // Transform `-> T` into `-> impl Future<Output = T>` for `async fn`
     //
-    // fn_span: the span of the async function declaration. Used for error reporting.
-    // inputs: lowered types of arguments to the function. Used to collect lifetimes.
-    // output: unlowered output type (`T` in `-> T`)
-    // fn_def_id: DefId of the parent function. Used to create child impl trait definition.
+    // `fn_span`: the span of the async function declaration. Used for error reporting.
+    // `inputs`: lowered types of arguments to the function. Used to collect lifetimes.
+    // `output`: unlowered output type (`T` in `-> T`).
+    // `fn_def_id`: `DefId` of the parent function. Used to create child impl trait definition.
     fn lower_async_fn_ret_ty(
         &mut self,
         inputs: &[hir::Ty],
@@ -2320,7 +2320,7 @@ impl<'a> LoweringContext<'a> {
                 }
             };
 
-            // "<Output = T>"
+            // `<Output = T>`
             let LoweredNodeId { node_id, hir_id } = this.next_id();
             let future_params = P(hir::GenericArgs {
                 args: hir_vec![],
@@ -2534,9 +2534,9 @@ impl<'a> LoweringContext<'a> {
         -> hir::Generics
     {
         // Collect `?Trait` bounds in where clause and move them to parameter definitions.
-        // FIXME: this could probably be done with less rightward drift. Also looks like two control
-        //        paths where report_error is called are also the only paths that advance to after
-        //        the match statement, so the error reporting could probably just be moved there.
+        // FIXME: this could probably be done with less rightward drift. It also looks like two
+        // control paths where `report_error` is called are the only paths that advance to after the
+        // match statement, so the error reporting could probably just be moved there.
         let mut add_bounds: NodeMap<Vec<_>> = Default::default();
         for pred in &generics.where_clause.predicates {
             if let WherePredicate::BoundPredicate(ref bound_pred) = *pred {
@@ -3202,7 +3202,7 @@ impl<'a> LoweringContext<'a> {
                     let mut ident = ident.clone();
                     let mut prefix = prefix.clone();
 
-                    // Give the segments new node-ids since they are being cloned.
+                    // Give the segments new `NodeId`s since they are being cloned.
                     for seg in &mut prefix.segments {
                         seg.id = self.sess.next_node_id();
                     }
@@ -3258,7 +3258,7 @@ impl<'a> LoweringContext<'a> {
                 // because that affects rustdoc and also the lints
                 // about `pub` items. But we can't *always* make it
                 // private -- particularly not for restricted paths --
-                // because it contains node-ids that would then be
+                // because it contains `NodeId`s that would then be
                 // unused, failing the check that HirIds are "densely
                 // assigned".
                 match vis.node {

@@ -207,7 +207,7 @@ pub struct Inherited<'a, 'gcx: 'a+'tcx, 'tcx: 'a> {
     // `FnOnce` closure. In that case, we defer full resolution of the
     // call until upvar inference can kick in and make the
     // decision. We keep these deferred resolutions grouped by the
-    // def-id of the closure, so that once we decide, we can easily go
+    // `DefId` of the closure, so that once we decide, we can easily go
     // back and process them.
     deferred_call_resolutions: RefCell<DefIdMap<Vec<DeferredCallResolution<'gcx, 'tcx>>>>,
 
@@ -923,7 +923,7 @@ fn typeck_tables_of<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         fcx.resolve_type_vars_in_body(body)
     });
 
-    // Consistency check our TypeckTables instance can hold all ItemLocalIds
+    // Consistency check our `TypeckTables` instance can hold all `ItemLocalId`s
     // it will need to hold.
     assert_eq!(tables.local_id_root, Some(DefId::local(id.owner)));
 
@@ -1099,7 +1099,7 @@ fn check_fn<'a, 'gcx, 'tcx>(inherited: &'a Inherited<'a, 'gcx, 'tcx>,
             None,
         );
 
-        // Check that argument is Sized.
+        // Check that argument is `Sized`.
         // The check for a non-trivial pattern is a hack to avoid duplicate warnings
         // for simple cases like `fn foo(x: Trait)`,
         // where we would error once on the parameter as a whole, and once on the binding `x`.
@@ -1116,7 +1116,7 @@ fn check_fn<'a, 'gcx, 'tcx>(inherited: &'a Inherited<'a, 'gcx, 'tcx>,
 
     // We insert the deferred_generator_interiors entry after visiting the body.
     // This ensures that all nested generators appear before the entry of this generator.
-    // resolve_generator_interiors relies on this property.
+    // `resolve_generator_interiors` relies on this property.
     let gen_ty = if can_be_generator.is_some() && body.is_generator {
         let interior = fcx.next_ty_var(TypeVariableOrigin::MiscVariable(span));
         fcx.deferred_generator_interiors.borrow_mut().push((body.id(), interior));
@@ -1784,7 +1784,7 @@ fn check_packed_inner<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
             if tcx.adt_def(def.did).repr.align > 0 {
                 return true;
             }
-            // push struct def_id before checking fields
+            // Push `def_id` of struct before checking fields.
             stack.push(def_id);
             for field in &def.non_enum_variant().fields {
                 let f = field.ty(tcx, substs);
@@ -2074,13 +2074,13 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
     }
 
     /// Resolves type variables in `ty` if possible. Unlike the infcx
-    /// version (resolve_type_vars_if_possible), this version will
+    /// version (`resolve_type_vars_if_possible`), this version will
     /// also select obligations if it seems useful, in an effort
     /// to get more type information.
     fn resolve_type_vars_with_obligations(&self, mut ty: Ty<'tcx>) -> Ty<'tcx> {
         debug!("resolve_type_vars_with_obligations(ty={:?})", ty);
 
-        // No Infer()? Nothing needs doing.
+        // No `Infer()`? Nothing needs doing.
         if !ty.has_infer_types() {
             debug!("resolve_type_vars_with_obligations: ty={:?}", ty);
             return ty;
@@ -2275,7 +2275,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                 debug!(" - composing on top of {:?}", entry.get());
                 match (&entry.get()[..], &adj[..]) {
                     // Applying any adjustment on top of a NeverToAny
-                    // is a valid NeverToAny adjustment, because it can't
+                    // is a valid `NeverToAny` adjustment, because it can't
                     // be reached.
                     (&[Adjustment { kind: Adjust::NeverToAny, .. }], _) => return,
                     (&[
@@ -2288,7 +2288,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                         // A reborrow has no effect before a dereference.
                     }
                     // FIXME: currently we never try to compose autoderefs
-                    // and ReifyFnPointer/UnsafeFnPointer, but we could.
+                    // and `ReifyFnPointer`/`UnsafeFnPointer`, but we could.
                     _ =>
                         bug!("while adjusting {:?}, can't compose {:?} and {:?}",
                              expr, entry.get(), adj)
@@ -2543,11 +2543,11 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
     }
 
     // Tries to apply a fallback to `ty` if it is an unsolved variable.
-    // Non-numerics get replaced with ! or () (depending on whether
-    // feature(never_type) is enabled, unconstrained ints with i32,
+    // Non-numerics get replaced with `!` or `()` (depending on whether
+    // feature(never_type) is enabled, unconstrained ints with `i32`,
     // unconstrained floats with f64.
     // Fallback becomes very dubious if we have encountered type-checking errors.
-    // In that case, fallback to Error.
+    // In that case, fallback to `Error`.
     // The return value indicates whether fallback has occurred.
     fn fallback_if_possible(&self, ty: Ty<'tcx>) -> bool {
         use rustc::ty::error::UnconstrainedNumeric::Neither;
@@ -2588,10 +2588,10 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                                           method: MethodCallee<'tcx>)
                                           -> ty::TypeAndMut<'tcx>
     {
-        // extract method return type, which will be &T;
+        // Extract method return type, which will be `&T`.
         let ret_ty = method.sig.output();
 
-        // method returns &T, but the type as visible to user is T, so deref
+        // Method returns `&T`, but type as visible to user is `T`, so deref.
         ret_ty.builtin_deref(true).unwrap()
     }
 
@@ -2666,7 +2666,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                         hir::MutMutable => AutoBorrowMutability::Mutable {
                             // Indexing can be desugared to a method call,
                             // so maybe we could use two-phase here.
-                            // See the documentation of AllowTwoPhase for why that's
+                            // See the documentation of `AllowTwoPhase` for why that's
                             // not the case today.
                             allow_two_phase_borrow: AllowTwoPhase::No,
                         }
@@ -2726,7 +2726,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                needs,
                op);
 
-        // Try Mut first, if needed.
+        // Try `Mut` first, if needed.
         let (mut_tr, mut_op) = self.resolve_place_op(op, true);
         let method = match (needs, mut_tr) {
             (Needs::MutPlace, Some(trait_did)) => {
@@ -2966,7 +2966,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             expected_arg_tys = &[];
             self.err_args(supplied_arg_count)
         };
-        // If there is no expectation, expect formal_tys.
+        // If there is no expectation, expect `formal_tys`.
         let expected_arg_tys = if !expected_arg_tys.is_empty() {
             expected_arg_tys
         } else {
@@ -3960,8 +3960,8 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         let error_happened = self.check_expr_struct_fields(adt_ty, expected, expr.hir_id, path_span,
                                                            variant, fields, base_expr.is_none());
         if let &Some(ref base_expr) = base_expr {
-            // If check_expr_struct_fields hit an error, do not attempt to populate
-            // the fields with the base_expr. This could cause us to hit errors later
+            // If `check_expr_struct_fields` hit an error, do not attempt to populate
+            // the fields with the `base_expr`. This could cause us to hit errors later
             // when certain fields are assumed to exist that in fact do not.
             if !error_happened {
                 self.check_expr_has_type_or_error(base_expr, adt_ty);
@@ -4008,7 +4008,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         // Warn for expressions after diverging siblings.
         self.warn_if_unreachable(expr.hir_id, expr.span, "expression");
 
-        // Hide the outer diverging and has_errors flags.
+        // Hide the outer diverging and `has_errors` flags.
         let old_diverges = self.diverges.get();
         let old_has_errors = self.has_errors.get();
         self.diverges.set(Diverges::Maybe);
@@ -4035,7 +4035,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         // we don't warn for the diverging expression itself.
         self.write_ty(expr.hir_id, ty);
 
-        // Combine the diverging and has_error flags.
+        // Combine the diverging and `has_error` flags.
         self.diverges.set(self.diverges.get() | old_diverges);
         self.has_errors.set(self.has_errors.get() | old_has_errors);
 
@@ -4212,9 +4212,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                         // but don't want to expose the removal to stable Rust.
                         // i.e., we don't want to allow
                         //
-                        // ```rust
-                        // drop as fn(str);
-                        // ```
+                        //     drop as fn(str);
                         //
                         // to work in stable even if the Sized bound on `drop` is relaxed.
                         for i in 0..fn_sig.inputs().skip_binder().len() {
@@ -4444,7 +4442,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             }
             ExprKind::Loop(ref body, _, source) => {
                 let coerce = match source {
-                    // you can only use break with a value from a normal `loop { }`
+                    // Can only use `break` with a value from a normal `loop { }`.
                     hir::LoopSource::Loop => {
                         let coerce_to = expected.coercion_target_type(self, body.span);
                         Some(CoerceMany::new(coerce_to))
@@ -4592,8 +4590,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                 if let Ok(count) = count {
                     let zero_or_one = count.assert_usize(tcx).map_or(false, |count| count <= 1);
                     if !zero_or_one {
-                        // For [foo, ..n] where n > 1, `foo` must have
-                        // Copy type:
+                        // For [foo, ..n] where n > 1, `foo` must have `Copy` type.
                         let lang_item = self.tcx.require_lang_item(lang_items::CopyTraitLangItem);
                         self.require_type_meets(t, expr.span, traits::RepeatVec, lang_item);
                     }
@@ -4655,7 +4652,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                     let base_t = self.structurally_resolved_type(base.span, base_t);
                     match self.lookup_indexing(expr, base, base_t, idx_t, needs) {
                         Some((index_ty, element_ty)) => {
-                            // two-phase not needed because index_ty is never mutable
+                            // Two-phase not needed because `index_ty` is never mutable.
                             self.demand_coerce(idx, idx_t, index_ty, AllowTwoPhase::No);
                             element_ty
                         }
@@ -5580,7 +5577,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                                       hir_id: hir::HirId,
                                       span: Span) {
         // We're only interested in functions tagged with
-        // #[rustc_args_required_const], so ignore anything that's not.
+        // `#[rustc_args_required_const]`, so ignore anything that's not.
         if !self.tcx.has_attr(def_id, "rustc_args_required_const") {
             return
         }

@@ -91,7 +91,7 @@ pub struct MismatchedProjectionTypes<'tcx> {
 
 #[derive(PartialEq, Eq, Debug)]
 enum ProjectionTyCandidate<'tcx> {
-    // from a where-clause in the env or object type
+    // from a `where` clause in the env or object type
     ParamEnv(ty::PolyProjectionPredicate<'tcx>),
 
     // from the definition of `Trait` when you have something like <<A as Trait>::B as Trait2>::C
@@ -117,7 +117,7 @@ impl<'tcx> ProjectionTyCandidateSet<'tcx> {
         *self = ProjectionTyCandidateSet::Error(err);
     }
 
-    // Returns true if the push was successful, or false if the candidate
+    // Returns `true` if the push was successful, or `false` if the candidate
     // was discarded -- this could be because of ambiguity, or because
     // a higher-priority candidate is already there.
     fn push_candidate(&mut self, candidate: ProjectionTyCandidate<'tcx>) -> bool {
@@ -141,14 +141,14 @@ impl<'tcx> ProjectionTyCandidateSet<'tcx> {
             }
 
             Single(current) => {
-                // Duplicates can happen inside ParamEnv. In the case, we
+                // Duplicates can happen inside `ParamEnv`. In the case, we
                 // perform a lazy deduplication.
                 if current == &candidate {
                     return false;
                 }
 
-                // Prefer where-clauses. As in select, if there are multiple
-                // candidates, we prefer where-clause candidates over impls.  This
+                // Prefer `where` clauses. As in select, if there are multiple
+                // candidates, we prefer `where` clause candidates over impls. This
                 // may seem a bit surprising, since impls are the source of
                 // "truth" in some sense, but in fact some of the impls that SEEM
                 // applicable are not, because of nested obligations. Where
@@ -543,17 +543,17 @@ fn opt_normalize_projection_type<'a, 'b, 'gcx, 'tcx>(
             }
         }
         Err(ProjectionCacheEntry::InProgress) => {
-            // If while normalized A::B, we are asked to normalize
-            // A::B, just return A::B itself. This is a conservative
-            // answer, in the sense that A::B *is* clearly equivalent
+            // If while normalized `A::B`, we are asked to normalize
+            // `A::B`, just return `A::B` itself. This is a conservative
+            // answer, in the sense that `A::B` *is* clearly equivalent
             // to A::B, though there may be a better value we can
             // find.
 
             // Under lazy normalization, this can arise when
-            // bootstrapping.  That is, imagine an environment with a
-            // where-clause like `A::B == u32`. Now, if we are asked
+            // bootstrapping. That is, imagine an environment with a
+            // `where` clause like `A::B == u32`. Now, if we are asked
             // to normalize `A::B`, we will want to check the
-            // where-clauses in scope. So we will try to unify `A::B`
+            // `where` clauses in scope. So we will try to unify `A::B`
             // with `A::B`, which can trigger a recursive
             // normalization. In that case, I think we will want this code:
             //
@@ -621,7 +621,7 @@ fn opt_normalize_projection_type<'a, 'b, 'gcx, 'tcx>(
                                             obligations: mut projected_obligations })) => {
             // if projection succeeded, then what we get out of this
             // is also non-normalized (consider: it was derived from
-            // an impl, where-clause etc) and hence we must
+            // an impl, `where` clause etc) and hence we must
             // re-normalize it
 
             debug!("opt_normalize_projection_type: \
@@ -1141,7 +1141,7 @@ fn assemble_candidates_from_impls<'cx, 'gcx, 'tcx>(
                 // resolve `T::Foo`? And of course it does, but in fact
                 // that single predicate is desugared into two predicates
                 // in the compiler: a trait predicate (`T : SomeTrait`) and a
-                // projection. And the projection where clause is handled
+                // projection. And the projection `where` clause is handled
                 // in `assemble_candidates_from_param_env`.
                 false
             }
@@ -1212,7 +1212,7 @@ fn confirm_select_candidate<'cx, 'gcx, 'tcx>(
         super::VtableParam(..) |
         super::VtableBuiltin(..) |
         super::VtableTraitAlias(..) =>
-            // we don't create Select candidates with this kind of resolution
+            // We don't create `Select` candidates with this kind of resolution.
             span_bug!(
                 obligation.cause.span,
                 "Cannot project an associated type from `{:?}`",
@@ -1479,7 +1479,7 @@ fn confirm_impl_candidate<'cx, 'gcx, 'tcx>(
         // This means that the impl is missing a definition for the
         // associated type. This error will be reported by the type
         // checker method `check_impl_items_against_trait`, so here we
-        // just return Error.
+        // just return `Error`.
         debug!("confirm_impl_candidate: no associated type {:?} for {:?}",
                assoc_ty.item.ident,
                obligation.predicate);
@@ -1694,7 +1694,7 @@ impl<'tcx> ProjectionCache<'tcx> {
     }
 
     /// A specialized version of `complete` for when the key's value is known
-    /// to be a NormalizedTy.
+    /// to be a `NormalizedTy`.
     pub fn complete_normalized(&mut self, key: ProjectionCacheKey<'tcx>, ty: &NormalizedTy<'tcx>) {
         // We want to insert `ty` with no obligations. If the existing value
         // already has no obligations (as is common) we don't insert anything.

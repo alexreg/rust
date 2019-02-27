@@ -390,7 +390,7 @@ fn nameize<I: Iterator<Item = NamedMatch>>(
             TokenTree::MetaVarDecl(sp, bind_name, _) => {
                 match ret_val.entry(bind_name) {
                     Vacant(spot) => {
-                        // FIXME(simulacrum): Don't construct Rc here
+                        // FIXME(simulacrum): don't construct `Rc` here.
                         spot.insert(Rc::new(res.next().unwrap()));
                     }
                     Occupied(..) => {
@@ -727,9 +727,9 @@ pub fn parse(
                 );
             }
         }
-        // Performance hack: eof_items may share matchers via Rc with other things that we want
-        // to modify. Dropping eof_items now may drop these refcounts to 1, preventing an
-        // unnecessary implicit clone later in Rc::make_mut.
+        // Performance hack: `eof_items` may share matchers via Rc with other things that we want
+        // to modify. Dropping eof_items now may drop these ref counts to 1, preventing an
+        // unnecessary implicit clone later in `Rc::make_mut`.
         drop(eof_items);
 
         // Another possibility is that we need to call out to parse some rust nonterminal

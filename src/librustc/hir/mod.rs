@@ -122,8 +122,8 @@ impl fmt::Display for HirId {
 mod item_local_id_inner {
     use rustc_data_structures::indexed_vec::Idx;
     /// An `ItemLocalId` uniquely identifies something within a given "item-like",
-    /// that is within a hir::Item, hir::TraitItem, or hir::ImplItem. There is no
-    /// guarantee that the numerical value of a given `ItemLocalId` corresponds to
+    /// that is within a `hir::Item`, `hir::TraitItem`, or `hir::ImplItem`. There is
+    /// no guarantee that the numerical value of a given `ItemLocalId` corresponds to
     /// the node's position within the owning item in any way, but there is a
     /// guarantee that the `LocalItemId`s within an owner occupy a dense range of
     /// integers starting at zero, so a mapping that maps all or most nodes within
@@ -380,8 +380,8 @@ impl PathSegment {
         }
     }
 
-    // FIXME: hack required because you can't create a static
-    // `GenericArgs`, so you can't just return a `&GenericArgs`.
+    // HACK: required because you can't create a static `GenericArgs`,
+    // so you can't just return a `&GenericArgs`.
     pub fn with_generic_args<F, R>(&self, f: F) -> R
         where F: FnOnce(&GenericArgs) -> R
     {
@@ -624,7 +624,7 @@ pub enum SyntheticTyParamKind {
     ImplTrait
 }
 
-/// A where-clause in a definition.
+/// A `where` clause in a definition.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub struct WhereClause {
     pub hir_id: HirId,
@@ -643,7 +643,7 @@ impl WhereClause {
     }
 }
 
-/// A single predicate in a where-clause.
+/// A single predicate in a `where` clause.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub enum WherePredicate {
     /// A type binding (e.g., `for<'c> Foo: Send + Clone + 'c`).
@@ -715,8 +715,8 @@ pub struct Crate {
     pub span: Span,
     pub exported_macros: HirVec<MacroDef>,
 
-    // N.B., we use a BTreeMap here so that `visit_all_items` iterates
-    // over the ids in increasing order. In principle it should not
+    // N.B., we use a `BTreeMap` here so that `visit_all_items` iterates
+    // over the IDs in increasing order. In principle it should not
     // matter what order we visit things in, but in *practice* it
     // does, because it can affect the order in which errors are
     // detected, which in turn can make compile-fail tests yield
@@ -1623,11 +1623,11 @@ impl fmt::Display for LoopIdError {
 
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug, Copy)]
 pub struct Destination {
-    // This is `Some(_)` iff there is an explicit user-specified `label
+    // This is `Some(_)` iff there is an explicit user-specified label.
     pub label: Option<Label>,
 
     // These errors are caught and then reported during the diagnostics pass in
-    // librustc_passes/loops.rs
+    // `librustc_passes/loops.rs`.
     pub target_id: Result<NodeId, LoopIdError>,
 }
 
@@ -1644,7 +1644,7 @@ pub enum CaptureClause {
 }
 
 // N.B., if you change this, you'll probably want to change the corresponding
-// type structure in middle/ty.rs as well.
+// type structure in `middle/ty.rs` as well.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub struct MutTy {
     pub ty: P<Ty>,
@@ -1659,7 +1659,7 @@ pub struct MethodSig {
 }
 
 // The bodies for items are stored "out of line", in a separate
-// hashmap in the `Crate`. Here we just record the node-id of the item
+// hashmap in the `Crate`. Here we just record the `NodeId` of the item
 // so it can fetched later.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, RustcEncodable, RustcDecodable, Debug)]
 pub struct TraitItemId {
@@ -1705,7 +1705,7 @@ pub enum TraitItemKind {
 }
 
 // The bodies for items are stored "out of line", in a separate
-// hashmap in the `Crate`. Here we just record the node-id of the item
+// hashmap in the `Crate`. Here we just record the `NodeId` of the item
 // so it can fetched later.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, RustcEncodable, RustcDecodable, Debug)]
 pub struct ImplItemId {
@@ -2058,12 +2058,12 @@ pub enum UseKind {
     ListStem,
 }
 
-/// TraitRef's appear in impls.
+/// `TraitRef`'s appear in impls.
 ///
-/// resolve maps each TraitRef's ref_id to its defining trait; that's all
-/// that the ref_id is for. Note that ref_id's value is not the NodeId of the
-/// trait being referred to but just a unique NodeId that serves as a key
-/// within the DefMap.
+/// Resolution maps each TraitRef's `ref_id` to its defining trait; that's all
+/// that the `ref_id` is for. Note that `ref_id`'s value is not the `NodeId` of the
+/// trait being referred to but just a unique `NodeId` that serves as a key
+/// within the `DefMap`.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub struct TraitRef {
     pub path: Path,
@@ -2215,7 +2215,7 @@ impl VariantData {
 }
 
 // The bodies for items are stored "out of line", in a separate
-// hashmap in the `Crate`. Here we just record the node-id of the item
+// hashmap in the `Crate`. Here we just record the `NodeId` of the item
 // so it can fetched later.
 #[derive(Copy, Clone, RustcEncodable, RustcDecodable, Debug)]
 pub struct ItemId {
@@ -2268,7 +2268,7 @@ pub enum ItemKind {
     Mod(Mod),
     /// An external module
     ForeignMod(ForeignMod),
-    /// Module-level inline assembly (from global_asm!)
+    /// Module-level inline assembly (from `global_asm!`).
     GlobalAsm(P<GlobalAsm>),
     /// A type alias, e.g., `type Foo = Bar<u8>`
     Ty(P<Ty>, Generics),
@@ -2280,9 +2280,9 @@ pub enum ItemKind {
     Struct(VariantData, Generics),
     /// A union definition, e.g., `union Foo<A, B> {x: A, y: B}`
     Union(VariantData, Generics),
-    /// Represents a Trait Declaration
+    /// Represents a trait declaration (e.g., `trait Foo<A> { ... }`).
     Trait(IsAuto, Unsafety, Generics, GenericBounds, HirVec<TraitItemRef>),
-    /// Represents a Trait Alias Declaration
+    /// Represents a trait alias declaration (e.g., `trait Foo<A> = Bar<A>;`).
     TraitAlias(Generics, GenericBounds),
 
     /// An implementation, eg `impl<A> Trait for Foo { .. }`
@@ -2445,7 +2445,7 @@ pub struct TraitCandidate {
 // Trait method resolution
 pub type TraitMap = NodeMap<Vec<TraitCandidate>>;
 
-// Map from the NodeId of a glob import to a list of items which are actually
+// Map from the `NodeId` of a glob import to a list of items which are actually
 // imported.
 pub type GlobMap = NodeMap<FxHashSet<Name>>;
 
@@ -2543,7 +2543,7 @@ impl CodegenFnAttrs {
         }
     }
 
-    /// True if it looks like this symbol needs to be exported, for example:
+    /// Returns `true` if it looks like this symbol needs to be exported, for example, if:
     ///
     /// * `#[no_mangle]` is present
     /// * `#[export_name(...)]` is present

@@ -281,7 +281,7 @@ macro_rules! make_value_visitor {
                     layout::Abi::Scalar(ref layout) => {
                         self.visit_scalar(v, layout)?;
                     }
-                    // FIXME: Should we do something for ScalarPair? Vector?
+                    // FIXME: should we do something for `ScalarPair` and `Vector`?
                     _ => {}
                 }
 

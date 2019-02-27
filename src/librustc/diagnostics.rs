@@ -1243,7 +1243,7 @@ like `<T as SomeTrait<'a>>::Output`, as shown in this example:
 ```compile_fail,E0309
 // This won't compile because the applicable impl of
 // `SomeTrait` (below) requires that `T: 'a`, but the struct does
-// not have a matching where-clause.
+// not have a matching `where` clause.
 struct Foo<'a, T> {
     foo: <T as SomeTrait<'a>>::Output,
 }
@@ -1262,7 +1262,7 @@ where
 
 Here, the where clause `T: 'a` that appears on the impl is not known to be
 satisfied on the struct. To make this example compile, you have to add
-a where-clause like `T: 'a` to the struct definition:
+a `where` clause like `T: 'a` to the struct definition:
 
 ```
 struct Foo<'a, T>

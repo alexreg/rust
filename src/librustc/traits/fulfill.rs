@@ -140,7 +140,7 @@ impl<'tcx> TraitEngine<'tcx> for FulfillmentContext<'tcx> {
     /// creating a fresh type variable `$0` as well as a projection
     /// predicate `<SomeType as SomeTrait>::X == $0`. When the
     /// inference engine runs, it will attempt to find an impl of
-    /// `SomeTrait` or a where-clause that lets us unify `$0` with
+    /// `SomeTrait` or a `where` clause that lets us unify `$0` with
     /// something concrete. If this fails, we'll unify `$0` with
     /// `projection_ty` again.
     fn normalize_projection_type<'a, 'gcx>(&mut self,

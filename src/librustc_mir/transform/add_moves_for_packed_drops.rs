@@ -10,8 +10,8 @@ use crate::util;
 // struct to a separate local before dropping them, to ensure that
 // they are dropped from an aligned address.
 //
-// For example, if we have something like
-// ```Rust
+// For example, if we have something like:
+// ```
 //     #[repr(packed)]
 //     struct Foo {
 //         dealign: u8,

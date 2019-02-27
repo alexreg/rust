@@ -196,17 +196,17 @@ pub struct SelectionCache<'tcx> {
 /// - a type from another crate (that doesn't implement fmt::Debug) could
 /// implement AsDebug.
 ///
-/// Because where-clauses match the type exactly, multiple clauses can
+/// Because `where` clauses match the type exactly, multiple clauses can
 /// only match if there are unresolved variables, and we can mostly just
 /// report this ambiguity in that case. This is still a problem - we can't
 /// *do anything* with ambiguities that involve only regions. This is issue
 /// #21974.
 ///
-/// If a single where-clause matches and there are no inference
+/// If a single `where` clause matches and there are no inference
 /// variables left, then it definitely matches and we can just select
 /// it.
 ///
-/// In fact, we even select the where-clause when the obligation contains
+/// In fact, we even select the `where` clause when the obligation contains
 /// inference variables. The can lead to inference making "leaps of logic",
 /// for example in this situation:
 ///
@@ -219,19 +219,19 @@ pub struct SelectionCache<'tcx> {
 ///    }
 ///    fn main() { foo(false); }
 ///
-/// Here the obligation <T as Foo<$0>> can be matched by both the blanket
-/// impl and the where-clause. We select the where-clause and unify $0=bool,
-/// so the program prints "false". However, if the where-clause is omitted,
-/// the blanket impl is selected, we unify $0=(), and the program prints
-/// "()".
+/// Here the obligation `<T as Foo<$0>>` can be matched by both the blanket
+/// impl and the `where` clause. We select the `where` clause and unify `$0 = bool`,
+/// so the program prints "false". However, if the `where` clause is omitted,
+/// the blanket impl is selected, we unify `$0 = ()`, and the program prints
+/// `"()"`.
 ///
 /// Exactly the same issues apply to projection and object candidates, except
-/// that we can have both a projection candidate and a where-clause candidate
+/// that we can have both a projection candidate and a `where` clause candidate
 /// for the same obligation. In that case either would do (except that
 /// different "leaps of logic" would occur if inference variables are
-/// present), and we just pick the where-clause. This is, for example,
+/// present), and we just pick the `where` clause. This is, for example,
 /// required for associated types to work in default impls, as the bounds
-/// are visible both as projection bounds and as where-clauses from the
+/// are visible both as projection bounds and as `where` clauses from the
 /// parameter environment.
 #[derive(PartialEq, Eq, Debug, Clone)]
 enum SelectionCandidate<'tcx> {
@@ -314,7 +314,7 @@ enum BuiltinImplConditions<'tcx> {
     /// The impl is conditional on T1,T2,.. : Trait
     Where(ty::Binder<Vec<Ty<'tcx>>>),
     /// There is no built-in impl. There may be some other
-    /// candidate (a where-clause or user-defined impl).
+    /// candidate (a `where` clause or user-defined impl).
     None,
     /// It is unknown whether there is an impl.
     Ambiguous,
@@ -1070,9 +1070,9 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
                     trait_ref, result,
                 );
                 // This may overwrite the cache with the same value
-                // FIXME: Due to #50507 this overwrites the different values
-                // This should be changed to use HashMapExt::insert_same
-                // when that is fixed
+                // FIXME: due to #50507 this overwrites the different values
+                // This should be changed to use `HashMapExt::insert_same`
+                // when that is fixed.
                 self.tcx()
                     .evaluation_cache
                     .hashmap
@@ -1437,7 +1437,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
     /// Do note that if the type itself is not in the
     /// global tcx, the local caches will be used.
     fn can_use_global_caches(&self, param_env: ty::ParamEnv<'tcx>) -> bool {
-        // If there are any where-clauses in scope, then we always use
+        // If there are any `where` clauses in scope, then we always use
         // a cache local to this particular scope. Otherwise, we
         // switch to a global cache. We used to try and draw
         // finer-grained distinctions, but that led to a serious of
@@ -2017,7 +2017,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
                     // candidates: this means that typeck will only
                     // succeed if there is another reason to believe
                     // that this obligation holds. That could be a
-                    // where-clause or, in the case of an object type,
+                    // `where` clause or, in the case of an object type,
                     // it could be that the object type lists the
                     // trait (e.g., `Foo+Send : Send`). See
                     // `compile-fail/typeck-default-trait-impl-send-param.rs`
@@ -2139,10 +2139,10 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         // A `T: Unsize<U>` obligation is always used as part of a `T: CoerceUnsize<U>`
         // impl, and those are generally applied to concrete types.
         //
-        // That said, one might try to write a fn with a where clause like
+        // That said, one might try to write a fn with a `where` clause like
         //     for<'a> Foo<'a, T>: Unsize<Foo<'a, Trait>>
         // where the `'a` is kind of orthogonal to the relevant part of the `Unsize`.
-        // Still, you'd be more likely to write that where clause as
+        // Still, you'd be more likely to write that `where` clause as
         //     T: Trait
         // so it seems ok if we (conservatively) fail to accept that `Unsize`
         // obligation above. Should be possible to extend this in the future.
@@ -2244,7 +2244,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
 
     /// Returns `true` if `victim` should be dropped in favor of
     /// `other`. Generally speaking we will drop duplicate
-    /// candidates and prefer where-clause candidates.
+    /// candidates and prefer `where` clause candidates.
     ///
     /// See the comment for "SelectionCandidate" for more details.
     fn candidate_should_be_dropped_in_favor_of<'o>(
@@ -2286,7 +2286,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
                 | BuiltinUnsizeCandidate
                 | BuiltinCandidate { .. }
                 | TraitAliasCandidate(..) => {
-                    // Global bounds from the where clause should be ignored
+                    // Global bounds from the `where` clause should be ignored
                     // here (see issue #50825). Otherwise, we have a where
                     // clause so don't go around looking for impls.
                     !is_global(cand)
@@ -2337,7 +2337,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
                                     other_def, victim_def).is_some();
                         }
                         ParamCandidate(ref cand) => {
-                            // Prefer the impl to a global where clause candidate.
+                            // Prefer the impl to a global `where` clause candidate.
                             return is_global(cand);
                         }
                         _ => (),
@@ -2354,8 +2354,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
             | BuiltinCandidate { has_nested: true } => {
                 match victim.candidate {
                     ParamCandidate(ref cand) => {
-                        // Prefer these to a global where-clause bound
-                        // (see issue #50825)
+                        // Prefer these to a global `where` clause bound (see issue #50825).
                         is_global(cand) && other.evaluation.must_apply_modulo_regions()
                     }
                     _ => false,
@@ -2788,14 +2787,14 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         debug!("confirm_param_candidate({:?},{:?})", obligation, param);
 
         // During evaluation, we already checked that this
-        // where-clause trait-ref could be unified with the obligation
-        // trait-ref. Repeat that unification now without any
+        // `where` clause trait ref could be unified with the obligation
+        // trait ref. Repeat that unification now without any
         // transactional boundary; it should not fail.
         match self.match_where_clause_trait_ref(obligation, param.clone()) {
             Ok(obligations) => obligations,
             Err(()) => {
                 bug!(
-                    "Where clause `{:?}` was applicable to `{:?}` but now is not",
+                    "`where` clause `{:?}` was applicable to `{:?}` but now is not",
                     param,
                     obligation
                 );
@@ -2856,7 +2855,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
     /// The idea is that the impl applies to `X : Foo` if the following conditions are met:
     ///
     /// 1. For each constituent type `Y` in `X`, `Y : Foo` holds
-    /// 2. For each where-clause `C` declared on `Foo`, `[Self => X] C` holds.
+    /// 2. For each `where` clause `C` declared on `Foo`, `[Self => X] C` holds.
     fn confirm_auto_impl_candidate(
         &mut self,
         obligation: &TraitObligation<'tcx>,
@@ -3277,7 +3276,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
     ) -> Result<VtableBuiltinData<PredicateObligation<'tcx>>, SelectionError<'tcx>> {
         let tcx = self.tcx();
 
-        // assemble_candidates_for_unsizing should ensure there are no late bound
+        // `assemble_candidates_for_unsizing` should ensure there are no late-bound
         // regions here. See the comment there for more details.
         let source = self.infcx
             .shallow_resolve(obligation.self_ty().no_bound_vars().unwrap());
@@ -3638,7 +3637,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
     /// Normalize `where_clause_trait_ref` and try to match it against
     /// `obligation`. If successful, return any predicates that
     /// result from the normalization. Normalization is necessary
-    /// because where-clauses are stored in the parameter environment
+    /// because `where` clauses are stored in the parameter environment
     /// unnormalized.
     fn match_where_clause_trait_ref(
         &mut self,
@@ -3809,8 +3808,8 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         // types.
         //
         // This code is hot enough that it's worth avoiding the allocation
-        // required for the FxHashSet when possible. Special-casing lengths 0,
-        // 1 and 2 covers roughly 75--80% of the cases.
+        // required for the FxHashSet when possible. Special-casing lengths `0`,
+        // `1` and `2` covers roughly 75 to 80% of the cases.
         if predicates.len() <= 1 {
             // No possibility of duplicates.
         } else if predicates.len() == 2 {

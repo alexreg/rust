@@ -479,8 +479,8 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
             sess: self.cx.parse_sess,
             features: self.cx.ecfg.features,
         };
-        // Since the item itself has already been configured by the InvocationCollector,
-        // we know that fold result vector will contain exactly one element
+        // Since the item itself has already been configured by the `InvocationCollector`,
+        // we know that fold result `Vec` will contain exactly one element.
         match item {
             Annotatable::Item(item) => {
                 Annotatable::Item(cfg.flat_map_item(item).pop().unwrap())
@@ -842,7 +842,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
                         // yet, when they do, we should use it here.
                         def_site: None,
                         format: macro_bang_format(path),
-                        // FIXME probably want to follow macro_rules macros here.
+                        // FIXME: probably want to follow `macro_rules` macros here.
                         allow_internal_unstable: allow_internal_unstable.clone(),
                         allow_internal_unsafe: false,
                         local_inner_macros: false,
@@ -892,7 +892,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
         );
     }
 
-    /// Expand a derive invocation. Returns the resulting expanded AST fragment.
+    /// Expands a `derive` invocation. Returns the resulting expanded AST fragment.
     fn expand_derive_invoc(&mut self,
                            invoc: Invocation,
                            ext: &SyntaxExtension)
@@ -941,7 +941,8 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
                     Symbol::intern("rustc_attrs"),
                     Symbol::intern("derive_clone_copy"),
                     Symbol::intern("derive_eq"),
-                    Symbol::intern("libstd_sys_internals"), // RustcDeserialize and RustcSerialize
+                    // `RustcDeserialize` and `RustcSerialize`.
+                    Symbol::intern("libstd_sys_internals"),
                 ].into());
                 invoc.expansion_data.mark.set_expn_info(expn_info);
                 let span = span.with_ctxt(self.cx.backtrace());
@@ -1126,7 +1127,8 @@ impl<'a, 'b> InvocationCollector<'a, 'b> {
         attr
     }
 
-    /// If `item` is an attr invocation, remove and return the macro attribute and derive traits.
+    /// If `item` is an attribute invocation, remove and return the macro attribute and `derive`
+    /// traits.
     fn classify_item<T>(&mut self, item: &mut T)
                         -> (Option<ast::Attribute>, Vec<Path>, /* after_derive */ bool)
         where T: HasAttrs,
@@ -1191,7 +1193,7 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
         visit_clobber(expr.deref_mut(), |mut expr| {
             self.cfg.configure_expr_kind(&mut expr.node);
 
-            // ignore derives so they remain unused
+            // Ignore `derive`s so that they remain unused.
             let (attr, after_derive) = self.classify_nonitem(&mut expr);
 
             if attr.is_some() {
@@ -1199,7 +1201,7 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
                 // expansion will eat the attribute so it won't error later.
                 attr.as_ref().map(|a| self.cfg.maybe_emit_expr_attr_err(a));
 
-                // AstFragmentKind::Expr requires the macro to emit an expression.
+                // `AstFragmentKind::Expr` requires the macro to emit an expression.
                 return self.collect_attr(attr, vec![], Annotatable::Expr(P(expr)),
                                           AstFragmentKind::Expr, after_derive)
                     .make_expr()
@@ -1483,8 +1485,8 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
     }
 
     fn visit_attribute(&mut self, at: &mut ast::Attribute) {
-        // turn `#[doc(include="filename")]` attributes into `#[doc(include(file="filename",
-        // contents="file contents")]` attributes
+        // Turn `#[doc(include="filename")]` attributes into
+        // `#[doc(include(file="filename", contents="file contents")]` attributes.
         if !at.check_name("doc") {
             return noop_visit_attribute(at, self);
         }
@@ -1623,7 +1625,8 @@ pub struct ExpansionConfig<'feat> {
     pub features: Option<&'feat Features>,
     pub recursion_limit: usize,
     pub trace_mac: bool,
-    pub should_test: bool, // If false, strip `#[test]` nodes
+    // If `false`, strip `#[test]` nodes.
+    pub should_test: bool,
     pub single_step: bool,
     pub keep_macs: bool,
 }
@@ -1674,7 +1677,7 @@ impl<'feat> ExpansionConfig<'feat> {
     }
 }
 
-// A Marker adds the given mark to the syntax context.
+// A `Marker` adds the given mark to the syntax context.
 #[derive(Debug)]
 pub struct Marker(pub Mark);
 

@@ -269,7 +269,7 @@ pub fn transitive_bounds<'cx, 'gcx, 'tcx>(tcx: TyCtxt<'cx, 'gcx, 'tcx>,
 }
 
 ///////////////////////////////////////////////////////////////////////////
-// Iterator over def-ids of supertraits
+// Iterator over `DefId`s of supertraits
 
 pub struct SupertraitDefIds<'a, 'gcx: 'a+'tcx, 'tcx: 'a> {
     tcx: TyCtxt<'a, 'gcx, 'tcx>,

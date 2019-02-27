@@ -19,7 +19,7 @@ crate struct UniversalRegionRelations<'tcx> {
     universal_regions: Rc<UniversalRegions<'tcx>>,
 
     /// Stores the outlives relations that are known to hold from the
-    /// implied bounds, in-scope where-clauses, and that sort of
+    /// implied bounds, in-scope `where` clauses, and that sort of
     /// thing.
     outlives: TransitiveRelation<RegionVid>,
 

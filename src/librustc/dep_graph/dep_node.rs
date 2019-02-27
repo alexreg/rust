@@ -428,7 +428,7 @@ define_dep_nodes!( <'tcx>
     [] Null,
 
     // Represents the `Krate` as a whole (the `hir::Krate` value) (as
-    // distinct from the krate module). This is basically a hash of
+    // distinct from the `krate` module). This is basically a hash of
     // the entire krate, so if you read from `Krate` (e.g., by calling
     // `tcx.hir().krate()`), we will have to assume that any change
     // means that you need to be recompiled. This is because the
@@ -440,11 +440,11 @@ define_dep_nodes!( <'tcx>
     // edges yourself for the individual items that you read.
     [input] Krate,
 
-    // Represents the body of a function or method. The def-id is that of the
+    // Represents the body of a function or method. The `DefId` is that of the
     // function/method.
     [input] HirBody(DefId),
 
-    // Represents the HIR node with the given node-id
+    // Represents the HIR node with the given `NodeId`.
     [input] Hir(DefId),
 
     // Represents metadata from an extern crate.
@@ -548,7 +548,7 @@ define_dep_nodes!( <'tcx>
     [] Environment(DefId),
     [] DescribeDef(DefId),
 
-    // FIXME(mw): DefSpans are not really inputs since they are derived from
+    // FIXME(mw): `DefSpan`s are not really inputs since they are derived from
     // HIR. But at the moment HIR hashing still contains some hacks that allow
     // to make type debuginfo to be source location independent. Declaring
     // DefSpan an input makes sure that changes to these are always detected

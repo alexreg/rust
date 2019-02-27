@@ -144,10 +144,10 @@ impl From<AutoBorrowMutability> for hir::Mutability {
 
 #[derive(Copy, Clone, PartialEq, Debug, RustcEncodable, RustcDecodable)]
 pub enum AutoBorrow<'tcx> {
-    /// Converts from T to &T.
+    /// Converts from `T` to `&T`.
     Ref(ty::Region<'tcx>, AutoBorrowMutability),
 
-    /// Converts from T to *T.
+    /// Converts from `T` to `*T`.
     RawPtr(hir::Mutability),
 }
 

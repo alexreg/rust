@@ -203,7 +203,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                 let size = left_layout.size;
                 match bin_op {
                     Rem | Div => {
-                        // int_min / -1
+                        // `int_min / -1`
                         if r == -1 && l == (1 << (size.bits() - 1)) {
                             return Ok((Scalar::from_uint(l, size), true));
                         }
@@ -303,7 +303,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                 self.binary_float_op(bin_op, fty, left, right)
             }
             _ => {
-                // Must be integer(-like) types.  Don't forget about == on fn pointers.
+                // Must be integer(-like) types. Don't forget about `==` on fn pointers.
                 assert!(left.layout.ty.is_integral() || left.layout.ty.is_unsafe_ptr() ||
                     left.layout.ty.is_fn());
                 assert!(right.layout.ty.is_integral() || right.layout.ty.is_unsafe_ptr() ||
@@ -366,7 +366,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                         (-(val as i128)) as u128
                     }
                 };
-                // res needs tuncating
+                // `res` needs truncating.
                 Ok(Scalar::from_uint(self.truncate(res, layout), layout.size))
             }
         }

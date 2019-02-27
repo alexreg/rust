@@ -66,7 +66,7 @@ struct Context<'a, 'b: 'a> {
     pieces: Vec<P<ast::Expr>>,
     /// Collection of string literals
     str_pieces: Vec<P<ast::Expr>>,
-    /// Stays `true` if all formatting parameters are default (as in "{}{}").
+    /// Stays `true` if all formatting parameters are default (as in `{}{}`).
     all_pieces_simple: bool,
 
     /// Mapping between positional argument references and indices into the
@@ -110,7 +110,7 @@ struct Context<'a, 'b: 'a> {
     invalid_refs: Vec<(usize, usize)>,
     /// Spans of all the formatting arguments, in order.
     arg_spans: Vec<Span>,
-    /// Whether this formatting string is a literal or it comes from a macro.
+    /// `true` if this formatting string is a literal; `false` if it comes from a macro.
     is_literal: bool,
 }
 
@@ -325,7 +325,7 @@ impl<'a, 'b> Context<'a, 'b> {
                 }
                 match ty {
                     Placeholder(_) => {
-                        // record every (position, type) combination only once
+                        // Record every `(position, type)` combination only once.
                         let ref mut seen_ty = self.arg_unique_types[arg];
                         let i = seen_ty.iter().position(|x| *x == ty).unwrap_or_else(|| {
                             let i = seen_ty.len();
@@ -424,8 +424,7 @@ impl<'a, 'b> Context<'a, 'b> {
         self.ecx.expr_str(sp, s)
     }
 
-    /// Builds a static `rt::Argument` from a `parse::Piece` or append
-    /// to the `literal` string.
+    /// Builds a static `rt::Argument` from a `parse::Piece` or append to the `literal` string.
     fn build_piece(&mut self,
                    piece: &parse::Piece<'_>,
                    arg_index_consumed: &mut Vec<usize>)
@@ -459,7 +458,7 @@ impl<'a, 'b> Context<'a, 'b> {
                                 None => 0, // error already emitted elsewhere
                                 Some(offset) => {
                                     let ref idx_map = self.arg_index_map[i];
-                                    // unwrap_or branch: error already emitted elsewhere
+                                    // `unwrap_or` branch: error already emitted elsewhere.
                                     let arg_idx = *idx_map.get(*offset).unwrap_or(&0);
                                     *offset += 1;
                                     arg_idx
@@ -476,7 +475,7 @@ impl<'a, 'b> Context<'a, 'b> {
 
                 let simple_arg = parse::Argument {
                     position: {
-                        // We don't have ArgumentNext any more, so we have to
+                        // We don't have `ArgumentNext` any more, so we have to
                         // track the current argument ourselves.
                         let i = self.curarg;
                         self.curarg += 1;
@@ -544,8 +543,7 @@ impl<'a, 'b> Context<'a, 'b> {
         }
     }
 
-    /// Actually builds the expression which the format_args! block will be
-    /// expanded to.
+    /// Actually builds the expression which the `format_args!` block will be expanded to.
     fn into_expr(self) -> P<ast::Expr> {
         let mut locals = Vec::with_capacity(
             (0..self.args.len()).map(|i| self.arg_unique_types[i].len()).sum()
@@ -564,11 +562,10 @@ impl<'a, 'b> Context<'a, 'b> {
 
         // Before consuming the expressions, we have to remember spans for
         // count arguments as they are now generated separate from other
-        // arguments, hence have no access to the `P<ast::Expr>`'s.
+        // arguments, hence have no access to the `P<ast::Expr>`s.
         let spans_pos: Vec<_> = self.args.iter().map(|e| e.span.clone()).collect();
 
-        // Right now there is a bug such that for the expression:
-        //      foo(bar(&1))
+        // Right now there is a bug such that for the expression `foo(bar(&1))`.
         // the lifetime of `1` doesn't outlast the call to `bar`, so it's not
         // valid for the call to `foo`. To work around this all arguments to the
         // format! string are shoved into locals. Furthermore, we shove the address
@@ -633,7 +630,7 @@ impl<'a, 'b> Context<'a, 'b> {
 
         let args_slice = self.ecx.expr_addr_of(self.fmtsp, result);
 
-        // Now create the fmt::Arguments struct with all our locals we created.
+        // Now, create the `fmt::Arguments` struct with all our locals we created.
         let (fn_name, fn_args) = if self.all_pieces_simple {
             ("new_v1", vec![pieces, args_slice])
         } else {
@@ -708,12 +705,14 @@ pub fn expand_format_args_nl<'cx>(
     mut sp: Span,
     tts: &[tokenstream::TokenTree],
 ) -> Box<dyn base::MacResult + 'cx> {
-    //if !ecx.ecfg.enable_allow_internal_unstable() {
-
-    // For some reason, the only one that actually works for `println` is the first check
-    if !sp.allows_unstable("format_args_nl") // the span is marked as `#[allow_insternal_unsable]`
-        && !ecx.ecfg.enable_allow_internal_unstable()  // NOTE: when is this enabled?
-        && !ecx.ecfg.enable_format_args_nl()  // enabled using `#[feature(format_args_nl]`
+    // For some reason, the only one that actually works for `println` is the first check.
+    if
+        // The span is marked as `#[allow_insternal_unsable]`.
+        !sp.allows_unstable("format_args_nl")
+        // NOTE: when is this enabled?
+        && !ecx.ecfg.enable_allow_internal_unstable()
+        // Enabled using `#[feature(format_args_nl]`.
+        && !ecx.ecfg.enable_format_args_nl()
     {
         feature_gate::emit_feature_err(&ecx.parse_sess,
                                        "format_args_nl",
@@ -797,7 +796,7 @@ pub fn expand_preparsed_format_args(ecx: &mut ExtCtxt<'_>,
         let mut skips = vec![];
         while let Some((pos, c)) = s.next() {
             match (c, s.peek()) {
-                // skip whitespace and empty lines ending in '\\'
+                // Skip whitespace and empty lines ending in `\\`.
                 ('\\', Some((next_pos, '\n'))) if !is_raw => {
                     eat_ws = true;
                     skips.push(pos);
@@ -869,7 +868,9 @@ pub fn expand_preparsed_format_args(ecx: &mut ExtCtxt<'_>,
                         }
                     }
                 }
-                _ if eat_ws => {  // `take_while(|c| c.is_whitespace())`
+                _ if eat_ws => {
+                    // `take_while(|c| c.is_whitespace())`
+
                     eat_ws = false;
                 }
                 _ => {}
@@ -946,7 +947,7 @@ pub fn expand_preparsed_format_args(ecx: &mut ExtCtxt<'_>,
         is_literal,
     };
 
-    // This needs to happen *after* the Parser has consumed all pieces to create all the spans
+    // This needs to happen *after* the `Parser` has consumed all pieces to create all the spans.
     let pieces = unverified_pieces.into_iter().map(|mut piece| {
         cx.verify_piece(&piece);
         cx.resolve_name_inplace(&mut piece);

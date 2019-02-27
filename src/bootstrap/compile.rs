@@ -165,12 +165,12 @@ pub fn std_cargo(builder: &Builder<'_>,
         let features = builder.std_features();
 
         if compiler.stage != 0 && builder.config.sanitizers {
-            // This variable is used by the sanitizer runtime crates, e.g.
-            // rustc_lsan, to build the sanitizer runtime from C code
+            // This variable is used by the sanitizer runtime crates, e.g.,
+            // `rustc_lsan`, to build the sanitizer runtime from C code
             // When this variable is missing, those crates won't compile the C code,
             // so we don't set this variable during stage0 where llvm-config is
             // missing
-            // We also only build the runtimes when --enable-sanitizers (or its
+            // We also only build the runtimes when `--enable-sanitizers` (or its
             // config.toml equivalent) is used
             let llvm_config = builder.ensure(native::Llvm {
                 target: builder.config.build,
@@ -1032,11 +1032,11 @@ pub fn run_cargo(builder: &Builder<'_>,
         return Vec::new();
     }
 
-    // `target_root_dir` looks like $dir/$target/release
+    // `target_root_dir` looks like `$dir/$target/release`.
     let target_root_dir = stamp.parent().unwrap();
-    // `target_deps_dir` looks like $dir/$target/release/deps
+    // `target_deps_dir` looks like `$dir/$target/release/deps`.
     let target_deps_dir = target_root_dir.join("deps");
-    // `host_root_dir` looks like $dir/release
+    // `host_root_dir` looks like `$dir/release`.
     let host_root_dir = target_root_dir.parent().unwrap() // chop off `release`
                                        .parent().unwrap() // chop off `$target`
                                        .join(target_root_dir.file_name().unwrap());

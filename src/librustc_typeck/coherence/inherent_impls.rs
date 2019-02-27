@@ -286,7 +286,7 @@ impl<'a, 'tcx> InherentCollect<'a, 'tcx> {
     fn check_def_id(&mut self, item: &hir::Item, def_id: DefId) {
         if def_id.is_local() {
             // Add the implementation to the mapping from implementation to base
-            // type def ID, if there is a base type for this implementation and
+            // type `DefId`, if there is a base type for this implementation and
             // the implementation does not have any associated traits.
             let impl_def_id = self.tcx.hir().local_def_id(item.id);
             let mut rc_vec = self.impls_map.inherent_impls

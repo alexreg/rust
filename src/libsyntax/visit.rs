@@ -105,7 +105,7 @@ pub trait Visitor<'ast>: Sized {
         // if you really want a visitor that
         // works on macros, use this
         // definition in your trait impl:
-        // visit::walk_mac(self, _mac)
+        // `visit::walk_mac(self, _mac)`.
     }
     fn visit_mac_def(&mut self, _mac: &'ast MacroDef, _id: NodeId) {
         // Nothing to do

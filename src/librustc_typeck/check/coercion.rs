@@ -72,7 +72,7 @@ struct Coerce<'a, 'gcx: 'a + 'tcx, 'tcx: 'a> {
     fcx: &'a FnCtxt<'a, 'gcx, 'tcx>,
     cause: ObligationCause<'tcx>,
     use_lub: bool,
-    /// Determines whether or not allow_two_phase_borrow is set on any
+    /// Determines whether or not `allow_two_phase_borrow` is set on any
     /// autoref adjustments we create while coercing. We don't want to
     /// allow deref coercions to create two-phase borrows, at least initially,
     /// but we do need two-phase borrows for function argument reborrows.
@@ -1096,8 +1096,7 @@ impl<'gcx, 'tcx, 'exprs, E> CoerceMany<'gcx, 'tcx, 'exprs, E>
     }
 
     /// The inner coercion "engine". If `expression` is `None`, this
-    /// is a forced-unit case, and hence `expression_ty` must be
-    /// `Nil`.
+    /// is a forced-unit case, and hence `expression_ty` must be `Nil`.
     fn coerce_inner<'a>(&mut self,
                         fcx: &FnCtxt<'a, 'gcx, 'tcx>,
                         cause: &ObligationCause<'tcx>,

@@ -259,7 +259,7 @@ impl<'tcx> Relate<'tcx> for Vec<ty::PolyExistentialProjection<'tcx>> {
     {
         // To be compatible, `a` and `b` must be for precisely the
         // same set of traits and item names. We always require that
-        // projection bounds lists are sorted by trait-def-id and item-name,
+        // projection bounds lists are sorted by trait `DefId` and item-name,
         // so we can just iterate through the lists pairwise, so long as they are the
         // same length.
         if a.len() != b.len() {

@@ -480,11 +480,11 @@ fn sub_bound_free_true() {
 fn subst_ty_renumber_bound() {
     test_env(EMPTY_SOURCE_STR, errors(&[]), |env| {
         // Situation:
-        // Theta = [A -> &'a foo]
+        // `Theta = [A -> &'a foo]`
 
         let t_rptr_bound1 = env.t_rptr_late_bound(1);
 
-        // t_source = fn(A)
+        // `t_source = fn(A)`
         let t_source = {
             let t_param = env.t_param(0);
             env.t_fn(&[t_param], env.t_nil())
@@ -493,7 +493,7 @@ fn subst_ty_renumber_bound() {
         let substs = env.infcx.tcx.intern_substs(&[t_rptr_bound1.into()]);
         let t_substituted = t_source.subst(env.infcx.tcx, substs);
 
-        // t_expected = fn(&'a isize)
+        // `t_expected = fn(&'a isize)`
         let t_expected = {
             let t_ptr_bound2 = env.t_rptr_late_bound_with_debruijn(1, d2());
             env.t_fn(&[t_ptr_bound2], env.t_nil())

@@ -75,12 +75,12 @@ pub struct Session {
     /// if the value stored here has been affected by path remapping.
     pub working_dir: (PathBuf, bool),
 
-    // FIXME: lint_store and buffered_lints are not thread-safe,
-    // but are only used in a single thread
+    // FIXME: `lint_store` and buffered_lints are not thread-safe,
+    // but are only used in a single thread.
     pub lint_store: RwLock<lint::LintStore>,
     pub buffered_lints: Lock<Option<lint::LintBuffer>>,
 
-    /// Set of (DiagnosticId, Option<Span>, message) tuples tracking
+    /// Set of `(DiagnosticId, Option<Span>, message)` tuples tracking
     /// (sub)diagnostics that have been set once, but should not be set again,
     /// in order to avoid redundantly verbose output (Issue #24690, #44953).
     pub one_time_diagnostics: Lock<FxHashSet<(DiagnosticMessageId, Option<Span>, String)>>,
@@ -88,7 +88,7 @@ pub struct Session {
     pub plugin_attributes: Lock<Vec<(String, AttributeType)>>,
     pub crate_types: Once<Vec<config::CrateType>>,
     pub dependency_formats: Once<dependency_format::Dependencies>,
-    /// The crate_disambiguator is constructed out of all the `-C metadata`
+    /// The `crate_disambiguator` is constructed out of all the `-C metadata`
     /// arguments passed to the compiler. Its value together with the crate-name
     /// forms a unique global identifier for the crate. It is used to allow
     /// multiple crates with the same name to coexist. See the
@@ -179,7 +179,7 @@ pub struct PerfStats {
     pub normalize_projection_ty: AtomicUsize,
 }
 
-/// Enum to support dispatch of one-time diagnostics (in Session.diag_once)
+/// Enum to support dispatch of one-time diagnostics (in `Session.diag_once`).
 enum DiagnosticBuilderMethod {
     Note,
     SpanNote,
@@ -709,7 +709,7 @@ impl Session {
             &self.sysroot,
             self.opts.target_triple.triple(),
             &self.opts.search_paths,
-            // target_tlib_path==None means it's the same as host_tlib_path.
+            // `target_tlib_path == None` means it's the same as `host_tlib_path`.
             self.target_tlib_path.as_ref().unwrap_or(&self.host_tlib_path),
             kind,
         )

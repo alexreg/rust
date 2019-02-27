@@ -90,12 +90,12 @@ for hir::ItemLocalId {
     }
 }
 
-// The following implementations of HashStable for ItemId, TraitItemId, and
-// ImplItemId deserve special attention. Normally we do not hash NodeIds within
-// the HIR, since they just signify a HIR nodes own path. But ItemId et al
+// The following implementations of `HashStable` for `ItemId`, `TraitItemId`, and
+// `ImplItemId` deserve special attention. Normally we do not hash `NodeId`s within
+// the HIR, since they just signify a HIR nodes own path. But `ItemId` et al
 // are used when another item in the HIR is *referenced* and we certainly
-// want to pick up on a reference changing its target, so we hash the NodeIds
-// in "DefPath Mode".
+// want to pick up on a reference changing its target, so we hash the `NodeId`s
+// in DefPath mode.
 
 impl<'a> HashStable<StableHashingContext<'a>> for hir::ItemId {
     fn hash_stable<W: StableHasherResult>(&self,

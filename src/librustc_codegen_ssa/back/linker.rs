@@ -128,7 +128,7 @@ pub trait Linker {
     fn group_start(&mut self);
     fn group_end(&mut self);
     fn linker_plugin_lto(&mut self);
-    // Should have been finalize(self), but we don't support self-by-value on trait objects (yet?).
+    // Should be `finalize(self)`, but we don't support self-by-value on trait objects (yet?).
     fn finalize(&mut self) -> Command;
 }
 
@@ -166,7 +166,7 @@ impl<'a> GccLinker<'a> {
     // Some platforms take hints about whether a library is static or dynamic.
     // For those that support this, we ensure we pass the option if the library
     // was flagged "static" (most defaults are dynamic) to ensure that if
-    // libfoo.a and libfoo.so both exist that the right one is chosen.
+    // `libfoo.a` and `libfoo.so` both exist that the right one is chosen.
     fn hint_static(&mut self) {
         if !self.takes_hints() { return }
         if !self.hinted_static {
@@ -246,7 +246,7 @@ impl<'a> Linker for GccLinker<'a> {
             self.linker_arg("--whole-archive").cmd.arg(format!("-l{}", lib));
             self.linker_arg("--no-whole-archive");
         } else {
-            // -force_load is the macOS equivalent of --whole-archive, but it
+            // `-force_load` is the macOS equivalent of `--whole-archive`, but it
             // involves passing the full path to the library to link.
             self.linker_arg("-force_load");
             let lib = archive::find_library(lib, search_path, &self.sess);
@@ -266,7 +266,7 @@ impl<'a> Linker for GccLinker<'a> {
     }
 
     fn gc_sections(&mut self, keep_metadata: bool) {
-        // The dead_strip option to the linker specifies that functions and data
+        // The `dead_strip` option to the linker specifies that functions and data
         // unreachable by the entry point will be removed. This is quite useful
         // with Rust's compilation model of compiling libraries at a time into
         // one object file. For example, this brings hello world from 1.7MB to
@@ -277,8 +277,8 @@ impl<'a> Linker for GccLinker<'a> {
         // stripped away as much as it could. This has not been seen to impact
         // link times negatively.
         //
-        // -dead_strip can't be part of the pre_link_args because it's also used
-        // for partial linking when using multiple codegen units (-r).  So we
+        // `-dead_strip` can't be part of the `pre_link_args` because it's also used
+        // for partial linking when using multiple codegen units (`-r`). So we
         // insert it here.
         if self.sess.target.target.options.is_like_osx {
             self.linker_arg("-dead_strip");
@@ -288,7 +288,7 @@ impl<'a> Linker for GccLinker<'a> {
         // If we're building a dylib, we don't use --gc-sections because LLVM
         // has already done the best it can do, and we also don't want to
         // eliminate the metadata. If we're building an executable, however,
-        // --gc-sections drops the size of hello world from 1.8MB to 597K, a 67%
+        // `--gc-sections` drops the size of hello world from 1.8MB to 597K, a 67%
         // reduction.
         } else if !keep_metadata {
             self.linker_arg("--gc-sections");
@@ -298,7 +298,7 @@ impl<'a> Linker for GccLinker<'a> {
     fn optimize(&mut self) {
         if !self.sess.target.target.options.linker_is_gnu { return }
 
-        // GNU-style linkers support optimization with -O. GNU ld doesn't
+        // GNU-style linkers support optimization with `-O`. GNU ld doesn't
         // need a numeric argument, but other linkers do.
         if self.sess.opts.optimize == config::OptLevel::Default ||
            self.sess.opts.optimize == config::OptLevel::Aggressive {
@@ -544,7 +544,7 @@ impl<'a> Linker for MsvcLinker<'a> {
     }
 
     fn no_default_libraries(&mut self) {
-        // Currently we don't pass the /NODEFAULTLIB flag to the linker on MSVC
+        // Currently we don't pass the `/NODEFAULTLIB` flag to the linker on MSVC
         // as there's been trouble in the past of linking the C++ standard
         // library required by LLVM. This likely needs to happen one day, but
         // in general Windows is also a more controlled environment than
@@ -599,7 +599,7 @@ impl<'a> Linker for MsvcLinker<'a> {
         let natvis_dir_path = self.sess.sysroot.join("lib\\rustlib\\etc");
         if let Ok(natvis_dir) = fs::read_dir(&natvis_dir_path) {
             // LLVM 5.0.0's lld-link frontend doesn't yet recognize, and chokes
-            // on, the /NATVIS:... flags.  LLVM 6 (or earlier) should at worst ignore
+            // on, the `/NATVIS:...` flags.  LLVM 6 (or earlier) should at worst ignore
             // them, eventually mooting this workaround, per this landed patch:
             // https://github.com/llvm-mirror/lld/commit/27b9c4285364d8d76bb43839daa100
             if let Some(ref linker_path) = self.sess.opts.cg.linker {

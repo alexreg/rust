@@ -51,7 +51,7 @@ impl<'a> AstValidator<'a> {
         self.outer_impl_trait = old;
     }
 
-    // Mirrors visit::walk_ty, but tracks relevant state
+    // Mirrors `visit::walk_ty`, but tracks relevant state.
     fn walk_ty(&mut self, t: &'a Ty) {
         match t.node {
             TyKind::ImplTrait(..) => {
@@ -70,7 +70,7 @@ impl<'a> AstValidator<'a> {
                 // To implement this, we disallow `impl Trait` from `qself`
                 // (for cases like `<impl Trait>::Foo>`)
                 // but we allow `impl Trait` in `GenericArgs`
-                // iff there are no more PathSegments.
+                // iff there are no more `PathSegment`s.
                 if let Some(ref qself) = *qself {
                     // `impl Trait` in `qself` is always illegal
                     self.with_banned_impl_trait(|this| this.visit_ty(&qself.ty));
@@ -78,7 +78,7 @@ impl<'a> AstValidator<'a> {
 
                 // Note that there should be a call to visit_path here,
                 // so if any logic is added to process `Path`s a call to it should be
-                // added both in visit_path and here. This code mirrors visit::walk_path.
+                // added both in `visit_path` and here. This code mirrors `visit::walk_path`.
                 for (i, segment) in path.segments.iter().enumerate() {
                     // Allow `impl Trait` iff we're on the final path segment
                     if i == path.segments.len() - 1 {
@@ -594,7 +594,7 @@ impl<'a> Visitor<'a> for AstValidator<'a> {
         visit::walk_foreign_item(self, fi)
     }
 
-    // Mirrors visit::walk_generic_args, but tracks relevant state
+    // Mirrors `visit::walk_generic_args`, but tracks relevant state.
     fn visit_generic_args(&mut self, _: Span, generic_args: &'a GenericArgs) {
         match *generic_args {
             GenericArgs::AngleBracketed(ref data) => {

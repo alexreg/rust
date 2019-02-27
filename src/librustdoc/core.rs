@@ -108,9 +108,9 @@ impl<'a, 'tcx, 'rcx> DocContext<'a, 'tcx, 'rcx> {
     // registered after the AST is constructed would require storing the defid mapping in a
     // RefCell, decreasing the performance for normal compilation for very little gain.
     //
-    // Instead, we construct 'fake' def ids, which start immediately after the last DefId in
+    // Instead, we construct 'fake' `DefId`s, which start immediately after the last DefId in
     // DefIndexAddressSpace::Low. In the Debug impl for clean::Item, we explicitly check for fake
-    // def ids, as we'll end up with a panic if we use the DefId Debug impl for fake DefIds
+    // `DefId`s, as we'll end up with a panic if we use the DefId Debug impl for fake DefIds
     pub fn next_def_id(&self, crate_num: CrateNum) -> DefId {
         let start_def_id = {
             let next_id = if crate_num == LOCAL_CRATE {

@@ -44,7 +44,7 @@ extern "system" {
 }
 
 fn color_to_bits(color: color::Color) -> u16 {
-    // magic numbers from mingw-w64's wincon.h
+    // Magic numbers from mingw-w64's `wincon.h`.
 
     let bits = match color % 8 {
         color::BLACK => 0,
@@ -89,8 +89,8 @@ impl<T: Write + Send + 'static> WinConsole<T> {
         accum |= color_to_bits(self.background) << 4;
 
         unsafe {
-            // Magic -11 means stdout, from
-            // http://msdn.microsoft.com/en-us/library/windows/desktop/ms683231%28v=vs.85%29.aspx
+            // Magic `-11` means stdout, from
+            // <http://msdn.microsoft.com/en-us/library/windows/desktop/ms683231%28v=vs.85%29.aspx>.
             //
             // You may be wondering, "but what about stderr?", and the answer
             // to that is that setting terminal attributes on the stdout

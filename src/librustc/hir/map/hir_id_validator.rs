@@ -96,7 +96,7 @@ impl<'a, 'hir: 'a> HirIdValidator<'a, 'hir> {
                       .expect("owning item has no entry");
 
         if max != self.hir_ids_seen.len() - 1 {
-            // Collect the missing ItemLocalIds
+            // Collect the missing `ItemLocalId`s.
             let missing: Vec<_> = (0 ..= max as u32)
               .filter(|&i| !self.hir_ids_seen.contains(&ItemLocalId::from_u32(i)))
               .collect();

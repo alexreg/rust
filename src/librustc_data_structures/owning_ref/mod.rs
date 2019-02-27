@@ -507,7 +507,7 @@ impl<O, T: ?Sized> OwningRef<O, T> {
         }
     }
 
-    // TODO: wrap_owner
+    // TODO: `wrap_owner`
 
     // FIXME: Naming convention?
     /// A getter for the underlying owner.
@@ -753,7 +753,7 @@ impl<O, T: ?Sized> OwningRefMut<O, T> {
         }
     }
 
-    // TODO: wrap_owner
+    // TODO: `wrap_owner`
 
     // FIXME: Naming convention?
     /// A getter for the underlying owner.

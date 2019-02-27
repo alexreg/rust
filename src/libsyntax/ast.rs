@@ -368,7 +368,7 @@ impl Default for Generics {
     }
 }
 
-/// A where-clause in a definition.
+/// A `where` clause in a definition.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub struct WhereClause {
     pub id: NodeId,
@@ -376,7 +376,7 @@ pub struct WhereClause {
     pub span: Span,
 }
 
-/// A single predicate in a where-clause.
+/// A single predicate in a `where` clause.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub enum WherePredicate {
     /// A type binding (e.g., `for<'c> Foo: Send + Clone + 'c`).
@@ -531,7 +531,7 @@ impl Pat {
             }
             PatKind::Tuple(pats, None) => {
                 let mut tys = Vec::with_capacity(pats.len());
-                // FIXME(#48994) - could just be collected into an Option<Vec>
+                // FIXME(#48994): could just be collected into an `Option<Vec>`.
                 for pat in pats {
                     tys.push(pat.to_ty()?);
                 }

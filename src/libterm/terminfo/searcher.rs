@@ -26,11 +26,11 @@ pub fn get_dbpath_for_term(term: &str) -> Option<PathBuf> {
             }
         }
     } else {
-        // Found nothing in TERMINFO_DIRS, use the default paths:
-        // According to  /etc/terminfo/README, after looking at
-        // ~/.terminfo, ncurses will search /etc/terminfo, then
-        // /lib/terminfo, and eventually /usr/share/terminfo.
-        // On Haiku the database can be found at /boot/system/data/terminfo
+        // Found nothing in `TERMINFO_DIRS`, so use the default paths.
+        // According to `/etc/terminfo/README`, after looking at
+        // `~/.terminfo`, ncurses will search `/etc/terminfo`, then
+        // `/lib/terminfo`, and eventually `/usr/share/terminfo`.
+        // On Haiku, the database can be found at `/boot/system/data/terminfo`.
         if let Some(mut homedir) = env::home_dir() {
             homedir.push(".terminfo");
             dirs_to_search.push(homedir)

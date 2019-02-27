@@ -68,7 +68,7 @@ impl<'cx, 'gcx, 'tcx> VerifyBoundCx<'cx, 'gcx, 'tcx> {
     }
 
     /// Given a projection like `T::Item`, searches the environment
-    /// for where-clauses like `T::Item: 'a`. Returns the set of
+    /// for `where` clauses like `T::Item: 'a`. Returns the set of
     /// regions `'a` that it finds.
     ///
     /// This is an "approximate" check -- it may not find all
@@ -96,7 +96,7 @@ impl<'cx, 'gcx, 'tcx> VerifyBoundCx<'cx, 'gcx, 'tcx> {
         })
     }
 
-    /// Searches the where-clauses in scope for regions that
+    /// Searches the `where` clauses in scope for regions that
     /// `projection_ty` is known to outlive. Currently requires an
     /// exact match.
     pub fn projection_declared_bounds_from_trait(
@@ -112,7 +112,7 @@ impl<'cx, 'gcx, 'tcx> VerifyBoundCx<'cx, 'gcx, 'tcx> {
         let projection_ty_as_ty =
             self.tcx.mk_projection(projection_ty.item_def_id, projection_ty.substs);
 
-        // Search the env for where clauses like `P: 'a`.
+        // Search the env for `where` clauses like `P: 'a`.
         let env_bounds = self.projection_approx_declared_bounds_from_env(projection_ty)
             .into_iter()
             .map(|ty::OutlivesPredicate(ty, r)| {
@@ -165,7 +165,7 @@ impl<'cx, 'gcx, 'tcx> VerifyBoundCx<'cx, 'gcx, 'tcx> {
         }
     }
 
-    /// Searches the environment for where-clauses like `G: 'a` where
+    /// Searches the environment for `where` clauses like `G: 'a` where
     /// `G` is either some type parameter `T` or a projection like
     /// `T::Item`. Returns a vector of the `'a` bounds it can find.
     ///
@@ -267,7 +267,7 @@ impl<'cx, 'gcx, 'tcx> VerifyBoundCx<'cx, 'gcx, 'tcx> {
     /// projection to convert this into your namespace. This also
     /// works if the user writes `where <Self as Foo<'a>>::Bar: 'a` on
     /// the trait. In fact, it works by searching for just such a
-    /// where-clause.
+    /// `where` clause.
     ///
     /// It will not, however, work for higher-ranked bounds like:
     ///

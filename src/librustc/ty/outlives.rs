@@ -13,7 +13,7 @@ pub enum Component<'tcx> {
 
     // Projections like `T::Foo` are tricky because a constraint like
     // `T::Foo: 'a` can be satisfied in so many ways. There may be a
-    // where-clause that says `T::Foo: 'a`, or the defining trait may
+    // `where` clause that says `T::Foo: 'a`, or the defining trait may
     // include a bound like `type Foo: 'static`, or -- in the most
     // conservative way -- we can prove that `T: 'a` (more generally,
     // that all components in the projection outlive `'a`). This code
@@ -104,8 +104,8 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
                     // OutlivesProjectionComponents to regionck.
                     out.push(Component::Projection(*data));
                 } else {
-                    // fallback case: hard code
-                    // OutlivesProjectionComponents.  Continue walking
+                    // Fallback case: hard code
+                    // `OutlivesProjectionComponents`.  Continue walking
                     // through and constrain Pi.
                     let subcomponents = self.capture_components(ty);
                     out.push(Component::EscapingProjection(subcomponents));

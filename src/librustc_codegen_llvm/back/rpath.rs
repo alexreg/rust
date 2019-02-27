@@ -92,7 +92,7 @@ fn get_rpaths_relative_to_output(config: &mut RPathConfig<'_>,
 }
 
 fn get_rpath_relative_to_output(config: &mut RPathConfig<'_>, lib: &Path) -> String {
-    // Mac doesn't appear to support $ORIGIN
+    // macOS doesn't appear to support `$ORIGIN`.
     let prefix = if config.is_like_osx {
         "@loader_path"
     } else {

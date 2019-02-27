@@ -441,8 +441,9 @@ enum FfiResult<'tcx> {
 /// Check if this enum can be safely exported based on the
 /// "nullable pointer optimization". Currently restricted
 /// to function pointers and references, but could be
-/// expanded to cover NonZero raw pointers and newtypes.
-/// FIXME: This duplicates code in codegen.
+/// expanded to cover `NonZero` raw pointers and newtypes.
+//
+// FIXME: this duplicates code in codegen.
 fn is_repr_nullable_ptr<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                   def: &'tcx ty::AdtDef,
                                   substs: SubstsRef<'tcx>)

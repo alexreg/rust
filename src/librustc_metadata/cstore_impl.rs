@@ -500,8 +500,8 @@ impl CrateStore for cstore::CStore {
     /// parent `DefId` as well as some idea of what kind of data the
     /// `DefId` refers to.
     fn def_key(&self, def: DefId) -> DefKey {
-        // Note: loading the def-key (or def-path) for a def-id is not
-        // a *read* of its metadata. This is because the def-id is
+        // Note: loading the def-key (or def-path) for a `DefId` is not
+        // a *read* of its metadata. This is because the `DefId` is
         // really just an interned shorthand for a def-path, which is the
         // canonical name for an item.
         //

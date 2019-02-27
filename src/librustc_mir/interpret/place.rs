@@ -337,8 +337,8 @@ where
         Ok(MPlaceTy { mplace, layout })
     }
 
-    // Take an operand, representing a pointer, and dereference it to a place -- that
-    // will always be a MemPlace.  Lives in `place.rs` because it creates a place.
+    // Takes an operand, representing a pointer, and dereferences it to a place
+    // (always a `MemPlace`).  Lives in `place.rs` because it creates a place.
     // This calls the "deref" machine hook, and counts as a deref as far as
     // Stacked Borrows is concerned.
     pub fn deref_operand(
@@ -360,8 +360,8 @@ where
         Ok(place)
     }
 
-    /// Offset a pointer to project to a field. Unlike place_field, this is always
-    /// possible without allocating, so it can take &self. Also return the field's layout.
+    /// Offsets a pointer to project to a field. Unlike `place_field`, this is always
+    /// possible without allocating, so it can take `&self`. Also return the field's layout.
     /// This supports both struct and array fields.
     #[inline(always)]
     pub fn mplace_field(
@@ -408,7 +408,7 @@ where
             };
             (base.meta, offset.align_to(align))
         } else {
-            // base.meta could be present; we might be accessing a sized field of an unsized
+            // `base.meta` could be present; we might be accessing a sized field of an unsized
             // struct.
             (None, offset)
         };
@@ -604,9 +604,9 @@ where
                 // and it knows how to deal with alloc_id that are present in the
                 // global table but not in its local memory: It calls back into tcx through
                 // a query, triggering the CTFE machinery to actually turn this lazy reference
-                // into a bunch of bytes.  IOW, statics are evaluated with CTFE even when
-                // this EvalContext uses another Machine (e.g., in miri).  This is what we
-                // want!  This way, computing statics works concistently between codegen
+                // into a bunch of bytes. That is, statics are evaluated with CTFE even when
+                // this `EvalContext` uses another Machine (e.g., in miri). This is what we
+                // want! This way, computing statics works concistently between codegen
                 // and miri: They use the same query to eventually obtain a `ty::Const`
                 // and use that for further computation.
                 let alloc = self.tcx.alloc_map.lock().intern_static(cid.instance.def_id());
@@ -751,8 +751,8 @@ where
         let ptr = ptr.to_ptr()?;
         self.memory.check_align(ptr.into(), ptr_align)?;
         let tcx = &*self.tcx;
-        // FIXME: We should check that there are dest.layout.size many bytes available in
-        // memory.  The code below is not sufficient, with enough padding it might not
+        // FIXME: we should check that there are `dest.layout.size` many bytes available in
+        // memory. The code below is not sufficient, with enough padding it might not
         // cover all the bytes!
         match value {
             Immediate::Scalar(scalar) => {

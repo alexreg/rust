@@ -50,7 +50,7 @@ pub(crate) fn link_binary(sess: &Session,
                           crate_name: &str) -> Vec<PathBuf> {
     let mut out_filenames = Vec::new();
     for &crate_type in sess.crate_types.borrow().iter() {
-        // Ignore executable crates if we have -Z no-codegen, as they will error.
+        // Ignore executable crates if we have `-Z no-codegen`, as they will error.
         let output_metadata = sess.opts.output_types.contains_key(&OutputType::Metadata);
         if (sess.opts.debugging_opts.no_codegen || !sess.opts.output_types.should_codegen()) &&
            !output_metadata &&
@@ -590,8 +590,8 @@ fn link_natively(sess: &Session,
         out.extend(&output.stdout);
         let out = String::from_utf8_lossy(&out);
 
-        // Check to see if the link failed with "unrecognized command line option:
-        // '-no-pie'" for gcc or "unknown argument: '-no-pie'" for clang. If so,
+        // Check to see if the link failed with `unrecognized command line option:
+        // '-no-pie'` for gcc or `unknown argument: '-no-pie'` for clang. If so,
         // reperform the link step without the -no-pie option. This is safe because
         // if the linker doesn't support -no-pie then it should not default to
         // linking executables as pie. Different versions of gcc seem to use
@@ -1105,17 +1105,17 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
                             crate_type: config::CrateType,
                             tmpdir: &Path) {
     // All of the heavy lifting has previously been accomplished by the
-    // dependency_format module of the compiler. This is just crawling the
+    // `dependency_format` module of the compiler. This is just crawling the
     // output of that module, adding crates as necessary.
     //
     // Linking to a rlib involves just passing it to the linker (the linker
-    // will slurp up the object files inside), and linking to a dynamic library
-    // involves just passing the right -l flag.
+    // will gather up the object files inside), and linking to a dynamic library
+    // involves just passing the right `-l` flag.
 
     let formats = sess.dependency_formats.borrow();
     let data = formats.get(&crate_type).unwrap();
 
-    // Invoke get_used_crates to ensure that we get a topological sorting of
+    // Invoke `get_used_crates` to ensure that we get a topological sorting of
     // crates.
     let deps = &codegen_results.crate_info.used_crates_dynamic;
 
@@ -1436,12 +1436,12 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
                                  codegen_results: &CodegenResults,
                                  crate_type: config::CrateType) {
     // Be sure to use a topological sorting of crates because there may be
-    // interdependencies between native libraries. When passing -nodefaultlibs,
+    // interdependencies between native libraries. When passing `-nodefaultlibs`,
     // for example, almost all native libraries depend on libc, so we have to
     // make sure that's all the way at the right (liblibc is near the base of
     // the dependency chain).
     //
-    // This passes RequireStatic, but the actual requirement doesn't matter,
+    // This passes `RequireStatic`, but the actual requirement doesn't matter,
     // we're just getting an ordering of crate numbers, we're not worried about
     // the paths.
     let formats = sess.dependency_formats.borrow();

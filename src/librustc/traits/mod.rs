@@ -178,28 +178,29 @@ pub enum ObligationCauseCode<'tcx> {
     /// Obligation incurred due to an object cast.
     ObjectCastObligation(/* Object type */ Ty<'tcx>),
 
-    // Various cases where expressions must be sized/copy/etc:
-    /// L = X implies that L is Sized
+    // Various cases where expressions must be `Sized`/`Copy`/etc.
+
+    /// `L = X` implies that `L` is `Sized`.
     AssignmentLhsSized,
-    /// (x1, .., xn) must be Sized
+    /// `(x1, .., xn)` must be `Sized`.
     TupleInitializerSized,
-    /// S { ... } must be Sized
+    /// `S { ... }` must be `Sized`.
     StructInitializerSized,
-    /// Type of each variable must be Sized
+    /// Type of each variable must be `Sized`.
     VariableType(ast::NodeId),
-    /// Argument type must be Sized
+    /// Argument type must be `Sized`.
     SizedArgumentType,
-    /// Return type must be Sized
+    /// Returns type must be `Sized`.
     SizedReturnType,
-    /// Yield type must be Sized
+    /// Yield type must be `Sized`.
     SizedYieldType,
-    /// [T,..n] --> T must be Copy
+    /// `[T,..n] --> T` must be `Copy`.
     RepeatVec,
 
     /// Types of fields (other than the last, except for packed structs) in a struct must be sized.
     FieldSized { adt_kind: AdtKind, last: bool },
 
-    /// Constant expressions must be sized.
+    /// Constant expressions must be `Sized`.
     ConstSized,
 
     /// static items must have `Sync` type
@@ -209,7 +210,7 @@ pub enum ObligationCauseCode<'tcx> {
 
     ImplDerivedObligation(DerivedObligationCause<'tcx>),
 
-    /// error derived when matching traits/impls; see ObligationCause for more details
+    /// Error derived when matching traits/impls; see `ObligationCause` for more details.
     CompareImplMethodObligation {
         item_name: ast::Name,
         impl_item_def_id: DefId,
@@ -262,7 +263,7 @@ pub enum ObligationCauseCode<'tcx> {
     /// Block implicit return
     BlockTailExpression(hir::HirId),
 
-    /// #[feature(trivial_bounds)] is not enabled
+    /// `#[feature(trivial_bounds)]` is not enabled.
     TrivialBound,
 }
 
@@ -464,7 +465,7 @@ pub enum FulfillmentErrorCode<'tcx> {
     CodeSelectionError(SelectionError<'tcx>),
     CodeProjectionError(MismatchedProjectionTypes<'tcx>),
     CodeSubtypeError(ExpectedFound<Ty<'tcx>>,
-                     TypeError<'tcx>), // always comes from a SubtypePredicate
+                     TypeError<'tcx>), // always comes from a `SubtypePredicate`
     CodeAmbiguity,
 }
 
@@ -527,7 +528,7 @@ pub enum Vtable<'tcx, N> {
 
     /// Successful resolution to an obligation provided by the caller
     /// for some type parameter. The `Vec<N>` represents the
-    /// obligations incurred from normalizing the where-clause (if
+    /// obligations incurred from normalizing the `where` clause (if
     /// any).
     VtableParam(Vec<N>),
 
@@ -677,9 +678,8 @@ pub fn type_known_to_meet_bound_modulo_regions<'a, 'gcx, 'tcx>(
         // NLL.
         let mut fulfill_cx = FulfillmentContext::new_ignoring_regions();
 
-        // We can use a dummy node-id here because we won't pay any mind
-        // to region obligations that arise (there shouldn't really be any
-        // anyhow).
+        // We can use a dummy `NodeId` here because we won't pay any mind
+        // to region obligations that arise (there shouldn't really be any anyhow).
         let cause = ObligationCause::misc(span, hir::DUMMY_HIR_ID);
 
         fulfill_cx.register_bound(infcx, param_env, ty, def_id, cause);
@@ -979,7 +979,9 @@ fn substitute_normalize_and_test_predicates<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx
 
 /// Given a trait `trait_ref`, iterates the vtable entries
 /// that come from `trait_ref`, including its supertraits.
-#[inline] // FIXME(#35870): avoid closures being unexported due to `impl Trait`.
+//
+// FIXME(#35870): avoid closures being unexported due to `impl Trait`.
+#[inline]
 fn vtable_methods<'a, 'tcx>(
     tcx: TyCtxt<'a, 'tcx, 'tcx>,
     trait_ref: ty::PolyTraitRef<'tcx>)
@@ -1025,7 +1027,7 @@ fn vtable_methods<'a, 'tcx>(
                     &substs
                 );
 
-                // It's possible that the method relies on where clauses that
+                // It's possible that the method relies on `where` clauses that
                 // do not hold for this particular set of type parameters.
                 // Note that this method could then never be called, so we
                 // do not want to try and codegen it, in that case (see #23435).

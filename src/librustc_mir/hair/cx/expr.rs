@@ -741,8 +741,8 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
             };
 
             if let Some(user_ty) = user_ty {
-                // NOTE: Creating a new Expr and wrapping a Cast inside of it may be
-                //       inefficient, revisit this when performance becomes an issue.
+                // NOTE: creating a new `Expr` and wrapping a `Cast` inside of it may be
+                // inefficient, revisit this when performance becomes an issue.
                 let cast_expr = Expr {
                     temp_lifetime,
                     ty: expr_ty,

@@ -179,8 +179,8 @@ fn check_impl_overlap<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, node_id: ast::NodeI
 
     // check for overlap with the automatic `impl Trait for Trait`
     if let ty::Dynamic(ref data, ..) = trait_ref.self_ty().sty {
-        // This is something like impl Trait1 for Trait2. Illegal
-        // if Trait1 is a supertrait of Trait2 or Trait2 is not object safe.
+        // This is something like `impl Trait1 for Trait2`. Illegal
+        // if `Trait1` is a supertrait of `Trait2` or `Trait2` is not object safe.
 
         let component_def_ids = data.iter().flat_map(|predicate| {
             match predicate.skip_binder() {

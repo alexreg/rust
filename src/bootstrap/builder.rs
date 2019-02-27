@@ -80,7 +80,7 @@ pub trait Step: 'static + Clone + Debug + PartialEq + Eq + Hash {
         // It is reasonable to not have an implementation of make_run for rules
         // who do not want to get called from the root context. This means that
         // they are likely dependencies (e.g., sysroot creation) or similar, and
-        // as such calling them from ./x.py isn't logical.
+        // as such calling them from `./x.py` isn't logical.
         unimplemented!()
     }
 }
@@ -236,7 +236,7 @@ impl StepDescription {
 #[derive(Clone)]
 pub struct ShouldRun<'a> {
     pub builder: &'a Builder<'a>,
-    // use a BTreeSet to maintain sort order
+    // Use a `BTreeSet` to maintain sort order.
     paths: BTreeSet<PathSet>,
 
     // If this is a default rule, this is an additional constraint placed on
@@ -301,7 +301,7 @@ impl<'a> ShouldRun<'a> {
         self
     }
 
-    // allows being more explicit about why should_run in Step returns the value passed to it
+    // Allows being more explicit about why `Step::should_run` returns the value passed to it.
     pub fn never(mut self) -> ShouldRun<'a> {
         self.paths.insert(PathSet::empty());
         self
@@ -677,7 +677,7 @@ impl<'a> Builder<'a> {
         let compiler = self.compiler(self.top_stage, host);
         cmd.env("RUSTC_STAGE", compiler.stage.to_string())
             .env("RUSTC_SYSROOT", self.sysroot(compiler))
-            // Note that this is *not* the sysroot_libdir because rustdoc must be linked
+            // Note that this is *not* the `sysroot_libdir`, since rustdoc must be linked
             // equivalently to rustc.
             .env("RUSTDOC_LIBDIR", self.rustc_libdir(compiler))
             .env("CFG_RELEASE_CHANNEL", &self.config.channel)
@@ -1476,7 +1476,7 @@ mod __test {
     #[test]
     fn dist_with_target_flag() {
         let mut config = configure(&["B"], &["C"]);
-        config.run_host_only = false; // as-if --target=C was passed
+        config.run_host_only = false; // as if `--target=C` were passed
         let build = Build::new(config);
         let mut builder = Builder::new(&build);
         builder.run_step_descriptions(&Builder::get_step_descriptions(Kind::Dist), &[]);

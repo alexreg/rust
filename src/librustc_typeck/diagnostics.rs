@@ -787,10 +787,10 @@ const SOME_CONST : i32 = 12;
 fn some_other_func() {}
 
 fn some_function() {
-    SOME_CONST = 14; // error : a constant value cannot be changed!
-    1 = 3; // error : 1 isn't a valid place!
-    some_other_func() = 4; // error : we can't assign value to a function!
-    SomeStruct.x = 12; // error : SomeStruct a structure name but it is used
+    SOME_CONST = 14; // error: a constant value cannot be changed!
+    1 = 3; // error: 1 isn't a valid place!
+    some_other_func() = 4; // error: we can't assign value to a function!
+    SomeStruct.x = 12; // error: `SomeStruct` is a structure name but it is used
                        // like a variable!
 }
 ```
@@ -4444,7 +4444,7 @@ Erroneous code example:
 
 #[start]
 fn start(_: isize, _: *const *const u8) -> isize where (): Copy {
-    //^ error: start function is not allowed to have a where clause
+    //^ error: start function is not allowed to have a `where` clause
     0
 }
 ```

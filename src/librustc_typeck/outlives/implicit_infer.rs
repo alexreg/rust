@@ -71,14 +71,14 @@ impl<'cx, 'tcx> ItemLikeVisitor<'tcx> for InferVisitor<'cx, 'tcx> {
             hir::ItemKind::Union(..) | hir::ItemKind::Enum(..) | hir::ItemKind::Struct(..) => {
                 let adt_def = self.tcx.adt_def(item_did);
 
-                // Iterate over all fields in item_did
+                // Iterate over all fields in `item_did`.
                 for field_def in adt_def.all_fields() {
                     // Calculating the predicate requirements necessary
-                    // for item_did.
+                    // for `item_did`.
                     //
-                    // For field of type &'a T (reference) or Adt
-                    // (struct/enum/union) there will be outlive
-                    // requirements for adt_def.
+                    // For field of a reference type (i.e., `&'a T`) or ADT
+                    // (i.e., struct/enum/union), there will be 'outlives'
+                    // requirements for `adt_def`.
                     let field_ty = self.tcx.type_of(field_def.did);
                     insert_required_predicates_to_be_wf(
                         self.tcx,
@@ -125,8 +125,8 @@ fn insert_required_predicates_to_be_wf<'tcx>(
 ) {
     for ty in field_ty.walk() {
         match ty.sty {
-            // The field is of type &'a T which means that we will have
-            // a predicate requirement of T: 'a (T outlives 'a).
+            // The field is of type `&'a T`, which means that we will have
+            // a predicate requirement of `T: 'a` (`T` outlives `'a`).
             //
             // We also want to calculate potential predicates for the T
             ty::Ref(region, rty, _) => {
@@ -137,7 +137,7 @@ fn insert_required_predicates_to_be_wf<'tcx>(
             // For each Adt (struct/enum/union) type `Foo<'a, T>`, we
             // can load the current set of inferred and explicit
             // predicates from `global_inferred_outlives` and filter the
-            // ones that are TypeOutlives.
+            // ones that are `TypeOutlives`.
             ty::Adt(def, substs) => {
                 // First check the inferred predicates
                 //

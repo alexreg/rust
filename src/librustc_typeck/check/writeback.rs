@@ -219,7 +219,7 @@ impl<'cx, 'gcx, 'tcx> WritebackCx<'cx, 'gcx, 'tcx> {
 // This is the master code which walks the AST. It delegates most of
 // the heavy lifting to the generic visit and resolve functions
 // below. In general, a function is made into a `visitor` if it must
-// traffic in node-ids or update tables in the type context etc.
+// traffic in `NodeId`s or update tables in the type context etc.
 
 impl<'cx, 'gcx, 'tcx> Visitor<'gcx> for WritebackCx<'cx, 'gcx, 'tcx> {
     fn nested_visit_map<'this>(&'this mut self) -> NestedVisitorMap<'this, 'gcx> {
@@ -456,7 +456,7 @@ impl<'cx, 'gcx, 'tcx> WritebackCx<'cx, 'gcx, 'tcx> {
             let generics = self.tcx().generics_of(def_id);
 
             let definition_ty = if generics.parent.is_some() {
-                // impl trait
+                // `impl Trait`
                 self.fcx.infer_opaque_definition_from_instantiation(
                     def_id,
                     opaque_defn,
@@ -809,8 +809,8 @@ impl<'cx, 'gcx, 'tcx> TypeFolder<'gcx, 'tcx> for Resolver<'cx, 'gcx, 'tcx> {
         }
     }
 
-    // FIXME This should be carefully checked
-    // We could use `self.report_error` but it doesn't accept a ty::Region, right now.
+    // FIXME: this should be carefully checked.
+    // We could use `self.report_error`, but it doesn't accept a `ty::Region` right now.
     fn fold_region(&mut self, r: ty::Region<'tcx>) -> ty::Region<'tcx> {
         self.infcx.fully_resolve(&r).unwrap_or(self.tcx.types.re_static)
     }

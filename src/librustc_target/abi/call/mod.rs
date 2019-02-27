@@ -40,14 +40,14 @@ pub enum PassMode {
     Indirect(ArgAttributes, Option<ArgAttributes>),
 }
 
-// Hack to disable non_upper_case_globals only for the bitflags! and not for the rest
-// of this module
+// Hack to disable `non_upper_case_globals` only for the `bitflags!` and not for the rest
+// of this module.
 pub use attr_impl::ArgAttribute;
 
 #[allow(non_upper_case_globals)]
 #[allow(unused)]
 mod attr_impl {
-    // The subset of llvm::Attribute needed for arguments, packed into a bitfield.
+    // The subset of `llvm::Attribute` needed for arguments, packed into a bit field.
     bitflags::bitflags! {
         #[derive(Default)]
         pub struct ArgAttribute: u16 {

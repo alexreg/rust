@@ -131,7 +131,7 @@ impl<'cx, 'gcx, 'tcx> InferCtxt<'cx, 'gcx, 'tcx> {
     /// # Parameters
     ///
     /// - `region_bound_pairs`: the set of region bounds implied by
-    ///   the parameters and where-clauses. In particular, each pair
+    ///   the parameters and `where` clauses. In particular, each pair
     ///   `('a, K)` in this list tells us that the bounds in scope
     ///   indicate that `K: 'a`, where `K` is either a generic
     ///   parameter like `T` or a projection like `T::Item`.

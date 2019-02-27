@@ -544,7 +544,7 @@ impl<'a> TraitDef<'a> {
             GenericParamKind::Lifetime { .. } => param.clone(),
             GenericParamKind::Type { .. } => {
                 // I don't think this can be moved out of the loop, since
-                // a GenericBound requires an ast id
+                // a `GenericBound` requires an AST ID.
                 let bounds: Vec<_> =
                     // extra restrictions on the generics parameters to the
                     // type being derived upon
@@ -563,7 +563,7 @@ impl<'a> TraitDef<'a> {
             GenericParamKind::Const { .. } => param.clone(),
         }));
 
-        // and similarly for where clauses
+        // Do similarly for `where` clauses.
         where_clause.predicates.extend(generics.where_clause.predicates.iter().map(|clause| {
             match *clause {
                 ast::WherePredicate::BoundPredicate(ref wb) => {
@@ -593,7 +593,7 @@ impl<'a> TraitDef<'a> {
         }));
 
         {
-            // Extra scope required here so ty_params goes out of scope before params is moved
+            // Extra scope required here so `ty_params` goes out of scope before `params` is moved.
 
             let mut ty_params = params.iter()
                 .filter_map(|param| match param.kind {
@@ -1033,7 +1033,7 @@ impl<'a> MethodDef<'a> {
             raw_fields.push(ident_expr);
         }
 
-        // transpose raw_fields
+        // Transpose `raw_fields`.
         let fields = if !raw_fields.is_empty() {
             let mut raw_fields = raw_fields.into_iter().map(|v| v.into_iter());
             let first_field = raw_fields.next().unwrap();
@@ -1208,7 +1208,7 @@ impl<'a> MethodDef<'a> {
             .collect::<Vec<ast::Ident>>();
 
         // The `vi_idents` will be bound, solely in the catch-all, to
-        // a series of let statements mapping each self_arg to an int
+        // a series of let statements mapping each `self_arg` to an int
         // value corresponding to its discriminant.
         let vi_idents = self_arg_names.iter()
             .map(|name| {
@@ -1217,7 +1217,7 @@ impl<'a> MethodDef<'a> {
             })
             .collect::<Vec<ast::Ident>>();
 
-        // Builds, via callback to call_substructure_method, the
+        // Builds, via callback to `call_substructure_method`, the
         // delegated expression that handles the catch-all case,
         // using `__variants_tuple` to drive logic if necessary.
         let catch_all_substructure =
@@ -1226,10 +1226,10 @@ impl<'a> MethodDef<'a> {
         let first_fieldless = variants.iter().find(|v| v.node.data.fields().is_empty());
 
         // These arms are of the form:
-        // (Variant1, Variant1, ...) => Body1
-        // (Variant2, Variant2, ...) => Body2
-        // ...
-        // where each tuple has length = self_args.len()
+        //     (Variant1, Variant1, ...) => Body1
+        //     (Variant2, Variant2, ...) => Body2
+        //     ...
+        // where each tuple has length `self_args.len()`.
         let mut match_arms: Vec<ast::Arm> = variants.iter()
             .enumerate()
             .filter(|&(_, v)| !(self.unify_fieldless_variants && v.node.data.fields().is_empty()))
@@ -1261,21 +1261,21 @@ impl<'a> MethodDef<'a> {
                 // Here is the pat = `(&VariantK, &VariantK, ...)`
                 let single_pat = cx.pat_tuple(sp, subpats);
 
-                // For the BodyK, we need to delegate to our caller,
-                // passing it an EnumMatching to indicate which case
+                // For the `BodyK`, we need to delegate to our caller,
+                // passing it an `EnumMatching` to indicate which case
                 // we are in.
 
                 // All of the Self args have the same variant in these
-                // cases.  So we transpose the info in self_pats_idents
+                // cases.  So we transpose the info in `self_pats_idents`
                 // to gather the getter expressions together, in the
-                // form that EnumMatching expects.
+                // form that `EnumMatching` expects.
 
                 // The transposition is driven by walking across the
                 // arg fields of the variant for the first self pat.
                 let field_tuples = first_self_pat_idents.into_iter().enumerate()
                     // For each arg field of self, pull out its getter expr ...
                     .map(|(field_index, (sp, opt_ident, self_getter_expr, attrs))| {
-                        // ... but FieldInfo also wants getter expr
+                        // ... but `FieldInfo` also wants getter expr
                         // for matching other arguments of Self type;
                         // so walk across the *other* self_pats_idents
                         // and pull out getter for same field in each
@@ -1286,7 +1286,7 @@ impl<'a> MethodDef<'a> {
                                 fields[field_index];
 
                             // All Self args have same variant, so
-                            // opt_idents are the same.  (Assert
+                            // `opt_idents` are the same.  (Assert
                             // here to make it self-evident that
                             // it is okay to ignore `_opt_ident`.)
                             assert!(opt_ident == _opt_ident);
@@ -1302,9 +1302,9 @@ impl<'a> MethodDef<'a> {
                         }
                     }).collect::<Vec<FieldInfo<'_>>>();
 
-                // Now, for some given VariantK, we have built up
+                // Now, for some given `VariantK`, we have built up
                 // expressions for referencing every field of every
-                // Self arg, assuming all are instances of VariantK.
+                // Self arg, assuming all are instances of `VariantK`.
                 // Build up code associated with such a case.
                 let substructure = EnumMatching(index, variants.len(), variant, field_tuples);
                 let arm_expr = self.call_substructure_method(cx,
@@ -1349,7 +1349,7 @@ impl<'a> MethodDef<'a> {
         //
         // * when there is only one Self arg, the arms above suffice
         // (and the deriving we call back into may not be prepared to
-        // handle EnumNonMatchCollapsed), and,
+        // handle `EnumNonMatchCollapsed`), and,
         //
         // * when the enum has only one variant, the single arm that
         // is already present always suffices.
@@ -1378,8 +1378,8 @@ impl<'a> MethodDef<'a> {
             // ```
             let mut index_let_stmts: Vec<ast::Stmt> = Vec::with_capacity(vi_idents.len() + 1);
 
-            // We also build an expression which checks whether all discriminants are equal
-            // discriminant_test = __self0_vi == __self1_vi && __self0_vi == __self2_vi && ...
+            // We also build an expression which checks whether all discriminants are equal.
+            // `discriminant_test = __self0_vi == __self1_vi && __self0_vi == __self2_vi && ...`
             let mut discriminant_test = cx.expr_bool(sp, true);
 
             let target_type_name = find_repr_type_name(&cx.parse_sess, type_attrs);
@@ -1416,7 +1416,7 @@ impl<'a> MethodDef<'a> {
                                                          nonself_args,
                                                          &catch_all_substructure);
 
-            // Final wrinkle: the self_args are expressions that deref
+            // Final wrinkle: the `self_args` are expressions that deref
             // down to desired places, but we cannot actually deref
             // them when they are fed as r-values into a tuple
             // expression; here add a layer of borrowing, turning
@@ -1493,7 +1493,7 @@ impl<'a> MethodDef<'a> {
             deriving::call_intrinsic(cx, sp, "unreachable", vec![])
         } else {
 
-            // Final wrinkle: the self_args are expressions that deref
+            // Final wrinkle: the `self_args` are expressions that deref
             // down to desired places, but we cannot actually deref
             // them when they are fed as r-values into a tuple
             // expression; here add a layer of borrowing, turning

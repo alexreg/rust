@@ -450,7 +450,8 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
         return_place: Option<PlaceTy<'tcx, M::PointerTag>>,
         return_to_block: StackPopCleanup,
     ) -> EvalResult<'tcx> {
-        if self.stack.len() > 1 { // FIXME should be "> 0", printing topmost frame crashes rustc...
+        // FIXME: should be `> 0`, but printing topmost frame crashes rustc.
+        if self.stack.len() > 1 {
             info!("PAUSING({}) {}", self.cur_frame(), self.frame().instance);
         }
         ::log_settings::settings().indentation += 1;
@@ -474,7 +475,7 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
         // don't allocate at all for trivial constants
         if mir.local_decls.len() > 1 {
             // We put some marker immediate into the locals that we later want to initialize.
-            // This can be anything except for LocalValue::Dead -- because *that* is the
+            // This can be anything except for `LocalValue::Dead` -- because *that* is the
             // value we use for things that we know are initially dead.
             let dummy = LocalState {
                 state: LocalValue::Live(Operand::Immediate(Immediate::Scalar(
@@ -525,7 +526,8 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
             self.frame_mut().locals = locals;
         }
 
-        if self.stack.len() > 1 { // FIXME no check should be needed, but some instances ICE
+        // FIXME: should be `> 0`, but printing topmost frame crashes rustc.
+        if self.stack.len() > 1 {
             info!("ENTERING({}) {}", self.cur_frame(), self.frame().instance);
         }
 
@@ -537,7 +539,8 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
     }
 
     pub(super) fn pop_stack_frame(&mut self) -> EvalResult<'tcx> {
-        if self.stack.len() > 1 { // FIXME no check should be needed, but some instances ICE
+        // FIXME: should be `> 0`, but printing topmost frame crashes rustc.
+        if self.stack.len() > 1 {
             info!("LEAVING({}) {}", self.cur_frame(), self.frame().instance);
         }
         ::log_settings::settings().indentation -= 1;
@@ -591,7 +594,8 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
             StackPopCleanup::None { .. } => {}
         }
 
-        if self.stack.len() > 1 { // FIXME should be "> 0", printing topmost frame crashes rustc...
+        // FIXME: should be `> 0`, but printing topmost frame crashes rustc.
+        if self.stack.len() > 1 {
             info!("CONTINUING({}) {}", self.cur_frame(), self.frame().instance);
         }
 

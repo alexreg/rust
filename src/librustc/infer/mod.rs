@@ -75,8 +75,8 @@ pub type UnitResult<'tcx> = RelateResult<'tcx, ()>; // "unify result"
 pub type FixupResult<T> = Result<T, FixupError>; // "fixup result"
 
 /// A flag that is used to suppress region errors. This is normally
-/// false, but sometimes -- when we are doing region checks that the
-/// NLL borrow checker will also do -- it might be set to true.
+/// `false`, but sometimes -- when we are doing region checks that the
+/// NLL borrow checker will also do -- it might be set to `true`.
 #[derive(Copy, Clone, Default, Debug)]
 pub struct SuppressRegionErrors {
     suppressed: bool,
@@ -170,7 +170,7 @@ pub struct InferCtxt<'a, 'gcx: 'a + 'tcx, 'tcx: 'a> {
     // `tained_by_errors`) to avoid reporting certain kinds of errors.
     err_count_on_creation: usize,
 
-    // This flag is true while there is an active snapshot.
+    // This flag is `true` while there is an active snapshot.
     in_snapshot: Cell<bool>,
 
     // A set of constraints that regionck must validate. Each
@@ -196,7 +196,7 @@ pub struct InferCtxt<'a, 'gcx: 'a + 'tcx, 'tcx: 'a> {
     // something more fine-grained, is so that it is easier for
     // regionck to be sure that it has found *all* the region
     // obligations (otherwise, it's easy to fail to walk to a
-    // particular node-id).
+    // particular `NodeId`).
     //
     // Before running `resolve_regions_and_report_errors`, the creator
     // of the inference context is expected to invoke
@@ -291,7 +291,7 @@ pub enum SubregionOrigin<'tcx> {
     // Data with type `Ty<'tcx>` was borrowed
     DataBorrowed(Ty<'tcx>, Span),
 
-    // (&'a &'b T) where a >= b
+    // `(&'a &'b T)` where `a >= b`.
     ReferenceOutlivesReferent(Ty<'tcx>, Span),
 
     // Type or region parameters must be in scope.
@@ -337,10 +337,10 @@ pub enum SubregionOrigin<'tcx> {
 /// Places that type/region parameters can appear.
 #[derive(Clone, Copy, Debug)]
 pub enum ParameterOrigin {
-    Path,               // foo::bar
-    MethodCall,         // foo.bar() <-- parameters on impl providing bar()
-    OverloadedOperator, // a + b when overloaded
-    OverloadedDeref,    // *a when overloaded
+    Path,               // `foo::bar`
+    MethodCall,         // `foo.bar()` <-- parameters on impl providing `bar()`
+    OverloadedOperator, // `a + b` when overloaded
+    OverloadedDeref,    // `*a` when overloaded
 }
 
 /// Times when we replace late-bound regions with variables:
@@ -1222,7 +1222,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         self.resolve_type_vars_if_possible(t).to_string()
     }
 
-    // We have this force-inlined variant of shallow_resolve() for the one
+    // We have this force-inlined variant of `shallow_resolve()` for the one
     // callsite that is extremely hot. All other callsites use the normal
     // variant.
     #[inline(always)]
@@ -1285,14 +1285,12 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
     where
         T: TypeFoldable<'tcx>,
     {
-        /*!
-         * Where possible, replaces type/int/float variables in
-         * `value` with their final value. Note that region variables
-         * are unaffected. If a type variable has not been unified, it
-         * is left as is. This is an idempotent operation that does
-         * not affect inference state in any way and so you can do it
-         * at will.
-         */
+        // Where possible, replaces type/int/float variables in
+        // `value` with their final value. Note that region variables
+        // are unaffected. If a type variable has not been unified, it
+        // is left as is. This is an idempotent operation that does
+        // not affect inference state in any way and so you can do it
+        // at will.
 
         if !value.needs_infer() {
             return value.clone(); // avoid duplicated subst-folding
@@ -1315,28 +1313,26 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
     }
 
     pub fn fully_resolve<T: TypeFoldable<'tcx>>(&self, value: &T) -> FixupResult<T> {
-        /*!
-         * Attempts to resolve all type/region variables in
-         * `value`. Region inference must have been run already (e.g.,
-         * by calling `resolve_regions_and_report_errors`). If some
-         * variable was never unified, an `Err` results.
-         *
-         * This method is idempotent, but it not typically not invoked
-         * except during the writeback phase.
-         */
+        // Attempts to resolve all type/region variables in `value`.
+        // Region inference must have been run already (e.g., by calling
+        // `resolve_regions_and_report_errors`). If some variable was never
+        // unified, an `Err` results.
+        //
+        // This method is idempotent, but it not typically not invoked
+        // except during the writeback phase.
 
         resolve::fully_resolve(self, value)
     }
 
     // [Note-Type-error-reporting]
-    // An invariant is that anytime the expected or actual type is Error (the special
-    // error type, meaning that an error occurred when typechecking this expression),
+    // An invariant is that anytime the expected or actual type is `Error` (the special
+    // error type, meaning that an error occurred when type-checking this expression),
     // this is a derived error. The error cascaded from another error (that was already
     // reported), so it's not useful to display it to the user.
     // The following methods implement this logic.
-    // They check if either the actual or expected type is Error, and don't print the error
-    // in this case. The typechecker should only ever report type errors involving mismatched
-    // types using one of these methods, and should not call span_err directly for such
+    // They check if either the actual or expected type is `Error`, and don't print the error
+    // in this case. The type-checker should only ever report type errors involving mismatched
+    // types using one of these methods, and should not call `span_err` directly for such
     // errors.
 
     pub fn type_error_struct_with_diag<M>(
@@ -1416,9 +1412,9 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
 
         let copy_def_id = self.tcx.require_lang_item(lang_items::CopyTraitLangItem);
 
-        // this can get called from typeck (by euv), and moves_by_default
+        // This can get called from typeck (by euv), and `moves_by_default`
         // rightly refuses to work with inference variables, but
-        // moves_by_default has a cache, which we want to use in other
+        // `moves_by_default` has a cache, which we want to use in other
         // cases.
         traits::type_known_to_meet_bound_modulo_regions(self, param_env, ty, copy_def_id, span)
     }

@@ -40,8 +40,8 @@ impl<F: Float> ieee::Semantics for FallbackS<F> {
     const MIN_EXP: ExpInt = F::MIN_EXP as ExpInt + F::PRECISION as ExpInt;
 }
 
-// Convert number to F. To avoid spurious underflows, we re-
-// normalize against the F exponent range first, and only *then*
+// Convert number to `F`. To avoid spurious underflows, we re-
+// normalize against the `F` exponent range first, and only *then*
 // truncate the mantissa. The result of that second conversion
 // may be inexact, but should never underflow.
 // FIXME(eddyb) This shouldn't need to be `pub`, it's only used in bounds.

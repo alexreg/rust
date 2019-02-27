@@ -21,7 +21,7 @@ use syntax_pos::Span;
 
 /// Checks that all the type/lifetime parameters on an impl also
 /// appear in the trait ref or self type (or are constrained by a
-/// where-clause). These rules are needed to ensure that, given a
+/// `where` clause). These rules are needed to ensure that, given a
 /// trait ref like `<T as Trait<U>>`, we can derive the values of all
 /// parameters on the impl (which is needed to make specialization
 /// possible).

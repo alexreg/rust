@@ -86,7 +86,7 @@ pub enum ProfileQueriesMsg {
     TimeBegin(String),
     /// end a timed pass
     TimeEnd,
-    /// begin a task (see dep_graph::graph::with_task)
+    /// Begin a task (see `dep_graph::graph::with_task`).
     TaskBegin(DepNode),
     /// end a task
     TaskEnd,

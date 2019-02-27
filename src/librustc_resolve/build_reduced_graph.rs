@@ -110,7 +110,7 @@ impl<'a> Resolver<'a> {
 
     fn build_reduced_graph_for_use_tree(
         &mut self,
-        // This particular use tree
+        // This particular `use` tree.
         use_tree: &ast::UseTree,
         id: NodeId,
         parent_prefix: &[Segment],
@@ -298,7 +298,7 @@ impl<'a> Resolver<'a> {
 
                 for &(ref tree, id) in items {
                     self.build_reduced_graph_for_use_tree(
-                        // This particular use tree
+                        // This particular `use` tree.
                         tree, id, &prefix, true,
                         // The whole `use` item
                         parent_scope.clone(), item, vis, root_span,
@@ -322,7 +322,7 @@ impl<'a> Resolver<'a> {
                         span: use_tree.span,
                     };
                     self.build_reduced_graph_for_use_tree(
-                        // This particular use tree
+                        // This particular `use` tree.
                         &tree, id, &prefix, true,
                         // The whole `use` item
                         parent_scope, item, ty::Visibility::Invisible, root_span,
@@ -343,7 +343,7 @@ impl<'a> Resolver<'a> {
         match item.node {
             ItemKind::Use(ref use_tree) => {
                 self.build_reduced_graph_for_use_tree(
-                    // This particular use tree
+                    // This particular `use` tree.
                     use_tree, item.id, &[], false,
                     // The whole `use` item
                     parent_scope, item, vis, use_tree.span,
@@ -883,7 +883,7 @@ impl<'a> Resolver<'a> {
                 let msg = "macro_escape is a deprecated synonym for macro_use";
                 let mut err = self.session.struct_span_warn(attr.span, msg);
                 if let ast::AttrStyle::Inner = attr.style {
-                    err.help("consider an outer attribute, #[macro_use] mod ...").emit();
+                    err.help("consider an outer attribute, `#[macro_use] mod ...`").emit();
                 } else {
                     err.emit();
                 }
@@ -892,7 +892,7 @@ impl<'a> Resolver<'a> {
             }
 
             if !attr.is_word() {
-                self.session.span_err(attr.span, "arguments to macro_use are not allowed here");
+                self.session.span_err(attr.span, "arguments to `macro_use` are not allowed here");
             }
             return true;
         }

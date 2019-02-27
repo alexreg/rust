@@ -282,7 +282,7 @@ impl<O: ForestObligation> ObligationForest<O> {
         let _ = self.register_obligation_at(obligation, None);
     }
 
-    // returns Err(()) if we already know this obligation failed.
+    // Returns `Err(())` if we already know this obligation failed.
     fn register_obligation_at(&mut self, obligation: O, parent: Option<NodeIndex>)
                               -> Result<(), ()>
     {
@@ -731,7 +731,7 @@ impl<O> Node<O> {
     }
 }
 
-// I need a Clone closure
+// I need a `Clone` closure.
 #[derive(Clone)]
 struct GetObligation<'a, O>(&'a [Node<O>]);
 

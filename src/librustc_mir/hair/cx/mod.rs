@@ -70,7 +70,7 @@ impl<'a, 'gcx, 'tcx> Cx<'a, 'gcx, 'tcx> {
         // the settings for the crate they are codegened in.
         let mut check_overflow = attr::contains_name(attrs, "rustc_inherit_overflow_checks");
 
-        // Respect -C overflow-checks.
+        // Respect `-C overflow-checks`.
         check_overflow |= tcx.sess.overflow_checks();
 
         // Constants always need overflow checks.

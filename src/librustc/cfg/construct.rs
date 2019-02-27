@@ -19,15 +19,20 @@ struct CFGBuilder<'a, 'tcx: 'a> {
 
 #[derive(Copy, Clone)]
 struct BlockScope {
-    block_expr_id: hir::ItemLocalId, // id of breakable block expr node
-    break_index: CFGIndex, // where to go on `break`
+    // ID of breakable block expr node.
+    block_expr_id: hir::ItemLocalId,
+    // Where to go on `break`.
+    break_index: CFGIndex,
 }
 
 #[derive(Copy, Clone)]
 struct LoopScope {
-    loop_id: hir::ItemLocalId,     // id of loop/while node
-    continue_index: CFGIndex, // where to go on a `loop`
-    break_index: CFGIndex,    // where to go on a `break`
+    // ID of `loop`/`while` node.
+    loop_id: hir::ItemLocalId,
+    // Where to go on a `loop`.
+    continue_index: CFGIndex,
+    // Where to go on `break`.
+    break_index: CFGIndex,
 }
 
 pub fn construct<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,

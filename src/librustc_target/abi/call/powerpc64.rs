@@ -8,8 +8,10 @@ use crate::spec::HasTargetSpec;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum ABI {
-    ELFv1, // original ABI used for powerpc64 (big-endian)
-    ELFv2, // newer ABI used for powerpc64le and musl (both endians)
+    // Original ABI used for `powerpc64` (big-endian).
+    ELFv1,
+    // Newer ABI used for `powerpc64le` and `musl` (both endians).
+    ELFv2,
 }
 use ABI::*;
 

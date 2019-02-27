@@ -516,8 +516,7 @@ fn unsafety_check_result<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId)
 {
     debug!("unsafety_violations({:?})", def_id);
 
-    // N.B., this borrow is valid because all the consumers of
-    // `mir_built` force this.
+    // N.B., this borrow is valid because all the consumers of `mir_built` force this.
     let mir = &tcx.mir_built(def_id).borrow();
 
     let source_scope_local_data = match mir.source_scope_local_data {

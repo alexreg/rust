@@ -845,7 +845,7 @@ pub enum Locations {
     /// equality is basically a no-op. Then, later on, when we do `_0
     /// = &'3 y`, that region `'3` never winds up related to the
     /// universal region `'1` and hence no error occurs. Therefore, we
-    /// use Locations::All instead, which ensures that the `'1` and
+    /// use `Locations::All` instead, which ensures that the `'1` and
     /// `'2` are equal everything. We also use this for other
     /// user-given type annotations; e.g., if the user wrote `let mut
     /// x: &'static u32 = ...`, we would ensure that all values
@@ -1062,7 +1062,7 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
             if let TyKind::Opaque(..) = sup.sty {
                 // When you have `let x: impl Foo = ...` in a closure,
                 // the resulting inferend values are stored with the
-                // def-id of the base function.
+                // `DefId` of the base function.
                 let parent_def_id = self.tcx().closure_base_def_id(self.mir_def_id);
                 return self.eq_opaque_type_and_type(sub, sup, parent_def_id, locations, category);
             } else {
@@ -1743,8 +1743,8 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
                 // sized by typeck, but return values of ADT constructors are
                 // not because we don't include a `Self: Sized` bounds on them.
                 //
-                // Unbound parts of arguments were never required to be Sized
-                // - maybe we should make that a warning.
+                // Unbound parts of arguments were never required to be `Sized`
+                // -- maybe we should make that a warning.
                 return;
             }
             LocalKind::Var | LocalKind::Temp => {}
@@ -2280,7 +2280,7 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
 
                         match k1.unpack() {
                             UnpackedKind::Lifetime(r1) => {
-                                // constraint is r1: r2
+                                // Constraint is `r1: r2`.
                                 let r1_vid = borrowck_context.universal_regions.to_region_vid(r1);
                                 let r2_vid = borrowck_context.universal_regions.to_region_vid(r2);
                                 let outlives_requirements =

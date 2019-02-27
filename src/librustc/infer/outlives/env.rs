@@ -8,7 +8,7 @@ use crate::ty::{self, Ty};
 
 /// The `OutlivesEnvironment` collects information about what outlives
 /// what in a given type-checking setting. For example, if we have a
-/// where-clause like `where T: 'a` in scope, then the
+/// `where` clause like `where T: 'a` in scope, then the
 /// `OutlivesEnvironment` would record that (in its
 /// `region_bound_pairs` field). Similarly, it contains methods for
 /// processing and adding implied bounds into the outlives
@@ -63,7 +63,7 @@ pub struct OutlivesEnvironment<'tcx> {
 }
 
 /// "Region-bound pairs" tracks outlives relations that are known to
-/// be true, either because of explicit where-clauses like `T: 'a` or
+/// be true, either because of explicit `where` clauses like `T: 'a` or
 /// because of implied bounds.
 pub type RegionBoundPairs<'tcx> = Vec<(ty::Region<'tcx>, GenericKind<'tcx>)>;
 

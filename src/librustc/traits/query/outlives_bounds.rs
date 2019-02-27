@@ -79,7 +79,7 @@ impl<'cx, 'gcx, 'tcx> InferCtxt<'cx, 'gcx, 'tcx> {
     ///
     /// # Parameters
     ///
-    /// - `param_env`, the where-clauses in scope
+    /// - `param_env`, the `where` clauses in scope
     /// - `body_id`, the body-id to use when normalizing assoc types.
     ///   Note that this may cause outlives obligations to be injected
     ///   into the inference context with this body-id.

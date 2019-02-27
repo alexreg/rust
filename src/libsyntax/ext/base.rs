@@ -137,7 +137,7 @@ impl Annotatable {
     }
 }
 
-// A more flexible ItemDecorator.
+// A more flexible `ItemDecorator`.
 pub trait MultiItemDecorator {
     fn expand(&self,
               ecx: &mut ExtCtxt<'_>,
@@ -207,7 +207,7 @@ impl<F> ProcMacro for F
                    _span: Span,
                    ts: TokenStream)
                    -> TokenStream {
-        // FIXME setup implicit context in TLS before calling self.
+        // FIXME: set up implicit context in TLS before calling `self`.
         (*self)(ts)
     }
 }
@@ -463,8 +463,7 @@ pub struct DummyResult {
 impl DummyResult {
     /// Creates a default MacResult that can be anything.
     ///
-    /// Use this as a return value after hitting any errors and
-    /// calling `span_err`.
+    /// Use this as a return value after hitting any errors and calling `span_err`.
     pub fn any(span: Span) -> Box<dyn MacResult+'static> {
         Box::new(DummyResult { expr_only: false, is_error: true, span })
     }
@@ -522,7 +521,7 @@ impl MacResult for DummyResult {
     }
 
     fn make_items(self: Box<DummyResult>) -> Option<SmallVec<[P<ast::Item>; 1]>> {
-        // this code needs a comment... why not always just return the Some() ?
+        // NOTE: this needs an explanation -- why not always just return the `Some()`?
         if self.expr_only {
             None
         } else {
@@ -573,11 +572,11 @@ pub type BuiltinDeriveFn =
 /// Represents different kinds of macro invocations that can be resolved.
 #[derive(Clone, Copy, PartialEq, Eq, RustcEncodable, RustcDecodable, Hash, Debug)]
 pub enum MacroKind {
-    /// A bang macro - foo!()
+    /// A bang macro (e.g., `foo!()`).
     Bang,
-    /// An attribute macro - #[foo]
+    /// An attribute macro (e.g., `#[foo]`).
     Attr,
-    /// A derive attribute macro - #[derive(Foo)]
+    /// A derive attribute macro (e.g., `#[derive(Foo)]`).
     Derive,
     /// A view of a procedural macro from the same crate that defines it.
     ProcMacroStub,
@@ -611,14 +610,14 @@ pub enum SyntaxExtension {
     ///
     /// `#[derive(...)]` is a `MultiItemDecorator`.
     ///
-    /// Prefer ProcMacro or MultiModifier since they are more flexible.
+    /// Prefer `ProcMacro` or `MultiModifier` since they are more flexible.
     MultiDecorator(Box<dyn MultiItemDecorator + sync::Sync + sync::Send>),
 
     /// A syntax extension that is attached to an item and modifies it
     /// in-place. Also allows decoration, i.e., creating new items.
     MultiModifier(Box<dyn MultiItemModifier + sync::Sync + sync::Send>),
 
-    /// A function-like procedural macro. TokenStream -> TokenStream.
+    /// A function-like procedural macro; `TokenStream -> TokenStream`.
     ProcMacro {
         expander: Box<dyn ProcMacro + sync::Sync + sync::Send>,
         /// Whitelist of unstable features that are treated as stable inside this macro
@@ -626,7 +625,7 @@ pub enum SyntaxExtension {
         edition: Edition,
     },
 
-    /// An attribute-like procedural macro. TokenStream, TokenStream -> TokenStream.
+    /// An attribute-like procedural macro; `TokenStream, TokenStream -> TokenStream`.
     /// The first TokenSteam is the attribute, the second is the annotated item.
     /// Allows modification of the input items and adding new items, similar to
     /// MultiModifier, but uses TokenStreams, rather than AST nodes.
@@ -638,15 +637,14 @@ pub enum SyntaxExtension {
     NormalTT {
         expander: Box<dyn TTMacroExpander + sync::Sync + sync::Send>,
         def_info: Option<(ast::NodeId, Span)>,
-        /// Whether the contents of the macro can
-        /// directly use `#[unstable]` things.
+        /// Whether the contents of the macro can directly use `#[unstable]` things.
         ///
         /// Only allows things that require a feature gate in the given whitelist
         allow_internal_unstable: Option<Lrc<[Symbol]>>,
-        /// Whether the contents of the macro can use `unsafe`
-        /// without triggering the `unsafe_code` lint.
+        /// `true` if the contents of the macro can use `unsafe` without triggering
+        /// the `unsafe_code` lint.
         allow_internal_unsafe: bool,
-        /// Enables the macro helper hack (`ident!(...)` -> `$crate::ident!(...)`)
+        /// `true` to enable the macro helper hack (i.e, `ident!(...)` -> `$crate::ident!(...)`)
         /// for a given macro.
         local_inner_macros: bool,
         /// The macro's feature name if it is unstable, and the stability feature
@@ -803,9 +801,9 @@ pub struct ExpansionData {
     pub crate_span: Option<Span>,
 }
 
-/// One of these is made during expansion and incrementally updated as we go;
-/// when a macro expansion occurs, the resulting nodes have the `backtrace()
-/// -> expn_info` of their expansion context stored into their span.
+/// Information created during expansion and updated incrementally as we go;
+/// when a macro expansion occurs, the resulting nodes have the `backtrace() -> expn_info`
+/// of their expansion context stored into their span.
 pub struct ExtCtxt<'a> {
     pub parse_sess: &'a parse::ParseSess,
     pub ecfg: expand::ExpansionConfig<'a>,

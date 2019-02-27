@@ -15,8 +15,8 @@
 //!       | *E        // deref of a ptr
 //!       | E.comp    // access to an interior component
 //!
-//! Imagine a routine ToAddr(Expr) that evaluates an expression and returns an
-//! address where the result is to be found. If Expr is a place, then this
+//! Imagine a routine `ToAddr(Expr)` that evaluates an expression and returns an
+//! address where the result is to be found. If `Expr` is a place, then this
 //! is the address of the place. If `Expr` is an rvalue, this is the address of
 //! some temporary spot in memory where the result is stored.
 //!
@@ -30,9 +30,9 @@
 //! - `ty`: the type of data found at the address `A`.
 //!
 //! The resulting categorization tree differs somewhat from the expressions
-//! themselves. For example, auto-derefs are explicit. Also, an index a[b] is
-//! decomposed into two operations: a dereference to reach the array data and
-//! then an index to jump forward to the relevant item.
+//! themselves. For example, auto-derefs are explicit. Also, an index `a[b]` is
+//! decomposed into two operations: a dereference to reach the array data, and
+//! an index to jump forward to the relevant item.
 //!
 //! ## By-reference upvars
 //!
@@ -187,7 +187,7 @@ pub enum Note {
 // a consistent fashion. For more details, see the method `cat_pattern`
 #[derive(Clone, Debug, PartialEq)]
 pub struct cmt_<'tcx> {
-    pub hir_id: hir::HirId,        // HIR id of expr/pat producing this value
+    pub hir_id: hir::HirId,        // `HirId` of expr/pat producing this value
     pub span: Span,                // span of same expr/pat
     pub cat: Categorization<'tcx>, // categorization of expr
     pub mutbl: MutabilityCategory, // mutability of expr as place
@@ -659,9 +659,8 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
                 if self.tables.is_method_call(expr) {
                     // If this is an index implemented by a method call, then it
                     // will include an implicit deref of the result.
-                    // The call to index() returns a `&T` value, which
-                    // is an rvalue. That is what we will be
-                    // dereferencing.
+                    // The call to `index()` returns a `&T` value, which
+                    // is an rvalue. That is what we will be dereferencing.
                     self.cat_overloaded_place(expr, base, NoteIndex)
                 } else {
                     let base_cmt = Rc::new(self.cat_expr(&base)?);
@@ -791,7 +790,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
             ty::Closure(closure_def_id, closure_substs) => {
                 match self.infcx {
                     // During upvar inference we may not know the
-                    // closure kind, just use the LATTICE_BOTTOM value.
+                    // closure kind, just use the `LATTICE_BOTTOM` value.
                     Some(infcx) =>
                         infcx.closure_kind(closure_def_id, closure_substs)
                              .unwrap_or(ty::ClosureKind::LATTICE_BOTTOM),
@@ -1305,7 +1304,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
             }
 
             PatKind::Struct(ref qpath, ref field_pats, _) => {
-                // {f1: p1, ..., fN: pN}
+                // `{f1: p1, ..., fN: pN}`
                 let def = self.tables.qpath_def(qpath, pat.hir_id);
                 let cmt = match def {
                     Def::Err => {
@@ -1333,7 +1332,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
             }
 
             PatKind::Tuple(ref subpats, ddpos) => {
-                // (p1, ..., pN)
+                // `(p1, ..., pN)`
                 let expected_len = match self.pat_ty_unadjusted(&pat)?.sty {
                     ty::Tuple(ref tys) => tys.len(),
                     ref ty => span_bug!(pat.span, "tuple pattern unexpected type {:?}", ty),
@@ -1348,8 +1347,8 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
             }
 
             PatKind::Box(ref subpat) | PatKind::Ref(ref subpat, _) => {
-                // box p1, &p1, &mut p1.  we can ignore the mutability of
-                // PatKind::Ref since that information is already contained
+                // `box p1`, `&p1`, `&mut p1`. We can ignore the mutability of
+                // `PatKind::Ref`, since that information is already contained
                 // in the type.
                 let subcmt = Rc::new(self.cat_deref(pat, cmt, NoteNone)?);
                 self.cat_pattern_(subcmt, &subpat, op)?;

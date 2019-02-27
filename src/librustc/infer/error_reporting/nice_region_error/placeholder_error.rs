@@ -165,7 +165,7 @@ impl NiceRegionError<'me, 'gcx, 'tcx> {
     // 12 |     all::<&'static u32>();
     //    |     ^^^^^^^^^^^^^^^^^^^ lifetime mismatch
     //    |
-    //    = note: Due to a where-clause on the function `all`,
+    //    = note: Due to a `where` clause on the function `all`,
     //    = note: `T` must implement `...` for any two lifetimes `'1` and `'2`.
     //    = note: However, the type `T` only implements `...` for some specific lifetime `'2`.
     fn try_report_placeholders_trait(
@@ -200,7 +200,7 @@ impl NiceRegionError<'me, 'gcx, 'tcx> {
         match cause.code {
             ObligationCauseCode::ItemObligation(def_id) => {
                 err.note(&format!(
-                    "Due to a where-clause on `{}`,",
+                    "due to a `where` clause on `{}`,",
                     self.tcx().item_path_str(def_id),
                 ));
             }

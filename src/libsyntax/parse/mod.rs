@@ -400,7 +400,8 @@ pub fn str_lit(lit: &str, diag: Option<(Span, &Handler)>) -> String {
                 } else {
                     // otherwise, a normal escape
                     let (c, n) = char_lit(&lit[i..], diag);
-                    for _ in 0..n - 1 { // we don't need to move past the first \
+                    // We don't need to move past the first `\`.
+                    for _ in 0..n - 1 {
                         chars.next();
                     }
                     res.push(c);
@@ -449,7 +450,7 @@ fn raw_str_lit(lit: &str) -> String {
     res
 }
 
-// check if `s` looks like i32 or u1234 etc.
+// Checks if `s` looks like `i32`, `u1234`, etc.
 fn looks_like_width_suffix(first_chars: &[char], s: &str) -> bool {
     s.starts_with(first_chars) && s[1..].chars().all(|c| c.is_ascii_digit())
 }
@@ -540,7 +541,7 @@ fn float_lit(s: &str, suffix: Option<Symbol>, diag: Option<(Span, &Handler)>)
     debug!("float_lit: {:?}, {:?}", s, suffix);
     // FIXME #2252: bounds checking float literals is deferred until trans
 
-    // Strip underscores without allocating a new String unless necessary.
+    // Strip underscores without allocating a new `String` unless necessary.
     let s2;
     let s = if s.chars().any(|c| c == '_') {
         s2 = s.chars().filter(|&c| c != '_').collect::<String>();
@@ -669,7 +670,7 @@ fn integer_lit(s: &str, suffix: Option<Symbol>, diag: Option<(Span, &Handler)>)
         }
     }
 
-    // 1f64 and 2f32 etc. are valid float literals.
+    // `1f64`, `2f32`, etc. are valid float literals.
     if let Some(suf) = suffix {
         if looks_like_width_suffix(&['f'], &suf.as_str()) {
             let err = match base {
@@ -802,7 +803,7 @@ mod tests {
         new_parser_from_source_str(sess, name, source).parse_item()
     }
 
-    // produce a syntax_pos::span
+    // Produces a `syntax_pos::span`.
     fn sp(a: u32, b: u32) -> Span {
         Span::new(BytePos(a), BytePos(b), NO_EXPANSION)
     }

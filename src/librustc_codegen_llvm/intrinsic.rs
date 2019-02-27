@@ -365,7 +365,8 @@ impl IntrinsicCallMethods<'tcx> for Builder<'a, 'll, 'tcx> {
                             ),
                             "bswap" => {
                                 if width == 8 {
-                                    args[0].immediate() // byte swap a u8/i8 is just a no-op
+                                    // Byte-swapping a `u8`/`i8` is just a no-op.
+                                    args[0].immediate()
                                 } else {
                                     self.call(
                                         self.get_intrinsic(
@@ -886,8 +887,8 @@ fn codegen_msvc_try(
     bx.store(ret, dest, i32_align);
 }
 
-// Definition of the standard "try" function for Rust using the GNU-like model
-// of exceptions (e.g., the normal semantics of LLVM's landingpad and invoke
+// Definition of the standard `try` function for Rust using the GNU-like model
+// of exceptions (e.g., the normal semantics of LLVM's `landingpad` and `invoke`
 // instructions).
 //
 // This codegen is a little surprising because we always call a shim
@@ -1923,8 +1924,8 @@ fn int_type_width_signed(ty: Ty<'_>, cx: &CodegenCx<'_, '_>) -> Option<(u64, boo
     }
 }
 
-// Returns the width of a float TypeVariant
-// Returns None if the type is not a float
+// Returns the width of a float `TypeVariant`, or
+// `None` if the type is not a float.
 fn float_type_width<'tcx>(sty: &ty::TyKind<'tcx>) -> Option<u64> {
     match *sty {
         ty::Float(t) => Some(t.bit_width() as u64),
