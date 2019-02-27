@@ -456,15 +456,15 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
         }
         ::log_settings::settings().indentation += 1;
 
-        // first push a stack frame so we have access to the local substs
+        // First, push a stack frame so we have access to the local substs.
         let extra = M::stack_push(self)?;
         self.stack.push(Frame {
             mir,
             block: mir::START_BLOCK,
             return_to_block,
             return_place,
-            // empty local array, we fill it in below, after we are inside the stack frame and
-            // all methods actually know about the frame
+            // Empty local array -- we fill it in below, after we are inside the stack frame and
+            // all methods actually know about the frame.
             locals: IndexVec::new(),
             span,
             instance,
@@ -472,7 +472,7 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
             extra,
         });
 
-        // don't allocate at all for trivial constants
+        // Don't allocate at all for trivial constants.
         if mir.local_decls.len() > 1 {
             // We put some marker immediate into the locals that we later want to initialize.
             // This can be anything except for `LocalValue::Dead` -- because *that* is the
@@ -489,7 +489,7 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
             locals[mir::RETURN_PLACE].state = LocalValue::Dead;
             // Now mark those locals as dead that we do not want to initialize
             match self.tcx.describe_def(instance.def_id()) {
-                // statics and constants don't have `Storage*` statements, no need to look for them
+                // Statics and constants don't have `Storage*` statements; no need to look for them.
                 Some(Def::Static(..)) | Some(Def::Const(..)) | Some(Def::AssociatedConst(..)) => {},
                 _ => {
                     trace!("push_stack_frame: {:?}: num_bbs: {}", span, mir.basic_blocks().len());
@@ -507,7 +507,7 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
                     }
                 },
             }
-            // Finally, properly initialize all those that still have the dummy value
+            // Finally, properly initialize all those that still have the dummy value.
             for (idx, local) in locals.iter_enumerated_mut() {
                 match local.state {
                     LocalValue::Live(_) => {
@@ -518,11 +518,11 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
                         local.layout = Cell::new(Some(layout));
                     }
                     LocalValue::Dead => {
-                        // Nothing to do
+                        // Nothing to do.
                     }
                 }
             }
-            // done
+            // Done.
             self.frame_mut().locals = locals;
         }
 

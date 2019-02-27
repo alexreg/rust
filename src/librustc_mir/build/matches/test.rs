@@ -1,4 +1,4 @@
-// Testing candidates
+// Testing candidates.
 //
 // After candidates have been simplified, the only match pairs that
 // remain are those that require some sort of test. The functions here
@@ -229,7 +229,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                                               true_bb, false_bb))
                 } else {
                     // The switch may be inexhaustive so we
-                    // add a catch all block
+                    // add a catch all block.
                     let otherwise = self.cfg.start_new_block();
                     let targets: Vec<_> =
                         options.iter()
@@ -251,7 +251,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 let val = Operand::Copy(place.clone());
                 let mut expect = self.literal_operand(test.span, ty, value);
                 // Use `PartialEq::eq` instead of `BinOp::Eq`
-                // (the binop can only handle primitives)
+                // (The binop can only handle primitives.)
                 let fail = self.cfg.start_new_block();
                 if !ty.is_scalar() {
                     // If we're using `b"..."` as a pattern, we need to insert an
@@ -276,7 +276,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                         (Some((region, elem_ty, _)), _) |
                         (None, Some((region, elem_ty, _))) => {
                             let tcx = self.hir.tcx();
-                            // make both a slice
+                            // Make both a slice.
                             ty = tcx.mk_imm_ref(region, tcx.mk_slice(elem_ty));
                             if opt_ref_ty.is_some() {
                                 place = self.temp(ty, test.span);
@@ -302,7 +302,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     let method = self.hir.tcx().mk_lazy_const(ty::LazyConst::Evaluated(method));
 
                     let re_erased = self.hir.tcx().types.re_erased;
-                    // take the argument by reference
+                    // Take the argument by reference.
                     let tam = ty::TypeAndMut {
                         ty,
                         mutbl: Mutability::MutImmutable,
@@ -337,9 +337,8 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                             // FIXME(#54571): this constant comes from user
                             // input (a constant in a pattern). Are
                             // there forms where users can add type
-                            // annotations here?  For example, an
-                            // associated constant? Need to
-                            // experiment.
+                            // annotations here? For example, an
+                            // associated constant? Need to experiment.
                             user_ty: None,
 
                             literal: method,
@@ -350,7 +349,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                         from_hir_call: false,
                     });
 
-                    // check the result
+                    // Check the result.
                     let block = self.cfg.start_new_block();
                     self.cfg.terminate(eq_block, source_info,
                                        TerminatorKind::if_(self.hir.tcx(),
@@ -397,7 +396,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                                                       Operand::Move(actual),
                                                       Operand::Move(expected)));
 
-                // branch based on result
+                // Branch based on result.
                 let (false_bb, true_bb) = (self.cfg.start_new_block(),
                                            self.cfg.start_new_block());
                 self.cfg.terminate(block, source_info,
@@ -423,7 +422,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         self.cfg.push_assign(block, source_info, &result,
                              Rvalue::BinaryOp(op, left, right));
 
-        // branch based on result
+        // Branch based on result.
         let target_block = self.cfg.start_new_block();
         self.cfg.terminate(block, source_info,
                            TerminatorKind::if_(self.hir.tcx(), Operand::Move(result),
@@ -451,7 +450,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// This is used by the overall `match_candidates` algorithm to structure
     /// the match as a whole. See `match_candidates` for more details.
     ///
-    /// FIXME(#29623). In some cases, we have some tricky choices to make.  for
+    /// FIXME(#29623): in some cases, we have some tricky choices to make.  for
     /// example, if we are testing that `x == 22`, but the candidate is `x @
     /// 13..55`, what should we do? In the event that the test is true, we know
     /// that the candidate applies, but in the event of false, we don't know
@@ -557,7 +556,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
             (&TestKind::Len { len: test_len, op: BinOp::Ge },
              &PatternKind::Slice { ref prefix, ref slice, ref suffix }) => {
-                // the test is `$actual_len >= test_len`
+                // The test is `$actual_len >= test_len`.
                 let pat_len = (prefix.len() + suffix.len()) as u64;
                 match (test_len.cmp(&pat_len), slice) {
                     (Ordering::Equal, &Some(_))  => {
@@ -645,7 +644,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             (&TestKind::Len { .. }, _) => {
                 // These are all binary tests.
                 //
-                // FIXME(#29623) we can be more clever here
+                // FIXME(#29623): we can be more clever here.
                 let pattern_test = self.test(&match_pair);
                 if pattern_test.kind == test.kind {
                     self.candidate_without_match_pair(match_pair_index, candidate);

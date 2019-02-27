@@ -66,7 +66,7 @@ impl fmt::Debug for llvm::Metadata {
 }
 
 // From DWARF 5.
-// See http://www.dwarfstd.org/ShowIssue.php?issue=140129.1
+// See <http://www.dwarfstd.org/ShowIssue.php?issue=140129.1>.
 const DW_LANG_RUST: c_uint = 0x1c;
 #[allow(non_upper_case_globals)]
 const DW_ATE_boolean: c_uint = 0x02;
@@ -149,11 +149,11 @@ impl TypeMap<'ll, 'tcx> {
     // ID will be generated and stored for later lookup.
     fn get_unique_type_id_of_type<'a>(&mut self, cx: &CodegenCx<'a, 'tcx>,
                                       type_: Ty<'tcx>) -> UniqueTypeId {
-        // Let's see if we already have something in the cache
+        // Let's see if we already have something in the cache.
         if let Some(unique_type_id) = self.type_to_unique_id.get(&type_).cloned() {
             return unique_type_id;
         }
-        // if not, generate one
+        // If not, generate one.
 
         // The hasher we are using to generate the `UniqueTypeId`. We want
         // something that provides more than the 64 bits of the `DefaultHasher`.
@@ -259,7 +259,7 @@ impl RecursiveTypeDescription<'ll, 'tcx> {
                     }
                 }
 
-                // ... then create the member descriptions ...
+                // ... then create the member descriptions, ...
                 let member_descriptions =
                     member_description_factory.create_member_descriptions(cx);
 
@@ -275,7 +275,7 @@ impl RecursiveTypeDescription<'ll, 'tcx> {
 }
 
 // Returns from the enclosing function if the type metadata with the given
-// unique id can be found in the type map
+// unique ID can be found in the type map.
 macro_rules! return_if_metadata_created_in_meantime {
     ($cx: expr, $unique_type_id: expr) => (
         if let Some(metadata) = debug_context($cx).type_map
@@ -388,13 +388,13 @@ fn subroutine_type_metadata(
     );
 
     let signature_metadata: Vec<_> = iter::once(
-        // return type
+        // Return type.
         match signature.output().sty {
             ty::Tuple(ref tys) if tys.is_empty() => None,
             _ => Some(type_metadata(cx, signature.output(), span))
         }
     ).chain(
-        // regular arguments
+        // Regular arguments.
         signature.inputs().iter().map(|argument_type| {
             Some(type_metadata(cx, argument_type, span))
         })
@@ -607,7 +607,7 @@ pub fn type_metadata(
                 return metadata;
             }
 
-            // This is actually a function pointer, so wrap it in pointer DI
+            // This is actually a function pointer, so wrap it in pointer DI.
             MetadataCreationResult::new(pointer_type_metadata(cx, t, fn_metadata), false)
 
         }
@@ -836,7 +836,7 @@ pub fn compile_unit_metadata(tcx: TyCtxt<'_, '_, '_>,
     }
 
     debug!("compile_unit_metadata: {:?}", name_in_debuginfo);
-    // FIXME(#41252) Remove "clang LLVM" if we can get GDB and LLVM to play nice.
+    // FIXME(#41252): remove "clang LLVM" if we can get GDB and LLVM to play nice.
     let producer = format!("clang LLVM (rustc version {})",
                            (option_env!("CFG_VERSION")).expect("CFG_VERSION"));
 
@@ -1166,9 +1166,9 @@ fn use_enum_fallback(cx: &CodegenCx<'_, '_>) -> bool {
     // On MSVC we have to use the fallback mode, because LLVM doesn't
     // lower variant parts to PDB.
     return cx.sess().target.target.options.is_like_msvc
-        // LLVM version 7 did not release with an important bug fix;
-        // but the required patch is in the LLVM 8.  Rust LLVM reports
-        // 8 as well.
+        // LLVM version 7 did not release with an important bug fix,
+        // but the required patch is in the LLVM 8. Rust LLVM reports
+        // version 8 as well.
         || llvm_util::get_major_version() < 8;
 }
 
@@ -1283,7 +1283,7 @@ impl EnumMemberDescriptionFactory<'ll, 'tcx> {
             } => {
                 if fallback {
                     let variant = self.layout.for_variant(cx, dataful_variant);
-                    // Create a description of the non-null variant
+                    // Create a description of the non-null variant.
                     let (variant_type_metadata, member_description_factory) =
                         describe_enum_variant(cx,
                                               variant,
@@ -1760,7 +1760,7 @@ fn composite_type_metadata(
     _file_metadata: &'ll DIFile,
     _definition_span: Span,
 ) -> &'ll DICompositeType {
-    // Create the (empty) struct metadata node ...
+    // Create the (empty) struct metadata node, ...
     let composite_type_metadata = create_struct_stub(cx,
                                                      composite_type,
                                                      composite_type_name,
@@ -1970,8 +1970,8 @@ pub fn create_global_var_metadata(
     }
 
     let no_mangle = attrs.flags.contains(CodegenFnAttrFlags::NO_MANGLE);
-    // We may want to remove the namespace scope if we're in an extern block, see:
-    // https://github.com/rust-lang/rust/pull/46457#issuecomment-351750952
+    // We may want to remove the namespace scope if we're in an extern block, see
+    // <https://github.com/rust-lang/rust/pull/46457#issuecomment-351750952>.
     let var_scope = get_namespace_for_item(cx, def_id);
     let span = tcx.def_span(def_id);
 

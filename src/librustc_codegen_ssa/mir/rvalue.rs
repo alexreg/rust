@@ -227,7 +227,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                         }
                     }
                     mir::CastKind::UnsafeFnPointer => {
-                        // this is a no-op at the LLVM level
+                        // This is a no-op at the LLVM level.
                         operand.val
                     }
                     mir::CastKind::Unsize => {
@@ -238,14 +238,14 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                                 // trait-object-to-supertrait coercion (e.g.,
                                 // `&'a fmt::Debug + Send => &'a fmt::Debug`).
 
-                                // HACK(eddyb) have to bitcast pointers
+                                // HACK(eddyb): have to bitcast pointers
                                 // until LLVM removes pointee types.
                                 let lldata = bx.pointercast(lldata,
                                     bx.cx().scalar_pair_element_backend_type(cast, 0, true));
                                 OperandValue::Pair(lldata, llextra)
                             }
                             OperandValue::Immediate(lldata) => {
-                                // "standard" unsize
+                                // "Standard" unsize.
                                 let (lldata, llextra) = base::unsize_thin_ptr(&mut bx, lldata,
                                     operand.layout.ty, cast.ty);
                                 OperandValue::Pair(lldata, llextra)
@@ -901,7 +901,7 @@ fn cast_float_to_int<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
 
     // Step 3: NaN replacement.
     // For unsigned types, the above step already yielded int_ty::MIN == 0 if x is NaN.
-    // Therefore we only need to execute this step for signed integer types.
+    // Therefore, we only need to execute this step for signed integer types.
     if signed {
         // LLVM has no isNaN predicate, so we use (x == x) instead
         let zero = bx.cx().const_uint(int_ty, 0);

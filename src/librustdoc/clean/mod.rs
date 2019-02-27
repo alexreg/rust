@@ -1108,7 +1108,7 @@ fn external_generic_args(cx: &DocContext<'_, '_, '_>, trait_did: Option<DefId>, 
                 }
             };
             let output = None;
-            // FIXME(#20299) return type comes from a projection now
+            // FIXME(#20299): return type comes from a projection now.
             // match types[1].sty {
             //     ty::Tuple(ref v) if v.is_empty() => None, // -> ()
             //     _ => Some(types[1].clean(cx))

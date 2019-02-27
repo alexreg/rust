@@ -129,7 +129,7 @@ mod temp_stable_hash_impls {
         fn hash_stable<W: StableHasherResult>(&self,
                                               _: &mut HCX,
                                               _: &mut StableHasher<W>) {
-            // do nothing
+            // Do nothing.
         }
     }
 }
@@ -159,7 +159,7 @@ pub fn build_unchecked_lshift<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
     rhs: Bx::Value
 ) -> Bx::Value {
     let rhs = base::cast_shift_expr_rhs(bx, hir::BinOpKind::Shl, lhs, rhs);
-    // #1877, #10183: Ensure that input is always valid
+    // #1877, #10183: ensure that input is always valid.
     let rhs = shift_mask_rhs(bx, rhs);
     bx.shl(lhs, rhs)
 }
@@ -171,7 +171,7 @@ pub fn build_unchecked_rshift<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
     rhs: Bx::Value
 ) -> Bx::Value {
     let rhs = base::cast_shift_expr_rhs(bx, hir::BinOpKind::Shr, lhs, rhs);
-    // #1877, #10183: Ensure that input is always valid
+    // #1877, #10183: ensure that input is always valid.
     let rhs = shift_mask_rhs(bx, rhs);
     let is_signed = lhs_t.is_signed();
     if is_signed {

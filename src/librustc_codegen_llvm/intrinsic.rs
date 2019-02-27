@@ -1898,11 +1898,11 @@ unsupported {} from `{}` with element `{}` of size `{}` to `{}`"#,
     span_bug!(span, "unknown SIMD intrinsic");
 }
 
-// Returns the width of an int Ty, and if it's signed or not
-// Returns None if the type is not an integer
-// FIXME: there’s multiple of this functions, investigate using some of the already existing
-// stuffs.
-fn int_type_width_signed(ty: Ty<'_>, cx: &CodegenCx<'_, '_>) -> Option<(u64, bool)> {
+/// Returns the width of an integer `Ty`, and if it's signed or not.
+/// Returns `None` if the type is not an integer.
+//
+// FIXME: there’s multiple of this functions, investigate using some of the already existing stuff.
+fn int_type_width_signed(ty: Ty, cx: &CodegenCx) -> Option<(u64, bool)> {
     match ty.sty {
         ty::Int(t) => Some((match t {
             ast::IntTy::Isize => cx.tcx.sess.target.isize_ty.bit_width().unwrap() as u64,

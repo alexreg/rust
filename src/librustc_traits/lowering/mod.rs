@@ -382,7 +382,7 @@ pub fn program_clauses_for_type_def<'a, 'tcx>(
             // move the binders to the left
             wc.map_bound(|goal| ProgramClause {
                 // FIXME: we inject `bound_vars` and `hypotheses` into this binding
-                // level, which may be incorrect in the future: see the FIXME in
+                // level, which may be incorrect in the future; see the FIXME in
                 // `program_clauses_for_trait`.
                 goal: goal.subst(tcx, bound_vars).into_from_env_goal(),
                 hypotheses,

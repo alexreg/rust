@@ -293,7 +293,7 @@ impl<'rt, 'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>>
                 let size = value.layout.size;
                 let value = value.to_scalar_or_undef();
                 if self.const_mode {
-                    // Integers/floats in CTFE: Must be scalar bits, pointers are dangerous
+                    // Integers/floats in CTFE: must be scalar bits; pointers are dangerous
                     try_validation!(value.to_bits(size),
                         value, self.path, "initialized plain (non-pointer) bytes");
                 } else {

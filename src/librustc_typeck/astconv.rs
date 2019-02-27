@@ -1015,11 +1015,11 @@ impl<'o, 'gcx: 'tcx, 'tcx> dyn AstConv<'gcx, 'tcx> + 'o {
                     //     }
                     // ```
                     //
-                    // Here, the user could theoretically write `dyn MyTrait<Output=X>`,
+                    // Here, the user could theoretically write `dyn MyTrait<Output = X>`,
                     // but actually supporting that would "expand" to an infinitely-long type
-                    // `fix $ τ → dyn MyTrait<MyOutput=X, Output=<τ as MyTrait>::MyOutput`.
+                    // `fix $ τ → dyn MyTrait<MyOutput = X, Output=<τ as MyTrait>::MyOutput`.
                     //
-                    // Instead, we force the user to write `dyn MyTrait<MyOutput=X, Output=X>`,
+                    // Instead, we force the user to write `dyn MyTrait<MyOutput = X, Output = X>`,
                     // which is uglier but works. See the discussion in #56288 for alternatives.
                     if !references_self {
                         // Include projections defined on supertraits,

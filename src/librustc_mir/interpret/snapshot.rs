@@ -398,11 +398,11 @@ impl<'a, 'mir, 'tcx: 'a + 'mir> EvalSnapshot<'a, 'mir, 'tcx>
         }
     }
 
-    // Used to compare two snapshots
+    // Used to compare two snapshots.
     fn snapshot(&'b self)
         -> Vec<FrameSnapshot<'b, 'tcx>>
     {
-        // Start with the stack, iterate and recursively snapshot
+        // Start with the stack, iterate, and recursively snapshot.
         self.stack.iter().map(|frame| frame.snapshot(&self.memory)).collect()
     }
 
@@ -420,7 +420,7 @@ impl<'a, 'mir, 'tcx> Hash for EvalSnapshot<'a, 'mir, 'tcx>
 }
 
 impl_stable_hash_for!(impl<'tcx, 'b, 'mir> for struct EvalSnapshot<'b, 'mir, 'tcx> {
-    // Not hashing memory: Avoid hashing memory all the time during execution
+    // Not hashing memory: avoid hashing memory all the time during execution.
     memory -> _,
     stack,
 });

@@ -370,7 +370,7 @@ impl VisibilityLike for Option<AccessLevel> {
     const MAX: Self = Some(AccessLevel::Public);
     // Type inference is very smart sometimes.
     // It can make an impl reachable even some components of its type or trait are unreachable.
-    // E.g. methods of `impl ReachableTrait<UnreachableTy> for ReachableTy<UnreachableTy> { ... }`
+    // E.g., methods of `impl ReachableTrait<UnreachableTy> for ReachableTy<UnreachableTy> { ... }`
     // can be usable from other crates (#57264). So we skip substs when calculating reachability
     // and consider an impl reachable if its "shallow" type and trait are reachable.
     //
@@ -989,7 +989,7 @@ impl<'a, 'tcx> Visitor<'tcx> for TypePrivacyVisitor<'a, 'tcx> {
             }
         } else {
             // Types in signatures.
-            // FIXME: This is very ineffective. Ideally each HIR type should be converted
+            // FIXME: this is very ineffective. Ideally, each HIR type should be converted
             // into a semantic type only once and the result should be cached somehow.
             if self.visit(rustc_typeck::hir_ty_to_ty(self.tcx, hir_ty)) {
                 return;

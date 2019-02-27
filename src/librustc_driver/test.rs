@@ -529,7 +529,7 @@ fn subst_ty_renumber_some_bounds() {
 
         // `t_expected = (&'a isize, fn(&'a isize))`
         //
-        // However, note that the Debruijn index is different in the different cases.
+        // However, note that the De Bruijn index is different in the different cases.
         let t_expected = {
             let t_rptr_bound2 = env.t_rptr_late_bound_with_debruijn(1, d2());
             env.t_pair(t_rptr_bound1, env.t_fn(&[t_rptr_bound2], env.t_nil()))
@@ -589,7 +589,7 @@ fn subst_region_renumber_region() {
 
         // `t_expected = fn(&'a isize)`
         //
-        // but not that the Debruijn index is different in the different cases.
+        // but not that the De Bruijn index is different in the different cases.
         let t_expected = {
             let t_rptr_bound2 = env.t_rptr_late_bound_with_debruijn(1, d2());
             env.t_fn(&[t_rptr_bound2], env.t_nil())

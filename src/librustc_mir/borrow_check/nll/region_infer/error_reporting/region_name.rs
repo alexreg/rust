@@ -526,7 +526,7 @@ impl<'tcx> RegionInferenceContext<'tcx> {
                 }
 
                 _ => {
-                    // FIXME there are other cases that we could trace
+                    // FIXME: there are other cases that we could trace
                 }
             }
         }

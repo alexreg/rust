@@ -241,7 +241,7 @@ fn optimized_mir<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> &'tcx 
 
     let mut mir = tcx.mir_validated(def_id).steal();
     run_passes(tcx, &mut mir, InstanceDef::Item(def_id), MirPhase::Optimized, &[
-        // Remove all things only needed by analysis
+        // Remove all things only needed by analysis.
         &no_landing_pads::NoLandingPads,
         &simplify_branches::SimplifyBranches::new("initial"),
         &remove_noop_landing_pads::RemoveNoopLandingPads,
@@ -249,7 +249,7 @@ fn optimized_mir<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> &'tcx 
 
         &simplify::SimplifyCfg::new("early-opt"),
 
-        // These next passes must be executed together
+        // These next passes must be executed together.
         &add_call_guards::CriticalCallEdges,
         &elaborate_drops::ElaborateDrops,
         &no_landing_pads::NoLandingPads,

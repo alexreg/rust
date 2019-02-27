@@ -213,12 +213,12 @@ impl<'a, 'b> Context<'a, 'b> {
         match *p {
             parse::String(..) => {}
             parse::NextArgument(ref arg) => {
-                // width/precision first, if they have implicit positional
-                // parameters it makes more sense to consume them first.
+                // Width/precision first: if they have implicit positional
+                // parameters, it makes more sense to consume them first.
                 self.verify_count(arg.format.width);
                 self.verify_count(arg.format.precision);
 
-                // argument second, if it's an implicit positional parameter
+                // Argument second: if it's an implicit positional parameter,
                 // it's written second, so it should come after width/precision.
                 let pos = match arg.position {
                     parse::ArgumentIs(i) | parse::ArgumentImplicitlyIs(i) => Exact(i),
@@ -374,7 +374,7 @@ impl<'a, 'b> Context<'a, 'b> {
 
         let mut sofar = 0usize;
 
-        // Map the arguments
+        // Map the arguments.
         for i in 0..args_len {
             let ref arg_types = self.arg_types[i];
             let arg_offsets = arg_types.iter().map(|offset| sofar + *offset).collect::<Vec<_>>();
@@ -382,7 +382,7 @@ impl<'a, 'b> Context<'a, 'b> {
             sofar += self.arg_unique_types[i].len();
         }
 
-        // Record starting index for counts, which appear just after arguments
+        // Record starting index for counts, which appear just after arguments.
         self.count_args_index_offset = sofar;
     }
 
@@ -411,7 +411,7 @@ impl<'a, 'b> Context<'a, 'b> {
                 count("Param", Some(self.ecx.expr_usize(sp, i)))
             }
             parse::CountImplied => count("Implied", None),
-            // should never be the case, names are already resolved
+            // Should never be the case, names are already resolved.
             parse::CountIsName(_) => panic!("should never happen"),
         }
     }
@@ -436,7 +436,7 @@ impl<'a, 'b> Context<'a, 'b> {
                 None
             }
             parse::NextArgument(ref arg) => {
-                // Build the position
+                // Build the position.
                 let pos = {
                     let pos = |c, arg| {
                         let mut path = Context::rtpath(self.ecx, "Position");
@@ -453,7 +453,7 @@ impl<'a, 'b> Context<'a, 'b> {
                         parse::ArgumentIs(i)
                         | parse::ArgumentImplicitlyIs(i) => {
                             // Map to index in final generated argument array
-                            // in case of multiple types specified
+                            // in case of multiple types specified.
                             let arg_idx = match arg_index_consumed.get_mut(i) {
                                 None => 0, // error already emitted elsewhere
                                 Some(offset) => {
@@ -500,7 +500,7 @@ impl<'a, 'b> Context<'a, 'b> {
                     self.all_pieces_simple = false;
                 }
 
-                // Build the format
+                // Build the format.
                 let fill = self.ecx.expr_lit(sp, ast::LitKind::Char(fill));
                 let align = |name| {
                     let mut p = Context::rtpath(self.ecx, "Alignment");
@@ -557,7 +557,7 @@ impl<'a, 'b> Context<'a, 'b> {
             .collect();
 
         // First, build up the static array which will become our precompiled
-        // format "string"
+        // format "string".
         let pieces = self.ecx.expr_vec_slice(self.fmtsp, self.str_pieces);
 
         // Before consuming the expressions, we have to remember spans for
@@ -591,7 +591,7 @@ impl<'a, 'b> Context<'a, 'b> {
             counts.push(Context::format_arg(self.ecx, self.macsp, span, &Count, name));
         }
 
-        // Now create a vector containing all the arguments
+        // Now, create a vector containing all the arguments.
         let args = locals.into_iter().chain(counts.into_iter());
 
         let args_array = self.ecx.expr_vec(self.fmtsp, args.collect());
@@ -855,8 +855,9 @@ pub fn expand_preparsed_format_args(ecx: &mut ExtCtxt<'_>,
                         } else if next_c.is_digit(16) {
                             skips.push(next_pos);
                             // We suggest adding `{` and `}` when appropriate, accept it here as if
-                            // it were correct
-                            let mut i = 0;  // consume up to 6 hexanumeric chars
+                            // it were correct.
+                            // Consume up to 6 hexanumeric chars.
+                            let mut i = 0;
                             while let (Some((next_pos, c)), _) = (s.next(), i < 6) {
                                 if c.is_digit(16) {
                                     skips.push(next_pos);
@@ -996,10 +997,10 @@ pub fn expand_preparsed_format_args(ecx: &mut ExtCtxt<'_>,
                  .filter(|(i, ty)| ty.is_empty() && !cx.count_positions.contains_key(&i))
                  .map(|(i, _)| {
                     let msg = if i >= num_pos_args {
-                        // named argument
+                        // Named argument.
                         "named argument never used"
                     } else {
-                        // positional argument
+                        // Positional argument.
                         "argument never used"
                     };
                     (cx.args[i].span, msg)
@@ -1066,7 +1067,7 @@ pub fn expand_preparsed_format_args(ecx: &mut ExtCtxt<'_>,
                         }
 
                         if let Some((start, end)) = pos {
-                            // account for `"` and account for raw strings `r#`
+                            // Account for `"` and account for raw strings `r#`.
                             let padding = str_style.map(|i| i + 2).unwrap_or(1);
                             let sp = fmt_sp.from_inner_byte_pos(start + padding, end + padding);
                             suggestions.push((sp, trn));

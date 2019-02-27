@@ -515,11 +515,11 @@ fn opt_normalize_projection_type<'a, 'b, 'gcx, 'tcx>(
            projection_ty,
            depth);
 
-    // FIXME(#20304) For now, I am caching here, which is good, but it
+    // FIXME(#20304): for now, I am caching here, which is good, but it
     // means we don't capture the type variables that are created in
     // the case of ambiguity. Which means we may create a large stream
     // of such variables. OTOH, if we move the caching up a level, we
-    // would not benefit from caching when proving `T: Trait<U=Foo>`
+    // would not benefit from caching when proving `T: Trait<U = Foo>`
     // bounds. It might be the case that we want two distinct caches,
     // or else another kind of cache entry.
 
@@ -1245,8 +1245,8 @@ fn confirm_object_candidate<'cx, 'gcx, 'tcx>(
     let env_predicate = {
         let env_predicates = elaborate_predicates(selcx.tcx(), env_predicates);
 
-        // select only those projections that are actually projecting an
-        // item with the correct name
+        // Select only those projections that are actually projecting an
+        // item with the correct name.
         let env_predicates = env_predicates.filter_map(|p| match p {
             ty::Predicate::Projection(data) =>
                 if data.projection_def_id() == obligation.predicate.item_def_id {
@@ -1270,7 +1270,7 @@ fn confirm_object_candidate<'cx, 'gcx, 'tcx>(
 
         // Select the first matching one; there really ought to be one or
         // else the object type is not WF, since an object type should
-        // include all of its projections explicitly
+        // include all of its projections explicitly.
         match env_predicates.next() {
             Some(env_predicate) => env_predicate,
             None => {
@@ -1697,7 +1697,7 @@ impl<'tcx> ProjectionCache<'tcx> {
     /// to be a `NormalizedTy`.
     pub fn complete_normalized(&mut self, key: ProjectionCacheKey<'tcx>, ty: &NormalizedTy<'tcx>) {
         // We want to insert `ty` with no obligations. If the existing value
-        // already has no obligations (as is common) we don't insert anything.
+        // already has no obligations (as is common), we don't insert anything.
         if !ty.obligations.is_empty() {
             self.map.insert(key, ProjectionCacheEntry::NormalizedTy(Normalized {
                 value: ty.value,

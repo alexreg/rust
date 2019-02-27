@@ -68,7 +68,7 @@ impl<'a, 'tcx> BitDenotation<'tcx> for HaveBeenBorrowedLocals<'a, 'tcx> {
         _dest_bb: mir::BasicBlock,
         _dest_place: &mir::Place<'tcx>,
     ) {
-        // Nothing to do when a call returns successfully
+        // Nothing to do when a call returns successfully.
     }
 }
 

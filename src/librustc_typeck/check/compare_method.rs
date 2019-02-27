@@ -244,7 +244,7 @@ fn compare_predicate_entailment<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         // compatible with that of the trait method. We do this by
         // checking that `impl_fty <: trait_fty`.
         //
-        // FIXME. Unfortunately, this doesn't quite work right now because
+        // FIXME: unfortunately, this doesn't quite work right now because
         // associated type normalization is not integrated into subtype
         // checks. For the comparison to be valid, we need to
         // normalize the associated types in the impl/trait methods
@@ -936,7 +936,7 @@ pub fn compare_const_impl<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                    impl_ty,
                    trait_ty);
 
-            // Locate the Span containing just the type of the offending impl
+            // Locate the Span containing just the type of the offending impl.
             match tcx.hir().expect_impl_item(impl_c_node_id).node {
                 ImplItemKind::Const(ref ty, _) => cause.span = ty.span,
                 _ => bug!("{:?} is not a impl const", impl_c),

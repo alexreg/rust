@@ -161,8 +161,8 @@ fn build_local_id_to_index(body: Option<&hir::Body>,
                            -> FxHashMap<hir::ItemLocalId, Vec<CFGIndex>> {
     let mut index = FxHashMap::default();
 
-    // FIXME(#15020) Would it be better to fold formals from decl
-    // into cfg itself?  i.e., introduce a fn-based flow-graph in
+    // FIXME(#15020): would it be better to fold formals from decl
+    // into cfg itself? I.e., introduce a fn-based flow-graph in
     // addition to the current block-based flow-graph, rather than
     // have to put traversals like this here?
     if let Some(body) = body {
@@ -424,7 +424,7 @@ impl<'a, 'tcx, O:DataFlowOperator> DataFlowContext<'a, 'tcx, O> {
                         // it is an even multiple of `usize::BITS`.  This
                         // means that there may be some stray bits at
                         // the end that do not correspond to any
-                        // actual value.  So before we callback, check
+                        // actual value.  So, before we callback, check
                         // whether the bit_index is greater than the
                         // actual value the user specified and stop
                         // iterating if so.

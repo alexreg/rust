@@ -42,10 +42,10 @@ fn prepare_lto(cgcx: &CodegenContext<LlvmCodegenBackend>,
     -> Result<(Vec<CString>, Vec<(SerializedModule<ModuleBuffer>, CString)>), FatalError>
 {
     let export_threshold = match cgcx.lto {
-        // We're just doing LTO for our one crate
+        // We're just doing LTO for our one crate.
         Lto::ThinLocal => SymbolExportLevel::Rust,
 
-        // We're doing LTO for the entire crate graph
+        // We're doing LTO for the entire crate graph.
         Lto::Fat | Lto::Thin => {
             symbol_export::crates_export_threshold(&cgcx.crate_types)
         }
@@ -75,8 +75,8 @@ fn prepare_lto(cgcx: &CodegenContext<LlvmCodegenBackend>,
     // upstream dependencies, find the corresponding rlib and load the bitcode
     // from the archive.
     //
-    // We save off all the bytecode and LLVM module ids for later processing
-    // with either fat or thin LTO
+    // We save off all the bytecode and LLVM module IDs for later processing
+    // with either fat or thin LTO.
     let mut upstream_modules = Vec::new();
     if cgcx.lto != Lto::ThinLocal {
         if cgcx.opts.cg.prefer_dynamic {
@@ -544,8 +544,8 @@ pub(crate) fn run_pass_manager(cgcx: &CodegenContext<LlvmCodegenBackend>,
     // Now we have one massive module inside of llmod. Time to run the
     // LTO-specific optimization passes that LLVM provides.
     //
-    // This code is based off the code found in llvm's LTO code generator:
-    //      tools/lto/LTOCodeGenerator.cpp
+    // This code is based off the code found in LLVM's LTO code generator
+    // (see `tools/lto/LTOCodeGenerator.cpp`).
     debug!("running the pass manager");
     unsafe {
         let pm = llvm::LLVMCreatePassManager();
@@ -556,7 +556,7 @@ pub(crate) fn run_pass_manager(cgcx: &CodegenContext<LlvmCodegenBackend>,
             llvm::LLVMRustAddPass(pm, pass.unwrap());
         }
 
-        // When optimizing for LTO we don't actually pass in `-O0`, but we force
+        // When optimizing for LTO, we don't actually pass in `-O0`, but we force
         // it to always happen at least with `-O1`.
         //
         // With ThinLTO we mess around a lot with symbol visibility in a way

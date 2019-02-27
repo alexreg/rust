@@ -411,7 +411,7 @@ impl<'a> Resolver<'a> {
         let path_span = path.span;
         let mut path = Segment::from_path(path);
 
-        // Possibly apply the macro helper hack
+        // Possibly apply the macro helper hack.
         if kind == MacroKind::Bang && path.len() == 1 &&
            path[0].ident.span.ctxt().outer().expn_info()
                .map_or(false, |info| info.local_inner_macros) {

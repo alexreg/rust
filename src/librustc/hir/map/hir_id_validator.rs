@@ -101,7 +101,7 @@ impl<'a, 'hir: 'a> HirIdValidator<'a, 'hir> {
               .filter(|&i| !self.hir_ids_seen.contains(&ItemLocalId::from_u32(i)))
               .collect();
 
-            // Try to map those to something more useful
+            // Try to map those to something more useful.
             let mut missing_items = Vec::with_capacity(missing.len());
 
             for local_id in missing {

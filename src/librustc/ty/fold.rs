@@ -105,6 +105,8 @@ pub trait TypeFoldable<'tcx>: fmt::Debug + Clone {
     fn has_closure_types(&self) -> bool {
         self.has_type_flags(TypeFlags::HAS_TY_CLOSURE)
     }
+
+    /// Returns `true` if there are any free regions.
     /// "Free" regions in this context means that it has any region
     /// that is not (a) erased or (b) late-bound.
     fn has_free_regions(&self) -> bool {
@@ -345,7 +347,6 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
 /// regions (aka "lifetimes") that are bound within a type are not
 /// visited by this folder; only regions that occur free will be
 /// visited by `fld_r`.
-
 pub struct RegionFolder<'a, 'gcx: 'a+'tcx, 'tcx: 'a> {
     tcx: TyCtxt<'a, 'gcx, 'tcx>,
     skipped_regions: &'a mut bool,
@@ -889,7 +890,7 @@ impl<'tcx> TypeVisitor<'tcx> for LateBoundRegionsCollector {
     fn visit_ty(&mut self, t: Ty<'tcx>) -> bool {
         // If we are only looking for "constrained" region, we have to
         // ignore the inputs to a projection, as they may not appear
-        // in the normalized form
+        // in the normalized form.
         if self.just_constrained {
             match t.sty {
                 ty::Projection(..) | ty::Opaque(..) => { return false; }

@@ -48,7 +48,7 @@ fn uncached_llvm_type<'a, 'tcx>(cx: &CodegenCx<'a, 'tcx>,
         ty::Closure(..) |
         ty::Generator(..) |
         ty::Adt(..) |
-        // FIXME(eddyb) producing readable type names for trait objects can result
+        // FIXME(eddyb): producing readable type names for trait objects can result
         // in problematically distinct types due to HRTB and subtyping (see #47638).
         // ty::Dynamic(..) |
         ty::Foreign(..) |
@@ -334,7 +334,7 @@ impl<'tcx> LayoutLlvmExt<'tcx> for TyLayout<'tcx> {
 
     fn scalar_pair_element_llvm_type<'a>(&self, cx: &CodegenCx<'a, 'tcx>,
                                          index: usize, immediate: bool) -> &'a Type {
-        // HACK(eddyb) special-case fat pointers until LLVM removes
+        // HACK(eddyb): special-case fat pointers until LLVM removes
         // pointee types, to avoid bitcasting every `OperandRef::deref`.
         match self.ty.sty {
             ty::Ref(..) |
@@ -487,7 +487,7 @@ impl<'tcx> LayoutLlvmExt<'tcx> for TyLayout<'tcx> {
                         if field_start <= offset {
                             let field = variant.field(cx, i);
                             if ptr_end <= field_start + field.size {
-                                // We found the right field, look inside it.
+                                // We found the right field; look inside it.
                                 result = field.pointee_info_at(cx, offset - field_start);
                                 break;
                             }
@@ -495,7 +495,7 @@ impl<'tcx> LayoutLlvmExt<'tcx> for TyLayout<'tcx> {
                     }
                 }
 
-                // FIXME(eddyb) This should be for `ptr::Unique<T>`, not `Box<T>`.
+                // FIXME(eddyb): this should be for `ptr::Unique<T>`, not `Box<T>`.
                 if let Some(ref mut pointee) = result {
                     if let ty::Adt(def, _) = self.ty.sty {
                         if def.is_box() && offset.bytes() == 0 {

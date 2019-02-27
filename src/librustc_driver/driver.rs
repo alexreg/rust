@@ -392,7 +392,7 @@ pub struct CompileController<'a> {
     pub after_analysis: PhaseController<'a>,
     pub compilation_done: PhaseController<'a>,
 
-    // FIXME we probably want to group the below options together and offer a
+    // FIXME: we probably want to group the below options together and offer a
     // better API, rather than this ad-hoc approach.
     // Whether the compiler should keep the ast beyond parsing.
     pub keep_ast: bool,

@@ -1163,9 +1163,9 @@ impl<'a> LoweringContext<'a> {
     }
 
     fn lower_generic_arg(&mut self,
-                        arg: &ast::GenericArg,
-                        itctx: ImplTraitContext<'_>)
-                        -> hir::GenericArg {
+                         arg: &ast::GenericArg,
+                         itctx: ImplTraitContext<'_>)
+                         -> hir::GenericArg {
         match arg {
             ast::GenericArg::Lifetime(lt) => GenericArg::Lifetime(self.lower_lifetime(&lt)),
             ast::GenericArg::Type(ty) => GenericArg::Type(self.lower_ty_direct(&ty, itctx)),
@@ -1537,7 +1537,7 @@ impl<'a> LoweringContext<'a> {
 
                     // We need to manually create the IDs here, because the
                     // definitions will go into the explicit `existential type`
-                    // declaration and thus need to have their owner set to that item
+                    // declaration and thus need to have their owner set to that item.
                     let def_node_id = self.context.sess.next_node_id();
                     let LoweredNodeId { node_id: _, hir_id } =
                         self.context.lower_node_id_with_owner(def_node_id, self.exist_ty_id);
@@ -1959,7 +1959,7 @@ impl<'a> LoweringContext<'a> {
         &mut self,
         data: &ParenthesizedArgs,
     ) -> (hir::GenericArgs, bool) {
-        // Switch to `PassThrough` mode for anonymous lifetimes: this
+        // Switch to `PassThrough` mode for anonymous lifetimes; this
         // means that we permit things like `&Ref<T>`, where `Ref` has
         // a hidden lifetime parameter. This is needed for backwards
         // compatibility, even in contexts like an impl header where
@@ -2141,7 +2141,7 @@ impl<'a> LoweringContext<'a> {
         })
     }
 
-    // Transform `-> T` into `-> impl Future<Output = T>` for `async fn`
+    // Transform `-> T` into `-> impl Future<Output = T>` for `async fn`.
     //
     // `fn_span`: the span of the async function declaration. Used for error reporting.
     // `inputs`: lowered types of arguments to the function. Used to collect lifetimes.
@@ -2226,7 +2226,7 @@ impl<'a> LoweringContext<'a> {
                  // Record the introduction of 'a in `for<'a> ...`
                 if let hir::GenericParamKind::Lifetime { .. } = param.kind {
                     // Introduce lifetimes one at a time so that we can handle
-                    // cases like `fn foo<'d>() -> impl for<'a, 'b: 'a, 'c: 'b + 'd>`
+                    // cases like `fn foo<'d>() -> impl for<'a, 'b: 'a, 'c: 'b + 'd>`.
                     let lt_name = hir::LifetimeName::Param(param.name);
                     self.currently_bound_lifetimes.push(lt_name);
                 }
@@ -2752,7 +2752,7 @@ impl<'a> LoweringContext<'a> {
             hir_id,
             ident: match f.ident {
                 Some(ident) => ident,
-                // FIXME(jseyfried): positional field hygiene
+                // FIXME(jseyfried): positional field hygiene.
                 None => Ident::new(Symbol::intern(&index.to_string()), f.span),
             },
             vis: self.lower_visibility(&f.vis, None),

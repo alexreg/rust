@@ -45,7 +45,7 @@ use rustc_data_structures::stable_hasher::{HashStable, StableHasher,
 /// the scope of user code running immediately after the initializer
 /// expression for the indexed statement, until the end of the block.
 ///
-/// So: the following code can be broken down into the scopes beneath:
+/// So, the following code can be broken down into the scopes beneath:
 ///
 /// ```text
 /// let a = f().g( 'b: { let x = d(); let y = d(); x.h(y)  }   ) ;
@@ -197,7 +197,7 @@ impl Scope {
                 // forward to end of indexed statement.
                 //
                 // (This is the special case aluded to in the
-                // doc-comment for this method)
+                // doc-comment for this method.)
 
                 let stmt_span = blk.stmts[first_statement_index.index()].span;
 
@@ -844,7 +844,7 @@ fn resolve_stmt<'a, 'tcx>(visitor: &mut RegionResolutionVisitor<'a, 'tcx>, stmt:
     debug!("resolve_stmt(stmt.id={:?})", stmt_id);
 
     // Every statement will clean up the temporaries created during
-    // execution of that statement. Therefore each statement has an
+    // execution of that statement. Therefore, each statement has an
     // associated destruction scope that represents the scope of the
     // statement plus its destructors, and thus the scope for which
     // regions referenced by the destructors need to survive.

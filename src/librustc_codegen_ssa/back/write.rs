@@ -154,7 +154,7 @@ impl ModuleConfig {
 
         // Some targets (namely, NVPTX) interact badly with the MergeFunctions
         // pass. This is because MergeFunctions can generate new function calls
-        // which may interfere with the target calling convention; e.g. for the
+        // which may interfere with the target calling convention; e.g., for the
         // NVPTX target, PTX kernels should not call other PTX kernels.
         // MergeFunctions can also be configured to generate aliases instead,
         // but aliases are not supported by some backends (again, NVPTX).
@@ -184,7 +184,7 @@ pub struct AssemblerCommand {
     cmd: Command,
 }
 
-// HACK(eddyb) work around `#[derive]` producing wrong bounds for `Clone`.
+// HACK(eddyb): work around `#[derive]` producing wrong bounds for `Clone`.
 pub struct TargetMachineFactory<B: WriteBackendMethods>(
     pub Arc<dyn Fn() -> Result<B::TargetMachine, String> + Send + Sync>,
 );
@@ -1858,12 +1858,12 @@ impl<B: ExtraBackendMethods> OngoingCodegen<B> {
     pub fn wait_for_signal_to_codegen_item(&self) {
         match self.codegen_worker_receive.recv() {
             Ok(Message::CodegenItem) => {
-                // Nothing to do
+                // Nothing to do.
             }
             Ok(_) => panic!("unexpected message"),
             Err(_) => {
-                // One of the LLVM threads must have panicked, fall through so
-                // error handling can be reached.
+                // One of the LLVM threads must have panicked; fall through so
+                // that error handling can be reached.
             }
         }
     }

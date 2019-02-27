@@ -124,12 +124,12 @@ pub trait Semantics: Sized {
                 }
             }
             Category::Zero => {
-                // FIXME(eddyb) Maybe we should guarantee an invariant instead?
+                // FIXME(eddyb): maybe we should guarantee an invariant instead?
                 significand = 0;
                 Self::MIN_EXP - 1
             }
             Category::Infinity => {
-                // FIXME(eddyb) Maybe we should guarantee an invariant instead?
+                // FIXME(eddyb): maybe we should guarantee an invariant instead?
                 significand = 0;
                 Self::MAX_EXP + 1
             }
@@ -234,12 +234,12 @@ impl Semantics for X87DoubleExtendedS {
                 }
             }
             Category::Zero => {
-                // FIXME(eddyb) Maybe we should guarantee an invariant instead?
+                // FIXME(eddyb): maybe we should guarantee an invariant instead?
                 significand = 0;
                 Self::MIN_EXP - 1
             }
             Category::Infinity => {
-                // FIXME(eddyb) Maybe we should guarantee an invariant instead?
+                // FIXME(eddyb): maybe we should guarantee an invariant instead?
                 significand = 1 << (Self::PRECISION - 1);
                 Self::MAX_EXP + 1
             }
@@ -645,7 +645,7 @@ impl<S: Semantics> Float for IeeeFloat<S> {
         marker: PhantomData,
     };
 
-    // FIXME(eddyb) remove when qnan becomes const fn.
+    // FIXME(eddyb): remove when qnan becomes const fn.
     const NAN: Self = IeeeFloat {
         sig: [S::QNAN_SIGNIFICAND],
         exp: S::MAX_EXP + 1,

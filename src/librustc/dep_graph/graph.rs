@@ -620,7 +620,7 @@ impl DepGraph {
             debug_assert!(data.colors.get(prev_dep_node_index).is_none());
         }
 
-        // We never try to mark inputs as green
+        // We never try to mark inputs as green.
         debug_assert!(!dep_node.kind.is_input());
 
         debug_assert_eq!(data.previous.index_to_node(prev_dep_node_index), *dep_node);
@@ -746,21 +746,21 @@ impl DepGraph {
         // dependencies of this `DepNode` could be marked as green. Therefore, we
         // can also mark this `DepNode` as green.
 
-        // There may be multiple threads trying to mark the same dep node green concurrently
+        // There may be multiple threads trying to mark the same dep node green concurrently.
 
         let (dep_node_index, did_allocation) = {
             let mut current = data.current.borrow_mut();
 
             // Copy the fingerprint from the previous graph,
-            // so we don't have to recompute it
+            // so we don't have to recompute it.
             let fingerprint = data.previous.fingerprint_by_index(prev_dep_node_index);
 
             // We allocating an entry for the node in the current dependency graph and
-            // adding all the appropriate edges imported from the previous graph
+            // adding all the appropriate edges imported from the previous graph.
             current.intern_node(*dep_node, current_deps, fingerprint)
         };
 
-        // ... emitting any stored diagnostic ...
+        // ... emitting any stored diagnostic, ...
 
         let diagnostics = tcx.queries.on_disk_cache
                                 .load_diagnostics(tcx, prev_dep_node_index);
@@ -775,8 +775,8 @@ impl DepGraph {
             );
         }
 
-        // ... and finally storing a "Green" entry in the color map.
-        // Multiple threads can all write the same color here
+        // ... and finally storing a "green" entry in the color map.
+        // Multiple threads can all write the same color here.
         #[cfg(not(parallel_compiler))]
         debug_assert!(data.colors.get(prev_dep_node_index).is_none(),
                       "DepGraph::try_mark_previous_green() - Duplicate DepNodeColor \
@@ -801,7 +801,7 @@ impl DepGraph {
         diagnostics: Vec<Diagnostic>,
     ) {
         if did_allocation || !cfg!(parallel_compiler) {
-            // Only the thread which did the allocation emits the error messages
+            // Only the thread which did the allocation emits the error messages.
             let handle = tcx.sess.diagnostic();
 
             // Promote the previous diagnostics to the current session.
@@ -814,12 +814,12 @@ impl DepGraph {
 
             #[cfg(parallel_compiler)]
             {
-                // Mark the diagnostics and emitted and wake up waiters
+                // Mark the diagnostics and emitted and wake up waiters.
                 data.emitted_diagnostics.lock().insert(dep_node_index);
                 data.emitted_diagnostics_cond_var.notify_all();
             }
         } else {
-            // The other threads will wait for the diagnostics to be emitted
+            // The other threads will wait for the diagnostics to be emitted.
 
             let mut emitted_diagnostics = data.emitted_diagnostics.lock();
             loop {

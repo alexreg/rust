@@ -107,7 +107,7 @@ pub trait Visitor<'ast>: Sized {
         // `visit::walk_mac(self, _mac)`.
     }
     fn visit_mac_def(&mut self, _mac: &'ast MacroDef, _id: NodeId) {
-        // Nothing to do
+        // Nothing to do.
     }
     fn visit_path(&mut self, path: &'ast Path, _id: NodeId) {
         walk_path(self, path)

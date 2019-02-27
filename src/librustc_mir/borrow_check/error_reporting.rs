@@ -627,7 +627,7 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
                             let desc_second = self.describe_place(second_borrowed_place)
                                 .unwrap_or_else(|| "_".to_owned());
 
-                            // Also compute the name of the union type, eg. `Foo` so we
+                            // Also compute the name of the union type, e.g., `Foo` so we
                             // can add a helpful note with it.
                             let ty = base.ty(self.mir, self.infcx.tcx).to_ty(self.infcx.tcx);
 
@@ -1052,7 +1052,7 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
     ) -> DiagnosticBuilder<'cx> {
         let tcx = self.infcx.tcx;
 
-        // FIXME use a better heuristic than Spans
+        // FIXME: use a better heuristic than Spans
         let reference_desc = if return_span == self.mir.source_info(borrow.reserve_location).span {
             "reference to"
         } else {

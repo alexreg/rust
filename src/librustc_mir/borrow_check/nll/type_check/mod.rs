@@ -1378,7 +1378,7 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
             | TerminatorKind::Drop { .. }
             | TerminatorKind::FalseEdges { .. }
             | TerminatorKind::FalseUnwind { .. } => {
-                // no checks needed for these
+                // No checks needed for these.
             }
 
             TerminatorKind::DropAndReplace {
@@ -1428,7 +1428,7 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
                 if !switch_ty.is_integral() && !switch_ty.is_char() && !switch_ty.is_bool() {
                     span_mirbug!(self, term, "bad SwitchInt discr ty {:?}", switch_ty);
                 }
-                // FIXME: check the values
+                // FIXME: check the values.
             }
             TerminatorKind::Call {
                 ref func,
@@ -2041,7 +2041,7 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
         self.prove_aggregate_predicates(aggregate_kind, location);
 
         if *aggregate_kind == AggregateKind::Tuple {
-            // tuple rvalue field type is always the type of the op. Nothing to check here.
+            // Tuple rvalue field type is always the type of the op; nothing to check here.
             return;
         }
 

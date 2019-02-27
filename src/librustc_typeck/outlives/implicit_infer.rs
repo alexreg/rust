@@ -36,7 +36,7 @@ pub fn infer_predicates<'tcx>(
             explicit_map: explicit_map,
         };
 
-        // Visit all the crates and infer predicates
+        // Visit all the crates and infer predicates.
         tcx.hir().krate().visit_all_item_likes(&mut visitor);
     }
 
@@ -96,7 +96,7 @@ impl<'cx, 'tcx> ItemLikeVisitor<'tcx> for InferVisitor<'cx, 'tcx> {
         // If new predicates were added (`local_predicate_map` has more
         // predicates than the `global_inferred_outlives`), the new predicates
         // might result in implied predicates for their parent types.
-        // Therefore mark `predicates_added` as true and which will ensure
+        // Therefore, mark `predicates_added` as true and which will ensure
         // we walk the crates again and re-calculate predicates for all
         // items.
         let item_predicates_len: usize = self
@@ -198,7 +198,7 @@ fn insert_required_predicates_to_be_wf<'tcx>(
                     // placeholder value with the function
                     // `with_self_ty`, since there is no concrete type
                     // `Self` for a `dyn Trait` at this
-                    // stage. Therefore when checking explicit
+                    // stage. Therefore, when checking explicit
                     // predicates in `check_explicit_predicates` we
                     // need to ignore checking the explicit_map for
                     // Self type.
@@ -311,7 +311,7 @@ pub fn check_explicit_predicates<'tcx>(
         // ignore such requirements as well (cc #54467)-- though
         // conceivably it might be better if we could extract the `Foo
         // = X` binding from the object type (there must be such a
-        // binding) and thus infer an outlives requirement that `X:
+        // binding) and thus infer an 'outlives' requirement that `X:
         // 'b`.
         if ignore_self_ty.0 {
             if let UnpackedKind::Type(ty) = outlives_predicate.0.unpack() {

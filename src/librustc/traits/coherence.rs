@@ -371,7 +371,7 @@ fn orphan_check_trait_ref<'tcx>(tcx: TyCtxt<'_, '_, '_>,
         // Given `impl<P1..=Pn> Trait<T1..=Tn> for T0`, an impl is valid only
         // if at least one of the following is true:
         //
-        // - Trait is a local trait
+        // - Trait is a local trait.
         // (already checked in orphan_check prior to calling this function)
         // - All of:
         //     - At least one of the types `T0..=Tn` must be a local type.
@@ -411,7 +411,7 @@ fn orphan_check_trait_ref<'tcx>(tcx: TyCtxt<'_, '_, '_>,
                     }
                 }
 
-                // OK, found local type, all prior types upheld invariant.
+                // Ok, found local type; all prior types upheld invariant.
                 return Ok(());
             }
 

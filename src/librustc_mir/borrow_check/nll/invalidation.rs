@@ -26,7 +26,7 @@ pub(super) fn generate_invalidates<'cx, 'gcx, 'tcx>(
     borrow_set: &BorrowSet<'tcx>,
 ) {
     if all_facts.is_none() {
-        // Nothing to do if we don't have any facts
+        // Nothing to do if we don't have any facts.
         return;
     }
 
@@ -100,7 +100,7 @@ impl<'cx, 'tcx, 'gcx> Visitor<'tcx> for InvalidationGenerator<'cx, 'tcx, 'gcx> {
                 let context = ContextKind::InlineAsm.new(location);
                 for (o, output) in asm.outputs.iter().zip(outputs.iter()) {
                     if o.is_indirect {
-                        // FIXME(eddyb) indirect inline asm outputs should
+                        // FIXME(eddyb): indirect inline ASM outputs should
                         // be encoeded through MIR place derefs instead.
                         self.access_place(
                             context,
@@ -228,7 +228,7 @@ impl<'cx, 'tcx, 'gcx> Visitor<'tcx> for InvalidationGenerator<'cx, 'tcx, 'gcx> {
             } => {
                 self.consume_operand(ContextKind::Yield.new(location), value);
 
-                // Invalidate all borrows of local places
+                // Invalidate all borrows of local places.
                 let borrow_set = self.borrow_set.clone();
                 let resume = self.location_table.start_index(resume.start_location());
                 for i in borrow_set.borrows.indices() {
@@ -238,7 +238,7 @@ impl<'cx, 'tcx, 'gcx> Visitor<'tcx> for InvalidationGenerator<'cx, 'tcx, 'gcx> {
                 }
             }
             TerminatorKind::Resume | TerminatorKind::Return | TerminatorKind::GeneratorDrop => {
-                // Invalidate all borrows of local places
+                // Invalidate all borrows of local places.
                 let borrow_set = self.borrow_set.clone();
                 let start = self.location_table.start_index(location);
                 for i in borrow_set.borrows.indices() {
@@ -258,7 +258,7 @@ impl<'cx, 'tcx, 'gcx> Visitor<'tcx> for InvalidationGenerator<'cx, 'tcx, 'gcx> {
                 real_target: _,
                 unwind: _,
             } => {
-                // no data used, thus irrelevant to borrowck
+                // No data used, thus irrelevant to borrowck.
             }
         }
 
@@ -430,26 +430,26 @@ impl<'cg, 'cx, 'tcx, 'gcx> InvalidationGenerator<'cx, 'tcx, 'gcx> {
                     // thus aren't injecting unsoundenss w/ this check.)
                     (Activation(_, activating), _) if activating == borrow_index => {
                         // Activating a borrow doesn't generate any invalidations, since we
-                        // have already taken the reservation
+                        // have already taken the reservation.
                     }
 
                     (Read(_), BorrowKind::Shallow) | (Reservation(..), BorrowKind::Shallow)
                     | (Read(_), BorrowKind::Shared) | (Reservation(..), BorrowKind::Shared)
                     | (Read(ReadKind::Borrow(BorrowKind::Shallow)), BorrowKind::Unique)
                     | (Read(ReadKind::Borrow(BorrowKind::Shallow)), BorrowKind::Mut { .. }) => {
-                        // Reads/reservations don't invalidate shared or shallow borrows
+                        // Reads/reservations don't invalidate shared or shallow borrows.
                     }
 
                     (Read(_), BorrowKind::Unique) | (Read(_), BorrowKind::Mut { .. }) => {
                         // Reading from mere reservations of mutable-borrows is ok.
                         if !is_active(&this.dominators, borrow, context.loc) {
-                            // If the borrow isn't active yet, reads don't invalidate it
+                            // If the borrow isn't active yet, reads don't invalidate it.
                             assert!(allow_two_phase_borrow(&this.tcx, borrow.kind));
                             return Control::Continue;
                         }
 
                         // Unique and mutable borrows are invalidated by reads from any
-                        // involved path
+                        // involved path.
                         this.generate_invalidates(borrow_index, context.loc);
                     }
 
@@ -459,8 +459,8 @@ impl<'cg, 'cx, 'tcx, 'gcx> InvalidationGenerator<'cx, 'tcx, 'gcx> {
                         | (Write(_), _) => {
                             // Unique or mutable borrows are invalidated by writes.
                             // Reservations count as writes since we need to check
-                            // that activating the borrow will be OK
-                            // FIXME(bob_twinkles) is this actually the right thing to do?
+                            // that activating the borrow will be ok.
+                            // FIXME(bob_twinkles): is this actually the right thing to do?
                             this.generate_invalidates(borrow_index, context.loc);
                         }
                 }

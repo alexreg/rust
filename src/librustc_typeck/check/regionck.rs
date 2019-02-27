@@ -125,7 +125,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         rcx.outlives_environment.save_implied_bounds(id);
 
         if self.err_count_since_creation() == 0 {
-            // regionck assumes typeck succeeded
+            // regionck assumes typeck succeeded.
             rcx.visit_body(body);
             rcx.visit_region_obligations(id);
         }
@@ -175,7 +175,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         );
 
         if self.err_count_since_creation() == 0 {
-            // regionck assumes typeck succeeded
+            // regionck assumes typeck succeeded.
             rcx.visit_fn_body(fn_id, body, self.tcx.hir().span_by_hir_id(fn_id));
         }
 
@@ -304,7 +304,7 @@ impl<'a, 'gcx, 'tcx> RegionCtxt<'a, 'gcx, 'tcx> {
         body: &'gcx hir::Body,
         span: Span,
     ) {
-        // When we enter a function, we can derive
+        // When we enter a function, we can derive.
         debug!("visit_fn_body(id={:?})", id);
 
         let body_id = body.id();
@@ -329,7 +329,7 @@ impl<'a, 'gcx, 'tcx> RegionCtxt<'a, 'gcx, 'tcx> {
         // For the return type, if diverging, substitute `bool` just
         // because it will have no effect.
         //
-        // FIXME(#27579) return types should not be implied bounds
+        // FIXME(#27579): return types should not be implied bounds.
         let fn_sig_tys: Vec<_> = fn_sig
             .inputs()
             .iter()
@@ -483,7 +483,7 @@ impl<'a, 'gcx, 'tcx> Visitor<'gcx> for RegionCtxt<'a, 'gcx, 'tcx> {
     //visit_pat: visit_pat, // (..) see above
 
     fn visit_arm(&mut self, arm: &'gcx hir::Arm) {
-        // see above
+        // See above.
         for p in &arm.pats {
             self.constrain_bindings_in_pat(p);
         }
@@ -491,7 +491,7 @@ impl<'a, 'gcx, 'tcx> Visitor<'gcx> for RegionCtxt<'a, 'gcx, 'tcx> {
     }
 
     fn visit_local(&mut self, l: &'gcx hir::Local) {
-        // see above
+        // See above.
         self.constrain_bindings_in_pat(&l.pat);
         self.link_local(l);
         intravisit::walk_local(self, l);
@@ -902,7 +902,7 @@ impl<'a, 'gcx, 'tcx> RegionCtxt<'a, 'gcx, 'tcx> {
                 // Require that the resulting region encompasses
                 // the current node.
                 //
-                // FIXME(#6268) remove to support nested method calls
+                // FIXME(#6268): remove to support nested method calls.
                 self.type_of_node_must_outlive(
                     infer::AutoBorrow(expr.span),
                     expr.hir_id,
@@ -1364,7 +1364,7 @@ impl<'a, 'gcx, 'tcx> RegionCtxt<'a, 'gcx, 'tcx> {
         //     ref_cmt                 ^~~
         //
         // (Note that since we have not examined `ref_cmt.cat`, we don't
-        // know whether this scenario has occurred; but I wanted to show
+        // know whether this scenario has occurred, but I wanted to show
         // how all the types get adjusted.)
         match ref_kind {
             ty::ImmBorrow => {

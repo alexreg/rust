@@ -398,7 +398,7 @@ pub fn str_lit(lit: &str, diag: Option<(Span, &Handler)>) -> String {
                     }
                     eat(&mut chars);
                 } else {
-                    // otherwise, a normal escape
+                    // Otherwise, a normal escape.
                     let (c, n) = char_lit(&lit[i..], diag);
                     // We don't need to move past the first `\`.
                     for _ in 0..n - 1 {
@@ -536,6 +536,7 @@ fn filtered_float_lit(data: Symbol, suffix: Option<Symbol>, diag: Option<(Span, 
         }
     })
 }
+
 fn float_lit(s: &str, suffix: Option<Symbol>, diag: Option<(Span, &Handler)>)
                  -> Option<ast::LitKind> {
     debug!("float_lit: {:?}, {:?}", s, suffix);

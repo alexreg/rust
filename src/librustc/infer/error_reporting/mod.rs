@@ -303,8 +303,8 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
             return;
         }
 
-        // try to pre-process the errors, which will group some of them
-        // together into a `ProcessedErrors` group:
+        // Try to pre-process the errors, which will group some of them
+        // together into a `ProcessedErrors` group.
         let errors = self.process_errors(errors);
 
         debug!(
@@ -323,7 +323,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
                     // attempt to do is go through a number of specific
                     // scenarios and try to find the best way to present
                     // the error. If all of these fails, we fall back to a rather
-                    // general bit of code that displays the error information
+                    // general bit of code that displays the error information.
                     RegionResolutionError::ConcreteFailure(origin, sub, sup) => {
                         if sub.is_placeholder() || sup.is_placeholder() {
                             self.report_placeholder_failure(region_scope_tree, origin, sub, sup)
@@ -401,7 +401,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         debug!("process_errors()");
 
         // We want to avoid reporting generic-bound failures if we can
-        // avoid it: these have a very high rate of being unhelpful in
+        // avoid it; these have a very high rate of being unhelpful in
         // practice. This is because they are basically secondary
         // checks that test the state of the region graph after the
         // rest of inference is done, and the other kinds of errors
@@ -437,7 +437,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         errors
     }
 
-    /// Adds a note if the types come from similarly named crates
+    /// Adds a note if the types come from similarly named crates.
     fn check_and_note_conflicting_crates(
         &self,
         err: &mut DiagnosticBuilder<'_>,
@@ -446,7 +446,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
     ) {
         let report_path_match = |err: &mut DiagnosticBuilder<'_>, did1: DefId, did2: DefId| {
             // Only external crates, if either is from a local
-            // module we could have false positives
+            // module we could have false positives.
             if !(did1.is_local() || did2.is_local()) && did1.krate != did2.krate {
                 let exp_path = self.tcx.item_path_str(did1);
                 let found_path = self.tcx.item_path_str(did2);
@@ -469,8 +469,8 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         };
         match *terr {
             TypeError::Sorts(ref exp_found) => {
-                // if they are both "path types", there's a chance of ambiguity
-                // due to different versions of the same crate
+                // If they are both "path types", there's a chance of ambiguity
+                // due to different versions of the same crate.
                 if let (&ty::Adt(exp_adt, _), &ty::Adt(found_adt, _))
                      = (&exp_found.expected.sty, &exp_found.found.sty)
                 {
@@ -582,7 +582,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
             value.push_highlighted("<");
         }
 
-        // Output the lifetimes for the first type
+        // Output the lifetimes for the first type.
         let lifetimes = sub.regions()
             .map(|lifetime| {
                 let s = lifetime.to_string();
@@ -974,7 +974,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
                 let vals = match self.values_str(&values) {
                     Some((expected, found)) => Some((expected, found)),
                     None => {
-                        // Derived error. Cancel the emitter.
+                        // Derived error; cancel the emitter.
                         self.tcx.sess.diagnostic().cancel(diag);
                         return;
                     }
@@ -1219,7 +1219,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
                             }
                             let sp = hir.span(id);
                             // `sp` only covers `T`, change it so that it covers
-                            // `T:` when appropriate
+                            // `T:` when appropriate.
                             let is_impl_trait = bound_kind.to_string().starts_with("impl ");
                             let sp = if has_bounds && !is_impl_trait {
                                 sp.to(self.tcx

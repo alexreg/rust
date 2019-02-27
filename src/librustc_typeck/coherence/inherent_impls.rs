@@ -38,7 +38,7 @@ pub fn inherent_impls<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                 -> Lrc<Vec<DefId>> {
     assert!(ty_def_id.is_local());
 
-    // NB. Until we adopt the red-green dep-tracking algorithm (see
+    // N.B., until we adopt the red-green dep-tracking algorithm (see
     // [the plan] for details on that), we do some hackery here to get
     // the dependencies correct.  Basically, we use a `with_ignore` to
     // read the result we want. If we didn't have the `with_ignore`,

@@ -237,7 +237,7 @@ impl<'a, 'tcx> AstConv<'tcx, 'tcx> for ItemCtxt<'a, 'tcx> {
     }
 
     fn set_tainted_by_errors(&self) {
-        // no obvious place to track this, just let it go
+        // No obvious place to track this; just let it go.
     }
 
     fn record_ty(&self, _hir_id: hir::HirId, _ty: Ty<'tcx>, _span: Span) {
@@ -709,7 +709,7 @@ fn super_predicates_of<'a, 'tcx>(
 
     let icx = ItemCtxt::new(tcx, trait_def_id);
 
-    // Convert the bounds that follow the colon, e.g., `Bar + Zed` in `trait Foo : Bar + Zed`.
+    // Convert the bounds that follow the colon, e.g., `Bar + Zed` in `trait Foo: Bar + Zed`.
     let self_param_ty = tcx.mk_self_type();
     let superbounds1 = compute_bounds(&icx, self_param_ty, bounds, SizedByDefault::No, item.span);
 
@@ -1370,7 +1370,7 @@ fn find_existential_constraints<'a, 'tcx>(
             if let Some(ty::ResolvedOpaqueTy { concrete_type, substs }) = ty {
                 // FIXME(oli-obk): trace the actual span from inference to improve errors
                 let span = self.tcx.def_span(def_id);
-                // used to quickly look up the position of a generic parameter
+                // Used to quickly look up the position of a generic parameter.
                 let mut index_map: FxHashMap<ty::ParamTy, usize> = FxHashMap::default();
                 // Skip binder is ok, since we only use this to find generic parameters and their
                 // positions.
@@ -1378,8 +1378,8 @@ fn find_existential_constraints<'a, 'tcx>(
                     if let UnpackedKind::Type(ty) = subst.unpack() {
                         if let ty::Param(p) = ty.sty {
                             if index_map.insert(p, idx).is_some() {
-                                // there was already an entry for `p`, meaning a generic parameter
-                                // was used twice
+                                // There was already an entry for `p`, meaning a generic parameter
+                                // was used twice.
                                 self.tcx.sess.span_err(
                                     span,
                                     &format!("defining existential type use restricts existential \
@@ -1398,8 +1398,8 @@ fn find_existential_constraints<'a, 'tcx>(
                         }
                     }
                 }
-                // compute the index within the existential type for each generic parameter used in
-                // the concrete type
+                // Compute the index within the existential type for each generic parameter used in
+                // the concrete type.
                 let indices = concrete_type
                     .subst(self.tcx, substs)
                     .walk()
@@ -1427,7 +1427,7 @@ fn find_existential_constraints<'a, 'tcx>(
                         _ => t == p,
                     });
                     if !iter_eq || ty.next().is_some() || p_ty.next().is_some() {
-                        // found different concrete types for the existential type
+                        // Found different concrete types for the existential type.
                         let mut err = self.tcx.sess.struct_span_err(
                             span,
                             "concrete type differs from previous defining existential type use",
@@ -1439,7 +1439,7 @@ fn find_existential_constraints<'a, 'tcx>(
                         err.span_note(prev_span, "previous use here");
                         err.emit();
                     } else if indices != *prev_indices {
-                        // found "same" concrete types, but the generic parameter order differs
+                        // Found "same" concrete types, but the generic parameter order differs.
                         let mut err = self.tcx.sess.struct_span_err(
                             span,
                             "concrete type's generic parameters differ from previous defining use",
@@ -1477,7 +1477,7 @@ fn find_existential_constraints<'a, 'tcx>(
         }
         fn visit_item(&mut self, it: &'tcx Item) {
             let def_id = self.tcx.hir().local_def_id(it.id);
-            // the existential type itself or its children are not within its reveal scope
+            // The existential type itself or its children are not within its reveal scope.
             if def_id != self.def_id {
                 self.check(def_id);
                 intravisit::walk_item(self, it);
@@ -1485,7 +1485,7 @@ fn find_existential_constraints<'a, 'tcx>(
         }
         fn visit_impl_item(&mut self, it: &'tcx ImplItem) {
             let def_id = self.tcx.hir().local_def_id(it.id);
-            // the existential type itself or its children are not within its reveal scope
+            // The existential type itself or its children are not within its reveal scope.
             if def_id != self.def_id {
                 self.check(def_id);
                 intravisit::walk_impl_item(self, it);
@@ -1669,7 +1669,7 @@ fn is_unsized<'gcx: 'tcx, 'tcx>(
     let kind_id = tcx.lang_items().require(SizedTraitLangItem);
     match unbound {
         Some(ref tpb) => {
-            // FIXME(#8559) currently requires the unbound to be built-in.
+            // FIXME(#8559): currently requires the unbound to be built-in.
             if let Ok(kind_id) = kind_id {
                 if tpb.path.def != Def::Trait(kind_id) {
                     tcx.sess.span_warn(
@@ -1964,7 +1964,7 @@ fn explicit_predicates_of<'a, 'tcx>(
     }
 
     // Collect the predicates that were written inline by the user on each
-    // type parameter (e.g., `<T:Foo>`).
+    // type parameter (e.g., `<T: Foo>`).
     for param in &ast_generics.params {
         if let GenericParamKind::Type { .. } = param.kind {
             let name = param.name.ident().as_interned_str();
@@ -2079,8 +2079,8 @@ fn explicit_predicates_of<'a, 'tcx>(
     let mut predicates = predicates.predicates;
 
     // Subtle: before we store the predicates into the tcx, we
-    // sort them so that predicates like `T: Foo<Item=U>` come
-    // before uses of `U`.  This avoids false ambiguity errors
+    // sort them so that predicates like `T: Foo<Item = U>` come
+    // before uses of `U`. This avoids false ambiguity errors
     // in trait checking. See `setup_constraining_predicates`
     // for details.
     if let Node::Item(&Item {

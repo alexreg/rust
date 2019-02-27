@@ -62,7 +62,7 @@ pub fn predicate_obligations<'a, 'gcx, 'tcx>(infcx: &InferCtxt<'a, 'gcx, 'tcx>,
 {
     let mut wf = WfPredicates { infcx, param_env, body_id, span, out: vec![] };
 
-    // (*) ok to skip binders, because wf code is prepared for it
+    // (*) ok to skip binders, because WF code is prepared for it.
     match *predicate {
         ty::Predicate::Trait(ref t) => {
             wf.compute_trait_ref(&t.skip_binder().trait_ref, Elaborate::None); // (*)
@@ -481,7 +481,7 @@ impl<'a, 'gcx, 'tcx> WfPredicates<'a, 'gcx, 'tcx> {
         // `Foo<'x>+Bar<'y>`, we know that the type outlives *both* 'x and
         // 'y.)
         //
-        // Note: in fact we only permit builtin traits, not `Bar<'d>`, I
+        // Note: in fact, we only permit builtin traits, not `Bar<'d>`, I
         // am looking forward to the future here.
 
         if !data.has_escaping_bound_vars() {

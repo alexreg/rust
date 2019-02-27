@@ -42,7 +42,7 @@ const BASE_CONST: &[&str] = &[
 
 /// `DepNode`s for functions and methods.
 const BASE_FN: &[&str] = &[
-    // Callers will depend on the signature of these items, so we better test
+    // Callers will depend on the signature of these items, so we better test.
     label_strs::FnSignature,
     label_strs::GenericsOfItem,
     label_strs::PredicatesOfItem,
@@ -182,7 +182,7 @@ const LABELS_TRAIT: &[&[&str]] = &[
 
 type Labels = FxHashSet<String>;
 
-/// Represents the requested configuration by rustc_clean/dirty
+/// Represents the requested configuration by rustc_clean/dirty.
 struct Assertion {
     clean: Labels,
     dirty: Labels,
@@ -205,7 +205,7 @@ impl Assertion {
 }
 
 pub fn check_dirty_clean_annotations<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>) {
-    // can't add `#[rustc_dirty]` etc without opting in to this feature
+    // Can't add `#[rustc_dirty]`, etc., without opting in to this feature.
     if !tcx.features().rustc_attrs {
         return;
     }
@@ -248,11 +248,11 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
         } else if attr.check_name(ATTR_CLEAN) {
             true
         } else {
-            // skip: not rustc_clean/dirty
+            // Skip: not rustc_clean/dirty.
             return None
         };
         if !check_config(self.tcx, attr) {
-            // skip: not the correct `cfg=`
+            // Skip: not the correct `cfg=`.
             return None;
         }
         let assertion = if let Some(labels) = self.labels(attr) {
@@ -314,7 +314,7 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
                 return self.resolve_labels(&item, value.as_str().as_ref());
             }
         }
-        // if no `label` or `except` is given, only the node's group are asserted
+        // If no `label` or `except` is given, only the node's group are asserted.
         Labels::default()
     }
 
@@ -325,8 +325,8 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
         let (name, labels) = match node {
             HirNode::Item(item) => {
                 match item.node {
-                    // note: these are in the same order as hir::Item_;
-                    // FIXME(michaelwoerister): do commented out ones
+                    // N.B., these are in the same order as `hir::Item_;`
+                    // FIXME(michaelwoerister): do commented out ones.
 
                     // // An `extern crate` item, with optional original crate name,
                     // HirItem::ExternCrate(..),  // intentionally no assertions
@@ -334,17 +334,17 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
                     // // `use foo::bar::*;` or `use foo::bar::baz as quux;`
                     // HirItem::Use(..),  // intentionally no assertions
 
-                    // A `static` item
+                    // A `static` item.
                     HirItem::Static(..) => ("ItemStatic", LABELS_CONST),
 
-                    // A `const` item
+                    // A `const` item.
                     HirItem::Const(..) => ("ItemConst", LABELS_CONST),
 
-                    // A function declaration
+                    // A function declaration.
                     HirItem::Fn(..) => ("ItemFn", LABELS_FN),
 
-                    // // A module
-                    HirItem::Mod(..) =>("ItemMod", LABELS_HIR_ONLY),
+                    // A module.
+                    HirItem::Mod(..) => ("ItemMod", LABELS_HIR_ONLY),
 
                     // // An external module
                     HirItem::ForeignMod(..) => ("ItemForeignMod", LABELS_HIR_ONLY),
@@ -378,9 +378,9 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
                     // However, this did not seem to work effectively and more bugs were hit.
                     // Nebie @vitiral gave up :)
                     //
-                    //HirItem::Trait(..) => ("ItemTrait", LABELS_TRAIT),
+                    // HirItem::Trait(..) => ("ItemTrait", LABELS_TRAIT),
 
-                    // An implementation, eg `impl<A> Trait for Foo { .. }`
+                    // An implementation, e.g., `impl<A> Trait for Foo { .. }`.
                     HirItem::Impl(..) => ("ItemKind::Impl", LABELS_IMPL),
 
                     _ => self.tcx.sess.span_fatal(

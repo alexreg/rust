@@ -64,7 +64,7 @@ impl<'infcx, 'gcx, 'tcx> InferCtxt<'infcx, 'gcx, 'tcx> {
         let a_is_expected = relation.a_is_expected();
 
         match (&a.sty, &b.sty) {
-            // Relate integral variables to other types
+            // Relate integral variables to other types.
             (&ty::Infer(ty::IntVar(a_id)), &ty::Infer(ty::IntVar(b_id))) => {
                 self.int_unification_table
                     .borrow_mut()
@@ -85,7 +85,7 @@ impl<'infcx, 'gcx, 'tcx> InferCtxt<'infcx, 'gcx, 'tcx> {
                 self.unify_integral_variable(!a_is_expected, v_id, UintType(v))
             }
 
-            // Relate floating-point variables to other types
+            // Relate floating-point variables to other types.
             (&ty::Infer(ty::FloatVar(a_id)), &ty::Infer(ty::FloatVar(b_id))) => {
                 self.float_unification_table
                     .borrow_mut()
@@ -100,7 +100,7 @@ impl<'infcx, 'gcx, 'tcx> InferCtxt<'infcx, 'gcx, 'tcx> {
                 self.unify_float_variable(!a_is_expected, v_id, v)
             }
 
-            // All other cases of inference are errors
+            // All other cases of inference are errors.
             (&ty::Infer(_), _) |
             (_, &ty::Infer(_)) => {
                 Err(TypeError::Sorts(ty::relate::expected_found(relation, &a, &b)))

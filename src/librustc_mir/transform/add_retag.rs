@@ -20,12 +20,12 @@ fn is_stable<'tcx>(
     use rustc::mir::Place::*;
 
     match *place {
-        // Locals and statics have stable addresses, for sure
+        // Locals and statics have stable addresses, for sure.
         Local { .. } |
         Promoted { .. } |
         Static { .. } =>
             true,
-        // Recurse for projections
+        // Recurse for projections.
         Projection(ref proj) => {
             match proj.elem {
                 // Which place this evaluates to can change with any memory write,
@@ -51,16 +51,16 @@ fn is_stable<'tcx>(
 /// not below references.
 fn may_have_reference<'a, 'gcx, 'tcx>(ty: Ty<'tcx>, tcx: TyCtxt<'a, 'gcx, 'tcx>) -> bool {
     match ty.sty {
-        // Primitive types that are not references
+        // Primitive types that are not references.
         ty::Bool | ty::Char |
         ty::Float(_) | ty::Int(_) | ty::Uint(_) |
         ty::RawPtr(..) | ty::FnPtr(..) |
         ty::Str | ty::FnDef(..) | ty::Never =>
             false,
-        // References
+        // References.
         ty::Ref(..) => true,
         ty::Adt(..) if ty.is_box() => true,
-        // Compound types
+        // Compound types.
         ty::Array(ty, ..) | ty::Slice(ty) =>
             may_have_reference(ty, tcx),
         ty::Tuple(tys) =>
@@ -69,7 +69,7 @@ fn may_have_reference<'a, 'gcx, 'tcx>(ty: Ty<'tcx>, tcx: TyCtxt<'a, 'gcx, 'tcx>)
             adt.variants.iter().any(|v| v.fields.iter().any(|f|
                 may_have_reference(f.ty(tcx, substs), tcx)
             )),
-        // Conservative fallback
+        // Conservative fallback.
         _ => true,
     }
 }
@@ -99,7 +99,7 @@ impl MirPass for AddRetag {
                 span: span, // FIXME: Consider using just the span covering the function
                             // argument declaration.
             };
-            // Gather all arguments, skip return value.
+            // Gather all arguments; skip return value.
             let places = local_decls.iter_enumerated().skip(1).take(arg_count)
                     .map(|(local, _)| Place::Local(local))
                     .filter(needs_retag)
@@ -120,7 +120,7 @@ impl MirPass for AddRetag {
         for block_data in basic_blocks.iter_mut() {
             match block_data.terminator().kind {
                 TerminatorKind::Call { ref destination, .. } => {
-                    // Remember the return destination for later
+                    // Remember the return destination for later.
                     if let Some(ref destination) = destination {
                         if needs_retag(&destination.0) {
                             returns.push((
@@ -167,7 +167,7 @@ impl MirPass for AddRetag {
                             assert!(dest_ty.is_unsafe_ptr());
                             (RetagKind::Raw, place)
                         } else {
-                            // Some other cast, no retag
+                            // Some other cast, no retag.
                             continue
                         }
                     }
@@ -185,7 +185,7 @@ impl MirPass for AddRetag {
                         };
                         (kind, place)
                     }
-                    // Do nothing for the rest
+                    // Do nothing for the rest.
                     _ => continue,
                 };
                 // Insert a retag after the statement.

@@ -940,8 +940,8 @@ impl Step for Assemble {
         // produce some other architecture compiler we need to start from
         // `build` to get there.
         //
-        // FIXME: Perhaps we should download those libraries?
-        //        It would make builds faster...
+        // FIXME: perhaps we should download those libraries?
+        // It would certainly make builds faster.
         //
         // FIXME: it may be faster if we build just a stage 1 compiler and then
         // use that to bootstrap this compiler forward.
@@ -977,7 +977,7 @@ impl Step for Assemble {
         let host = target_compiler.host;
         builder.info(&format!("Assembling stage{} compiler ({})", stage, host));
 
-        // Link in all dylibs to the libdir
+        // Link in all dylibs to the libdir.
         let sysroot = builder.sysroot(target_compiler);
         let sysroot_libdir = sysroot.join(libdir(&*host));
         t!(fs::create_dir_all(&sysroot_libdir));
@@ -998,7 +998,7 @@ impl Step for Assemble {
 
         dist::maybe_install_llvm_dylib(builder, target_compiler.host, &sysroot);
 
-        // Link the compiler binary itself into place
+        // Link the compiler binary itself into place.
         let out_dir = builder.cargo_out(build_compiler, Mode::Rustc, host);
         let rustc = out_dir.join(exe("rustc_binary", &*host));
         let bindir = sysroot.join("bin");
@@ -1052,7 +1052,7 @@ pub fn run_cargo(builder: &Builder<'_>,
             _ => return,
         };
         for filename in filenames {
-            // Skip files like executables
+            // Skip files like executables.
             if !filename.ends_with(".rlib") &&
                !filename.ends_with(".lib") &&
                !is_dylib(&filename) &&
@@ -1075,7 +1075,7 @@ pub fn run_cargo(builder: &Builder<'_>,
                 continue;
             }
 
-            // Otherwise this was a "top level artifact" which right now doesn't
+            // Otherwise, this was a "top level artifact" which right now doesn't
             // have a hash in the name, but there's a version of this file in
             // the `deps` folder which *does* have a hash in the name. That's
             // the one we'll want to we'll probe for it later.
@@ -1195,7 +1195,7 @@ pub fn stream_cargo(
         let line = t!(line);
         match serde_json::from_str::<CargoMessage<'_>>(&line) {
             Ok(msg) => cb(msg),
-            // If this was informational, just print it out and continue
+            // If this was informational, just print it out and continue.
             Err(_) => println!("{}", line)
         }
     }

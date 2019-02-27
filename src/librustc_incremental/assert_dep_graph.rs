@@ -103,7 +103,7 @@ impl<'a, 'tcx> IfThisChanged<'a, 'tcx> {
                 Some(word) if value.is_none() =>
                     value = Some(word.name()),
                 _ =>
-                    // FIXME better-encapsulate meta_item (don't directly access `node`)
+                    // FIXME: better-encapsulate meta_item (don't directly access `node`)
                     span_bug!(list_item.span(), "unexpected meta-item {:?}", list_item.node),
             }
         }

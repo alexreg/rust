@@ -52,7 +52,7 @@ pub enum ImportDirectiveSubclass<'a> {
     GlobImport {
         is_prelude: bool,
         max_vis: Cell<ty::Visibility>, // The visibility of the greatest re-export.
-        // n.b. `max_vis` is only used in `finalize_import` to check for re-export errors.
+        // N.B., `max_vis` is only used in `finalize_import` to check for re-export errors.
     },
     ExternCrate {
         source: Option<Name>,
@@ -935,7 +935,7 @@ impl<'a, 'b:'a> ImportResolver<'a, 'b> {
                 (source, target, source_bindings, target_bindings, type_ns_only),
             GlobImport { is_prelude, ref max_vis } => {
                 if directive.module_path.len() <= 1 {
-                    // HACK(eddyb) `lint_if_path_starts_with_module` needs at least
+                    // HACK(eddyb): `lint_if_path_starts_with_module` needs at least
                     // 2 segments, so the `resolve_path` above won't trigger it.
                     let mut full_path = directive.module_path.clone();
                     full_path.push(Segment::from_ident(keywords::Invalid.ident()));
@@ -1077,7 +1077,7 @@ impl<'a, 'b:'a> ImportResolver<'a, 'b> {
                         if !ident.is_path_segment_keyword() {
                             format!("no `{}` external crate{}", ident, lev_suggestion)
                         } else {
-                            // HACK(eddyb) this shows up for `self` & `super`, which
+                            // HACK(eddyb): this shows up for `self` & `super`, which
                             // should work instead - for now keep the same error message.
                             format!("no `{}` in the root{}", ident, lev_suggestion)
                         }
@@ -1133,7 +1133,7 @@ impl<'a, 'b:'a> ImportResolver<'a, 'b> {
         }
 
         if directive.module_path.len() <= 1 {
-            // HACK(eddyb) `lint_if_path_starts_with_module` needs at least
+            // HACK(eddyb): `lint_if_path_starts_with_module` needs at least
             // 2 segments, so the `resolve_path` above won't trigger it.
             let mut full_path = directive.module_path.clone();
             full_path.push(Segment::from_ident(ident));

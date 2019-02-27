@@ -443,8 +443,8 @@ pub fn super_relate_tys<'a, 'gcx, 'tcx, R>(relation: &mut R,
          &ty::Closure(b_id, b_substs))
             if a_id == b_id =>
         {
-            // All Closure types with the same id represent
-            // the (anonymous) type of the same closure expression. So
+            // All closure types with the same ID represent
+            // the (anonymous) type of the same closure expression, so
             // all of their regions should be equated.
             let substs = relation.relate(&a_substs, &b_substs)?;
             Ok(tcx.mk_closure(a_id, substs))
@@ -471,7 +471,7 @@ pub fn super_relate_tys<'a, 'gcx, 'tcx, R>(relation: &mut R,
             let to_u64 = |x: ty::LazyConst<'tcx>| -> Result<u64, ErrorReported> {
                 match x {
                     ty::LazyConst::Unevaluated(def_id, substs) => {
-                        // FIXME(eddyb) get the right param_env.
+                        // FIXME(eddyb): get the right param_env.
                         let param_env = ty::ParamEnv::empty();
                         if let Some(substs) = tcx.lift_to_global(&substs) {
                             let instance = ty::Instance::resolve(

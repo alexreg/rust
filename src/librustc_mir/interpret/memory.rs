@@ -609,14 +609,14 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> Memory<'a, 'mir, 'tcx, M> {
     }
 }
 
-/// Interning (for CTFE)
+/// Interning (for CTFE).
 impl<'a, 'mir, 'tcx, M> Memory<'a, 'mir, 'tcx, M>
 where
     M: Machine<'a, 'mir, 'tcx, PointerTag=(), AllocExtra=(), MemoryExtra=()>,
     // FIXME: Working around https://github.com/rust-lang/rust/issues/24159
     M::MemoryMap: AllocMap<AllocId, (MemoryKind<M::MemoryKinds>, Allocation)>,
 {
-    /// mark an allocation as static and initialized, either mutable or not
+    /// Mark an allocation as static and initialized, either mutable or not.
     pub fn intern_static(
         &mut self,
         alloc_id: AllocId,
@@ -627,7 +627,7 @@ where
             alloc_id,
             mutability
         );
-        // remove allocation
+        // Remove allocation.
         let (kind, mut alloc) = self.alloc_map.remove(&alloc_id).unwrap();
         match kind {
             MemoryKind::Machine(_) => bug!("Static cannot refer to machine memory"),
@@ -637,7 +637,7 @@ where
         alloc.mutability = mutability;
         let alloc = self.tcx.intern_const_alloc(alloc);
         self.tcx.alloc_map.lock().set_alloc_id_memory(alloc_id, alloc);
-        // recurse into inner allocations
+        // Recurse into inner allocations.
         for &(_, alloc) in alloc.relocations.values() {
             // FIXME: reusing the mutability here is likely incorrect. It is originally
             // determined via `is_freeze`, and data is considered frozen if there is no
@@ -646,10 +646,10 @@ where
             // assume immutability -- and we should make sure that the compiler
             // does not permit code that would break this!
             if self.alloc_map.contains_key(&alloc) {
-                // Not yet interned, so proceed recursively
+                // Not yet interned, so proceed recursively.
                 self.intern_static(alloc, mutability)?;
             } else if self.dead_alloc_map.contains_key(&alloc) {
-                // dangling pointer
+                // Dangling pointer.
                 return err!(ValidationFailure(
                     "encountered dangling pointer in final constant".into(),
                 ))

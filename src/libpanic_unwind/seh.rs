@@ -1,4 +1,4 @@
-//! Windows SEH
+//! Windows SEH.
 //!
 //! On Windows (currently only on MSVC), the default exception handling
 //! mechanism is Structured Exception Handling (SEH). This is quite different

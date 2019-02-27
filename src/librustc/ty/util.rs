@@ -76,7 +76,7 @@ impl<'tcx> Discr<'tcx> {
             } else {
                 val + n
             };
-            // zero the upper bits
+            // Zero the upper bits.
             let val = val as u128;
             let val = truncate(val, size);
             (Self {
@@ -179,7 +179,7 @@ impl<'tcx> ty::ParamEnv<'tcx> {
                                        tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                        self_type: Ty<'tcx>)
                                        -> Result<(), CopyImplementationError<'tcx>> {
-        // FIXME: (@jroesch) float this code up
+        // FIXME(jroesch): float this code up.
         tcx.infer_ctxt().enter(|infcx| {
             let (adt, substs) = match self_type.sty {
                 // These types used to have a builtin impl.
@@ -779,7 +779,7 @@ impl<'a, 'tcx> ty::TyS<'tcx> {
                             sp: Span)
                             -> Representability
     {
-        // Iterate until something non-representable is found
+        // Iterate until something non-representable is found.
         fn fold_repr<It: Iterator<Item=Representability>>(iter: It) -> Representability {
             iter.fold(Representability::Representable, |r1, r2| {
                 match (r1, r2) {
@@ -807,7 +807,7 @@ impl<'a, 'tcx> ty::TyS<'tcx> {
                     }))
                 }
                 // Fixed-length vectors.
-                // FIXME(#11924) Behavior undecided for zero-length vectors.
+                // FIXME(#11924): behavior undecided for zero-length vectors.
                 Array(ty, _) => {
                     is_type_structurally_recursive(tcx, sp, seen, representable_cache, ty)
                 }
@@ -827,8 +827,8 @@ impl<'a, 'tcx> ty::TyS<'tcx> {
                     }))
                 }
                 Closure(..) => {
-                    // this check is run on type definitions, so we don't expect
-                    // to see closure types
+                    // This check is run on type definitions, so we don't expect
+                    // to see closure types.
                     bug!("requires check invoked on inapplicable type: {:?}", ty)
                 }
                 _ => Representability::Representable,
@@ -886,8 +886,8 @@ impl<'a, 'tcx> ty::TyS<'tcx> {
                         // for this check, so that `Bar<T>` in this example counts as
                         // `SelfRecursive`:
                         //
-                        // struct Foo;
-                        // struct Bar<T> { x: Bar<Foo> }
+                        //     struct Foo;
+                        //     struct Bar<T> { x: Bar<Foo> }
 
                         if let Some(&seen_type) = iter.next() {
                             if same_struct_or_enum(seen_type, def) {
@@ -1010,13 +1010,13 @@ fn needs_drop_raw<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     assert!(!ty.needs_infer());
 
     NeedsDrop(match ty.sty {
-        // Fast-path for primitive types
+        // Fast-path for primitive types.
         ty::Infer(ty::FreshIntTy(_)) | ty::Infer(ty::FreshFloatTy(_)) |
         ty::Bool | ty::Int(_) | ty::Uint(_) | ty::Float(_) | ty::Never |
         ty::FnDef(..) | ty::FnPtr(_) | ty::Char | ty::GeneratorWitness(..) |
         ty::RawPtr(_) | ty::Ref(..) | ty::Str => false,
 
-        // Foreign types can never have destructors
+        // Foreign types can never have destructors.
         ty::Foreign(..) => false,
 
         // `ManuallyDrop` doesn't have a destructor regardless of field types.
@@ -1053,8 +1053,8 @@ fn needs_drop_raw<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         ty::Closure(def_id, ref substs) => substs.upvar_tys(def_id, tcx).any(needs_drop),
 
         // Pessimistically assume that all generators will require destructors
-        // as we don't know if a destructor is a noop or not until after the MIR
-        // state transformation pass
+        // as we don't know if a destructor is a no-op or not until after the MIR
+        // state transformation pass.
         ty::Generator(..) => true,
 
         ty::Tuple(ref tys) => tys.iter().cloned().any(needs_drop),

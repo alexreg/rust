@@ -730,7 +730,7 @@ LinkedList::new() += 1;
 // ...
 
 fn some_func(i: &mut i32) {
-    i += 12; // Error : '+=' operation cannot be applied on a reference !
+    i += 12; // error: '+=' operation cannot be applied on a reference!
 }
 ```
 
@@ -739,12 +739,12 @@ And now some working examples:
 ```
 let mut i : i32 = 0;
 
-i += 12; // Good !
+i += 12; // good!
 
 // ...
 
 fn some_func(i: &mut i32) {
-    *i += 12; // Good !
+    *i += 12; // good!
 }
 ```
 "##,
@@ -804,12 +804,12 @@ struct SomeStruct {
 }
 let mut s = SomeStruct {x: 0, y: 0};
 
-s.x = 3; // that's good !
+s.x = 3; // that's good!
 
 // ...
 
 fn some_func(x: &mut i32) {
-    *x = 12; // that's good !
+    *x = 12; // that's good!
 }
 ```
 "##,

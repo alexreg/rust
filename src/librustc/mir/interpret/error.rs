@@ -191,7 +191,7 @@ impl<'tcx> From<EvalErrorKind<'tcx, u64>> for EvalError<'tcx> {
                 let mut backtrace = Backtrace::new_unresolved();
 
                 if val == "immediate" {
-                    // Print it now
+                    // Print it now.
                     print_backtrace(&mut backtrace);
                     None
                 } else {

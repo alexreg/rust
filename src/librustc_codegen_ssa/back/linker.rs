@@ -381,7 +381,7 @@ impl<'a> Linker for GccLinker<'a> {
         debug!("EXPORTED SYMBOLS:");
 
         if self.sess.target.target.options.is_like_osx {
-            // Write a plain, newline-separated list of symbols
+            // Write a plain, newline-separated list of symbols.
             let res = (|| -> io::Result<()> {
                 let mut f = BufWriter::new(File::create(&path)?);
                 for sym in self.info.exports[&crate_type].iter() {
@@ -394,7 +394,7 @@ impl<'a> Linker for GccLinker<'a> {
                 self.sess.fatal(&format!("failed to write lib.def file: {}", e));
             }
         } else {
-            // Write an LD version script
+            // Write an LD version script.
             let res = (|| -> io::Result<()> {
                 let mut f = BufWriter::new(File::create(&path)?);
                 writeln!(f, "{{\n  global:")?;
@@ -457,7 +457,7 @@ impl<'a> Linker for GccLinker<'a> {
     fn linker_plugin_lto(&mut self) {
         match self.sess.opts.cg.linker_plugin_lto {
             LinkerPluginLto::Disabled => {
-                // Nothing to do
+                // Nothing to do.
             }
             LinkerPluginLto::LinkerPluginAuto => {
                 self.push_linker_plugin_lto_args(None);
@@ -583,7 +583,7 @@ impl<'a> Linker for MsvcLinker<'a> {
         self.link_rlib(path);
     }
     fn optimize(&mut self) {
-        // Needs more investigation of `/OPT` arguments
+        // Needs more investigation of `/OPT` arguments.
     }
 
     fn pgo_gen(&mut self) {
@@ -683,7 +683,7 @@ impl<'a> Linker for MsvcLinker<'a> {
         // subsystem to be `mainCRTStartup` to get everything booted up
         // correctly.
         //
-        // For more information see RFC #1665
+        // For more information see RFC #1665.
         if subsystem == "windows" {
             self.cmd.arg("/ENTRY:mainCRTStartup");
         }
@@ -693,12 +693,12 @@ impl<'a> Linker for MsvcLinker<'a> {
         ::std::mem::replace(&mut self.cmd, Command::new(""))
     }
 
-    // MSVC doesn't need group indicators
+    // MSVC doesn't need group indicators.
     fn group_start(&mut self) {}
     fn group_end(&mut self) {}
 
     fn linker_plugin_lto(&mut self) {
-        // Do nothing
+        // Do nothing.
     }
 }
 
@@ -726,7 +726,7 @@ impl<'a> Linker for EmLinker<'a> {
     }
 
     fn link_dylib(&mut self, lib: &str) {
-        // Emscripten always links statically
+        // Emscripten always links statically.
         self.link_staticlib(lib);
     }
 
@@ -785,7 +785,7 @@ impl<'a> Linker for EmLinker<'a> {
     }
 
     fn optimize(&mut self) {
-        // Emscripten performs own optimizations
+        // Emscripten performs own optimizations.
         self.cmd.arg(match self.sess.opts.optimize {
             OptLevel::No => "-O0",
             OptLevel::Less => "-O1",
@@ -803,7 +803,7 @@ impl<'a> Linker for EmLinker<'a> {
     }
 
     fn debuginfo(&mut self) {
-        // Preserve names or generate source maps depending on debug info
+        // Preserve names or generate source maps depending on debug info.
         self.cmd.arg(match self.sess.opts.debuginfo {
             DebugInfo::None => "-g0",
             DebugInfo::Limited => "-g3",
@@ -866,7 +866,7 @@ impl<'a> Linker for EmLinker<'a> {
     fn group_end(&mut self) {}
 
     fn linker_plugin_lto(&mut self) {
-        // Do nothing
+        // Do nothing.
     }
 }
 
@@ -890,9 +890,9 @@ impl<'a> WasmLd<'a> {
 
         // By default LLD's memory layout is:
         //
-        // 1. First, a blank page
-        // 2. Next, all static data
-        // 3. Finally, the main stack (which grows down)
+        // 1. First, a blank page.
+        // 2. Next, all static data.
+        // 3. Finally, the main stack (which grows down).
         //
         // This has the unfortunate consequence that on stack overflows you
         // corrupt static data and can cause some exceedingly weird bugs. To
@@ -912,7 +912,7 @@ impl<'a> WasmLd<'a> {
         // stick to this and hopefully fix it before stabilization happens.
         cmd.arg("--allow-undefined");
 
-        // For now we just never have an entry symbol
+        // For now we just never have an entry symbol.
         cmd.arg("--no-entry");
 
         // Rust code should never have warnings, and warnings are often
@@ -920,7 +920,7 @@ impl<'a> WasmLd<'a> {
         cmd.arg("--fatal-warnings");
 
         // The symbol visibility story is a bit in flux right now with LLD.
-        // It's... not entirely clear to me what's going on, but this looks to
+        // It's not entirely clear to me what's going on, but this looks to
         // make everything work when `export_symbols` isn't otherwise called for
         // things like executables.
         cmd.arg("--export-dynamic");
@@ -1043,12 +1043,12 @@ impl<'a> Linker for WasmLd<'a> {
         ::std::mem::replace(&mut self.cmd, Command::new(""))
     }
 
-    // Not needed for now with LLD
+    // Not needed for now with LLD.
     fn group_start(&mut self) {}
     fn group_end(&mut self) {}
 
     fn linker_plugin_lto(&mut self) {
-        // Do nothing for now
+        // Do nothing for now.
     }
 }
 

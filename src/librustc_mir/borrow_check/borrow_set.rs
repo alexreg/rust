@@ -61,7 +61,7 @@ crate struct BorrowData<'tcx> {
     crate activation_location: TwoPhaseActivation,
     /// What kind of borrow this is
     crate kind: mir::BorrowKind,
-    /// The region for which this borrow is live
+    /// The region for which this borrow is live.
     crate region: RegionVid,
     /// The `Place` from which we are borrowing.
     crate borrowed_place: mir::Place<'tcx>,

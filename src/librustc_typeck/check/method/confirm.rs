@@ -246,7 +246,7 @@ impl<'a, 'gcx, 'tcx> ConfirmContext<'a, 'gcx, 'tcx> {
             probe::TraitPick => {
                 let trait_def_id = pick.item.container.id();
 
-                // Make a trait reference `$0 : Trait<$1...$n>`
+                // Make a trait reference `$0: Trait<$1...$n>`
                 // consisting entirely of type variables. Later on in
                 // the process we will unify the transformed-self-type
                 // of the method with the actual type in order to

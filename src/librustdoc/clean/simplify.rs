@@ -23,7 +23,7 @@ use crate::clean;
 use crate::core::DocContext;
 
 pub fn where_clauses(cx: &DocContext<'_, '_, '_>, clauses: Vec<WP>) -> Vec<WP> {
-    // First, partition the where clause into its separate components
+    // First, partition the where clause into its separate components.
     let mut params: BTreeMap<_, Vec<_>> = BTreeMap::new();
     let mut lifetimes = Vec::new();
     let mut equalities = Vec::new();

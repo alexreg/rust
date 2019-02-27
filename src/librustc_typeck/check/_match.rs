@@ -634,8 +634,8 @@ https://doc.rust-lang.org/reference/types.html#trait-objects");
             }
         }
 
-        // Otherwise, we have to union together the types that the
-        // arms produce and so forth.
+        // Otherwise, we have to take the union of the types that the
+        // arms produce, and so forth.
         let discrim_diverges = self.diverges.get();
         self.diverges.set(Diverges::Maybe);
 

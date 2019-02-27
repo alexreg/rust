@@ -1279,7 +1279,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
 impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
     fn maybe_report_ambiguity(&self, obligation: &PredicateObligation<'tcx>,
                               body_id: Option<hir::BodyId>) {
-        // Unable to successfully determine, probably means
+        // Unable to successfully determine; probably means
         // insufficient type information, but could mean
         // ambiguous impls. The latter *ought* to be a
         // coherence violation, so we don't report it here.

@@ -1,15 +1,15 @@
-//! Simplifying Candidates
+//! Simplifying candidates.
 //!
 //! *Simplifying* a match pair `place @ pattern` means breaking it down
 //! into bindings or other, simpler match pairs. For example:
 //!
-//! - `place @ (P1, P2)` can be simplified to `[place.0 @ P1, place.1 @ P2]`
-//! - `place @ x` can be simplified to `[]` by binding `x` to `place`
+//! - `place @ (P1, P2)` can be simplified to `[place.0 @ P1, place.1 @ P2]`.
+//! - `place @ x` can be simplified to `[]` by binding `x` to `place`.
 //!
 //! The `simplify_candidate` routine just repeatedly applies these
 //! sort of simplifications until there is nothing left to
 //! simplify. Match pairs cannot be simplified if they require some
-//! sort of test: for example, testing which variant an enum is, or
+//! sort of test; for example, testing which variant an enum is, or
 //! testing a value against a constant.
 
 use crate::build::Builder;
@@ -25,7 +25,7 @@ use std::mem;
 impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     pub fn simplify_candidate<'pat>(&mut self,
                                     candidate: &mut Candidate<'pat, 'tcx>) {
-        // repeatedly simplify match pairs until fixed point is reached
+        // Repeatedly simplify match pairs until fixed point is reached.
         loop {
             let match_pairs = mem::replace(&mut candidate.match_pairs, vec![]);
             let mut changed = false;
@@ -48,7 +48,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// Tries to simplify `match_pair`, returning `Ok(())` if
     /// successful. If successful, new match pairs and bindings will
     /// have been pushed into the candidate. If no simplification is
-    /// possible, `Err` is returned and no changes are made to
+    /// possible, `Err` is returned, and no changes are made to
     /// candidate.
     fn simplify_match_pair<'pat>(&mut self,
                                  match_pair: MatchPair<'pat, 'tcx>,
@@ -79,7 +79,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             }
 
             PatternKind::Wild => {
-                // nothing left to do
+                // Nothing left to do.
                 Ok(())
             }
 
@@ -95,7 +95,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 });
 
                 if let Some(subpattern) = subpattern.as_ref() {
-                    // this is the `x @ P` case; have to keep matching against `P` now
+                    // This is the `x @ P` case; have to keep matching against `P` now.
                     candidate.match_pairs.push(MatchPair::new(match_pair.place, subpattern));
                 }
 
@@ -103,7 +103,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             }
 
             PatternKind::Constant { .. } => {
-                // FIXME normalize patterns when possible
+                // FIXME: normalize patterns when possible.
                 Err(match_pair)
             }
 
@@ -147,7 +147,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
             PatternKind::Slice { ref prefix, ref slice, ref suffix } => {
                 if prefix.is_empty() && slice.is_some() && suffix.is_empty() {
-                    // irrefutable
+                    // Irrefutable.
                     self.prefix_slice_suffix(&mut candidate.match_pairs,
                                              &match_pair.place,
                                              prefix,

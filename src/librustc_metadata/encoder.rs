@@ -433,16 +433,16 @@ impl<'a, 'tcx> EncodeContext<'a, 'tcx> {
         let items = self.encode_info_for_items();
         let item_bytes = self.position() - i;
 
-        // Encode the allocation index
+        // Encode the allocation index.
         let interpret_alloc_index = {
             let mut interpret_alloc_index = Vec::new();
             let mut n = 0;
             trace!("beginning to encode alloc ids");
             loop {
                 let new_n = self.interpret_allocs_inverse.len();
-                // if we have found new ids, serialize those, too
+                // If we have found new IDs, serialize those too.
                 if n == new_n {
-                    // otherwise, abort
+                    // otherwise, abort.
                     break;
                 }
                 trace!("encoding {} further alloc ids", new_n - n);
@@ -461,7 +461,7 @@ impl<'a, 'tcx> EncodeContext<'a, 'tcx> {
             self.lazy_seq(interpret_alloc_index)
         };
 
-        // Index the items
+        // Index the items.
         i = self.position();
         let index = items.write_index(&mut self.opaque);
         let index_bytes = self.position() - i;

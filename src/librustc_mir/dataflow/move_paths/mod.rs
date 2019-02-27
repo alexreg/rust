@@ -198,20 +198,20 @@ impl fmt::Debug for MoveOut {
     }
 }
 
-/// `Init` represents a point in a program that initializes some L-value;
+/// `Init` represents a point in a program that initializes some L-value.
 #[derive(Copy, Clone)]
 pub struct Init {
     /// path being initialized
     pub path: MovePathIndex,
     /// location of initialization
     pub location: InitLocation,
-    /// Extra information about this initialization
+    /// Extra information about this initialization.
     pub kind: InitKind,
 }
 
 
 /// Initializations can be from an argument or from a statement. Arguments
-/// do not have locations, in those cases the `Local` is kept..
+/// do not have locations, in those cases the `Local` is kept.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum InitLocation {
     Argument(Local),
@@ -221,9 +221,9 @@ pub enum InitLocation {
 /// Additional information about the initialization.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum InitKind {
-    /// Deep init, even on panic
+    /// Deep init, even on panic.
     Deep,
-    /// Only does a shallow init
+    /// Only does a shallow init.
     Shallow,
     /// This doesn't initialize the variable on panic (and a panic is possible).
     NonPanicPathOnly,

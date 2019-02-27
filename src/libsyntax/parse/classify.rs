@@ -1,4 +1,4 @@
-//! Routines the parser uses to classify AST nodes
+//! Routines the parser uses to classify AST nodes.
 
 // Predicates on exprs and stmts that the pretty-printer and parser use
 

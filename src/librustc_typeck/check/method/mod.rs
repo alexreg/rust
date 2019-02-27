@@ -297,7 +297,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
 
         let trait_ref = ty::TraitRef::new(trait_def_id, substs);
 
-        // Construct an obligation
+        // Construct an obligation.
         let poly_trait_ref = trait_ref.to_poly_trait_ref();
         let obligation =
             traits::Obligation::misc(span,
@@ -305,7 +305,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                                      self.param_env,
                                      poly_trait_ref.to_predicate());
 
-        // Now we want to know if this can be matched
+        // Now we want to know if this can be matched.
         if !self.predicate_may_hold(&obligation) {
             debug!("--> Cannot match obligation");
             return None; // Cannot be matched, no such method resolution is possible.

@@ -95,8 +95,8 @@ impl SuppressRegionErrors {
             // If we're on AST or Migrate mode, report AST region errors
             BorrowckMode::Ast | BorrowckMode::Migrate => SuppressRegionErrors { suppressed: false },
 
-            // If we're on MIR or Compare mode, don't report AST region errors as they should
-            // be reported by NLL
+            // If we're in MIR or Compare mode, don't report AST region errors as they should
+            // be reported by NLL.
             BorrowckMode::Compare | BorrowckMode::Mir => SuppressRegionErrors { suppressed: true },
         }
     }
@@ -122,10 +122,10 @@ pub struct InferCtxt<'a, 'gcx: 'a + 'tcx, 'tcx: 'a> {
     // order, represented by its upper and lower bounds.
     pub type_variables: RefCell<type_variable::TypeVariableTable<'tcx>>,
 
-    // Map from integral variable to the kind of integer it represents
+    // Map from integral variable to the kind of integer it represents.
     int_unification_table: RefCell<ut::UnificationTable<ut::InPlace<ty::IntVid>>>,
 
-    // Map from floating variable to the kind of float it represents
+    // Map from floating variable to the kind of float it represents.
     float_unification_table: RefCell<ut::UnificationTable<ut::InPlace<ty::FloatVid>>>,
 
     // Tracks the set of region variables and the constraints between
@@ -223,7 +223,7 @@ pub struct InferCtxt<'a, 'gcx: 'a + 'tcx, 'tcx: 'a> {
 /// replaced with.
 pub type PlaceholderMap<'tcx> = BTreeMap<ty::BoundRegion, ty::Region<'tcx>>;
 
-/// See the `error_reporting` module for more details.
+/// See the [`error_reporting`] module for more details.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ValuePairs<'tcx> {
     Types(ExpectedFound<Ty<'tcx>>),
@@ -235,7 +235,7 @@ pub enum ValuePairs<'tcx> {
 /// The trace designates the path through inference that we took to
 /// encounter an error or subtyping constraint.
 ///
-/// See the `error_reporting` module for more details.
+/// See the [`error_reporting`] module for more details.
 #[derive(Clone)]
 pub struct TypeTrace<'tcx> {
     cause: ObligationCause<'tcx>,
@@ -247,27 +247,27 @@ pub struct TypeTrace<'tcx> {
 /// See `error_reporting` module for more details
 #[derive(Clone, Debug)]
 pub enum SubregionOrigin<'tcx> {
-    // Arose from a subtyping relation
+    // Arose from a subtyping relation.
     Subtype(TypeTrace<'tcx>),
 
     // Stack-allocated closures cannot outlive innermost loop
-    // or function so as to ensure we only require finite stack
+    // or function so as to ensure we only require finite stack.
     InfStackClosure(Span),
 
-    // Invocation of closure must be within its lifetime
+    // Invocation of closure must be within its lifetime.
     InvokeClosure(Span),
 
-    // Dereference of reference must be within its lifetime
+    // Dereference of reference must be within its lifetime.
     DerefPointer(Span),
 
-    // Closure bound must not outlive captured free variables
+    // Closure bound must not outlive captured free variables.
     FreeVariable(Span, ast::NodeId),
 
-    // Index into slice must be within its lifetime
+    // Index into slice must be within its lifetime.
     IndexSlice(Span),
 
     // When casting `&'a T` to an `&'b Trait` object,
-    // relating `'a` to `'b`
+    // relating `'a` to `'b`.
     RelateObjectBound(Span),
 
     // Some type parameter was instantiated with the given type,
@@ -282,13 +282,13 @@ pub enum SubregionOrigin<'tcx> {
     // the moment of their instantiation.
     RelateDefaultParamBound(Span, Ty<'tcx>),
 
-    // Creating a pointer `b` to contents of another reference
+    // Creating a pointer `b` to contents of another reference.
     Reborrow(Span),
 
-    // Creating a pointer `b` to contents of an upvar
+    // Creating a pointer `b` to contents of an upvar.
     ReborrowUpvar(Span, ty::UpvarId),
 
-    // Data with type `Ty<'tcx>` was borrowed
+    // Data with type `Ty<'tcx>` was borrowed.
     DataBorrowed(Ty<'tcx>, Span),
 
     // `(&'a &'b T)` where `a >= b`.
@@ -303,25 +303,25 @@ pub enum SubregionOrigin<'tcx> {
     // A `ref b` whose region does not enclose the decl site
     BindingTypeIsNotValidAtDecl(Span),
 
-    // Regions appearing in a method receiver must outlive method call
+    // Regions appearing in a method receiver must outlive method call.
     CallRcvr(Span),
 
-    // Regions appearing in a function argument must outlive func call
+    // Regions appearing in a function argument must outlive func call.
     CallArg(Span),
 
-    // Region in return type of invoked fn must enclose call
+    // Region in return type of invoked fn must enclose call.
     CallReturn(Span),
 
-    // Operands must be in scope
+    // Operands must be in scope.
     Operand(Span),
 
-    // Region resulting from a `&` expr must enclose the `&` expr
+    // Region resulting from a `&` expr must enclose the `&` expr.
     AddrOf(Span),
 
-    // An auto-borrow that does not enclose the expr where it occurs
+    // An auto-borrow that does not enclose the expr where it occurs.
     AutoBorrow(Span),
 
-    // Region constraint arriving from destructor safety
+    // Region constraint arriving from destructor safety.
     SafeDestructor(Span),
 
     // Comparing the signature and requirements of an impl method against
@@ -343,16 +343,16 @@ pub enum ParameterOrigin {
     OverloadedDeref,    // `*a` when overloaded
 }
 
-/// Times when we replace late-bound regions with variables:
+/// Times when we replace late-bound regions with variables.
 #[derive(Clone, Copy, Debug)]
 pub enum LateBoundRegionConversionTime {
-    /// when a fn is called
+    /// When a fn is called.
     FnCall,
 
-    /// when two higher-ranked types are compared
+    /// When two higher-ranked types are compared.
     HigherRankedType,
 
-    /// when projecting an associated type
+    /// When projecting an associated type.
     AssocTypeProjection(DefId),
 }
 
@@ -362,26 +362,26 @@ pub enum LateBoundRegionConversionTime {
 #[derive(Copy, Clone, Debug)]
 pub enum RegionVariableOrigin {
     // Region variables created for ill-categorized reasons,
-    // mostly indicates places in need of refactoring
+    // mostly indicates places in need of refactoring.
     MiscVariable(Span),
 
-    // Regions created by a `&P` or `[...]` pattern
+    // Regions created by a `&P` or `[...]` pattern.
     PatternRegion(Span),
 
-    // Regions created by `&` operator
+    // Regions created by `&` operator.
     AddrOfRegion(Span),
 
-    // Regions created as part of an autoref of a method receiver
+    // Regions created as part of an autoref of a method receiver.
     Autoref(Span),
 
-    // Regions created as part of an automatic coercion
+    // Regions created as part of an automatic coercion.
     Coercion(Span),
 
-    // Region variables created as the values for early-bound regions
+    // Region variables created as the values for early-bound regions.
     EarlyBoundRegion(Span, InternedString),
 
     // Region variables created for bound regions
-    // in a function or method that is called
+    // in a function or method that is called.
     LateBoundRegion(Span, ty::BoundRegion, LateBoundRegionConversionTime),
 
     UpvarRegion(ty::UpvarId, Span),
@@ -828,7 +828,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         r
     }
 
-    // Execute `f` in a snapshot, and commit the bindings it creates
+    // Execute `f` in a snapshot, and commit the bindings it creates.
     pub fn in_snapshot<T, F>(&self, f: F) -> T
     where
         F: FnOnce(&CombinedSnapshot<'a, 'tcx>) -> T,

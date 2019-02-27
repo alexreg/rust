@@ -110,7 +110,7 @@ impl DefPathTable {
 
 impl Encodable for DefPathTable {
     fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
-        // Index to key
+        // Index to key.
         self.index_to_key[DefIndexAddressSpace::Low.index()].encode(s)?;
         self.index_to_key[DefIndexAddressSpace::High.index()].encode(s)?;
 
@@ -334,43 +334,47 @@ pub enum DefPathData {
     CrateRoot,
     // Catch-all for random `DefId` things like `DUMMY_NODE_ID`.
     Misc,
-    // Different kinds of items and item-like things:
-    /// An impl
+
+    // Different kinds of items and item-like things.
+
+    /// An impl.
     Impl,
-    /// A trait
+    /// A trait.
     Trait(InternedString),
-    /// An associated type **declaration** (i.e., in a trait)
+    /// An associated type **declaration** (i.e., in a trait).
     AssocTypeInTrait(InternedString),
-    /// An associated type **value** (i.e., in an impl)
+    /// An associated type **value** (i.e., in an impl).
     AssocTypeInImpl(InternedString),
-    /// An existential associated type **value** (i.e., in an impl)
+    /// An existential associated type **value** (i.e., in an impl).
     AssocExistentialInImpl(InternedString),
     /// Something in the type NS
     TypeNs(InternedString),
     /// Something in the value NS
     ValueNs(InternedString),
-    /// A module declaration
+    /// A module declaration.
     Module(InternedString),
-    /// A macro rule
+    /// A macro rule.
     MacroDef(InternedString),
-    /// A closure expression
+    /// A closure expression.
     ClosureExpr,
-    // Subportions of items
-    /// A type (generic) parameter
+
+    // Subportions of items.
+
+    /// A type (generic) parameter.
     TypeParam(InternedString),
-    /// A lifetime (generic) parameter
+    /// A lifetime (generic) parameter.
     LifetimeParam(InternedString),
-    /// A const (generic) parameter
+    /// A const (generic) parameter.
     ConstParam(InternedString),
     /// A variant of a enum
     EnumVariant(InternedString),
-    /// A struct field
+    /// A struct field.
     Field(InternedString),
-    /// Implicit ctor for a tuple-like struct
+    /// Implicit ctor for a tuple-like struct.
     StructCtor,
     /// A constant expression (see `{ast,hir}::AnonConst`).
     AnonConst,
-    /// An `impl Trait` type node
+    /// An `impl Trait` type node.
     ImplTrait,
     /// GlobalMetaData identifies a piece of crate metadata that is global to
     /// a whole crate (as opposed to just one item). GlobalMetaData components
@@ -598,7 +602,7 @@ impl Definitions {
             self.expansions_that_defined.insert(index, expansion);
         }
 
-        // The span is added if it isn't dummy
+        // The span is added if it isn't dummy.
         if !span.is_dummy() {
             self.def_index_to_span.insert(index, span);
         }

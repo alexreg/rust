@@ -549,7 +549,7 @@ impl<'cx, 'gcx, 'tcx> DataflowResultsConsumer<'cx, 'tcx> for MirBorrowckCtxt<'cx
                 let context = ContextKind::InlineAsm.new(location);
                 for (o, output) in asm.outputs.iter().zip(outputs.iter()) {
                     if o.is_indirect {
-                        // FIXME(eddyb) indirect inline asm outputs should
+                        // FIXME(eddyb): indirect inline asm outputs should
                         // be encoeded through MIR place derefs instead.
                         self.access_place(
                             context,
@@ -983,8 +983,8 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
                 // reservation (or even prior activating uses of same
                 // borrow); so don't check if they interfere.
                 //
-                // NOTE: *reservations* do conflict with themselves;
-                // thus aren't injecting unsoundenss w/ this check.)
+                // NOTE: *reservations* do conflict with themselves,
+                // thus aren't injecting unsoundenss with this check.
                 (Activation(_, activating), _) if activating == borrow_index => {
                     debug!(
                         "check_access_for_conflict place_span: {:?} sd: {:?} rw: {:?} \
@@ -1518,7 +1518,7 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
               // ancestors; dataflow recurs on children when parents
               // move (to support partial (re)inits).
               //
-              // (I.e., querying parents breaks scenario 7; but may want
+              // (I.e., querying parents breaks scenario 7, but may want
               // to do such a query based on partial-init feature-gate.)
         }
     }
@@ -1723,13 +1723,13 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
             //
             // and also this:
             //
-            // 3. `let mut s = ...; drop(s); s.x=Val;`
+            // 3. `let mut s = ...; drop(s); s.x = Val;`
             //
             // This does not use `check_if_path_or_subpath_is_moved`,
             // because we want to *allow* reinitializations of fields:
             // e.g., want to allow
             //
-            // `let mut s = ...; drop(s.x); s.x=Val;`
+            // `let mut s = ...; drop(s.x); s.x = Val;`
             //
             // This does not use `check_if_full_path_is_moved` on
             // `base`, because that would report an error about the

@@ -62,12 +62,12 @@ impl<'a> ArchiveBuilder<'a> {
         }
     }
 
-    /// Removes a file from this archive
+    /// Removes a file from this archive.
     pub fn remove_file(&mut self, file: &str) {
         self.removals.push(file.to_string());
     }
 
-    /// Lists all files in an archive
+    /// Lists all files in an archive.
     pub fn src_files(&mut self) -> Vec<String> {
         if self.src_archive().is_none() {
             return Vec::new()
@@ -115,8 +115,8 @@ impl<'a> ArchiveBuilder<'a> {
                     lto: bool,
                     skip_objects: bool) -> io::Result<()> {
         // Ignoring obj file starting with the crate name
-        // as simple comparison is not enough - there
-        // might be also an extra name suffix
+        // as simple comparison is not enough -- there
+        // might be also an extra name suffix.
         let obj_start = name.to_owned();
 
         self.add_archive(rlib, move |fname: &str| {
@@ -125,7 +125,7 @@ impl<'a> ArchiveBuilder<'a> {
                 return true
             }
 
-            // Don't include Rust objects if LTO is enabled
+            // Don't include Rust objects if LTO is enabled.
             if lto && fname.starts_with(&obj_start) && fname.ends_with(".o") {
                 return true
             }
@@ -156,7 +156,7 @@ impl<'a> ArchiveBuilder<'a> {
         Ok(())
     }
 
-    /// Adds an arbitrary file to this archive
+    /// Adds an arbitrary file to this archive.
     pub fn add_file(&mut self, file: &Path) {
         let name = file.file_name().unwrap().to_str().unwrap();
         self.additions.push(Addition::File {

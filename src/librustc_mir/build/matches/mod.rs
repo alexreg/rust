@@ -18,7 +18,7 @@ use rustc_data_structures::fx::{FxHashMap, FxHashSet};
 use syntax::ast::{Name, NodeId};
 use syntax_pos::Span;
 
-// helper functions, broken out by category:
+// Helper functions, broken out by category.
 mod simplify;
 mod test;
 mod util;
@@ -119,7 +119,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         // around a `match` equivalent to `std::intrinsics::unreachable()`.
         // See issue #47412 for this hole being discovered in the wild.
         //
-        // HACK(eddyb) Work around the above issue by adding a dummy inspection
+        // HACK(eddyb): work around the above issue by adding a dummy inspection
         // of `scrutinee_place`, specifically by applying `ReadForMatch`.
         //
         // NOTE: `ReadForMatch` also checks that the scrutinee is initialized.
@@ -139,7 +139,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
         // Step 2. Create the otherwise and prebinding blocks.
 
-        // create binding start block for link them by false edges
+        // Create binding start block for link them by false edges.
         let candidate_count = arms.iter().map(|c| c.patterns.len()).sum::<usize>();
         let pre_binding_blocks: Vec<_> = (0..=candidate_count)
             .map(|_| self.cfg.start_new_block())
@@ -306,7 +306,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         initializer: ExprRef<'tcx>,
     ) -> BlockAnd<()> {
         match *irrefutable_pat.kind {
-            // Optimize the case of `let x = ...` to write directly into `x`
+            // Optimize the case of `let x = ...` to write directly into `x`.
             PatternKind::Binding {
                 mode: BindingMode::ByValue,
                 var,
@@ -318,7 +318,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 unpack!(block = self.into(&place, block, initializer));
 
 
-                // Inject a fake read, see comments on `FakeReadCause::ForLet`.
+                // Inject a fake read; see comments on `FakeReadCause::ForLet`.
                 let source_info = self.source_info(irrefutable_pat.span);
                 self.cfg.push(
                     block,
@@ -360,7 +360,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     self.storage_live_binding(block, var, irrefutable_pat.span, OutsideGuard);
                 unpack!(block = self.into(&place, block, initializer));
 
-                // Inject a fake read, see comments on `FakeReadCause::ForLet`.
+                // Inject a fake read; see comments on `FakeReadCause::ForLet`.
                 let pattern_source_info = self.source_info(irrefutable_pat.span);
                 self.cfg.push(
                     block,
@@ -418,14 +418,14 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         initializer: &Place<'tcx>,
         set_match_place: bool,
     ) -> BlockAnd<()> {
-        // create a dummy candidate
+        // Create a dummy candidate.
         let mut candidate = Candidate {
             span: irrefutable_pat.span,
             match_pairs: vec![MatchPair::new(initializer.clone(), &irrefutable_pat)],
             bindings: vec![],
             ascriptions: vec![],
 
-            // since we don't call `match_candidates`, next fields are unused
+            // Since we don't call `match_candidates`, next fields are unused.
             otherwise_block: None,
             pre_binding_block: block,
             next_candidate_pre_binding_block: block,
@@ -446,8 +446,8 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
         // For matches and function arguments, the place that is being matched
         // can be set when creating the variables. But the place for
-        // let PATTERN = ... might not even exist until we do the assignment.
-        // so we set it here instead
+        // `let PATTERN = ...` might not even exist until we do the assignment,
+        // so we set it here instead.
         if set_match_place {
             for binding in &candidate.bindings {
                 let local = self.var_local_id(binding.var_id, OutsideGuard);
@@ -466,7 +466,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
         self.ascribe_types(block, &candidate.ascriptions);
 
-        // now apply the bindings, which will also declare the variables
+        // Now apply the bindings, which will also declare the variables.
         self.bind_matched_candidate_for_arm_body(block, &candidate.bindings);
 
         block.unit()
@@ -674,19 +674,19 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
 #[derive(Debug)]
 pub struct Candidate<'pat, 'tcx: 'pat> {
-    // span of the original pattern that gave rise to this candidate
+    /// The span of the original pattern that gave rise to this candidate.
     span: Span,
 
-    // all of these must be satisfied...
+    /// The match pairs to be satisfied.
     match_pairs: Vec<MatchPair<'pat, 'tcx>>,
 
-    // ...these bindings established...
+    /// The bindings to be established.
     bindings: Vec<Binding<'tcx>>,
 
-    // ...and these types asserted...
+    /// The types to be asserted.
     ascriptions: Vec<Ascription<'tcx>>,
 
-    // ...and the guard must be evaluated, if false branch to Block...
+    /// The block to which to branch if the guard is evaluated as false.
     otherwise_block: Option<BasicBlock>,
 
     // ...and the blocks for add false edges between candidates
@@ -727,29 +727,29 @@ pub struct MatchPair<'pat, 'tcx: 'pat> {
 
 #[derive(Clone, Debug, PartialEq)]
 enum TestKind<'tcx> {
-    // test the branches of enum
+    // Test the branches of enum.
     Switch {
         adt_def: &'tcx ty::AdtDef,
         variants: BitSet<VariantIdx>,
     },
 
-    // test the branches of enum
+    // Test the branches of enum.
     SwitchInt {
         switch_ty: Ty<'tcx>,
         options: Vec<u128>,
         indices: FxHashMap<ty::Const<'tcx>, usize>,
     },
 
-    // test for equality
+    // Test for equality.
     Eq {
         value: ty::Const<'tcx>,
         ty: Ty<'tcx>,
     },
 
-    // test whether the value falls within an inclusive or exclusive range
+    // Test whether the value falls within an inclusive or exclusive range.
     Range(PatternRange<'tcx>),
 
-    // test length of the slice is equal to len
+    // Test length of the slice is equal to len.
     Len {
         len: u64,
         op: BinOp,
@@ -1128,7 +1128,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// we return an additional "unmatched" set alongside the obvious `k`
     /// sets. When we encounter a candidate that would be present in more
     /// than one of the sets, we put it and all candidates below it into the
-    /// "unmatched" set. This ensures these `k+1` sets are disjoint.
+    /// "unmatched" set. This ensures these `k + 1` sets are disjoint.
     ///
     /// After we perform our test, we branch into the appropriate candidate
     /// set and recurse with `match_candidates`. These sub-matches are
@@ -1158,7 +1158,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         // Most of the time, the test to perform is simply a function
         // of the main candidate, but for a test like `SwitchInt`, we
         // may want to add cases based on the candidates that are
-        // available
+        // available.
         match test.kind {
             TestKind::SwitchInt {
                 switch_ty,
@@ -1222,7 +1222,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 break;
             }
         }
-        // at least the first candidate ought to be tested
+        // At least the first candidate ought to be tested.
         assert!(total_candidate_count > candidates.len());
         debug!("tested_candidates: {}", total_candidate_count - candidates.len());
         debug!("untested_candidates: {}", candidates.len());
@@ -1354,7 +1354,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         // ```
         // let place = Foo::new();
         // match place { foo if inspect(foo)
-        //     => feed(foo), ...  }
+        //     => feed(foo), ... }
         // ```
         //
         // will be treated as if it were really something like:
@@ -1369,7 +1369,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         // ```
         // let place = Foo::new();
         // match place { ref mut foo if inspect(foo)
-        //     => feed(foo), ...  }
+        //     => feed(foo), ... }
         // ```
         //
         // will be treated as if it were really something like:
@@ -1453,8 +1453,8 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 );
             }
 
-            // the block to branch to if the guard fails; if there is no
-            // guard, this block is simply unreachable
+            // The block to branch to if the guard fails; if there is no
+            // guard, this block is simply unreachable.
             let guard = match guard {
                 Guard::If(e) => self.hir.mirror(e),
             };
@@ -1559,8 +1559,8 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         }
     }
 
-    /// Append `AscribeUserType` statements onto the end of `block`
-    /// for each ascription
+    /// Appends `AscribeUserType` statements onto the end of `block`
+    /// for each ascription.
     fn ascribe_types<'pat>(
         &mut self,
         block: BasicBlock,

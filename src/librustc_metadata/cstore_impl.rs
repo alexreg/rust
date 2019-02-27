@@ -145,7 +145,7 @@ provide! { <'tcx> tcx, def_id, other, cdata,
         cdata.get_deprecation(def_id.index).map(DeprecationEntry::external)
     }
     item_attrs => { cdata.get_item_attrs(def_id.index, tcx.sess) }
-    // FIXME(#38501) We've skipped a `read` on the `HirBody` of
+    // FIXME(#38501): we've skipped a `read` on the `HirBody` of
     // a `fn` when encoding, so the dep-tracking wouldn't work.
     // This is only used by rustdoc anyway, which shouldn't have
     // incremental recompilation ever enabled.
@@ -309,8 +309,8 @@ pub fn provide<'tcx>(providers: &mut Providers<'tcx>) {
             assert_eq!(cnum, LOCAL_CRATE);
             let mut visible_parent_map: DefIdMap<DefId> = Default::default();
 
-            // Issue 46112: We want the map to prefer the shortest
-            // paths when reporting the path to an item. Therefore we
+            // Issue #46112: We want the map to prefer the shortest
+            // paths when reporting the path to an item. Therefore, we
             // build up the map via a breadth-first search (BFS),
             // which naturally yields minimal-length paths.
             //

@@ -1,4 +1,4 @@
-/// The expansion from a test function to the appropriate test struct for libtest
+/// The expansion from a test function to the appropriate test struct for libtest.
 /// Ideally, this code would be in libtest but for efficiency and error messages it lives here.
 
 use syntax::ext::base::*;
@@ -36,7 +36,7 @@ pub fn expand_test_or_bench(
     item: Annotatable,
     is_bench: bool
 ) -> Vec<Annotatable> {
-    // If we're not in test configuration, remove the annotated item
+    // If we're not in test configuration, remove the annotated item.
     if !cx.ecfg.should_test { return vec![]; }
 
     let item =
@@ -78,7 +78,7 @@ pub fn expand_test_or_bench(
          attr_sp.with_ctxt(SyntaxContext::empty().apply_mark(mark)))
     };
 
-    // Gensym "test" so we can extern crate without conflicting with any local names
+    // Gensym "test" so we can extern crate without conflicting with any local names.
     let test_id = cx.ident_of("test").gensym();
 
     // Creates `test::$name`.
@@ -146,7 +146,7 @@ pub fn expand_test_or_bench(
                     field("name", cx.expr_call(sp, cx.expr_path(test_path("StaticTestName")),
                         vec![
                             cx.expr_str(sp, Symbol::intern(&item_path(
-                                // skip the name of the root module
+                                // Skip the name of the root module.
                                 &cx.current_expansion.module.mod_path[1..],
                                 &item.ident
                             )))
@@ -188,9 +188,9 @@ pub fn expand_test_or_bench(
     vec![
         // Access to libtest under a gensymed name
         Annotatable::Item(test_extern),
-        // The generated test case
+        // The generated test case.
         Annotatable::Item(test_const),
-        // The original item
+        // The original item.
         Annotatable::Item(item)
     ]
 }

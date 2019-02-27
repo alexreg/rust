@@ -476,7 +476,7 @@ impl<'tcx> RegionConstraintCollector<'tcx> {
     fn rollback_undo_entry(&mut self, undo_entry: UndoLog<'tcx>) {
         match undo_entry {
             Purged => {
-                // nothing to do here
+                // Nothing to do here.
             }
             AddVar(vid) => {
                 self.var_infos.pop().unwrap();

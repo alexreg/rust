@@ -539,22 +539,22 @@ impl<'a> TraitDef<'a> {
         let Generics { mut params, mut where_clause, span } = self.generics
             .to_generics(cx, self.span, type_ident, generics);
 
-        // Create the generic parameters
+        // Create the generic parameters.
         params.extend(generics.params.iter().map(|param| match param.kind {
             GenericParamKind::Lifetime { .. } => param.clone(),
             GenericParamKind::Type { .. } => {
                 // I don't think this can be moved out of the loop, since
                 // a `GenericBound` requires an AST ID.
                 let bounds: Vec<_> =
-                    // extra restrictions on the generics parameters to the
-                    // type being derived upon
+                    // Extra restrictions on the generics parameters to the
+                    // type being derived upon.
                     self.additional_bounds.iter().map(|p| {
                         cx.trait_bound(p.to_path(cx, self.span, type_ident, generics))
                     }).chain(
-                        // require the current trait
+                        // Require the current trait.
                         iter::once(cx.trait_bound(trait_path.clone()))
                     ).chain(
-                        // also add in any bounds from the declaration
+                        // Also add in any bounds from the declaration.
                         param.bounds.iter().cloned()
                     ).collect();
 
@@ -611,7 +611,7 @@ impl<'a> TraitDef<'a> {
                     let tys = find_type_parameters(&field_ty, &ty_param_names, self.span, cx);
 
                     for ty in tys {
-                        // if we have already handled this type, skip it
+                        // If we have already handled this type, skip it.
                         if let ast::TyKind::Path(_, ref p) = ty.node {
                             if p.segments.len() == 1 &&
                                ty_param_names.contains(&p.segments[0].ident.name) {
@@ -625,7 +625,7 @@ impl<'a> TraitDef<'a> {
                             })
                             .collect();
 
-                        // require the current trait
+                        // Require the current trait.
                         bounds.push(cx.trait_bound(trait_path.clone()));
 
                         let predicate = ast::WhereBoundPredicate {
@@ -1321,7 +1321,7 @@ impl<'a> MethodDef<'a> {
             Some(v) if self.unify_fieldless_variants => {
                 // We need a default case that handles the fieldless variants.
                 // The index and actual variant aren't meaningful in this case,
-                // so just use whatever
+                // so just use whatever.
                 let substructure = EnumMatching(0, variants.len(), v, Vec::new());
                 Some(self.call_substructure_method(cx,
                                                    trait_,

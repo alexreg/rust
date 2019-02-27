@@ -96,14 +96,14 @@ pub enum Categorization<'tcx> {
     // (*1) downcast is only required if the enum has more than one variant
 }
 
-// Represents any kind of upvar
+// Represents any kind of upvar.
 #[derive(Clone, Copy, PartialEq)]
 pub struct Upvar {
     pub id: ty::UpvarId,
     pub kind: ty::ClosureKind
 }
 
-// different kinds of pointers:
+// Different kinds of pointers.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum PointerKind<'tcx> {
     /// `Box<T>`
@@ -117,7 +117,7 @@ pub enum PointerKind<'tcx> {
 }
 
 // We use the term "interior" to mean "something reachable from the
-// base without a pointer dereference", e.g., a field
+// base without a pointer dereference", e.g., a field.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum InteriorKind {
     InteriorField(FieldIndex),
@@ -210,7 +210,7 @@ impl<'tcx> cmt_<'tcx> {
         let adt_def = match self.ty.sty {
             ty::Adt(def, _) => def,
             ty::Tuple(..) => return None,
-            // closures get `Categorization::Upvar` rather than `Categorization::Interior`
+            // Closures get `Categorization::Upvar` rather than `Categorization::Interior`.
             _ =>  bug!("interior cmt {:?} is not an ADT", self)
         };
         let variant_def = match self.cat {
@@ -814,7 +814,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
 
         let var_ty = self.node_ty(var_hir_id)?;
 
-        // Mutability of original variable itself
+        // Mutability of original variable itself.
         let var_mutbl = MutabilityCategory::from_local(self.tcx, self.tables, var_id);
 
         // Construct the upvar. This represents access to the field
@@ -1130,7 +1130,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
                                              base_cmt: cmt<'tcx>,
                                              variant_did: DefId)
                                              -> cmt<'tcx> {
-        // univariant enums do not need downcasts
+        // Univariant enums do not need downcasts.
         let base_did = self.tcx.parent_def_id(variant_did).unwrap();
         if self.tcx.adt_def(base_did).variants.len() != 1 {
             let base_ty = base_cmt.ty;
@@ -1156,7 +1156,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
         self.cat_pattern_(cmt, pat, &mut op)
     }
 
-    // FIXME(#19596) This is a workaround, but there should be a better way to do this
+    // FIXME(#19596): this is a workaround, but there should be a better way to do this.
     fn cat_pattern_<F>(&self, mut cmt: cmt<'tcx>, pat: &hir::Pat, op: &mut F) -> McResult<()>
         where F : FnMut(cmt<'tcx>, &hir::Pat)
     {

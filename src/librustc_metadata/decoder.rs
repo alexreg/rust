@@ -777,7 +777,7 @@ impl<'a, 'tcx> CrateMetadata {
 
                 // Hand off the item to the callback.
                 match child.kind {
-                    // FIXME(eddyb) Don't encode these in children.
+                    // FIXME(eddyb): don't encode these in children.
                     EntryKind::ForeignMod => {
                         for child_index in child.children.decode((self, sess)) {
                             if let Some(def) = self.get_def(child_index) {

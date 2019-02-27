@@ -4,7 +4,7 @@
 #![forbid(non_camel_case_types)]
 #![allow(missing_docs)]
 
-//! JSON parsing and serialization
+//! JSON parsing and serialization.
 //!
 //! # What is JSON?
 //!
@@ -106,20 +106,20 @@
 //! extern crate serialize;
 //! use serialize::json::{self, ToJson, Json};
 //!
-//! // A custom data structure
+//! // A custom data structure.
 //! struct ComplexNum {
 //!     a: f64,
 //!     b: f64,
 //! }
 //!
-//! // JSON value representation
+//! // JSON value representation.
 //! impl ToJson for ComplexNum {
 //!     fn to_json(&self) -> Json {
 //!         Json::String(format!("{}+{}i", self.a, self.b))
 //!     }
 //! }
 //!
-//! // Only generate `RustcEncodable` trait implementation
+//! // Only generate `RustcEncodable` trait implementation.
 //! #[derive(Encodable)]
 //! pub struct ComplexNumRecord {
 //!     uid: u8,
@@ -159,7 +159,7 @@
 //! impl ToJson for TestStruct {
 //!     fn to_json(&self) -> Json {
 //!         let mut d = BTreeMap::new();
-//!         // All standard types implement `to_json()`, so use it
+//!         // All standard types implement `to_json()`, so use it.
 //!         d.insert("data_int".to_string(), self.data_int.to_json());
 //!         d.insert("data_str".to_string(), self.data_str.to_json());
 //!         d.insert("data_vector".to_string(), self.data_vector.to_json());
@@ -168,7 +168,7 @@
 //! }
 //!
 //! fn main() {
-//!     // Serialize using `ToJson`
+//!     // Serialize using `ToJson`.
 //!     let input_data = TestStruct {
 //!         data_int: 1,
 //!         data_str: "madoka".to_string(),
@@ -202,7 +202,7 @@ use std::{char, f64, fmt, str};
 
 use crate::Encodable;
 
-/// Represents a json value
+/// Represents a JSON value.
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub enum Json {
     I64(i64),
@@ -293,7 +293,7 @@ pub fn error_str(error: ErrorCode) -> &'static str {
     }
 }
 
-/// Shortcut function to decode a JSON `&str` into an object
+/// Shortcut function to decode a JSON `&str` into an object.
 pub fn decode<T: crate::Decodable>(s: &str) -> DecodeResult<T> {
     let json = match from_str(s) {
         Ok(x) => x,
@@ -304,7 +304,7 @@ pub fn decode<T: crate::Decodable>(s: &str) -> DecodeResult<T> {
     crate::Decodable::decode(&mut decoder)
 }
 
-/// Shortcut function to encode a `T` into a JSON `String`
+/// Shortcut function to encode a `T` into a JSON `String`.
 pub fn encode<T: crate::Encodable>(object: &T) -> Result<string::String, EncoderError> {
     let mut s = String::new();
     {
@@ -326,14 +326,14 @@ fn io_error_to_error(io: io::Error) -> ParserError {
 
 impl fmt::Display for ParserError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // FIXME this should be a nicer error
+        // FIXME: this should be a nicer error.
         fmt::Debug::fmt(self, f)
     }
 }
 
 impl fmt::Display for DecoderError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // FIXME this should be a nicer error
+        // FIXME: this should be a nicer error.
         fmt::Debug::fmt(self, f)
     }
 }
@@ -344,7 +344,7 @@ impl std::error::Error for DecoderError {
 
 impl fmt::Display for EncoderError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // FIXME this should be a nicer error
+        // FIXME: this should be a nicer error.
         fmt::Debug::fmt(self, f)
     }
 }
@@ -354,7 +354,7 @@ impl std::error::Error for EncoderError {
 }
 
 impl From<fmt::Error> for EncoderError {
-    /// Converts a [`fmt::Error`] into `EncoderError`
+    /// Converts a [`fmt::Error`] into `EncoderError`.
     ///
     /// This conversion does not allocate memory.
     fn from(err: fmt::Error) -> EncoderError { EncoderError::FmtError(err) }
@@ -698,7 +698,7 @@ impl<'a> crate::Encoder for Encoder<'a> {
 }
 
 /// Another encoder for JSON, but prints out human-readable JSON instead of
-/// compact data
+/// compact data.
 pub struct PrettyEncoder<'a> {
     writer: &'a mut (dyn fmt::Write+'a),
     curr_indent: usize,
@@ -707,7 +707,7 @@ pub struct PrettyEncoder<'a> {
 }
 
 impl<'a> PrettyEncoder<'a> {
-    /// Creates a new encoder whose output will be written to the specified writer
+    /// Creates a new encoder whose output will be written to the specified writer.
     pub fn new(writer: &'a mut dyn fmt::Write) -> PrettyEncoder<'a> {
         PrettyEncoder {
             writer,
@@ -2038,7 +2038,7 @@ impl<T: Iterator<Item = char>> Builder<T> {
     }
 }
 
-/// Decodes a json value from an `&mut io::Read`
+/// Decodes a JSON value from an `&mut io::Read`.
 pub fn from_reader(rdr: &mut dyn Read) -> Result<Json, BuilderError> {
     let mut contents = Vec::new();
     match rdr.read_to_end(&mut contents) {
@@ -2053,7 +2053,7 @@ pub fn from_reader(rdr: &mut dyn Read) -> Result<Json, BuilderError> {
     builder.build()
 }
 
-/// Decodes a json value from a string
+/// Decodes a JSON value from a string.
 pub fn from_str(s: &str) -> Result<Json, BuilderError> {
     let mut builder = Builder::new(s.chars());
     builder.build()
@@ -2162,7 +2162,7 @@ impl crate::Decoder for Decoder {
         {
             let mut it = s.chars();
             match (it.next(), it.next()) {
-                // exactly one character
+                // Exactly one character.
                 (Some(c), None) => return Ok(c),
                 _ => ()
             }
@@ -2433,7 +2433,7 @@ impl ToJson for string::String {
 }
 
 macro_rules! tuple_impl {
-    // use variables to indicate the arity of the tuple
+    // Use variables to indicate the arity of the tuple.
     ($($tyvar:ident),* ) => {
         // The trailing commas are for the 1-tuple.
         impl<
@@ -2551,7 +2551,7 @@ impl<'a, T: Encodable> fmt::Display for AsJson<'a, T> {
 }
 
 impl<'a, T> AsPrettyJson<'a, T> {
-    /// Sets the indentation level for the emitted JSON
+    /// Sets the indentation level for the emitted JSON.
     pub fn indent(mut self, indent: usize) -> AsPrettyJson<'a, T> {
         self.indent = Some(indent);
         self
@@ -2582,7 +2582,7 @@ impl FromStr for Json {
 
 #[cfg(test)]
 mod tests {
-    // Benchmarks and tests that require private items
+    // Benchmarks and tests that require private items.
 
     extern crate test;
     use test::Bencher;

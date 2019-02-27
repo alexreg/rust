@@ -70,7 +70,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             }
         };
 
-        // we must check that return type of called functions is WF:
+        // We must check that return type of called functions is WF.
         self.register_wf_obligation(output, call_expr.span, traits::MiscObligation);
 
         output
@@ -397,7 +397,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         fn_sig: ty::FnSig<'tcx>,
     ) -> Ty<'tcx> {
         // `fn_sig` is the *signature* of the cosure being called. We
-        // don't know the full details yet (`Fn` vs `FnMut` etc), but we
+        // don't know the full details yet (`Fn` vs. `FnMut`, etc.), but we
         // do know the types expected for each argument and the return
         // type.
 
@@ -458,8 +458,8 @@ impl<'a, 'gcx, 'tcx> DeferredCallResolution<'gcx, 'tcx> {
     pub fn resolve(self, fcx: &FnCtxt<'a, 'gcx, 'tcx>) {
         debug!("DeferredCallResolution::resolve() {:?}", self);
 
-        // we should not be invoked until the closure kind has been
-        // determined by upvar inference
+        // We should not be invoked until the closure kind has been
+        // determined by upvar inference.
         assert!(fcx
             .closure_kind(self.closure_def_id, self.closure_substs)
             .is_some());

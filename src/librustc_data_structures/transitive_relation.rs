@@ -32,7 +32,7 @@ pub struct TransitiveRelation<T: Clone + Debug + Eq + Hash> {
     closure: Lock<Option<BitMatrix<usize, usize>>>,
 }
 
-// HACK(eddyb) manual impl avoids `Default` bound on `T`.
+// HACK(eddyb): manual impl avoids `Default` bound on `T`.
 impl<T: Clone + Debug + Eq + Hash> Default for TransitiveRelation<T> {
     fn default() -> Self {
         TransitiveRelation {

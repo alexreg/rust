@@ -41,7 +41,7 @@ impl<'a, 'gcx, 'tcx> UnsafetyChecker<'a, 'tcx> {
         tcx: TyCtxt<'a, 'tcx, 'tcx>,
         param_env: ty::ParamEnv<'tcx>,
     ) -> Self {
-        // sanity check
+        // Sanity check.
         if min_const_fn {
             assert!(const_context);
         }
@@ -84,7 +84,7 @@ impl<'a, 'tcx> Visitor<'tcx> for UnsafetyChecker<'a, 'tcx> {
             TerminatorKind::Unreachable |
             TerminatorKind::FalseEdges { .. } |
             TerminatorKind::FalseUnwind { .. } => {
-                // safe (at least as emitted during MIR construction)
+                // Safe (at least as emitted during MIR construction).
             }
 
             TerminatorKind::Call { ref func, .. } => {
@@ -115,7 +115,7 @@ impl<'a, 'tcx> Visitor<'tcx> for UnsafetyChecker<'a, 'tcx> {
             StatementKind::Retag { .. } |
             StatementKind::AscribeUserType(..) |
             StatementKind::Nop => {
-                // safe (at least as emitted during MIR construction)
+                // Safe (at least as emitted during MIR construction).
             }
 
             StatementKind::InlineAsm { .. } => {
@@ -158,7 +158,7 @@ impl<'a, 'tcx> Visitor<'tcx> for UnsafetyChecker<'a, 'tcx> {
             },
             // Casting pointers to ints is unsafe in const fn because the const evaluator cannot
             // possibly know what the result of various operations like `address / 2` would be
-            // pointers during const evaluation have no integral address, only an abstract one
+            // pointers during const evaluation have no integral address, only an abstract one.
             Rvalue::Cast(CastKind::Misc, ref operand, cast_ty)
             if self.const_context && self.tcx.features().const_raw_ptr_to_usize_cast => {
                 let operand_ty = operand.ty(self.mir, self.tcx);
@@ -178,7 +178,7 @@ impl<'a, 'tcx> Visitor<'tcx> for UnsafetyChecker<'a, 'tcx> {
                     _ => {},
                 }
             }
-            // raw pointer and fn pointer operations are unsafe as it is not clear whether one
+            // Raw pointer and fn pointer operations are unsafe, as it is not clear whether one
             // pointer would be "less" or "equal" to another, because we cannot know where llvm
             // or the linker will place various statics in memory. Without this information the
             // result of a comparison of addresses would differ between runtime and compile-time.
@@ -229,12 +229,12 @@ impl<'a, 'tcx> Visitor<'tcx> for UnsafetyChecker<'a, 'tcx> {
                     .ty(self.mir, self.tcx)
                     .to_ty(self.tcx)
                     .is_freeze(self.tcx, self.param_env, self.source_info.span);
-                // prevent
-                // * `&mut x.field`
-                // * `x.field = y;`
-                // * `&x.field` if `field`'s type has interior mutability
-                // because either of these would allow modifying the layout constrained field and
-                // insert values that violate the layout constraints.
+                // Prevent
+                // * `&mut x.field`,
+                // * `x.field = y;`,
+                // * `&x.field` if `field`'s type has interior mutability,
+                // since any of these would allow modifying the layout-constrained field and
+                // would insert values that violate the layout constraints.
                 if context.is_mutating_use() || is_borrow_of_interior_mut {
                     self.check_mut_borrowing_layout_constrained_field(
                         place, context.is_mutating_use(),
@@ -283,7 +283,7 @@ impl<'a, 'tcx> Visitor<'tcx> for UnsafetyChecker<'a, 'tcx> {
                                          causes undefined behavior if the field was not properly \
                                          initialized", UnsafetyViolationKind::General)
                                 } else {
-                                    // write to non-move union, safe
+                                    // Write to non-move union; safe.
                                 }
                             } else {
                                 self.require_unsafe("access to union field",
@@ -298,7 +298,7 @@ impl<'a, 'tcx> Visitor<'tcx> for UnsafetyChecker<'a, 'tcx> {
                 self.source_info = old_source_info;
             }
             &Place::Local(..) => {
-                // locals are safe
+                // Locals are safe.
             }
             &Place::Promoted(_) => {
                 bug!("unsafety checking should happen before promotion")
@@ -351,7 +351,7 @@ impl<'a, 'tcx> UnsafetyChecker<'a, 'tcx> {
                            unsafe_blocks: &[(hir::HirId, bool)]) {
         let safety = self.source_scope_local_data[self.source_info.scope].safety;
         let within_unsafe = match safety {
-            // `unsafe` blocks are required in safe code
+            // `unsafe` blocks are required in safe code.
             Safety::Safe => {
                 for violation in violations {
                     let mut violation = violation.clone();
@@ -372,20 +372,20 @@ impl<'a, 'tcx> UnsafetyChecker<'a, 'tcx> {
                 }
                 false
             }
-            // `unsafe` function bodies allow unsafe without additional unsafe blocks
+            // `unsafe` function bodies allow unsafe without additional unsafe blocks.
             Safety::BuiltinUnsafe | Safety::FnUnsafe => true,
             Safety::ExplicitUnsafe(hir_id) => {
-                // mark unsafe block as used if there are any unsafe operations inside
+                // Mark unsafe block as used if there are any unsafe operations inside.
                 if !violations.is_empty() {
                     self.used_unsafe.insert(hir_id);
                 }
-                // only some unsafety is allowed in const fn
+                // Only some unsafety is allowed in const fn.
                 if self.min_const_fn {
                     for violation in violations {
                         match violation.kind {
-                            // these unsafe things are stable in const fn
+                            // These unsafe things are stable in const fn.
                             UnsafetyViolationKind::GeneralAndConstFn => {},
-                            // these things are forbidden in const fns
+                            // These things are forbidden in const fns.
                             UnsafetyViolationKind::General |
                             UnsafetyViolationKind::BorrowPacked(_) |
                             UnsafetyViolationKind::ExternStatic(_) => {

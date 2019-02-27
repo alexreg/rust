@@ -54,7 +54,7 @@ fn classify_ret_ty<'a, Ty, C>(cx: &C, ret: &mut ArgType<'a, Ty>, abi: ABI)
         return;
     }
 
-    // The ELFv1 ABI doesn't return aggregates in registers
+    // The ELFv1 ABI doesn't return aggregates in registers.
     if abi == ELFv1 {
         ret.make_indirect();
         return;

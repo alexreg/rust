@@ -83,7 +83,7 @@ fn inferred_outlives_crate<'tcx>(
     // predicate is satisfied, so they form a kind of base set of requirements
     // for the type.
 
-    // Compute the inferred predicates
+    // Compute the inferred predicates.
     let mut exp_map = explicit::ExplicitPredicatesMap::new();
 
     let global_inferred_outlives = implicit_infer::infer_predicates(tcx, &mut exp_map);

@@ -222,7 +222,7 @@ pub enum InvocationKind {
         attr: Option<ast::Attribute>,
         traits: Vec<Path>,
         item: Annotatable,
-        // We temporarily report errors for attribute macros placed after derives
+        // We temporarily report errors for attribute macros placed after derives.
         after_derive: bool,
     },
     Derive {
@@ -283,7 +283,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
                 krate.module = module;
             },
             None => {
-                // Resolution failed so we return an empty expansion
+                // Resolution failed, so we return an empty expansion.
                 krate.attrs = vec![];
                 krate.module = ast::Mod {
                     inner: orig_mod_span,
@@ -714,19 +714,19 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
                                           allow_internal_unstable,
                                           allow_internal_unsafe,
                                           local_inner_macros,
-                                          // can't infer this type
+                                          // Can't infer this type.
                                           unstable_feature: Option<(Symbol, u32)>,
                                           edition| {
 
             // feature-gate the macro invocation
             if let Some((feature, issue)) = unstable_feature {
                 let crate_span = this.cx.current_expansion.crate_span.unwrap();
-                // don't stability-check macros in the same crate
-                // (the only time this is null is for syntax extensions registered as macros)
+                // Don't stability-check macros in the same crate.
+                // (The only time this is null is for syntax extensions registered as macros.)
                 if def_site_span.map_or(false, |def_span| !crate_span.contains(def_span))
                     && !span.allows_unstable(&feature.as_str())
                     && this.cx.ecfg.features.map_or(true, |feats| {
-                    // macro features will count as lib features
+                    // Macro features will count as lib features.
                     !feats.declared_lib_features.iter().any(|&(feat, _)| feat == feature)
                 }) {
                     let explain = format!("macro {}! is unstable", path);
@@ -910,7 +910,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
         let attr = ast::Attribute {
             path, span,
             tokens: TokenStream::empty(),
-            // irrelevant:
+            // Irrelevant.
             id: ast::AttrId(0), style: ast::AttrStyle::Outer, is_sugared_doc: false,
         };
 
@@ -928,7 +928,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
             ProcMacroDerive(ref ext, ..) => {
                 invoc.expansion_data.mark.set_expn_info(expn_info);
                 let span = span.with_ctxt(self.cx.backtrace());
-                let dummy = ast::MetaItem { // FIXME(jseyfried) avoid this
+                let dummy = ast::MetaItem { // FIXME(jseyfried): avoid this.
                     ident: Path::from_ident(keywords::Invalid.ident()),
                     span: DUMMY_SP,
                     node: ast::MetaItemKind::Word,
@@ -1016,7 +1016,7 @@ impl<'a> Parser<'a> {
             AstFragmentKind::Stmts => {
                 let mut stmts = SmallVec::new();
                 while self.token != token::Eof &&
-                      // won't make progress on a `}`
+                      // Won't make progress on a `}`.
                       self.token != token::CloseDelim(token::Brace) {
                     if let Some(stmt) = self.parse_full_stmt(macro_legacy_warnings)? {
                         stmts.push(stmt);
@@ -1267,13 +1267,13 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
     fn flat_map_stmt(&mut self, stmt: ast::Stmt) -> SmallVec<[ast::Stmt; 1]> {
         let mut stmt = configure!(self, stmt);
 
-        // we'll expand attributes on expressions separately
+        // We'll expand attributes on expressions separately.
         if !stmt.is_expr() {
             let (attr, derives, after_derive) = if stmt.is_item() {
                 self.classify_item(&mut stmt)
             } else {
-                // ignore derives on non-item statements so it falls through
-                // to the unused-attributes lint
+                // Ignore `derive`s on non-item statements, so it falls through
+                // to the unused-attributes lint.
                 let (attr, after_derive) = self.classify_nonitem(&mut stmt);
                 (attr, vec![], after_derive)
             };
@@ -1518,7 +1518,7 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
                             let src_interned = Symbol::intern(&src);
 
                             // Add this input file to the code map to make it available as
-                            // dependency information
+                            // dependency information.
                             self.cx.source_map().new_source_file(filename.into(), src);
 
                             let include_info = vec![

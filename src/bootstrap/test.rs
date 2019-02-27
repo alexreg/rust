@@ -971,7 +971,7 @@ impl Step for Compiletest {
             builder.ensure(compile::Std { compiler, target: compiler.host });
         }
 
-        // HACK(eddyb) ensure that `libproc_macro` is available on the host.
+        // HACK(eddyb): ensure that `libproc_macro` is available on the host.
         builder.ensure(compile::Test { compiler, target: compiler.host });
         // Also provide `rust_test_helpers` for the host.
         builder.ensure(native::TestHelpers { target: compiler.host });
@@ -1976,8 +1976,8 @@ impl Step for Bootstrap {
             .env("RUSTC", &builder.initial_rustc);
         if let Some(flags) = option_env!("RUSTFLAGS") {
             // Use the same rustc flags for testing as for "normal" compilation,
-            // so that Cargo doesn’t recompile the entire dependency graph every time:
-            // https://github.com/rust-lang/rust/issues/49215
+            // so that Cargo doesn’t recompile the entire dependency graph every time
+            // (issue #49215).
             cmd.env("RUSTFLAGS", flags);
         }
         if !builder.fail_fast {

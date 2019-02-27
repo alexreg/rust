@@ -70,7 +70,7 @@ pub(crate) fn link_binary(sess: &Session,
         out_filenames.extend(out_files);
     }
 
-    // Remove the temporary object file and metadata if we aren't saving temps
+    // Remove the temporary object file and metadata if we aren't saving temps.
     if !sess.opts.cg.save_temps {
         if sess.opts.output_types.should_codegen() && !preserve_objects_for_their_debuginfo(sess) {
             for obj in codegen_results.modules.iter().filter_map(|m| m.object.as_ref()) {
@@ -126,10 +126,10 @@ fn preserve_objects_for_their_debuginfo(sess: &Session) -> bool {
     // for debug information, so we must preserve them.
     if sess.target.target.options.is_like_osx {
         match sess.opts.debugging_opts.run_dsymutil {
-            // dsymutil is not being run, preserve objects
+            // dsymutil is not being run; preserve objects.
             Some(false) => return true,
 
-            // dsymutil is being run, no need to preserve the objects
+            // dsymutil is being run; no need to preserve the objects.
             Some(true) => return false,
 
             // The default historical behavior was to always run dsymutil, so
@@ -474,7 +474,7 @@ fn link_natively(sess: &Session,
     info!("preparing {:?} to {:?}", crate_type, out_filename);
     let (linker, flavor) = linker_and_flavor(sess);
 
-    // The invocations of cc share some flags across platforms
+    // The invocations of cc share some flags across platforms.
     let (pname, mut cmd) = get_linker(sess, &linker, flavor);
 
     if let Some(args) = sess.target.target.options.pre_link_args.get(&flavor) {
@@ -554,7 +554,7 @@ fn link_natively(sess: &Session,
     // May have not found libraries in the right formats.
     sess.abort_if_errors();
 
-    // Invoke the system linker
+    // Invoke the system linker.
     //
     // Note that there's a terribly awful hack that really shouldn't be present
     // in any compiler. Here an environment variable is supported to
@@ -569,7 +569,7 @@ fn link_natively(sess: &Session,
     // The issue #38878 has some more debugging information on it as well, but
     // this unfortunately looks like it's just a race condition in macOS's linker
     // with some thread pool working in the background. It seems that no one
-    // currently knows a fix for this so in the meantime we're left with this...
+    // currently knows a fix for this so in the meantime we're left with this.
     info!("{:?}", &cmd);
     let retry_on_segfault = env::var("RUSTC_RETRY_LINKER_ON_SEGFAULT").is_ok();
     let mut prog;
@@ -1098,7 +1098,7 @@ fn add_local_native_libraries(cmd: &mut dyn Linker,
 //
 // Rust crates are not considered at all when creating an rlib output. All
 // dependencies will be linked when producing the final output (instead of
-// the intermediate rlib version)
+// the intermediate rlib version).
 fn add_upstream_rust_crates(cmd: &mut dyn Linker,
                             sess: &Session,
                             codegen_results: &CodegenResults,
@@ -1237,7 +1237,7 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
             // rpath to the library as well (the rpath should be absolute, see
             // PR #41352 for details).
             //
-            // FIXME: Remove this logic into librustc_*san once Cargo supports it
+            // FIXME: remove this logic into librustc_*san once Cargo supports it.
             let rpath = cratepath.parent().unwrap();
             let rpath = rpath.to_str().expect("non-utf8 component in path");
             cmd.args(&["-Wl,-rpath".into(), "-Xlinker".into(), rpath.into()]);
@@ -1471,7 +1471,7 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
                 },
                 // Ignore statically included native libraries here as we've
                 // already included them when we included the rust library
-                // previously
+                // previously.
                 NativeLibraryKind::NativeStatic => {}
             }
         }

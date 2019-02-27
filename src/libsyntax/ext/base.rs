@@ -161,7 +161,7 @@ impl<F> MultiItemDecorator for F
 }
 
 // `meta_item` is the annotation, and `item` is the item being modified.
-// FIXME Decorators should follow the same pattern too.
+// FIXME: decorators should follow the same pattern too.
 pub trait MultiItemModifier {
     fn expand(&self,
               ecx: &mut ExtCtxt<'_>,
@@ -230,12 +230,12 @@ impl<F> AttrProcMacro for F
                    annotation: TokenStream,
                    annotated: TokenStream)
                    -> TokenStream {
-        // FIXME setup implicit context in TLS before calling self.
+        // FIXME: set up implicit context in TLS before calling self.
         (*self)(annotation, annotated)
     }
 }
 
-/// Represents a thing that maps token trees to Macro Results
+/// Represents a thing that maps token trees to macro results.
 pub trait TTMacroExpander {
     fn expand<'cx>(
         &self,
@@ -313,7 +313,7 @@ impl<F> IdentMacroExpander for F
     }
 }
 
-// Use a macro because forwarding to a simple function has type system issues
+// Use a macro because forwarding to a simple function has type system issues.
 macro_rules! make_stmts_default {
     ($me:expr) => {
         $me.make_expr().map(|e| smallvec![ast::Stmt {
@@ -639,7 +639,7 @@ pub enum SyntaxExtension {
         def_info: Option<(ast::NodeId, Span)>,
         /// Whether the contents of the macro can directly use `#[unstable]` things.
         ///
-        /// Only allows things that require a feature gate in the given whitelist
+        /// Only allows things that require a feature gate in the given whitelist.
         allow_internal_unstable: Option<Lrc<[Symbol]>>,
         /// `true` if the contents of the macro can use `unsafe` without triggering
         /// the `unsafe_code` lint.
@@ -718,7 +718,7 @@ impl SyntaxExtension {
             SyntaxExtension::ProcMacro { edition, .. } |
             SyntaxExtension::AttrProcMacro(.., edition) |
             SyntaxExtension::ProcMacroDerive(.., edition) => edition,
-            // Unstable legacy stuff
+            // Unstable legacy stuff.
             SyntaxExtension::NonMacroAttr { .. } |
             SyntaxExtension::IdentTT { .. } |
             SyntaxExtension::MultiDecorator(..) |
@@ -913,7 +913,7 @@ impl<'a> ExtCtxt<'a> {
     /// - there is literally nothing else that can be done (however,
     ///   in most cases one can construct a dummy expression/item to
     ///   substitute; we never hit resolve/type-checking so the dummy
-    ///   value doesn't have to match anything)
+    ///   value doesn't have to match anything).
     pub fn span_fatal<S: Into<MultiSpan>>(&self, sp: S, msg: &str) -> ! {
         self.parse_sess.span_diagnostic.span_fatal(sp, msg).raise();
     }
@@ -990,7 +990,7 @@ pub fn expr_to_spanned_string<'a>(
     // Update `expr.span`'s ctxt now in case expr is an `include!` macro invocation.
     expr.span = expr.span.apply_mark(cx.current_expansion.mark);
 
-    // we want to be able to handle e.g., `concat!("foo", "bar")`
+    // We want to be able to handle, e.g., `concat!("foo", "bar")`.
     cx.expander().visit_expr(&mut expr);
     Err(match expr.node {
         ast::ExprKind::Lit(ref l) => match l.node {

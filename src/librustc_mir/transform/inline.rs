@@ -1,4 +1,4 @@
-//! Inlining pass for MIR functions
+//! Inlining pass for MIR functions.
 
 use rustc::hir::CodegenFnAttrFlags;
 use rustc::hir::def_id::DefId;
@@ -136,7 +136,7 @@ impl<'a, 'tcx> Inliner<'a, 'tcx> {
                 }
                 debug!("attempting to inline callsite {:?} - success", callsite);
 
-                // Add callsites from inlined function
+                // Add callsites from inlined function.
                 for (bb, bb_data) in caller_mir.basic_blocks().iter_enumerated().skip(start) {
                     if let Some(new_callsite) = self.get_valid_function_call(bb,
                                                                              bb_data,

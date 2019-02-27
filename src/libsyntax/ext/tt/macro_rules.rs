@@ -279,7 +279,7 @@ pub fn compile(
             op: quoted::KleeneOp::OneOrMore,
             num_captures: 2,
         })),
-        // to phase into semicolon-termination instead of semicolon-separation
+        // To phase into semicolon-termination instead of semicolon-separation.
         quoted::TokenTree::Sequence(DelimSpan::dummy(), Lrc::new(quoted::SequenceRepetition {
             tts: vec![quoted::TokenTree::Token(DUMMY_SP, token::Semi)],
             separator: None,
@@ -305,7 +305,7 @@ pub fn compile(
 
     let mut valid = true;
 
-    // Extract the arguments:
+    // Extract the arguments.
     let lhses = match *argument_map[&lhs_nm] {
         MatchedSeq(ref s, _) => {
             s.iter().map(|m| {
@@ -448,7 +448,7 @@ fn check_lhs_nt_follows(sess: &ParseSess,
         sess.span_diagnostic.span_err(lhs.span(), msg);
         false
     }
-    // we don't abort on errors on rejection, the driver will do that for us
+    // We don't abort on errors on rejection; the driver will do that for us
     // after parsing/expansion. we can report every error in every macro this way.
 }
 
@@ -839,7 +839,7 @@ fn check_matcher_core(sess: &ParseSess,
                 }
 
                 if can_be_followed_by_any {
-                    // don't need to track tokens that work with any,
+                    // Don't need to track tokens that work with any, ...
                     last.replace_with_irrelevant();
                     // ... and don't need to check tokens that can be
                     // followed by anything against `SUFFIX`.
@@ -852,7 +852,7 @@ fn check_matcher_core(sess: &ParseSess,
             TokenTree::Delimited(span, ref d) => {
                 let my_suffix = TokenSet::singleton(d.close_tt(span.close));
                 check_matcher_core(sess, features, attrs, first_sets, &d.tts, &my_suffix);
-                // don't track non NT tokens
+                // Don't track non NT tokens.
                 last.replace_with_irrelevant();
 
                 // Also, we don't need to check delimited sequences against `SUFFIX`.
@@ -995,7 +995,7 @@ fn frag_can_be_followed_by_any(frag: &str) -> bool {
         "literal"  | // exactly one token tree
         "meta"     | // exactly one token tree
         "lifetime" | // exactly one token tree
-        "tt" =>   // exactly one token tree
+        "tt" =>      // exactly one token tree
             true,
 
         _ =>
@@ -1021,14 +1021,14 @@ fn is_in_follow(tok: &quoted::TokenTree, frag: &str) -> IsInFollow {
     use quoted::TokenTree;
 
     if let TokenTree::Token(_, token::CloseDelim(_)) = *tok {
-        // closing a token tree can never be matched by any fragment;
-        // iow, we always require that `(` and `)` match, etc.
+        // Closing a token tree can never be matched by any fragment;
+        // i.e., we always require that `(` and `)` match, etc.
         IsInFollow::Yes
     } else {
         match frag {
             "item" => {
-                // since items *must* be followed by either a `;` or a `}`, we can
-                // accept anything after them
+                // Since items *must* be followed by either a `;` or a `}`, we can
+                // accept anything after them.
                 IsInFollow::Yes
             },
             "block" => {
@@ -1080,7 +1080,7 @@ fn is_in_follow(tok: &quoted::TokenTree, frag: &str) -> IsInFollow {
                 IsInFollow::Yes
             },
             "literal" => {
-                // literals may be of a single token, or two tokens (negative numbers)
+                // Literals may be of a single token, or two tokens (negative numbers).
                 IsInFollow::Yes
             },
             "meta" | "tt" => {

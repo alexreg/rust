@@ -929,8 +929,8 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
         debug!("compute: using id for body, {}",
                self.ir.tcx.hir().hir_to_pretty_string(body.hir_id));
 
-        // the fallthrough exit is only for those cases where we do not
-        // explicitly return:
+        // The fallthrough exit is only for those cases where we do not
+        // explicitly return.
         let s = self.s;
         self.init_from_succ(s.fallthrough_ln, s.exit_ln);
         self.acc(s.fallthrough_ln, s.clean_exit_var, ACC_READ);
@@ -965,8 +965,8 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                               -> LiveNode {
         match stmt.node {
             hir::StmtKind::Local(ref local) => {
-                // Note: we mark the variable as defined regardless of whether
-                // there is an initializer.  Initially I had thought to only mark
+                // N.B., we mark the variable as defined regardless of whether
+                // there is an initializer. Initially, I had thought to only mark
                 // the live variable as defined if it was initialized, and then we
                 // could check for uninit variables just by scanning what is live
                 // at the start of the function. But that doesn't work so well for
@@ -1007,7 +1007,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
         debug!("propagate_through_expr: {}", self.ir.tcx.hir().hir_to_pretty_string(expr.hir_id));
 
         match expr.node {
-            // Interesting cases with control flow or which gen/kill
+            // Interesting cases with control flow or which gen/kill.
             hir::ExprKind::Path(hir::QPath::Resolved(_, ref path)) => {
                 self.access_path(expr.hir_id, path, succ, ACC_READ | ACC_USE)
             }
@@ -1060,7 +1060,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             }
 
             // Note that labels have been resolved, so we don't need to look
-            // at the label ident
+            // at the label ident.
             hir::ExprKind::Loop(ref blk, _, _) => {
                 self.propagate_through_loop(expr, LoopLoop, &blk, succ)
             }
@@ -1092,7 +1092,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                     );
                     // Only consider the first pattern; any later patterns must have
                     // the same bindings, and we also consider the first pattern to be
-                    // the "authoritative" set of ids
+                    // the "authoritative" set of IDs.
                     let arm_succ =
                         self.define_bindings_in_arm_pats(arm.pats.first().map(|p| &**p),
                                                          guard_succ);
@@ -1109,14 +1109,14 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             }
 
             hir::ExprKind::Break(label, ref opt_expr) => {
-                // Find which label this break jumps to
+                // Find which label this break jumps to.
                 let target = match label.target_id {
                     Ok(node_id) => self.break_ln.get(&node_id),
                     Err(err) => span_bug!(expr.span, "loop scope error: {}", err),
                 }.cloned();
 
                 // Now that we know the label we're going to,
-                // look it up in the break loop nodes table
+                // look it up in the break loop nodes table.
 
                 match target {
                     Some(b) => self.propagate_through_opt_expr(opt_expr.as_ref().map(|e| &**e), b),
@@ -1125,12 +1125,12 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             }
 
             hir::ExprKind::Continue(label) => {
-                // Find which label this expr continues to
+                // Find which label this expr continues to.
                 let sc = label.target_id.unwrap_or_else(|err|
                     span_bug!(expr.span, "loop scope error: {}", err));
 
                 // Now that we know the label we're going to,
-                // look it up in the continue loop nodes table
+                // look it up in the continue loop nodes table.
                 self.cont_ln.get(&sc).cloned().unwrap_or_else(||
                     span_bug!(expr.span, "continue to unknown label"))
             }
@@ -1143,7 +1143,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             }
 
             hir::ExprKind::AssignOp(_, ref l, ref r) => {
-                // an overloaded assign op is like a method call
+                // An overloaded assign op is like a method call.
                 if self.tables.is_method_call(expr) {
                     let succ = self.propagate_through_expr(&l, succ);
                     self.propagate_through_expr(&r, succ)
@@ -1241,7 +1241,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             }
 
             // Note that labels have been resolved, so we don't need to look
-            // at the label ident
+            // at the label ident.
             hir::ExprKind::Block(ref blk, _) => {
                 self.propagate_through_block(&blk, succ)
             }
@@ -1399,7 +1399,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
 
         let body_ln = self.propagate_through_block(body, cond_ln);
 
-        // repeat until fixed point is reached:
+        // Repeat until fixed point is reached.
         while self.merge_from_succ(ln, body_ln, first_merge) {
             first_merge = false;
 
@@ -1500,7 +1500,7 @@ fn check_expr<'a, 'tcx>(this: &mut Liveness<'a, 'tcx>, expr: &'tcx Expr) {
                 this.visit_expr(input);
             }
 
-            // Output operands must be places
+            // Output operands must be places.
             for (o, output) in ia.outputs.iter().zip(outputs) {
                 if !o.is_indirect {
                     this.check_place(output);
@@ -1511,7 +1511,7 @@ fn check_expr<'a, 'tcx>(this: &mut Liveness<'a, 'tcx>, expr: &'tcx Expr) {
             intravisit::walk_expr(this, expr);
         }
 
-        // no correctness conditions related to liveness
+        // No correctness conditions related to liveness.
         hir::ExprKind::Call(..) | hir::ExprKind::MethodCall(..) | hir::ExprKind::If(..) |
         hir::ExprKind::Match(..) | hir::ExprKind::While(..) | hir::ExprKind::Loop(..) |
         hir::ExprKind::Index(..) | hir::ExprKind::Field(..) |

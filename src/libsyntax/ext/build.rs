@@ -200,7 +200,7 @@ pub trait AstBuilder {
             name: Ident, attrs: Vec<ast::Attribute> , node: ast::ItemKind) -> P<ast::Item>;
 
     fn arg(&self, span: Span, name: Ident, ty: P<ast::Ty>) -> ast::Arg;
-    // FIXME unused self
+    // FIXME: unused self
     fn fn_decl(&self, inputs: Vec<ast::Arg> , output: ast::FunctionRetTy) -> P<ast::FnDecl>;
 
     fn item_fn_poly(&self,
@@ -980,7 +980,7 @@ impl<'a> AstBuilder for ExtCtxt<'a> {
         }
     }
 
-    // FIXME unused self
+    // FIXME: unused self
     fn fn_decl(&self, inputs: Vec<ast::Arg>, output: ast::FunctionRetTy) -> P<ast::FnDecl> {
         P(ast::FnDecl {
             inputs,

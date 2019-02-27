@@ -120,7 +120,7 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
                 bx.struct_gep(self.llval, bx.cx().backend_field_index(self.layout, ix))
             };
             PlaceRef {
-                // HACK(eddyb) have to bitcast pointers until LLVM removes pointee types.
+                // HACK(eddyb): have to bitcast pointers until LLVM removes pointee types.
                 llval: bx.pointercast(llval, bx.cx().type_ptr_to(bx.cx().backend_type(field))),
                 llextra: if bx.cx().type_has_metadata(field.ty) {
                     self.llextra
@@ -146,7 +146,7 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
             ty::Slice(..) | ty::Str | ty::Foreign(..) => return simple(),
             ty::Adt(def, _) => {
                 if def.repr.packed() {
-                    // FIXME(eddyb) generalize the adjustment when we
+                    // FIXME(eddyb): generalize the adjustment when we
                     // start supporting packing to larger alignments.
                     assert_eq!(self.layout.align.abi.bytes(), 1);
                     return simple();
@@ -180,9 +180,9 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
         // Bump the unaligned offset up to the appropriate alignment using the
         // following expression:
         //
-        //   (unaligned offset + (align - 1)) & -align
+        //     (unaligned offset + (align - 1)) & -align
 
-        // Calculate offset
+        // Calculate offset.
         let align_sub_1 = bx.sub(unsized_align, bx.cx().const_usize(1u64));
         let and_lhs = bx.add(unaligned_offset, align_sub_1);
         let and_rhs = bx.neg(unsized_align);
@@ -190,11 +190,11 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
 
         debug!("struct_field_ptr: DST field offset: {:?}", offset);
 
-        // Cast and adjust pointer
+        // Cast and adjust pointer.
         let byte_ptr = bx.pointercast(self.llval, bx.cx().type_i8p());
         let byte_ptr = bx.gep(byte_ptr, &[offset]);
 
-        // Finally, cast back to the type expected
+        // Finally, cast back to the type expected.
         let ll_fty = bx.cx().backend_type(field);
         debug!("struct_field_ptr: Field type is {:?}", ll_fty);
 
@@ -250,9 +250,9 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
             } => {
                 let niche_llty = bx.cx().immediate_backend_type(discr.layout);
                 if niche_variants.start() == niche_variants.end() {
-                    // FIXME(eddyb) Check the actual primitive type here.
+                    // FIXME(eddyb): check the actual primitive type here.
                     let niche_llval = if niche_start == 0 {
-                        // HACK(eddyb) Using `c_null` as it works on all types.
+                        // HACK(eddyb): using `c_null` as it works on all types.
                         bx.cx().const_null(niche_llty)
                     } else {
                         bx.cx().const_uint_big(niche_llty, niche_start)
@@ -322,9 +322,9 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
                     let niche_value = variant_index.as_u32() - niche_variants.start().as_u32();
                     let niche_value = (niche_value as u128)
                         .wrapping_add(niche_start);
-                    // FIXME(eddyb) Check the actual primitive type here.
+                    // FIXME(eddyb): check the actual primitive type here.
                     let niche_llval = if niche_value == 0 {
-                        // HACK(eddyb) Using `c_null` as it works on all types.
+                        // HACK(eddyb): using `c_null` as it works on all types.
                         bx.cx().const_null(niche_llty)
                     } else {
                         bx.cx().const_uint_big(niche_llty, niche_value)
@@ -425,8 +425,8 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                     Err(_) => {
                         // This is unreachable as long as runtime
                         // and compile-time agree on values
-                        // With floats that won't always be true
-                        // so we generate an abort
+                        // With floats that won't always be true,
+                        // so we generate an abort.
                         bx.abort();
                         let llval = bx.cx().const_undef(
                             bx.cx().type_ptr_to(bx.cx().backend_type(layout))

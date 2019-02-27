@@ -329,12 +329,12 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         // ambiguous.
         if let Some(bad_ty) = &steps.opt_bad_ty {
             if is_suggestion.0 {
-                // Ambiguity was encountered during a suggestion. Just keep going.
+                // Ambiguity was encountered during a suggestion; just keep going.
                 debug!("ProbeContext: encountered ambiguity in suggestion");
             } else if bad_ty.reached_raw_pointer && !self.tcx.features().arbitrary_self_types {
-                // this case used to be allowed by the compiler,
-                // so we do a future-compat lint here for the 2015 edition
-                // (see https://github.com/rust-lang/rust/issues/46906)
+                // Rhis case used to be allowed by the compiler,
+                // so we do a future-compat lint here for the 2015 edition.
+                // (See issue #46906.)
                 if self.tcx.sess.rust_2018() {
                     span_err!(self.tcx.sess, span, E0699,
                               "the type of this value must be known \

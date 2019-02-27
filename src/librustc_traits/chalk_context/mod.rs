@@ -363,14 +363,14 @@ impl context::TruncateOps<ChalkArenas<'gcx>, ChalkArenas<'tcx>>
         &mut self,
         _subgoal: &InEnvironment<'tcx, Goal<'tcx>>,
     ) -> Option<InEnvironment<'tcx, Goal<'tcx>>> {
-        None // FIXME we should truncate at some point!
+        None // FIXME: we should truncate at some point!
     }
 
     fn truncate_answer(
         &mut self,
         _subst: &CanonicalVarValues<'tcx>,
     ) -> Option<CanonicalVarValues<'tcx>> {
-        None // FIXME we should truncate at some point!
+        None // FIXME: we should truncate at some point!
     }
 }
 

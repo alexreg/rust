@@ -1,4 +1,4 @@
-// HIR datatypes. See the [rustc guide] for more info.
+//! HIR data-types. See the [rustc guide] for more info.
 //!
 //! [rustc guide]: https://rust-lang.github.io/rustc-guide/hir.html
 
@@ -848,7 +848,7 @@ impl fmt::Debug for Pat {
 }
 
 impl Pat {
-    // FIXME(#19596) this is a workaround, but there should be a better way
+    // FIXME(#19596): this is a workaround, but there should be a better way.
     fn walk_<G>(&self, it: &mut G) -> bool
         where G: FnMut(&Pat) -> bool
     {
@@ -1691,16 +1691,16 @@ pub enum TraitMethod {
     Provided(BodyId),
 }
 
-/// Represents a trait method or associated constant or type
+/// Represents a trait method or associated constant or type.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub enum TraitItemKind {
     /// An associated constant with an optional value (otherwise `impl`s
     /// must contain a value)
     Const(P<Ty>, Option<BodyId>),
-    /// A method with an optional body
+    /// A method with an optional body.
     Method(MethodSig, TraitMethod),
     /// An associated type with (possibly empty) bounds and optional concrete
-    /// type
+    /// type.
     Type(GenericBounds, Option<P<Ty>>),
 }
 
@@ -1712,7 +1712,7 @@ pub struct ImplItemId {
     pub node_id: NodeId,
 }
 
-/// Represents anything within an `impl` block
+/// Represents anything within an `impl` block.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub struct ImplItem {
     pub id: NodeId,
@@ -1730,13 +1730,13 @@ pub struct ImplItem {
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub enum ImplItemKind {
     /// An associated constant of the given type, set to the constant result
-    /// of the expression
+    /// of the expression.
     Const(P<Ty>, BodyId),
-    /// A method implementation with the given signature and body
+    /// A method implementation with the given signature and body.
     Method(MethodSig, BodyId),
-    /// An associated type
+    /// An associated type.
     Type(P<Ty>),
-    /// An associated existential type
+    /// An associated existential type.
     Existential(GenericBounds),
 }
 
@@ -2046,7 +2046,7 @@ pub type Variant = Spanned<VariantKind>;
 pub enum UseKind {
     /// One import, e.g., `use foo::bar` or `use foo::bar as baz`.
     /// Also produced for each element of a list `use`, e.g.
-    // `use foo::{a, b}` lowers to `use foo::a; use foo::b;`.
+    /// `use foo::{a, b}` lowers to `use foo::a; use foo::b;`.
     Single,
 
     /// Glob import, e.g., `use foo::*`.
@@ -2152,7 +2152,7 @@ impl StructField {
     }
 }
 
-/// Fields and Ids of enum variants and structs
+/// Fields and IDs of enum variants and structs.
 ///
 /// For enum variants: `NodeId` represents both an idd of the variant itself (relevant for all
 /// variant kinds) and an ID of the variant's constructor (not relevant for `Struct`-variants).
@@ -2222,9 +2222,9 @@ pub struct ItemId {
     pub id: NodeId,
 }
 
-/// An item
+/// An item.
 ///
-/// The name might be a dummy name in case of anonymous items
+/// The name might be a dummy name in case of anonymous items.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub struct Item {
     pub ident: Ident,
@@ -2258,15 +2258,15 @@ pub enum ItemKind {
     /// `use foo::bar::baz;` (with `as baz` implicitly on the right)
     Use(P<Path>, UseKind),
 
-    /// A `static` item
+    /// A `static` item.
     Static(P<Ty>, Mutability, BodyId),
-    /// A `const` item
+    /// A `const` item.
     Const(P<Ty>, BodyId),
-    /// A function declaration
+    /// A function declaration.
     Fn(P<FnDecl>, FnHeader, Generics, BodyId),
-    /// A module
+    /// A module.
     Mod(Mod),
-    /// An external module
+    /// An external module.
     ForeignMod(ForeignMod),
     /// Module-level inline assembly (from `global_asm!`).
     GlobalAsm(P<GlobalAsm>),
@@ -2285,7 +2285,7 @@ pub enum ItemKind {
     /// Represents a trait alias declaration (e.g., `trait Foo<A> = Bar<A>;`).
     TraitAlias(Generics, GenericBounds),
 
-    /// An implementation, eg `impl<A> Trait for Foo { .. }`
+    /// An implementation, e.g., `impl<A> Trait for Foo { .. }`.
     Impl(Unsafety,
          ImplPolarity,
          Defaultness,
@@ -2545,9 +2545,9 @@ impl CodegenFnAttrs {
 
     /// Returns `true` if it looks like this symbol needs to be exported, for example, if:
     ///
-    /// * `#[no_mangle]` is present
-    /// * `#[export_name(...)]` is present
-    /// * `#[linkage]` is present
+    /// * `#[no_mangle]` is present,
+    /// * `#[export_name(...)]` is present,
+    /// * `#[linkage]` is present.
     pub fn contains_extern_indicator(&self) -> bool {
         self.flags.contains(CodegenFnAttrFlags::NO_MANGLE) ||
             self.export_name.is_some() ||

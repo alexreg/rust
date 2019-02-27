@@ -250,7 +250,7 @@ pub fn codegen_mir<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
 
     let memory_locals = analyze::non_ssa_locals(&fx);
 
-    // Allocate variable and temp allocas
+    // Allocate variable and temp allocas.
     fx.locals = {
         let args = arg_local_refs(&mut bx, &fx, &fx.scopes, &memory_locals);
 
@@ -274,7 +274,7 @@ pub fn codegen_mir<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
                 if layout.is_unsized() {
                     let indirect_place =
                         PlaceRef::alloca_unsized_indirect(&mut bx, layout, &name.as_str());
-                    // FIXME: add an appropriate debuginfo
+                    // FIXME: add an appropriate debuginfo.
                     LocalRef::UnsizedPlace(indirect_place)
                 } else {
                     let place = PlaceRef::alloca(&mut bx, layout, &name.as_str());
@@ -346,7 +346,7 @@ pub fn codegen_mir<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
     // Remove blocks that haven't been visited, or have no
     // predecessors.
     for bb in mir.basic_blocks().indices() {
-        // Unreachable block
+        // Unreachable block.
         if !visited.contains(bb.index()) {
             debug!("codegen_mir: block {:?} was not visited", bb);
             unsafe {
@@ -541,7 +541,7 @@ fn arg_local_refs<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
         let place = if arg.is_sized_indirect() {
             // Don't copy an indirect argument to an alloca, the caller
             // already put it in a temporary alloca and gave it up.
-            // FIXME: lifetimes
+            // FIXME: lifetimes.
             let llarg = bx.get_param(bx.llfn(), llarg_idx as c_uint);
             bx.set_value_name(llarg, &name);
             llarg_idx += 1;

@@ -61,7 +61,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                 block.unit()
             }
             ExprKind::AssignOp { op, lhs, rhs } => {
-                // FIXME(#28160) there is an interesting semantics
+                // FIXME(#28160): there is an interesting semantics
                 // question raised here -- should we "freeze" the
                 // value of the lhs here?  I'm inclined to think not,
                 // since it seems closer to the semantics of the

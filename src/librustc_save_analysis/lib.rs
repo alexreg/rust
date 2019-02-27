@@ -386,7 +386,7 @@ impl<'l, 'tcx: 'l> SaveContext<'l, 'tcx> {
         }
     }
 
-    // FIXME would be nice to take a MethodItem here, but the ast provides both
+    // FIXME: would be nice to take a MethodItem here, but the ast provides both
     // trait and impl flavours, so the caller must do the disassembly.
     pub fn get_method_data(&self, id: ast::NodeId, ident: ast::Ident, span: Span) -> Option<Def> {
         // The qualname for a method is the trait name or name of the struct in an impl in
@@ -477,7 +477,7 @@ impl<'l, 'tcx: 'l> SaveContext<'l, 'tcx> {
             span: self.span_from_span(ident.span),
             name: ident.name.to_string(),
             qualname,
-            // FIXME you get better data here by using the visitor.
+            // FIXME: you get better data here by using the visitor.
             value: String::new(),
             parent: parent_scope.map(|id| id_from_def_id(id)),
             children: vec![],
@@ -556,7 +556,7 @@ impl<'l, 'tcx: 'l> SaveContext<'l, 'tcx> {
                         }))
                     }
                     _ => {
-                        // FIXME ty could legitimately be an enum, but then we will fail
+                        // FIXME: ty could legitimately be an enum, but then we will fail
                         // later if we try to look up the fields.
                         debug!("expected struct or union, found {:?}", ty);
                         None

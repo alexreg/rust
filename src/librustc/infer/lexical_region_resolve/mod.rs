@@ -262,7 +262,7 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
                 // of the parameter environment, we might be able to find a
                 // tighter bound than `'static`.
                 //
-                // (This might e.g. arise from being asked to prove `for<'a> { 'b: 'a }`.)
+                // (This might, e.g., arise from being asked to prove `for<'a> { 'b: 'a }`.)
                 let b_universe = self.var_infos[b_vid].universe;
                 if let ty::RePlaceholder(p) = lub {
                     if b_universe.cannot_name(p.universe) {
@@ -321,8 +321,8 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
             | (&ReFree(_), &ReScope(s_id))
             | (&ReScope(s_id), &ReFree(_)) => {
                 // A "free" region can be interpreted as "some region
-                // at least as big as fr.scope".  So, we can
-                // reasonably compare free regions and scopes:
+                // at least as big as fr.scope". So, we can
+                // reasonably compare free regions and scopes.
                 let fr_scope = match (a, b) {
                     (&ReEarlyBound(ref br), _) | (_, &ReEarlyBound(ref br)) => self.region_rels
                         .region_scope_tree
@@ -338,7 +338,7 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
                 if r_id == fr_scope {
                     // If the free region's scope `fr.scope` is bigger than
                     // the scope region `s_id`, then the LUB is the free
-                    // region itself:
+                    // region itself.
                     match (a, b) {
                         (_, &ReScope(_)) => return a,
                         (&ReScope(_), _) => return b,
@@ -346,8 +346,8 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
                     }
                 }
 
-                // otherwise, we don't know what the free region is,
-                // so we must conservatively say the LUB is static:
+                // Otherwise, we don't know what the free region is,
+                // so we must conservatively say the LUB is static.
                 tcx.types.re_static
             }
 
@@ -391,7 +391,7 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
             );
             match *constraint {
                 Constraint::RegSubVar(..) | Constraint::VarSubVar(..) => {
-                    // Expansion will ensure that these constraints hold. Ignore.
+                    // Expansion will ensure that these constraints hold; ignore.
                 }
 
                 Constraint::RegSubReg(sub, sup) => {
@@ -662,14 +662,14 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
         };
         state.set.insert(orig_node_idx);
 
-        // to start off the process, walk the source node in the
-        // direction specified
+        // To start off the process, walk the source node in the
+        // direction specified.
         process_edges(&self.data, &mut state, graph, orig_node_idx, dir);
 
         while !state.stack.is_empty() {
             let node_idx = state.stack.pop().unwrap();
 
-            // check whether we've visited this node on some previous walk
+            // Check whether we've visited this node on some previous walk.
             if dup_vec[node_idx.index() as usize] == u32::MAX {
                 dup_vec[node_idx.index() as usize] = orig_node_idx.index() as u32;
             } else if dup_vec[node_idx.index() as usize] != orig_node_idx.index() as u32 {

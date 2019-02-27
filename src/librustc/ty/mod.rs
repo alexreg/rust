@@ -1117,9 +1117,9 @@ impl<'a, 'gcx, 'tcx> Predicate<'tcx> {
         // normal substitution.
         //
         // In terms of why this is sound, the idea is that whenever there
-        // is an impl of `T:Foo<'a>`, it must show that `T:Bar<'a,'a>`
-        // holds.  So if there is an impl of `T:Foo<'a>` that applies to
-        // all `'a`, then we must know that `T:Bar<'a,'a>` holds for all
+        // is an impl of `T: Foo<'a>`, it must show that `T: Bar<'a, 'a>`
+        // holds.  So, if there is an impl of `T: Foo<'a>` that applies to
+        // all `'a`, then we must know that `T: Bar<'a, 'a>` holds for all
         // `'a`.
         //
         // Another example to be careful of is this:
@@ -1130,7 +1130,7 @@ impl<'a, 'gcx, 'tcx> Predicate<'tcx> {
         // Here, if we have `for<'x> T: Foo1<'x>`, then what do we know?
         // The answer is that we know `for<'x,'b> T: Bar1<'x,'b>`. The
         // reason is similar to the previous example: any impl of
-        // `T:Foo1<'x>` must show that `for<'b> T: Bar1<'x, 'b>`.  So
+        // `T: Foo1<'x>` must show that `for<'b> T: Bar1<'x, 'b>`.  So
         // basically we would want to collapse the bound lifetimes from
         // the input (`trait_ref`) and the supertraits.
         //
@@ -2411,7 +2411,7 @@ impl<'a, 'gcx, 'tcx> AdtDef {
             }
 
             Adt(adt, substs) => {
-                // recursive case
+                // Recursive case.
                 let adt_tys = adt.sized_constraint(tcx);
                 debug!("sized_constraint_for_ty({:?}) intermediate = {:?}",
                        ty, adt_tys);
@@ -3247,7 +3247,7 @@ fn issue33140_self_ty<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         return None;
     }
 
-    // impl must be `impl Trait for dyn Marker1 + Marker2 + ...`
+    // Impl must be `impl Trait for dyn Marker1 + Marker2 + ...`.
     if trait_ref.substs.len() != 1 {
         debug!("issue33140_self_ty - impl has substs!");
         return None;

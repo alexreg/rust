@@ -562,7 +562,7 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
             PatKind::Binding(_, id, _, ident, ref sub) => {
                 let var_ty = self.tables.node_type(pat.hir_id);
                 if let ty::Error = var_ty.sty {
-                    // Avoid ICE
+                    // Avoid ICE.
                     return Pattern { span: pat.span, ty, kind: Box::new(PatternKind::Wild) };
                 };
                 let bm = *self.tables.pat_binding_modes().get(pat.hir_id)
@@ -967,7 +967,7 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
                 }
             }
             ty::Adt(adt_def, _) if adt_def.is_union() => {
-                // Matching on union fields is unsafe, we can't hide it in constants
+                // Matching on union fields is unsafe; we can't hide it in constants.
                 self.tcx.sess.span_err(span, "cannot use unions in constant patterns");
                 PatternKind::Wild
             }

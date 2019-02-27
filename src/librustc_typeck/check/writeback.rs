@@ -463,10 +463,10 @@ impl<'cx, 'gcx, 'tcx> WritebackCx<'cx, 'gcx, 'tcx> {
                     instantiated_ty,
                 )
             } else {
-                // prevent
+                // Prevent:
                 // * `fn foo<T>() -> Foo<T>`
                 // * `fn foo<T: Bound + Other>() -> Foo<T>`
-                // from being defining
+                // from being defining.
 
                 // Also replace all generic params with the ones from the existential type
                 // definition so
@@ -474,20 +474,20 @@ impl<'cx, 'gcx, 'tcx> WritebackCx<'cx, 'gcx, 'tcx> {
                 // existential type Foo<T>: 'static;
                 // fn foo<U>() -> Foo<U> { .. }
                 // ```
-                // figures out the concrete type with `U`, but the stored type is with `T`
+                // figures out the concrete type with `U`, but the stored type is with `T`.
                 instantiated_ty.fold_with(&mut BottomUpFolder {
                     tcx: self.tcx().global_tcx(),
                     fldop: |ty| {
                         trace!("checking type {:?}: {:#?}", ty, ty.sty);
-                        // find a type parameter
+                        // Find a type parameter.
                         if let ty::Param(..) = ty.sty {
-                            // look it up in the substitution list
+                            // Look it up in the substitution list.
                             assert_eq!(opaque_defn.substs.len(), generics.params.len());
                             for (subst, param) in opaque_defn.substs.iter().zip(&generics.params) {
                                 if let UnpackedKind::Type(subst) = subst.unpack() {
                                     if subst == ty {
-                                        // found it in the substitution list, replace with the
-                                        // parameter from the existential type
+                                        // Found it in the substitution list; replace with the
+                                        // parameter from the existential type.
                                         return self.tcx()
                                             .global_tcx()
                                             .mk_ty_param(param.index, param.name);
@@ -511,15 +511,15 @@ impl<'cx, 'gcx, 'tcx> WritebackCx<'cx, 'gcx, 'tcx> {
                     },
                     reg_op: |region| {
                         match region {
-                            // ignore static regions
+                            // Ignore static regions.
                             ty::ReStatic => region,
                             _ => {
                                 trace!("checking {:?}", region);
                                 for (subst, p) in opaque_defn.substs.iter().zip(&generics.params) {
                                     if let UnpackedKind::Lifetime(subst) = subst.unpack() {
                                         if subst == region {
-                                            // found it in the substitution list, replace with the
-                                            // parameter from the existential type
+                                            // Found it in the substitution list; replace with the
+                                            // parameter from the existential type.
                                             let reg = ty::EarlyBoundRegion {
                                                 def_id: p.def_id,
                                                 index: p.index,
@@ -558,10 +558,10 @@ impl<'cx, 'gcx, 'tcx> WritebackCx<'cx, 'gcx, 'tcx> {
 
             if let ty::Opaque(defin_ty_def_id, _substs) = definition_ty.sty {
                 if def_id == defin_ty_def_id {
-                    // Concrete type resolved to the existential type itself
-                    // Force a cycle error
-                    // FIXME(oli-obk): we could just not insert it into `concrete_existential_types`
-                    // which simply would make this use not a defining use.
+                    // Concrete type resolved to the existential type itself.
+                    // Force a cycle error.
+                    // FIXME(oli-obk): we could just not insert it into `concrete_existential_types`,
+                    // which would simply make this use a non-defining use.
                     self.tcx().at(span).type_of(defin_ty_def_id);
                 }
             }

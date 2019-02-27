@@ -67,7 +67,7 @@ impl<'tcx> RegionInferenceContext<'tcx> {
     ) -> (ConstraintCategory, bool, Span) {
         debug!("best_blame_constraint(from_region={:?})", from_region);
 
-        // Find all paths
+        // Find all paths.
         let (path, target_region) =
             self.find_constraint_paths_between_regions(from_region, target_test)
                 .unwrap();
@@ -151,7 +151,7 @@ impl<'tcx> RegionInferenceContext<'tcx> {
     /// `results`. The paths are stored as a series of
     /// `ConstraintIndex` values -- in other words, a list of *edges*.
     ///
-    /// Returns: a series of constraints as well as the region `R`
+    /// Returns a series of constraints as well as the region `R`
     /// that passed the target test.
     fn find_constraint_paths_between_regions(
         &self,
@@ -585,7 +585,7 @@ impl<'tcx> RegionInferenceContext<'tcx> {
                 // Check whether or not the impl trait return type is intended to capture
                 // data with the static lifetime.
                 //
-                // eg. check for `impl Trait + 'static` instead of `impl Trait`.
+                // E.g., check for `impl Trait + 'static` instead of `impl Trait`.
                 let has_static_predicate = {
                     let predicates_of = infcx.tcx.predicates_of(*did);
                     let bounds = predicates_of.instantiate(infcx.tcx, substs);

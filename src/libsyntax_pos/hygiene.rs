@@ -612,12 +612,12 @@ impl CompilerDesugaringKind {
 
 impl Encodable for SyntaxContext {
     fn encode<E: Encoder>(&self, _: &mut E) -> Result<(), E::Error> {
-        Ok(()) // FIXME(jseyfried) intercrate hygiene
+        Ok(()) // FIXME(jseyfried): intercrate hygiene
     }
 }
 
 impl Decodable for SyntaxContext {
     fn decode<D: Decoder>(_: &mut D) -> Result<SyntaxContext, D::Error> {
-        Ok(SyntaxContext::empty()) // FIXME(jseyfried) intercrate hygiene
+        Ok(SyntaxContext::empty()) // FIXME(jseyfried): intercrate hygiene
     }
 }

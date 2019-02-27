@@ -287,7 +287,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
             return Ok(Some(Immediate::Scalar(Scalar::zst().into())));
         }
 
-        // check for integer pointers before alignment to report better errors
+        // Check for integer pointers before alignment to report better errors.
         let ptr = ptr.to_ptr()?;
         self.memory.check_align(ptr.into(), ptr_align)?;
         match mplace.layout.abi {
@@ -400,7 +400,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         })
     }
 
-    /// Projection functions
+    /// Projection functions.
     pub fn operand_field(
         &self,
         op: OpTy<'tcx, M::PointerTag>,
@@ -408,7 +408,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
     ) -> EvalResult<'tcx, OpTy<'tcx, M::PointerTag>> {
         let base = match op.try_as_mplace() {
             Ok(mplace) => {
-                // The easy case
+                // The easy case.
                 let field = self.mplace_field(mplace, field)?;
                 return Ok(field.into());
             },
@@ -423,9 +423,9 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         }
         let offset = op.layout.fields.offset(field);
         let immediate = match base {
-            // the field covers the entire type
+            // The field covers the entire type.
             _ if offset.bytes() == 0 && field_layout.size == op.layout.size => base,
-            // extract fields from types with `ScalarPair` ABI
+            // Extract fields from types with `ScalarPair` ABI.
             Immediate::ScalarPair(a, b) => {
                 let val = if offset.bytes() == 0 { a } else { b };
                 Immediate::Scalar(val)
@@ -441,7 +441,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         op: OpTy<'tcx, M::PointerTag>,
         variant: VariantIdx,
     ) -> EvalResult<'tcx, OpTy<'tcx, M::PointerTag>> {
-        // Downcasts only change the layout
+        // Downcasts only change the layout.
         Ok(match op.try_as_mplace() {
             Ok(mplace) => {
                 self.mplace_downcast(mplace, variant)?.into()
@@ -466,7 +466,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
             Subslice { .. } | ConstantIndex { .. } | Index(_) => if base.layout.is_zst() {
                 OpTy {
                     op: Operand::Immediate(Immediate::Scalar(Scalar::zst().into())),
-                    // the actual index doesn't matter, so we just pick a convenient one like 0
+                    // The actual index doesn't matter, so we just pick a convenient one like 0.
                     layout: base.layout.field(self, 0)?,
                 }
             } else {
@@ -541,7 +541,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
     ) -> EvalResult<'tcx, OpTy<'tcx, M::PointerTag>> {
         use rustc::mir::Operand::*;
         let op = match *mir_op {
-            // FIXME: do some more logic on `move` to invalidate the old location
+            // FIXME: do some more logic on `move` to invalidate the old location.
             Copy(ref place) |
             Move(ref place) =>
                 self.eval_place_to_op(place, layout)?,
@@ -631,12 +631,12 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
             layout::Variants::Tagged { .. } |
             layout::Variants::NicheFilling { .. } => {},
         }
-        // read raw discriminant value
+        // Read raw discriminant value.
         let discr_op = self.operand_field(rval, 0)?;
         let discr_val = self.read_immediate(discr_op)?;
         let raw_discr = discr_val.to_scalar_or_undef();
         trace!("discr value: {:?}", raw_discr);
-        // post-process
+        // Post-process.
         Ok(match rval.layout.variants {
             layout::Variants::Single { .. } => bug!(),
             layout::Variants::Tagged { .. } => {
@@ -648,7 +648,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                     // Going from layout tag type to typeck discriminant type
                     // requires first sign extending with the layout discriminant, ...`
                     let sexted = sign_extend(bits_discr, discr_val.layout.size) as i128;
-                    // and then zeroing with the typeck discriminant type
+                    // ... and then zeroing with the typeck discriminant type.
                     let discr_ty = rval.layout.ty
                         .ty_adt_def().expect("tagged layout corresponds to adt")
                         .repr
@@ -659,7 +659,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                 } else {
                     bits_discr
                 };
-                // Make sure we catch invalid discriminants
+                // Make sure we catch invalid discriminants.
                 let index = rval.layout.ty
                     .ty_adt_def()
                     .expect("tagged layout for non adt")
@@ -678,7 +678,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                 let variants_end = niche_variants.end().as_u32() as u128;
                 match raw_discr {
                     ScalarMaybeUndef::Scalar(Scalar::Ptr(ptr)) => {
-                        // The niche must be just 0 (which an inbounds pointer value never is)
+                        // The niche must be just 0 (which an inbounds pointer value never is).
                         let ptr_valid = niche_start == 0 && variants_start == variants_end &&
                             self.memory.check_bounds_ptr(ptr, InboundsCheck::MaybeDead).is_ok();
                         if !ptr_valid {

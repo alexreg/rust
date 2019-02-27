@@ -54,7 +54,7 @@ impl fmt::Display for Mode {
 
 const QUALIF_COUNT: usize = 4;
 
-// FIXME(eddyb) once we can use const generics, replace this array with
+// FIXME(eddyb): once we can use const generics, replace this array with
 // something like `IndexVec` but for fixed-size arrays (`IndexArray`?).
 #[derive(Copy, Clone, Default)]
 struct PerQualif<T>([T; QUALIF_COUNT]);
@@ -154,7 +154,7 @@ trait Qualif {
     }
 
     fn in_static(_cx: &ConstCx<'_, 'tcx>, _static: &Static<'tcx>) -> bool {
-        // FIXME(eddyb) should we do anything here for value properties?
+        // FIXME(eddyb): should we do anything here for value properties?
         false
     }
 
@@ -423,7 +423,7 @@ impl Qualif for IsNotConst {
                             op == BinOp::Ge || op == BinOp::Gt ||
                             op == BinOp::Offset);
 
-                    // raw pointer operations are not allowed inside promoteds
+                    // Raw pointer operations are not allowed inside promoteds.
                     return true;
                 }
             }
@@ -520,7 +520,7 @@ impl Qualif for IsNotPromotable {
             }
         }
 
-        // FIXME(eddyb) do we need "not promotable" in anything
+        // FIXME(eddyb): do we need "not promotable" in anything
         // other than `Mode::Fn` by any chance?
 
         false
@@ -689,7 +689,7 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
             // due to either a mutable borrow (with some exceptions),
             // or an shared borrow of a value with interior mutability.
             // Then `HasMutInterior` is replaced with `IsNotConst`,
-            // to avoid duplicate errors (e.g. from reborrowing).
+            // to avoid duplicate errors (e.g., from reborrowing).
             if qualifs[HasMutInterior] {
                 qualifs[HasMutInterior] = false;
                 qualifs[IsNotConst] = true;
@@ -737,8 +737,8 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
                         // (from `in_rvalue`), so we can safely ignore
                         // `HasMutInterior` from the local's qualifications.
                         // This allows borrowing fields which don't have
-                        // `HasMutInterior`, from a type that does, e.g.:
-                        // `let _: &'static _ = &(Cell::new(1), 2).1;`
+                        // `HasMutInterior`, from a type that does, e.g.,
+                        // `let _: &'static _ = &(Cell::new(1), 2).1;`.
                         let mut local_qualifs = self.qualifs_in_local(local);
                         local_qualifs[HasMutInterior] = false;
                         if !local_qualifs.0.iter().any(|&qualif| qualif) {
@@ -753,11 +753,11 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
         let mut dest = dest;
         let index = loop {
             match dest {
-                // We treat all locals equal in constants
+                // We treat all locals equal in constants.
                 Place::Local(index) => break *index,
-                // projections are transparent for assignments
-                // we qualify the entire destination at once, even if just a field would have
-                // stricter qualification
+                // Projections are transparent for assignments.
+                // We qualify the entire destination at once, even if just a field would have
+                // stricter qualification.
                 Place::Projection(proj) => {
                     // Catch more errors in the destination. `visit_place` also checks various
                     // projection rules like union field access and raw pointer deref
@@ -804,7 +804,7 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
         }
 
         // Ensure the `IsNotPromotable` qualification is preserved.
-        // NOTE(eddyb) this is actually unnecessary right now, as
+        // NOTE(eddyb): this is actually unnecessary right now, as
         // we never replace the local's qualif, but we might in
         // the future, and so it serves to catch changes that unset
         // important bits (in which case, asserting `contains` could
@@ -931,10 +931,10 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                 // Only allow statics (not consts) to refer to other statics.
                 if self.mode == Mode::Static || self.mode == Mode::StaticMut {
                     if self.mode == Mode::Static && context.is_mutating_use() {
-                        // this is not strictly necessary as miri will also bail out
-                        // For interior mutability we can't really catch this statically as that
-                        // goes through raw pointers and intermediate temporaries, so miri has
-                        // to catch this anyway
+                        // This is not strictly necessary, as Miri will also bail out.
+                        // For interior mutability, we can't really catch this statically, as that
+                        // goes through raw pointers and intermediate temporaries, so Miri has
+                        // to catch this anyway.
                         self.tcx.sess.span_err(
                             self.span,
                             "cannot mutate statics in the initializer of another static",
@@ -964,7 +964,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                 match proj.elem {
                     ProjectionElem::Deref => {
                         if context.is_mutating_use() {
-                            // `not_const` errors out in const contexts
+                            // `not_const` errors out in const contexts.
                             self.not_const()
                         }
                         let base_ty = proj.base.ty(self.mir, self.tcx).to_ty(self.tcx);
@@ -1103,8 +1103,8 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                     (CastTy::FnPtr, CastTy::Int(_)) if self.mode != Mode::Fn => {
                         unleash_miri!(self);
                         if !self.tcx.features().const_raw_ptr_to_usize_cast {
-                            // in const fn and constants require the feature gate
-                            // FIXME: make it unsafe inside const fn and constants
+                            // In const fn and constants, require the feature gate.
+                            // FIXME: make it unsafe inside const fn and constants.
                             emit_feature_err(
                                 &self.tcx.sess.parse_sess, "const_raw_ptr_to_usize_cast",
                                 self.span, GateIssue::Language,
@@ -1128,8 +1128,8 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
 
                     unleash_miri!(self);
                     if self.mode != Mode::Fn && !self.tcx.features().const_compare_raw_pointers {
-                        // require the feature gate inside constants and const fn
-                        // FIXME: make it unsafe to use these operations
+                        // Require the feature gate inside constants and const fn.
+                        // FIXME: make it unsafe to use these operations.
                         emit_feature_err(
                             &self.tcx.sess.parse_sess,
                             "const_compare_raw_pointers",
@@ -1186,8 +1186,8 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                         Abi::PlatformIntrinsic => {
                             assert!(!self.tcx.is_const_fn(def_id));
                             match &self.tcx.item_name(def_id).as_str()[..] {
-                                // special intrinsic that can be called diretly without an intrinsic
-                                // feature gate needs a language feature gate
+                                // Special intrinsic that can be called diretly without an intrinsic
+                                // feature gate needs a language feature gate.
                                 "transmute" => {
                                     // Never promote `transmute` calls.
                                     if self.mode != Mode::Fn {
@@ -1206,8 +1206,8 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                                     is_shuffle = true;
                                 }
 
-                                // no need to check feature gates, intrinsics are only callable
-                                // from the libstd or with forever unstable feature gates
+                                // No need to check feature gates; intrinsics are only callable
+                                // from the libstd or with forever-unstable feature gates.
                                 _ => {}
                             }
                         }
@@ -1223,7 +1223,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                                 if self.tcx.is_const_fn(def_id) || unleash_miri {
                                     // Stable const fns or unstable const fns
                                     // with their feature gate active
-                                    // FIXME(eddyb) move stability checks from `is_const_fn` here.
+                                    // FIXME(eddyb): move stability checks from `is_const_fn` here.
                                 } else if self.is_const_panic_fn(def_id) {
                                     // Check the `const_panic` feature gate.
                                     // FIXME: cannot allow this inside `allow_internal_unstable`
@@ -1383,7 +1383,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
             StatementKind::Assign(..) => {
                 self.super_statement(bb, statement, location);
             }
-            // FIXME(eddyb) should these really do nothing?
+            // FIXME(eddyb): should these really do nothing?
             StatementKind::FakeRead(..) |
             StatementKind::SetDiscriminant { .. } |
             StatementKind::StorageLive(_) |
@@ -1475,7 +1475,7 @@ impl MirPass for QualifyAndPromoteConstants {
                     if tcx.sess.opts.debugging_opts.unleash_the_miri_inside_of_you {
                         checker.check_const();
                     } else if tcx.is_min_const_fn(def_id) {
-                        // enforce `min_const_fn` for stable const fns
+                        // Enforce `min_const_fn` for stable const fns.
                         use super::qualify_min_const_fn::is_min_const_fn;
                         if let Err((span, err)) = is_min_const_fn(tcx, def_id, mir) {
                             let mut diag = struct_span_err!(
@@ -1490,7 +1490,7 @@ impl MirPass for QualifyAndPromoteConstants {
                             );
                             diag.emit();
                         } else {
-                            // this should not produce any errors, but better safe than sorry
+                            // This should not produce any errors, but better safe than sorry.
                             // FIXME(#53819)
                             checker.check_const();
                         }

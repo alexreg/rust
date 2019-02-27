@@ -224,7 +224,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                             kind: Adjust::Borrow(AutoBorrow::Ref(region, mutbl)),
                             target: method.sig.inputs()[1]
                         };
-                        // HACK(eddyb) Bypass checks due to reborrows being in
+                        // HACK(eddyb): bypass checks due to reborrows being in
                         // some cases applied on the RHS, on top of which we need
                         // to autoref, which is not allowed by apply_adjustments.
                         // self.apply_adjustments(rhs_expr, vec![autoref]);

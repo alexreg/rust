@@ -82,9 +82,9 @@ pub enum KleeneOp {
 pub enum TokenTree {
     Token(Span, token::Token),
     Delimited(DelimSpan, Lrc<Delimited>),
-    /// A kleene-style repetition sequence
+    /// A kleene-style repetition sequence.
     Sequence(DelimSpan, Lrc<SequenceRepetition>),
-    /// e.g., `$var`
+    /// E.g., `$var`.
     MetaVar(Span, ast::Ident),
     /// E.g., `$var:expr`. This is only used in the left-hand side of MBE macros.
     MetaVarDecl(
@@ -271,7 +271,7 @@ where
         // `tree` is a `$` token. Look at the next token in `trees`
         tokenstream::TokenTree::Token(span, token::Dollar) => match trees.next() {
             // `tree` is followed by a delimited set of token trees. This indicates the beginning
-            // of a repetition sequence in the macro (e.g. `$(pat)*`).
+            // of a repetition sequence in the macro (e.g., `$(pat)*`).
             Some(tokenstream::TokenTree::Delimited(span, delim, tts)) => {
                 // Must have `(` not `{` or `[`
                 if delim != token::Paren {
@@ -473,7 +473,7 @@ where
 
             if is_1_sep {
                 // #1 is a separator and #2 should be a KleepeOp.
-                // (N.B. We need to advance the input iterator.)
+                // (N.B., we need to advance the input iterator.)
                 match parse_kleene_op(input, span) {
                     // #2 is `?`, which is not allowed as a Kleene op in 2015 edition,
                     // but is allowed in the 2018 edition.

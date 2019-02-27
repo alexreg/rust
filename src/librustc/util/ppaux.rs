@@ -1192,7 +1192,7 @@ define_print! {
         }
         debug {
             // when printing out the debug representation, we don't need
-            // to enumerate the `for<...>` etc because the debruijn index
+            // to enumerate the `for<...>`, etc., because the De Bruijn index
             // tells you everything you need to know.
             print!(f, cx,
                    write("<"),
@@ -1378,8 +1378,8 @@ define_print! {
                             Ok(())
                         })?
                     } else {
-                        // cross-crate closure types should only be
-                        // visible in codegen bug reports, I imagine.
+                        // Cross-crate closure types should only be
+                        // visible in codegen bug reports.
                         write!(f, "@{:?}", did)?;
                         let mut sep = " ";
                         for (index, upvar_ty) in upvar_tys.enumerate() {
@@ -1418,8 +1418,8 @@ define_print! {
                             Ok(())
                         })?
                     } else {
-                        // cross-crate closure types should only be
-                        // visible in codegen bug reports, I imagine.
+                        // Cross-crate closure types should only be
+                        // visible in codegen bug reports.
                         write!(f, "@{:?}", did)?;
                         let mut sep = " ";
                         for (index, upvar_ty) in upvar_tys.enumerate() {

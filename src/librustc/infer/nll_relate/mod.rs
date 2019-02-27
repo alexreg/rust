@@ -598,7 +598,7 @@ where
 /// `bound_region_scope`.
 struct ScopeInstantiator<'me, 'tcx: 'me> {
     next_region: &'me mut dyn FnMut(ty::BoundRegion) -> ty::Region<'tcx>,
-    // The debruijn index of the scope we are instantiating.
+    // The De Bruijn index of the scope we are instantiating.
     target_index: ty::DebruijnIndex,
     bound_region_scope: &'me mut BoundRegionScope<'tcx>,
 }

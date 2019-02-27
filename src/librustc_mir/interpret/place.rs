@@ -350,7 +350,7 @@ where
         let mut place = self.ref_to_mplace(val)?;
         // Pointer tag tracking might want to adjust the tag.
         let mutbl = match val.layout.ty.sty {
-            // `builtin_deref` considers boxes immutable, that's useless for our purposes
+            // `builtin_deref` considers boxes immutable; that's useless for our purposes.
             ty::Ref(_, _, mutbl) => Some(mutbl),
             ty::Adt(def, _) if def.is_box() => Some(hir::MutMutable),
             ty::RawPtr(_) => None,
@@ -476,7 +476,7 @@ where
         base: MPlaceTy<'tcx, M::PointerTag>,
         variant: VariantIdx,
     ) -> EvalResult<'tcx, MPlaceTy<'tcx, M::PointerTag>> {
-        // Downcasts only change the layout
+        // Downcasts only change the layout.
         assert!(base.meta.is_none());
         Ok(MPlaceTy { layout: base.layout.for_variant(self, variant), ..base })
     }
@@ -742,12 +742,12 @@ where
         // to handle padding properly, which is only correct if we never look at this data with the
         // wrong type.
 
-        // Nothing to do for ZSTs, other than checking alignment
+        // Nothing to do for ZSTs, other than checking alignment.
         if dest.layout.is_zst() {
             return self.memory.check_align(ptr, ptr_align);
         }
 
-        // check for integer pointers before alignment to report better errors
+        // Check for integer pointers before alignment to report better errors.
         let ptr = ptr.to_ptr()?;
         self.memory.check_align(ptr.into(), ptr_align)?;
         let tcx = &*self.tcx;

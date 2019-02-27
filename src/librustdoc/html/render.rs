@@ -4467,7 +4467,7 @@ impl<'a> fmt::Display for Sidebar<'a> {
                path = relpath)?;
         if parentlen == 0 {
             // There is no sidebar-items.js beyond the crate root path
-            // FIXME maybe dynamic crate loading can be merged here
+            // FIXME: maybe dynamic crate loading can be merged here
         } else {
             write!(fmt, "<script defer src=\"{path}sidebar-items.js\"></script>",
                    path = relpath)?;

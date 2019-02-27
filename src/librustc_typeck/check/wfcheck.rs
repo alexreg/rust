@@ -96,7 +96,7 @@ pub fn check_item_well_formed<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: Def
             if polarity == hir::ImplPolarity::Positive {
                 check_impl(tcx, item, self_ty, trait_ref);
             } else {
-                // FIXME(#27579) what amount of WF checking do we need for neg impls?
+                // FIXME(#27579): what amount of WF checking do we need for neg impls?
                 if trait_ref.is_some() && !is_auto {
                     span_err!(tcx.sess, item.span, E0192,
                               "negative impls are only allowed for \
@@ -210,7 +210,7 @@ fn check_associated_item<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                 }
             }
             ty::AssociatedKind::Existential => {
-                // do nothing, existential types check themselves
+                // Do nothing; existential types check themselves.
             }
         }
 
@@ -454,7 +454,7 @@ fn check_where_clauses<'a, 'gcx, 'fcx, 'tcx>(
     // Checks that trait predicates are WF when params are substituted by their defaults.
     // We don't want to overly constrain the predicates that may be written but we want to
     // catch cases where a default my never be applied such as `struct Foo<T: Copy = String>`.
-    // Therefore we check if a predicate which contains a single type param
+    // Therefore, we check if a predicate which contains a single type param
     // with a concrete default is WF with that default substituted.
     // For more examples see tests `defaults-well-formedness.rs` and `type-check-defaults.rs`.
     //
@@ -568,7 +568,7 @@ fn check_fn_or_method<'a, 'fcx, 'gcx, 'tcx>(tcx: TyCtxt<'a, 'gcx, 'gcx>,
 
     fcx.register_wf_obligation(sig.output(), span, ObligationCauseCode::MiscObligation);
 
-    // FIXME(#25759) return types should not be implied bounds
+    // FIXME(#25759): return types should not be implied bounds.
     implied_bounds.push(sig.output());
 
     check_where_clauses(tcx, fcx, span, def_id, Some(sig.output()));
@@ -929,7 +929,7 @@ fn report_bivariance<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     let mut err = error_392(tcx, span, param_name);
 
     let suggested_marker_id = tcx.lang_items().phantom_data();
-    // help is available only in presence of lang items
+    // Help is available only in presence of lang items.
     if let Some(def_id) = suggested_marker_id {
         err.help(&format!("consider removing `{}` or using a marker such as `{}`",
                           param_name,
@@ -952,7 +952,7 @@ fn reject_shadowing_parameters(tcx: TyCtxt<'_, '_, '_>, def_id: DefId) {
             continue
         }
         if impl_params.contains_key(&method_param.name) {
-            // Tighten up the span to focus on only the shadowing type
+            // Tighten up the span to focus on only the shadowing type.
             let type_span = tcx.def_span(method_param.def_id);
 
             // The expectation here is that the original trait declaration is
@@ -980,7 +980,7 @@ fn check_false_global_bounds<'a, 'gcx, 'tcx>(
         .iter()
         .map(|(p, _)| *p)
         .collect();
-    // Check elaborated bounds
+    // Check elaborated bounds.
     let implied_obligations = traits::elaborate_predicates(fcx.tcx, predicates);
 
     for pred in implied_obligations {

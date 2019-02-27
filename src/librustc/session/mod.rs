@@ -183,8 +183,8 @@ pub struct PerfStats {
 enum DiagnosticBuilderMethod {
     Note,
     SpanNote,
-    SpanSuggestion(String), // suggestion
-                            // add more variants as needed to support one-time diagnostics
+    SpanSuggestion(String),
+    // Add more variants as needed to support one-time diagnostics.
 }
 
 /// Diagnostic message ID—used by `Session.one_time_diagnostics` to avoid
@@ -774,7 +774,7 @@ impl Session {
             )
         }
 
-        // Note: This will also drop the lock file, thus unlocking the directory
+        // Note: this will also drop the lock file, thus unlocking the directory.
         *incr_comp_session = IncrCompSession::Finalized {
             session_directory: new_directory_path,
         };
@@ -1250,7 +1250,7 @@ fn validate_commandline_args_with_session_available(sess: &Session) {
     // dynamically downstream, rustc generates `__imp_` symbols that help the
     // MSVC linker deal with this lack of knowledge (#27438). Unfortunately,
     // these manually generated symbols confuse LLD when it tries to merge
-    // bitcode during ThinLTO. Therefore we disallow dynamic linking on MSVC
+    // bitcode during ThinLTO. Therefore, we disallow dynamic linking on MSVC
     // when compiling for LLD ThinLTO. This way we can validly just not generate
     // the `dllimport` attributes and `__imp_` symbols in that case.
     if sess.opts.cg.linker_plugin_lto.enabled() &&

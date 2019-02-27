@@ -178,7 +178,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             .any(|predicate| {
                 match predicate {
                     ty::Predicate::Trait(ref data) => {
-                        // In the case of a trait predicate, we can skip the "self" type.
+                        // In the case of a trait predicate, we can skip the self type.
                         data.skip_binder().input_types().skip(1).any(|t| t.has_self_ty())
                     }
                     ty::Predicate::Projection(ref data) => {
@@ -188,7 +188,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
                         // the check to be safe.
                         //
                         // Note that we *do* allow projection *outputs* to contain
-                        // `self` (i.e., `trait Foo: Bar<Output=Self::Result> { type Result; }`),
+                        // `self` (i.e., `trait Foo: Bar<Output = Self::Result> { type Result; }`),
                         // we just require the user to specify *both* outputs
                         // in the object type (i.e., `dyn Foo<Output=(), Result=()>`).
                         //
@@ -225,7 +225,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             None => return false,
         };
 
-        // Search for a predicate like `Self : Sized` amongst the trait bounds.
+        // Search for a predicate like `Self: Sized` amongst the trait bounds.
         let predicates = self.predicates_of(def_id);
         let predicates = predicates.instantiate_identity(self).predicates;
         elaborate_predicates(self, predicates)
@@ -255,7 +255,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
                                           -> Option<MethodViolationCode>
     {
         debug!("object_safety_violation_for_method({:?}, {:?})", trait_def_id, method);
-        // Any method that has a `Self : Sized` requisite is otherwise
+        // Any method that has a `Self: Sized` requisite is otherwise
         // exempt from the regulations.
         if self.generics_require_sized_self(method.def_id) {
             return None;
@@ -274,7 +274,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
                                  -> bool
     {
         debug!("is_vtable_safe_method({:?}, {:?})", trait_def_id, method);
-        // Any method that has a `Self : Sized` requisite can't be called.
+        // Any method that has a `Self: Sized` requisite can't be called.
         if self.generics_require_sized_self(method.def_id) {
             return false;
         }
@@ -294,7 +294,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
                                          method: &ty::AssociatedItem)
                                          -> Option<MethodViolationCode>
     {
-        // The method's first parameter must be named `self`
+        // The method's first parameter must be named `self`.
         if !method.method_has_self_argument {
             return Some(MethodViolationCode::StaticMethod);
         }
@@ -335,8 +335,8 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
 
         // Until `unsized_locals` is fully implemented, `self: Self` can't be dispatched on.
         // However, this is already considered object-safe. We allow it as a special case here.
-        // FIXME(mikeyhew) get rid of this `if` statement once `receiver_is_dispatchable` allows
-        // `Receiver: Unsize<Receiver[Self => dyn Trait]>`
+        // FIXME(mikeyhew): get rid of this `if` statement once `receiver_is_dispatchable` allows
+        // `Receiver: Unsize<Receiver[Self => dyn Trait]>`.
         if receiver_ty != self.mk_self_type() {
             if !self.receiver_is_dispatchable(method, receiver_ty) {
                 return Some(MethodViolationCode::UndispatchableReceiver);
@@ -441,7 +441,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             .filter(|(_, item)| item.kind == ty::AssociatedKind::Type)
             .collect::<Vec<_>>();
 
-        // existential predicates need to be in a specific order
+        // Existential predicates need to be in a specific order.
         associated_types.sort_by_cached_key(|(_, item)| self.def_path_hash(item.def_id));
 
         let projection_predicates = associated_types.into_iter().map(|(super_trait_ref, item)| {
@@ -462,7 +462,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
         );
 
         let object_ty = self.mk_dynamic(
-            // (*) ... binder re-introduced here
+            // (*) ... binder re-introduced here.
             ty::Binder::bind(existential_predicates),
             lifetime,
         );
@@ -509,11 +509,11 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
     ///         Receiver: DispatchFromDyn<Receiver[Self => U]>
     ///     }
     ///
-    /// for `self: &'a mut Self`, this means `&'a mut Self: DispatchFromDyn<&'a mut U>`
-    /// for `self: Rc<Self>`, this means `Rc<Self>: DispatchFromDyn<Rc<U>>`
-    /// for `self: Pin<Box<Self>>`, this means `Pin<Box<Self>>: DispatchFromDyn<Pin<Box<U>>>`
+    /// For `self: &'a mut Self`, this means `&'a mut Self: DispatchFromDyn<&'a mut U>`.
+    /// For `self: Rc<Self>`, this means `Rc<Self>: DispatchFromDyn<Rc<U>>`.
+    /// For `self: Pin<Box<Self>>`, this means `Pin<Box<Self>>: DispatchFromDyn<Pin<Box<U>>>`.
     //
-    // FIXME(mikeyhew) when unsized receivers are implemented as part of unsized rvalues, add this
+    // FIXME(mikeyhew): when unsized receivers are implemented as part of unsized rvalues, add this
     // fallback query: `Receiver: Unsize<Receiver[Self => U]>` to support receivers like
     // `self: Wrapper<Self>`.
     #[allow(dead_code)]
@@ -603,7 +603,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
         };
 
         self.infer_ctxt().enter(|ref infcx| {
-            // the receiver is dispatchable iff the obligation holds
+            // The receiver is dispatchable iff the obligation holds.
             infcx.predicate_must_hold_modulo_regions(&obligation)
         })
     }

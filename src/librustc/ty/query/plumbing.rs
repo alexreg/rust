@@ -162,14 +162,14 @@ impl<'a, 'tcx, Q: QueryDescription<'tcx>> JobOwner<'a, 'tcx, Q> {
             mem::drop(lock);
 
             // If we are single-threaded we know that we have cycle error,
-            // so we just return the error
+            // so we just return the error.
             #[cfg(not(parallel_compiler))]
             return TryGetJob::Cycle(cold_path(|| {
                 Q::handle_cycle_error(tcx, job.find_cycle_in_stack(tcx, span))
             }));
 
             // With parallel queries we might just have to wait on some other
-            // thread
+            // thread.
             #[cfg(parallel_compiler)]
             {
                 let result = job.r#await(tcx, span);
@@ -186,12 +186,12 @@ impl<'a, 'tcx, Q: QueryDescription<'tcx>> JobOwner<'a, 'tcx, Q> {
     /// signals the waiter and forgets the JobOwner, so it won't poison the query
     #[inline(always)]
     pub(super) fn complete(self, result: &Q::Value, dep_node_index: DepNodeIndex) {
-        // We can move out of `self` here because we `mem::forget` it below
+        // We can move out of `self` here because we `mem::forget` it below.
         let key = unsafe { ptr::read(&self.key) };
         let job = unsafe { ptr::read(&self.job) };
         let cache = self.cache;
 
-        // Forget ourself so our destructor won't poison the query
+        // Forget ourself so our destructor won't poison the query.
         mem::forget(self);
 
         let value = QueryValue::new(result.clone(), dep_node_index);
@@ -219,7 +219,7 @@ impl<'a, 'tcx, Q: QueryDescription<'tcx>> Drop for JobOwner<'a, 'tcx, Q> {
     #[inline(never)]
     #[cold]
     fn drop(&mut self) {
-        // Poison the query so jobs waiting on it panic
+        // Poison the query so jobs waiting on it panic.
         self.cache.borrow_mut().active.insert(self.key.clone(), QueryResult::Poisoned);
         // Also signal the completion of the job, so waiters will continue execution.
         self.job.signal_complete();
@@ -228,7 +228,7 @@ impl<'a, 'tcx, Q: QueryDescription<'tcx>> Drop for JobOwner<'a, 'tcx, Q> {
 
 #[derive(Clone)]
 pub struct CycleError<'tcx> {
-    /// The query and related span which uses the cycle
+    /// The query and related span which uses the cycle.
     pub(super) usage: Option<(Span, Query<'tcx>)>,
     pub(super) cycle: Vec<QueryInfo<'tcx>>,
 }
@@ -449,11 +449,11 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
     ) -> Q::Value
     {
         // Note this function can be called concurrently from the same query
-        // We must ensure that this is handled correctly
+        // We must ensure that this is handled correctly.
 
         debug_assert!(self.dep_graph.is_green(dep_node));
 
-        // First we try to load the result from the on-disk cache
+        // First, we try to load the result from the on-disk cache
         let result = if Q::cache_on_disk(self.global_tcx(), key.clone()) &&
                         self.sess.opts.debugging_opts.incremental_queries {
             self.sess.profiler(|p| p.incremental_load_result_start(Q::NAME));
@@ -601,7 +601,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
     pub(super) fn ensure_query<Q: QueryDescription<'gcx>>(self, key: Q::Key) -> () {
         let dep_node = Q::to_dep_node(self, &key);
 
-        // Ensuring an "input" or anonymous query makes no sense
+        // Ensuring an "input" or anonymous query makes no sense.
         assert!(!dep_node.kind.is_anon());
         assert!(!dep_node.kind.is_input());
         if self.dep_graph.try_mark_green_and_read(self, &dep_node).is_none() {
@@ -631,8 +631,8 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
             ProfileQueriesMsg::QueryBegin(span.data(), profq_query_msg!(Q::NAME, self, key))
         );
 
-        // We may be concurrently trying both execute and force a query
-        // Ensure that only one of them runs the query
+        // We may be concurrently trying both execute and force a query.
+        // Ensure that only one of them runs the query.
         let job = match JobOwner::try_get(self, span, &key) {
             TryGetJob::NotYetStarted(job) => job,
             TryGetJob::Cycle(_) |
@@ -876,7 +876,7 @@ macro_rules! define_queries_inner {
                 }
             }
 
-            // FIXME(eddyb) Get more valid Span's on queries.
+            // FIXME(eddyb): get more valid Span's on queries.
             pub fn default_span(&self, tcx: TyCtxt<'_, $tcx, '_>, span: Span) -> Span {
                 if !span.is_dummy() {
                     return span;
@@ -953,7 +953,7 @@ macro_rules! define_queries_inner {
             fn compute(tcx: TyCtxt<'_, 'tcx, '_>, key: Self::Key) -> Self::Value {
                 __query_compute::$name(move || {
                     let provider = tcx.queries.providers.get(key.query_crate())
-                        // HACK(eddyb) it's possible crates may be loaded after
+                        // HACK(eddyb): it's possible crates may be loaded after
                         // the query engine is created, and because crate loading
                         // is not yet integrated with the query engine, such crates
                         // would be missing appropriate entries in `providers`.
@@ -1160,7 +1160,7 @@ pub fn force_from_dep_node<'a, 'gcx, 'lcx>(tcx: TyCtxt<'a, 'gcx, 'lcx>,
             if let Some(def_id) = dep_node.extract_def_id(tcx) {
                 def_id
             } else {
-                // return from the whole function
+                // Return from the whole function.
                 return false
             }
         }
@@ -1181,7 +1181,7 @@ pub fn force_from_dep_node<'a, 'gcx, 'lcx>(tcx: TyCtxt<'a, 'gcx, 'lcx>,
     // FIXME(#45015): we should try move this boilerplate code into a macro somehow.
     match dep_node.kind {
         // These are inputs that are expected to be pre-allocated and that
-        // should therefore always be red or green already
+        // should therefore always be red or green already.
         DepKind::AllLocalTraitImpls |
         DepKind::Krate |
         DepKind::CrateMetadata |
@@ -1230,12 +1230,12 @@ pub fn force_from_dep_node<'a, 'gcx, 'lcx>(tcx: TyCtxt<'a, 'gcx, 'lcx>,
         DepKind::InstanceDefSizeEstimate |
         DepKind::ProgramClausesForEnv |
 
-        // This one should never occur in this context
+        // This one should never occur in this context.
         DepKind::Null => {
             bug!("force_from_dep_node() - Encountered {:?}", dep_node)
         }
 
-        // These are not queries
+        // These are not queries.
         DepKind::CoherenceCheckTrait |
         DepKind::ItemVarianceConstraints => {
             return false

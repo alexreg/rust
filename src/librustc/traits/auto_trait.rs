@@ -115,7 +115,7 @@ impl<'a, 'tcx> AutoTraitFinder<'a, 'tcx> {
             }
         });
 
-        // If an explicit impl exists, it always takes priority over an auto impl
+        // If an explicit impl exists, it always takes priority over an auto impl.
         if bail_out {
             return AutoTraitResult::ExplicitImpl;
         }
@@ -686,7 +686,7 @@ impl<'a, 'tcx> AutoTraitFinder<'a, 'tcx> {
             //
             // Displaying a bound involving a concrete type (instead of a generic
             // parameter) would be pointless, since it's always true
-            // (e.g. u8: Copy)
+            // (e.g., u8: Copy)
             // Displaying an inference variable is impossible, since they're
             // an internal compiler detail without a defined visual representation
             //

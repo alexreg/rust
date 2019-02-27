@@ -25,9 +25,7 @@
 
 use std::ops::{Deref, DerefMut};
 
-use crate::Resolver;
-use crate::resolve_imports::ImportDirectiveSubclass;
-
+use rustc_data_structures::fx::FxHashSet;
 use rustc::util::nodemap::NodeMap;
 use rustc::{lint, ty};
 use rustc_data_structures::fx::FxHashSet;

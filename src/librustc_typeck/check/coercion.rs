@@ -76,8 +76,8 @@ struct Coerce<'a, 'gcx: 'a + 'tcx, 'tcx: 'a> {
     /// autoref adjustments we create while coercing. We don't want to
     /// allow deref coercions to create two-phase borrows, at least initially,
     /// but we do need two-phase borrows for function argument reborrows.
-    /// See #47489 and #48598
-    /// See docs on the "AllowTwoPhase" type for a more detailed discussion
+    /// See #47489 and #48598.
+    /// See docs on the `AllowTwoPhase` type for a more detailed discussion.
     allow_two_phase: AllowTwoPhase,
 }
 
@@ -276,7 +276,7 @@ impl<'f, 'gcx, 'tcx> Coerce<'f, 'gcx, 'tcx> {
                 continue;
             }
 
-            // At this point, we have deref'd `a` to `referent_ty`.  So
+            // At this point, we have deref'd `a` to `referent_ty`. So,
             // imagine we are coercing from `&'a mut Vec<T>` to `&'b mut [T]`.
             // In the autoderef loop for `&'a mut Vec<T>`, we would get
             // three callbacks:

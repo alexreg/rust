@@ -17,7 +17,7 @@ pub(super) struct AnonymousArgInfo<'tcx> {
     pub arg_ty: Ty<'tcx>,
     /// The `ty::BoundRegion` corresponding to the anonymous region.
     pub bound_region: ty::BoundRegion,
-    // arg_ty_span contains span of argument type
+    /// The span of the argument type.
     pub arg_ty_span : Span,
     /// `true` if corresponds to the ID the argument of the first parameter
     /// in the declaration.
@@ -98,9 +98,9 @@ impl<'a, 'gcx, 'tcx> NiceRegionError<'a, 'gcx, 'tcx> {
         }
     }
 
-    // Here, we check for the case where the anonymous region
-    // is in the return type.
-    // FIXME(#42703) - Need to handle certain cases here.
+    /// Checks for the case where the anonymous region is in the return type.
+    //
+    // FIXME(#42703): need to handle certain cases here.
     pub(super) fn is_return_type_anon(
         &self,
         scope_def_id: DefId,

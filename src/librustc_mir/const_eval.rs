@@ -67,7 +67,7 @@ fn mplace_to_const<'tcx>(
     mplace: MPlaceTy<'tcx>,
 ) -> EvalResult<'tcx, ty::Const<'tcx>> {
     let MemPlace { ptr, align, meta } = *mplace;
-    // extract alloc-offset pair
+    // Extract alloc-offset pair.
     assert!(meta.is_none());
     let ptr = ptr.to_ptr()?;
     let alloc = ecx.memory.get(ptr.alloc_id)?;
@@ -75,8 +75,8 @@ fn mplace_to_const<'tcx>(
     assert!(alloc.bytes.len() as u64 - ptr.offset.bytes() >= mplace.layout.size.bytes());
     let mut alloc = alloc.clone();
     alloc.align = align;
-    // FIXME shouldn't it be the case that `mark_static_initialized` has already
-    // interned this?  I thought that is the entire point of that `FinishStatic` stuff?
+    // FIXME: shouldn't it be the case that `mark_static_initialized` has already
+    // interned this? I thought that is the entire point of that `FinishStatic` stuff?
     let alloc = ecx.tcx.intern_const_alloc(alloc);
     let val = ConstValue::ByRef(ptr, alloc);
     Ok(ty::Const { val, ty: mplace.layout.ty })
@@ -86,7 +86,7 @@ fn op_to_const<'tcx>(
     ecx: &CompileTimeEvalContext<'_, '_, 'tcx>,
     op: OpTy<'tcx>,
 ) -> EvalResult<'tcx, ty::Const<'tcx>> {
-    // We do not normalize just any data.  Only scalar layout and slices.
+    // We do not normalize just any data, only scalar layout and slices.
     let normalize = match op.layout.abi {
         layout::Abi::Scalar(..) => true,
         layout::Abi::ScalarPair(..) => op.layout.ty.is_slice(),
@@ -122,7 +122,7 @@ fn eval_body_and_ecx<'a, 'mir, 'tcx>(
     (r, ecx)
 }
 
-// Returns a pointer to where the result lives
+// Returns a pointer to where the result lives.
 fn eval_body_using_ecx<'mir, 'tcx>(
     ecx: &mut CompileTimeEvalContext<'_, 'mir, 'tcx>,
     cid: GlobalId<'tcx>,
@@ -157,7 +157,7 @@ fn eval_body_using_ecx<'mir, 'tcx>(
     // The main interpreter loop.
     ecx.run()?;
 
-    // Intern the result
+    // Intern the result.
     let internally_mutable = !layout.ty.is_freeze(tcx, param_env, mir.span);
     let is_static = tcx.is_static(cid.instance.def_id());
     let mutability = if is_static == Some(hir::Mutability::MutMutable) || internally_mutable {
@@ -210,7 +210,7 @@ impl Error for ConstEvalError {
     }
 }
 
-// Extra machine state for CTFE, and the Machine instance
+// Extra machine state for CTFE, and the machine instance.
 pub struct CompileTimeInterpreter<'a, 'mir, 'tcx: 'a+'mir> {
     /// When this value is negative, it indicates the number of interpreter
     /// steps *until* the loop detector is enabled. When it is positive, it is
@@ -298,7 +298,7 @@ type CompileTimeEvalContext<'a, 'mir, 'tcx> =
 impl interpret::MayLeak for ! {
     #[inline(always)]
     fn may_leak(self) -> bool {
-        // `self` is uninhabited
+        // `self` is uninhabited.
         self
     }
 }
@@ -330,7 +330,7 @@ impl<'a, 'mir, 'tcx> interpret::Machine<'a, 'mir, 'tcx>
         ret: Option<mir::BasicBlock>,
     ) -> EvalResult<'tcx, Option<&'mir mir::Mir<'tcx>>> {
         debug!("eval_fn_call: {:?}", instance);
-        // Only check non-glue functions
+        // Only check non-glue functions.
         if let ty::InstanceDef::Item(def_id) = instance.def {
             // Execution might have wandered off into other crates, so we cannot to a stability-
             // sensitive check here.  But we can at least rule out functions that are not const
@@ -347,7 +347,7 @@ impl<'a, 'mir, 'tcx> interpret::Machine<'a, 'mir, 'tcx>
                 };
             }
         }
-        // This is a const fn. Call it.
+        // This is a const fn; call it.
         Ok(Some(match ecx.load_mir(instance.def) {
             Ok(mir) => mir,
             Err(err) => {
@@ -371,7 +371,7 @@ impl<'a, 'mir, 'tcx> interpret::Machine<'a, 'mir, 'tcx>
         if ecx.emulate_intrinsic(instance, args, dest)? {
             return Ok(());
         }
-        // An intrinsic that we do not support
+        // An intrinsic that we do not support.
         let intrinsic_name = &ecx.tcx.item_name(instance.def_id()).as_str()[..];
         Err(
             ConstEvalError::NeedsRfc(format!("calling intrinsic `{}`", intrinsic_name)).into()
@@ -476,16 +476,16 @@ pub fn const_field<'a, 'tcx>(
     trace!("const_field: {:?}, {:?}", field, value);
     let ecx = mk_eval_cx(tcx, DUMMY_SP, param_env);
     let result = (|| {
-        // get the operand again
+        // Get the operand again.
         let op = ecx.const_to_op(value, None)?;
-        // downcast
+        // Downcast, ...
         let down = match variant {
             None => op,
             Some(variant) => ecx.operand_downcast(op, variant)?
         };
-        // then project
+        // ... then project, ...
         let field = ecx.operand_field(down, field.index() as u64)?;
-        // and finally move back to the const world, always normalizing because
+        // ... and finally move back to the const world, always normalizing because
         // this is not called for statics.
         op_to_const(&ecx, field)
     })();
@@ -568,13 +568,13 @@ pub fn const_eval_provider<'a, 'tcx>(
         let mut key = key.clone();
         key.param_env.reveal = Reveal::UserFacing;
         match tcx.const_eval(key) {
-            // try again with reveal all as requested
+            // Try again with "reveal all", as requested.
             Err(ErrorHandled::TooGeneric) => {
                 // Promoteds should never be "too generic" when getting evaluated.
-                // They either don't get evaluated, or we are in a monomorphic context
+                // They either don't get evaluated, or we are in a monomorphic context.
                 assert!(key.value.promoted.is_none());
             },
-            // dedupliate calls
+            // Dedupliate calls.
             other => return other,
         }
     }
@@ -599,9 +599,9 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
         let mut key = key.clone();
         key.param_env.reveal = Reveal::UserFacing;
         match tcx.const_eval_raw(key) {
-            // try again with reveal all as requested
+            // Try again with "reveal all" as requested.
             Err(ErrorHandled::TooGeneric) => {},
-            // dedupliate calls
+            // Dedupliate calls.
             other => return other,
         }
     }
@@ -620,7 +620,7 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
     if let Some(id) = tcx.hir().as_local_node_id(def_id) {
         let tables = tcx.typeck_tables_of(def_id);
 
-        // Do match-check before building MIR
+        // Do match-check before building MIR.
         if let Err(ErrorReported) = tcx.check_match(def_id) {
             return Err(ErrorHandled::Reported)
         }
@@ -629,7 +629,7 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
             tcx.mir_const_qualif(def_id);
         }
 
-        // Do not continue into miri if typeck errors occurred; it will fail horribly
+        // Do not continue into Miri if typeck errors occurred; it will fail horribly.
         if tables.tainted_by_errors {
             return Err(ErrorHandled::Reported)
         }
@@ -643,7 +643,7 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
         })
     }).map_err(|error| {
         let err = error_to_const_error(&ecx, error);
-        // errors in statics are always emitted as fatal errors
+        // Errors in statics are always emitted as fatal errors.
         if tcx.is_static(def_id).is_some() {
             let reported_err = err.report_as_error(ecx.tcx,
                                                    "could not evaluate static initializer");
@@ -664,7 +664,7 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
                 //
                 // Note that validation may still cause a hard error on this very same constant,
                 // because any code that existed before validation could not have failed validation
-                // thus preventing such a hard error from being a backwards compatibility hazard
+                // thus preventing such a hard error from being a backwards compatibility hazard.
                 Some(Def::Const(_)) | Some(Def::AssociatedConst(_)) => {
                     let hir_id = tcx.hir().as_local_hir_id(def_id).unwrap();
                     err.report_as_lint(
@@ -673,8 +673,8 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
                         hir_id,
                     )
                 },
-                // promoting runtime code is only allowed to error if it references broken constants
-                // any other kind of error will be reported to the user as a deny-by-default lint
+                // Promoting runtime code is only allowed to error if it references broken constants
+                // any other kind of error will be reported to the user as a deny-by-default lint.
                 _ => if let Some(p) = cid.promoted {
                     let span = tcx.optimized_mir(def_id).promoted[p].span;
                     if let EvalErrorKind::ReferencedConstant = err.error {
@@ -689,8 +689,8 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
                             tcx.hir().as_local_hir_id(def_id).unwrap(),
                         )
                     }
-                // anything else (array lengths, enum initializers, constant patterns) are reported
-                // as hard errors
+                // Anything else (array lengths, enum initializers, constant patterns) are reported
+                // as hard errors.
                 } else {
                     err.report_as_error(
                         ecx.tcx,
@@ -699,7 +699,7 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
                 },
             }
         } else {
-            // use of broken constant from other crate
+            // Use of broken constant from other crate.
             err.report_as_error(ecx.tcx, "could not evaluate constant")
         }
     })

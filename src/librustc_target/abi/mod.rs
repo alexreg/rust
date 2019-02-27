@@ -629,7 +629,7 @@ pub struct Scalar {
     ///
     /// This is intended specifically to mirror LLVM’s `!range` metadata,
     /// semantics.
-    // FIXME(eddyb) always use the shortest range, e.g., by finding
+    // FIXME(eddyb): always use the shortest range, e.g., by finding
     // the largest space between two consecutive valid values and
     // taking everything else as the (shortest) valid range.
     pub valid_range: RangeInclusive<u128>,
@@ -687,12 +687,12 @@ pub enum FieldPlacement {
         /// Offsets for the first byte of each field,
         /// ordered to match the source definition order.
         /// This vector does not go in increasing order.
-        // FIXME(eddyb) use small vector optimization for the common case.
+        // FIXME(eddyb): use small vector optimization for the common case.
         offsets: Vec<Size>,
 
         /// Maps source order field indices to memory order indices,
         /// depending how fields were permuted.
-        // FIXME(camlorn) also consider small vector  optimization here.
+        // FIXME(camlorn): also consider small vector optimization here.
         memory_index: Vec<u32>
     }
 }

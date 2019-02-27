@@ -843,11 +843,11 @@ pub fn may_define_existential_type(
     // named existential types can be defined by any siblings or
     // children of siblings
     let mod_id = tcx.hir().get_parent(opaque_node_id);
-    // so we walk up the node tree until we hit the root or the parent
-    // of the opaque type
+    // We walk up the node tree until we hit the root or the parent
+    // of the opaque type.
     while node_id != mod_id && node_id != ast::CRATE_NODE_ID {
         node_id = tcx.hir().get_parent(node_id);
     }
-    // syntactically we are allowed to define the concrete type
+    // Syntactically we are allowed to define the concrete type.
     node_id == mod_id
 }

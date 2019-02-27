@@ -876,7 +876,7 @@ fn get_metadata_section_imp(target: &Target,
         CrateFlavor::Rlib => loader.get_rlib_metadata(target, filename)?,
         CrateFlavor::Dylib => {
             let buf = loader.get_dylib_metadata(target, filename)?;
-            // The header is uncompressed
+            // The header is uncompressed.
             let header_len = METADATA_HEADER.len();
             debug!("checking {} bytes of metadata-version stamp", header_len);
             let header = &buf[..cmp::min(header_len, buf.len())];

@@ -45,7 +45,7 @@ pub fn features(mut krate: ast::Crate, sess: &ParseSess, edition: Edition)
 
         features = get_features(&sess.span_diagnostic, &krate.attrs, edition);
 
-        // Avoid reconfiguring malformed `cfg_attr`s
+        // Avoid reconfiguring malformed `cfg_attr`s.
         if err_count == sess.span_diagnostic.err_count() {
             strip_unconfigured.features = Some(&features);
             strip_unconfigured.configure(unconfigured_attrs);
@@ -195,7 +195,7 @@ impl<'a> StripUnconfigured<'a> {
 
     /// Visits attributes on expression and statements (but not attributes on items in blocks).
     fn visit_expr_attrs(&mut self, attrs: &[ast::Attribute]) {
-        // flag the offending attributes
+        // Flag the offending attributes.
         for attr in attrs.iter() {
             self.maybe_emit_expr_attr_err(attr);
         }

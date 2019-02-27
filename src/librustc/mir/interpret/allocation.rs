@@ -183,7 +183,7 @@ impl<'tcx, Tag: Copy, Extra> Allocation<Tag, Extra> {
             self.check_defined(ptr, size)?;
             self.check_relocations(cx, ptr, size)?;
         } else {
-            // We still don't want relocations on the *edges*
+            // We still don't want relocations on the *edges*.
             self.check_relocation_edges(cx, ptr, size)?;
         }
 

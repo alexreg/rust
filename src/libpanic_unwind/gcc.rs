@@ -281,7 +281,7 @@ unsafe extern "C" fn rust_eh_unwind_resume(panic_ctx: *mut u8) -> ! {
     uw::_Unwind_Resume(panic_ctx as *mut uw::_Unwind_Exception);
 }
 
-// Frame unwind info registration
+// Frame unwind info registration.
 //
 // Each module's image contains a frame unwind info section (usually
 // ".eh_frame").  When a module is loaded/unloaded into the process, the

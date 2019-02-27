@@ -217,11 +217,12 @@ pub enum ObligationCauseCode<'tcx> {
         trait_item_def_id: DefId,
     },
 
-    /// Checking that this expression can be assigned where it needs to be
-    // FIXME(eddyb) #11161 is the original Expr required?
+    /// Checking that this expression can be assigned where it needs to be.
+    //
+    // FIXME(eddyb): #11161 is the original `Expr` required?
     ExprAssignable,
 
-    /// Computing common supertype in the arms of a match expression
+    /// Computing common supertype in the arms of a match expression.
     MatchExpressionArm {
         arm_span: Span,
         source: hir::MatchSource,
@@ -229,38 +230,38 @@ pub enum ObligationCauseCode<'tcx> {
         last_ty: Ty<'tcx>,
     },
 
-    /// Computing common supertype in the pattern guard for the arms of a match expression
+    /// Computing common supertype in the pattern guard for the arms of a match expression.
     MatchExpressionArmPattern { span: Span, ty: Ty<'tcx> },
 
-    /// Computing common supertype in an if expression
+    /// Computing common supertype in an if expression.
     IfExpression {
         then: Span,
         outer: Option<Span>,
         semicolon: Option<Span>,
     },
 
-    /// Computing common supertype of an if expression with no else counter-part
+    /// Computing common supertype of an if expression with no else counter-part.
     IfExpressionWithNoElse,
 
-    /// `main` has wrong type
+    /// `main` has wrong type.
     MainFunctionType,
 
-    /// `start` has wrong type
+    /// `start` has wrong type.
     StartFunctionType,
 
-    /// intrinsic has wrong type
+    /// Intrinsic has wrong type.
     IntrinsicType,
 
-    /// method receiver
+    /// Method receiver.
     MethodReceiver,
 
-    /// `return` with no expression
+    /// `return` with no expression.
     ReturnNoExpression,
 
-    /// `return` with an expression
+    /// `return` with an expression.
     ReturnType(hir::HirId),
 
-    /// Block implicit return
+    /// Block implicit return.
     BlockTailExpression(hir::HirId),
 
     /// `#[feature(trivial_bounds)]` is not enabled.
@@ -472,10 +473,10 @@ pub enum FulfillmentErrorCode<'tcx> {
 /// When performing resolution, it is typically the case that there
 /// can be one of three outcomes:
 ///
-/// - `Ok(Some(r))`: success occurred with result `r`
+/// - `Ok(Some(r))`: success occurred with result `r`.
 /// - `Ok(None)`: could not definitely determine anything, usually due
 ///   to inconclusive type inference.
-/// - `Err(e)`: error `e` occurred
+/// - `Err(e)`: error `e` occurred.
 pub type SelectionResult<'tcx, T> = Result<Option<T>, SelectionError<'tcx>>;
 
 /// Given the successful resolution of an obligation, the `Vtable`
@@ -673,7 +674,7 @@ pub fn type_known_to_meet_bound_modulo_regions<'a, 'gcx, 'tcx>(
         // this function's result remains infallible, we must confirm
         // that guess. While imperfect, I believe this is sound.
 
-        // The handling of regions in this area of the code is terrible,
+        // The handling of regions in this area of the code is terrible;
         // see issue #29149. We should be able to improve on this with
         // NLL.
         let mut fulfill_cx = FulfillmentContext::new_ignoring_regions();
@@ -1019,9 +1020,9 @@ fn vtable_methods<'a, 'tcx>(
                     )
                 );
 
-                // the trait type may have higher-ranked lifetimes in it;
-                // so erase them if they appear, so that we get the type
-                // at some particular call site
+                // The trait type may have higher-ranked lifetimes in it.
+                // Erase them if they appear, so that we get the type at some particular
+                // call site.
                 let substs = tcx.normalize_erasing_late_bound_regions(
                     ty::ParamEnv::reveal_all(),
                     &substs

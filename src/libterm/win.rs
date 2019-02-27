@@ -1,6 +1,6 @@
-//! Windows console handling
+//! Windows console handling.
 
-// FIXME (#13400): this is only a tiny fraction of the Windows console api
+// FIXME(#13400): this is only a tiny fraction of the Windows console API.
 
 extern crate libc;
 
@@ -171,8 +171,8 @@ impl<T: Write + Send + 'static> Terminal for WinConsole<T> {
     }
 
     fn supports_attr(&self, attr: Attr) -> bool {
-        // it claims support for underscore and reverse video, but I can't get
-        // it to do anything -cmr
+        // It claims support for underscore and reverse video, but I can't get
+        // it to do anything. -cmr
         match attr {
             Attr::ForegroundColor(_) | Attr::BackgroundColor(_) => true,
             _ => false,

@@ -573,14 +573,14 @@ impl Step for Test {
             compiler
         };
 
-        // Build libstd docs so that we generate relative links
+        // Build libstd docs so that we generate relative links.
         builder.ensure(Std { stage, target });
 
         builder.ensure(compile::Test { compiler, target });
         let out_dir = builder.stage_out(compiler, Mode::Test)
                            .join(target).join("doc");
 
-        // See docs in std above for why we symlink
+        // See docs in std above for why we symlink.
         let my_out = builder.crate_doc_out(target);
         t!(symlink_dir_force(&builder.config, &my_out, &out_dir));
 
@@ -641,14 +641,14 @@ impl Step for WhitelistedRustc {
             compiler
         };
 
-        // Build libstd docs so that we generate relative links
+        // Build libstd docs so that we generate relative links.
         builder.ensure(Std { stage, target });
 
         builder.ensure(compile::Rustc { compiler, target });
         let out_dir = builder.stage_out(compiler, Mode::Rustc)
                            .join(target).join("doc");
 
-        // See docs in std above for why we symlink
+        // See docs in std above for why we symlink.
         let my_out = builder.crate_doc_out(target);
         t!(symlink_dir_force(&builder.config, &my_out, &out_dir));
 
@@ -887,7 +887,7 @@ impl Step for ErrorIndex {
         index.arg("html");
         index.arg(out.join("error-index.html"));
 
-        // FIXME: shouldn't have to pass this env var
+        // FIXME: shouldn't have to pass this env var.
         index.env("CFG_BUILD", &builder.config.build)
              .env("RUSTC_ERROR_METADATA_DST", builder.extended_error_dir());
 

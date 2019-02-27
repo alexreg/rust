@@ -85,7 +85,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         &self,
         bin_op: mir::BinOp,
         fty: FloatTy,
-        // passing in raw bits
+        // Passing in raw bits.
         l: u128,
         r: u128,
     ) -> EvalResult<'tcx, (Scalar<M::PointerTag>, bool)> {
@@ -123,7 +123,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
     fn binary_int_op(
         &self,
         bin_op: mir::BinOp,
-        // passing in raw bits
+        // Passing in raw bits.
         l: u128,
         left_layout: TyLayout<'tcx>,
         r: u128,
@@ -160,7 +160,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
             return Ok((Scalar::from_uint(truncated, size), oflo));
         }
 
-        // For the remaining ops, the types must be the same on both sides
+        // For the remaining ops, the types must be the same on both sides.
         if left_layout.ty != right_layout.ty {
             let msg = format!(
                 "unimplemented asymmetric binary op {:?}: {:?} ({:?}), {:?} ({:?})",
@@ -173,7 +173,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
             return err!(Unimplemented(msg));
         }
 
-        // Operations that need special treatment for signed integers
+        // Operations that need special treatment for signed integers.
         if left_layout.abi.is_signed() {
             let op: Option<fn(&i128, &i128) -> bool> = match bin_op {
                 Lt => Some(i128::lt),
@@ -217,7 +217,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                     let max = 1 << (size.bits() - 1);
                     oflo = result >= max || result < -max;
                 }
-                // this may be out-of-bounds for the result type, so we have to truncate ourselves
+                // This may be out-of-bounds for the result type, so we have to truncate ourselves.
                 let result = result as u128;
                 let truncated = self.truncate(result, left_layout);
                 return Ok((Scalar::from_uint(truncated, size), oflo));
@@ -226,7 +226,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
 
         let size = left_layout.size;
 
-        // only ints left
+        // Only ints left.
         let val = match bin_op {
             Eq => Scalar::from_bool(l == r),
             Ne => Scalar::from_bool(l != r),
@@ -309,7 +309,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                 assert!(right.layout.ty.is_integral() || right.layout.ty.is_unsafe_ptr() ||
                     right.layout.ty.is_fn());
 
-                // Handle operations that support pointer values
+                // Handle operations that support pointer values.
                 if left.to_scalar_ptr()?.is_ptr() ||
                     right.to_scalar_ptr()?.is_ptr() ||
                     bin_op == mir::BinOp::Offset
@@ -317,7 +317,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                     return M::ptr_op(self, bin_op, left, right);
                 }
 
-                // Everything else only works with "proper" bits
+                // Everything else only works with "proper" bits.
                 let l = left.to_bits().expect("we checked is_ptr");
                 let r = right.to_bits().expect("we checked is_ptr");
                 self.binary_int_op(bin_op, l, left.layout, r, right.layout)

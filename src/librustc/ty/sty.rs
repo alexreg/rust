@@ -55,7 +55,7 @@ pub enum BoundRegion {
     BrFresh(u32),
 
     /// Anonymous region for the implicit env pointer parameter
-    /// to a closure
+    /// to a closure.
     BrEnv,
 }
 
@@ -472,7 +472,7 @@ impl<'a, 'gcx, 'tcx> GeneratorSubsts<'tcx> {
         self,
         def_id: DefId,
         tcx: TyCtxt<'a, 'gcx, 'tcx>,
-    ) -> impl Iterator<Item=Ty<'tcx>> + Captures<'gcx> + 'a {
+    ) -> impl Iterator<Item = Ty<'tcx>> + Captures<'gcx> + 'a {
         let state = tcx.generator_layout(def_id).fields.iter();
         state.map(move |d| d.ty.subst(tcx, self.substs))
     }
@@ -481,7 +481,7 @@ impl<'a, 'gcx, 'tcx> GeneratorSubsts<'tcx> {
     /// the generator transformation.
     /// This includes the upvars and the state discriminant (a `u32`).
     pub fn pre_transforms_tys(self, def_id: DefId, tcx: TyCtxt<'a, 'gcx, 'tcx>) ->
-        impl Iterator<Item=Ty<'tcx>> + 'a
+        impl Iterator<Item = Ty<'tcx>> + 'a
     {
         self.upvar_tys(def_id, tcx).chain(iter::once(tcx.types.u32))
     }
@@ -504,7 +504,7 @@ pub enum UpvarSubsts<'tcx> {
 impl<'tcx> UpvarSubsts<'tcx> {
     #[inline]
     pub fn upvar_tys(self, def_id: DefId, tcx: TyCtxt<'_, '_, '_>) ->
-        impl Iterator<Item=Ty<'tcx>> + 'tcx
+        impl Iterator<Item = Ty<'tcx>> + 'tcx
     {
         let upvar_kinds = match self {
             UpvarSubsts::Closure(substs) => substs.split(def_id, tcx).upvar_kinds,
@@ -729,7 +729,7 @@ impl<'tcx> PolyTraitRef<'tcx> {
     }
 
     pub fn to_poly_trait_predicate(&self) -> ty::PolyTraitPredicate<'tcx> {
-        // Note that we preserve binding levels
+        // Note that we preserve binding levels.
         Binder(ty::TraitPredicate { trait_ref: self.skip_binder().clone() })
     }
 }
@@ -774,7 +774,7 @@ impl<'a, 'gcx, 'tcx> ExistentialTraitRef<'tcx> {
     /// or some placeholder type.
     pub fn with_self_ty(&self, tcx: TyCtxt<'a, 'gcx, 'tcx>, self_ty: Ty<'tcx>)
         -> ty::TraitRef<'tcx>  {
-        // otherwise the escaping vars would be captured by the binder
+        // Otherwise, the escaping vars would be captured by the binder.
         // debug_assert!(!self_ty.has_escaping_bound_vars());
 
         ty::TraitRef {
@@ -1592,7 +1592,7 @@ impl<'a, 'gcx, 'tcx> TyS<'tcx> {
             }
             ty::Adt(def, _) => {
                 // Any ADT is uninhabited if either:
-                // (a) It has no variants (i.e. an empty `enum`);
+                // (a) It has no variants (i.e., an empty `enum`);
                 // (b) Each of its variants (a single one in the case of a `struct`) has at least
                 //     one uninhabited field.
                 def.variants.iter().all(|var| {

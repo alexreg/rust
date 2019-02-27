@@ -490,8 +490,8 @@ impl Diverges {
 pub struct BreakableCtxt<'gcx: 'tcx, 'tcx> {
     may_break: bool,
 
-    // this is `null` for loops where break with a value is illegal,
-    // such as `while`, `for`, and `while let`
+    // This is `null` for loops where break with a value is illegal,
+    // such as `while`, `for`, and `while let`.
     coerce: Option<DynamicCoerceMany<'gcx, 'tcx>>,
 }
 
@@ -1022,7 +1022,7 @@ impl<'a, 'gcx, 'tcx> Visitor<'gcx> for GatherLocalsVisitor<'a, 'gcx, 'tcx> {
         intravisit::walk_pat(self, p);
     }
 
-    // Don't descend into the bodies of nested closures
+    // Don't descend into the bodies of nested closures.
     fn visit_fn(&mut self, _: intravisit::FnKind<'gcx>, _: &'gcx hir::FnDecl,
                 _: hir::BodyId, _: Span, _: hir::HirId) { }
 }
@@ -1178,13 +1178,13 @@ fn check_fn<'a, 'gcx, 'tcx>(inherited: &'a Inherited<'a, 'gcx, 'tcx>,
         }
     }
 
-    // Check that a function marked as `#[panic_handler]` has signature `fn(&PanicInfo) -> !`
+    // Check that a function marked as `#[panic_handler]` has signature `fn(&PanicInfo) -> !`.
     if let Some(panic_impl_did) = fcx.tcx.lang_items().panic_impl() {
         if panic_impl_did == fcx.tcx.hir().local_def_id_from_hir_id(fn_id) {
             if let Some(panic_info_did) = fcx.tcx.lang_items().panic_info() {
-                // at this point we don't care if there are duplicate handlers or if the handler has
-                // the wrong signature as this value we'll be used when writing metadata and that
-                // only happens if compilation succeeded
+                // At this point we don't care if there are duplicate handlers or if the handler has
+                // the wrong signature, as this value will be used when writing metadata, and that
+                // only happens if compilation succeeded.
                 fcx.tcx.sess.has_panic_handler.try_set_same(true);
 
                 if declared_ret_ty.sty != ty::Never {
@@ -1236,7 +1236,7 @@ fn check_fn<'a, 'gcx, 'tcx>(inherited: &'a Inherited<'a, 'gcx, 'tcx>,
         }
     }
 
-    // Check that a function marked as `#[alloc_error_handler]` has signature `fn(Layout) -> !`
+    // Check that a function marked as `#[alloc_error_handler]` has signature `fn(Layout) -> !`.
     if let Some(alloc_error_handler_did) = fcx.tcx.lang_items().oom() {
         if alloc_error_handler_did == fcx.tcx.hir().local_def_id_from_hir_id(fn_id) {
             if let Some(alloc_layout_did) = fcx.tcx.lang_items().alloc_layout() {
@@ -1436,12 +1436,12 @@ pub fn check_item_type<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, it: &'tcx hir::Ite
 }
 
 fn maybe_check_static_with_link_section(tcx: TyCtxt<'_, '_, '_>, id: DefId, span: Span) {
-    // Only restricted on wasm32 target for now
+    // Only restricted on wasm32 target for now.
     if !tcx.sess.opts.target_triple.triple().starts_with("wasm32") {
         return
     }
 
-    // If `#[link_section]` is missing, then nothing to verify
+    // If `#[link_section]` is missing, then nothing to verify.
     let attrs = tcx.codegen_fn_attrs(id);
     if attrs.link_section.is_none() {
         return
@@ -1552,14 +1552,14 @@ fn check_impl_items_against_trait<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     let impl_items = || impl_item_refs.iter().map(|iiref| tcx.hir().impl_item(iiref.id));
 
     // Check existing impl methods to see if they are both present in trait
-    // and compatible with trait signature
+    // and compatible with trait signature.
     for impl_item in impl_items() {
         let ty_impl_item = tcx.associated_item(tcx.hir().local_def_id(impl_item.id));
         let ty_trait_item = tcx.associated_items(impl_trait_ref.def_id)
             .find(|ac| Namespace::from(&impl_item.node) == Namespace::from(ac.kind) &&
                        tcx.hygienic_eq(ty_impl_item.ident, ac.ident, impl_trait_ref.def_id))
             .or_else(|| {
-                // Not compatible, but needed for the error message
+                // Not compatible, but needed for the error message.
                 tcx.associated_items(impl_trait_ref.def_id)
                    .find(|ac| tcx.hygienic_eq(ty_impl_item.ident, ac.ident, impl_trait_ref.def_id))
             });
@@ -1582,8 +1582,8 @@ fn check_impl_items_against_trait<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                              ty_impl_item.ident,
                              impl_trait_ref);
                          err.span_label(impl_item.span, "does not match trait");
-                         // We can only get the spans from local trait definition
-                         // Same for E0324 and E0325
+                         // We can only get the spans from local trait definition.
+                         // Same for E0324 and E0325.
                          if let Some(trait_span) = tcx.hir().span_if_local(ty_trait_item.def_id) {
                             err.span_label(trait_span, "item in trait");
                          }
@@ -1807,12 +1807,12 @@ fn check_transparent<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, sp: Span, def_id: De
         return;
     }
 
-    // For each field, figure out if it's known to be a ZST and align(1)
+    // For each field, figure out if it's known to be a ZST and align(1).
     let field_infos = adt.non_enum_variant().fields.iter().map(|field| {
         let ty = field.ty(tcx, InternalSubsts::identity_for_item(tcx, field.did));
         let param_env = tcx.param_env(field.did);
         let layout = tcx.layout_of(param_env.and(ty));
-        // We are currently checking the type this field came from, so it must be local
+        // We are currently checking the type this field came from, so it must be local.
         let span = tcx.hir().span_if_local(field.did).unwrap();
         let zst = layout.map(|layout| layout.is_zst()).unwrap_or(false);
         let align1 = layout.map(|layout| layout.align.abi.bytes() == 1).unwrap_or(false);
@@ -1876,7 +1876,7 @@ pub fn check_enum<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
 
     let mut disr_vals: Vec<Discr<'tcx>> = Vec::with_capacity(vs.len());
     for ((_, discr), v) in def.discriminants(tcx).zip(vs) {
-        // Check for duplicate discriminant values
+        // Check for duplicate discriminant values.
         if let Some(i) = disr_vals.iter().position(|&x| x.val == discr.val) {
             let variant_did = def.variants[VariantIdx::new(i)].did;
             let variant_i_hir_id = tcx.hir().as_local_hir_id(variant_did).unwrap();
@@ -1929,7 +1929,7 @@ impl<'a, 'gcx, 'tcx> AstConv<'gcx, 'tcx> for FnCtxt<'a, 'gcx, 'tcx> {
                 match predicate {
                     ty::Predicate::Trait(ref data)
                     if data.skip_binder().self_ty().is_param(index) => {
-                        // HACK(eddyb) should get the original `Span`.
+                        // HACK(eddyb): should get the original `Span`.
                         let span = tcx.def_span(def_id);
                         Some((predicate, span))
                     }
@@ -2469,7 +2469,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                                   span: Span,
                                   code: traits::ObligationCauseCode<'tcx>)
     {
-        // WF obligations never themselves fail, so no real need to give a detailed cause:
+        // WF obligations never themselves fail, so no real need to give a detailed cause.
         let cause = traits::ObligationCause::new(span, self.body_id, code);
         self.register_predicate(traits::Obligation::new(cause,
                                                         self.param_env,
@@ -2650,7 +2650,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
 
             // If some lookup succeeds, write callee into table and extract index/element
             // type from the method signature.
-            // If some lookup succeeded, install method in table
+            // If some lookup succeeded, install method in table.
             let input_ty = self.next_ty_var(TypeVariableOrigin::AutoDeref(base_expr.span));
             let method = self.try_overloaded_place_op(
                 expr.span, self_ty, &[input_ty], needs, PlaceOp::Index);
@@ -2775,7 +2775,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         }
 
         let method = method.unwrap();
-        // HACK(eddyb) ignore self in the definition (see above).
+        // HACK(eddyb): ignore self in the definition (see above).
         let expected_arg_tys = self.expected_inputs_for_expected_output(
             sp,
             expected,
@@ -2868,7 +2868,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         let tcx = self.tcx;
 
         // Grab the argument types, supplying fresh type variables
-        // if the wrong number of arguments were supplied
+        // if the wrong number of arguments were supplied.
         let supplied_arg_count = if tuple_arguments == DontTupleArguments {
             args.len()
         } else {
@@ -2901,7 +2901,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             }
             if sugg_unit {
                 let sugg_span = tcx.sess.source_map().end_point(expr_sp);
-                // remove closing `)` from the span
+                // Remove closing `)` from the span.
                 let sugg_span = sugg_span.shrink_to_lo();
                 err.span_suggestion(
                     sugg_span,
@@ -3052,8 +3052,8 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             for arg in args.iter().skip(expected_arg_count) {
                 let arg_ty = self.check_expr(&arg);
 
-                // There are a few types which get autopromoted when passed via varargs
-                // in C but we just error out instead and require explicit casts.
+                // There are a few types that get auto-promoted when passed via varargs
+                // in C, but we just error out instead and require explicit casts.
                 let arg_ty = self.structurally_resolved_type(arg.span, arg_ty);
                 match arg_ty.sty {
                     ty::Float(ast::FloatTy::F32) => {
@@ -3250,8 +3250,8 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             let origin = self.misc(call_span);
             let ures = self.at(&origin, self.param_env).sup(ret_ty, &formal_ret);
 
-            // FIXME(#27336) can't use ? here, Try::from_error doesn't default
-            // to identity so the resulting type is not constrained.
+            // FIXME(#27336): can't use `?` here -- `Try::from_error` doesn't default
+            // to identity, so the resulting type is not constrained.
             match ures {
                 Ok(ok) => {
                     // Process any obligations locally as much as
@@ -3291,7 +3291,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                          needs: Needs) -> Ty<'tcx> {
         let rcvr = &args[0];
         let rcvr_t = self.check_expr_with_needs(&rcvr, needs);
-        // no need to check for bot/err -- callee does that
+        // No need to check for bot/err -- callee does that.
         let rcvr_t = self.structurally_resolved_type(args[0].span, rcvr_t);
 
         let method = match self.lookup_method(rcvr_t,
@@ -3485,7 +3485,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         }
     }
 
-    // Check field access expressions
+    // Check field access expressions.
     fn check_field(&self,
                    expr: &'gcx hir::Expr,
                    needs: Needs,
@@ -3651,7 +3651,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         }
     }
 
-    // Return an hint about the closest match in field names
+    // Return an hint about the closest match in field names.
     fn suggest_field_name(variant: &'tcx ty::VariantDef,
                           field: &str,
                           skip: Vec<LocalInternedString>)
@@ -3717,7 +3717,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                 }
             },
             ty);
-        // prevent all specified fields from being suggested
+        // Prevent all specified fields from being suggested.
         let skip_fields = skip_fields.iter().map(|ref x| x.ident.as_str());
         if let Some(field_name) = Self::suggest_field_name(variant,
                                                            &field.ident.as_str(),
@@ -3935,7 +3935,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                          fields: &'gcx [hir::Field],
                          base_expr: &'gcx Option<P<hir::Expr>>) -> Ty<'tcx>
     {
-        // Find the relevant variant
+        // Find the relevant variant.
         let (variant, adt_ty) =
             if let Some(variant_ty) = self.check_struct_path(qpath, expr.hir_id) {
                 variant_ty
@@ -3987,14 +3987,13 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         adt_ty
     }
 
-
     /// Invariant:
     /// If an expression has any sub-expressions that result in a type error,
     /// inspecting that expression's type with `ty.references_error()` will return
     /// true. Likewise, if an expression is known to diverge, inspecting its
-    /// type with `ty::type_is_bot` will return true (n.b.: since Rust is
-    /// strict, _|_ can appear in the type of an expression that does not,
-    /// itself, diverge: for example, fn() -> _|_.)
+    /// type with `ty::type_is_bot` will return true (N.B., since Rust is
+    /// strict, `_|_` can appear in the type of an expression that does not
+    /// itself diverge, e.g., `fn() -> _|_`.)
     /// Note that inspecting a type's structure *directly* may expose the fact
     /// that there are actually multiple representations for `Error`, so avoid
     /// that when err needs to be handled differently.
@@ -4025,7 +4024,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             _ => self.warn_if_unreachable(expr.hir_id, expr.span, "expression")
         }
 
-        // Any expression that produces a value of type `!` must have diverged
+        // Any expression that produces a value of type `!` must have diverged.
         if ty.is_never() {
             self.diverges.set(self.diverges.get() | Diverges::Always);
         }
@@ -4308,7 +4307,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
 
                     ctxt.may_break = true;
 
-                    // the type of a `break` is always `!`, since it diverges
+                    // The type of a `break` is always `!`, since it diverges.
                     tcx.types.never
                 } else {
                     // Otherwise, we failed to find the enclosing loop;
@@ -4418,7 +4417,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             }
             ExprKind::While(ref cond, ref body, _) => {
                 let ctxt = BreakableCtxt {
-                    // cannot use break with a value from a while loop
+                    // Cannot use break with a value from a while loop.
                     coerce: None,
                     may_break: false,  // Will get updated if/when we find a `break`.
                 };

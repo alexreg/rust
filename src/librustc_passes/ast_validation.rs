@@ -1,4 +1,4 @@
-// Validate AST before lowering it to HIR
+// Validate AST before lowering it to HIR.
 //
 // This pass is supposed to catch things that fit into AST data structures,
 // but not permitted by the language. It runs after expansion when AST is frozen,
@@ -28,9 +28,9 @@ struct AstValidator<'a> {
     has_proc_macro_decls: bool,
     has_global_allocator: bool,
 
-    // Used to ban nested `impl Trait`, e.g., `impl Into<impl Debug>`.
-    // Nested `impl Trait` _is_ allowed in associated type position,
-    // e.g `impl Iterator<Item=impl Debug>`
+    // Used to ban nested `impl Trait` (e.g., `impl Into<impl Debug>`).
+    // Nested `impl Trait` _is_ allowed in associated type position
+    // (e.g., `impl Iterator<Item = impl Debug>`).
     outer_impl_trait: Option<Span>,
 
     // Used to ban `impl Trait` in path projections like `<impl Iterator>::Item`
@@ -59,20 +59,20 @@ impl<'a> AstValidator<'a> {
             }
             TyKind::Path(ref qself, ref path) => {
                 // We allow these:
-                //  - `Option<impl Trait>`
-                //  - `option::Option<impl Trait>`
-                //  - `option::Option<T>::Foo<impl Trait>
+                // - `Option<impl Trait>`,
+                // - `option::Option<impl Trait>`,
+                // - `option::Option<T>::Foo<impl Trait>`,
                 //
-                // But not these:
-                //  - `<impl Trait>::Foo`
-                //  - `option::Option<impl Trait>::Foo`.
+                // but not these:
+                // - `<impl Trait>::Foo`,
+                // - `option::Option<impl Trait>::Foo`.
                 //
                 // To implement this, we disallow `impl Trait` from `qself`
                 // (for cases like `<impl Trait>::Foo>`)
                 // but we allow `impl Trait` in `GenericArgs`
                 // iff there are no more `PathSegment`s.
                 if let Some(ref qself) = *qself {
-                    // `impl Trait` in `qself` is always illegal
+                    // `impl Trait` in `qself` is always illegal.
                     self.with_banned_impl_trait(|this| this.visit_ty(&qself.ty));
                 }
 
@@ -80,7 +80,7 @@ impl<'a> AstValidator<'a> {
                 // so if any logic is added to process `Path`s a call to it should be
                 // added both in `visit_path` and here. This code mirrors `visit::walk_path`.
                 for (i, segment) in path.segments.iter().enumerate() {
-                    // Allow `impl Trait` iff we're on the final path segment
+                    // Allow `impl Trait` iff we're on the final path segment.
                     if i == path.segments.len() - 1 {
                         self.visit_path_segment(path.span, segment);
                     } else {
@@ -606,7 +606,7 @@ impl<'a> Visitor<'a> for AstValidator<'a> {
                         GenericArg::Const(..) => ParamKindOrd::Const,
                     }, arg.span(), None)
                 }), GenericPosition::Arg, generic_args.span());
-                // Type bindings such as `Item=impl Debug` in `Iterator<Item=Debug>`
+                // Type bindings such as `Item = impl Debug` in `Iterator<Item = Debug>`
                 // are allowed to contain nested `impl Trait`.
                 self.with_impl_trait(None, |this| {
                     walk_list!(this, visit_assoc_type_binding, &data.bindings);
@@ -697,8 +697,8 @@ impl<'a> Visitor<'a> for AstValidator<'a> {
     }
 
     fn visit_mac(&mut self, mac: &Spanned<Mac_>) {
-        // when a new macro kind is added but the author forgets to set it up for expansion
-        // because that's the only part that won't cause a compiler error
+        // When a new macro kind is added but the author forgets to set it up for expansion
+        // because that's the only part that won't cause a compiler error.
         self.session.diagnostic()
             .span_bug(mac.span, "macro invocation missed in expansion; did you forget to override \
                                  the relevant `fold_*()` method in `PlaceholderExpander`?");

@@ -329,7 +329,7 @@ impl<'a, Ty> TyLayout<'a, Ty> {
 
                     match (result, field.homogeneous_aggregate(cx)) {
                         (_, HomogeneousAggregate::NoData) => {
-                            // Ignore fields that have no data
+                            // Ignore fields that have no data.
                         }
                         (_, HomogeneousAggregate::Heterogeneous) => {
                             // The field itself must be a homogeneous aggregate.
@@ -434,7 +434,7 @@ impl<'a, Ty> ArgType<'a, Ty> {
     }
 
     pub fn extend_integer_width_to(&mut self, bits: u64) {
-        // Only integers have signedness
+        // Only integers have signedness.
         if let Abi::Scalar(ref scalar) = self.layout.abi {
             if let abi::Int(i, signed) = scalar.value {
                 if i.size().bits() < bits {
