@@ -86,7 +86,7 @@ pub enum TokenTree {
     Sequence(DelimSpan, Lrc<SequenceRepetition>),
     /// e.g., `$var`
     MetaVar(Span, ast::Ident),
-    /// e.g., `$var:expr`. This is only used in the left hand side of MBE macros.
+    /// E.g., `$var:expr`. This is only used in the left-hand side of MBE macros.
     MetaVarDecl(
         Span,
         ast::Ident, /* name to bind */

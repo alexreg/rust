@@ -221,7 +221,7 @@ impl<'a, 'tcx> Inliner<'a, 'tcx> {
         let tcx = self.tcx;
 
         // Don't inline closures that have captures
-        // FIXME: Handle closures better
+        // FIXME: handle closures better
         if callee_mir.upvar_decls.len() > 0 {
             debug!("    upvar decls present - not inlining");
             return false;
@@ -284,7 +284,7 @@ impl<'a, 'tcx> Inliner<'a, 'tcx> {
         }
         debug!("    final inline threshold = {}", threshold);
 
-        // FIXME: Give a bonus to functions with only a single caller
+        // FIXME: give a bonus to functions with only a single caller
 
         let param_env = tcx.param_env(self.source.def_id());
 
@@ -397,7 +397,7 @@ impl<'a, 'tcx> Inliner<'a, 'tcx> {
                    mut callee_mir: Mir<'tcx>) -> bool {
         let terminator = caller_mir[callsite.bb].terminator.take().unwrap();
         match terminator.kind {
-            // FIXME: Handle inlining of diverging calls
+            // FIXME: handle inlining of diverging calls
             TerminatorKind::Call { args, destination: Some(destination), cleanup, .. } => {
                 debug!("Inlined {:?} into {:?}", callsite.callee, self.source);
 
@@ -596,7 +596,7 @@ impl<'a, 'tcx> Inliner<'a, 'tcx> {
         callsite: &CallSite<'tcx>,
         caller_mir: &mut Mir<'tcx>,
     ) -> Local {
-        // FIXME: Analysis of the usage of the arguments to avoid
+        // FIXME: analysis of the usage of the arguments to avoid
         // unnecessary temporaries.
 
         if let Operand::Move(Place::Local(local)) = arg {

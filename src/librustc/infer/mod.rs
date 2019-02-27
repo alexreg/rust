@@ -188,7 +188,7 @@ pub struct InferCtxt<'a, 'gcx: 'a + 'tcx, 'tcx: 'a> {
     // can't generally check these things right away because we have
     // to wait until types are resolved.)
     //
-    // These are stored in a map keyed to the id of the innermost
+    // These are stored in a map keyed to the ID of the innermost
     // enclosing fn body / static initializer expression. This is
     // because the location where the obligation was incurred can be
     // relevant with respect to which sublifetime assumptions are in

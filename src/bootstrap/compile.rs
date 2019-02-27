@@ -943,14 +943,14 @@ impl Step for Assemble {
         // FIXME: Perhaps we should download those libraries?
         //        It would make builds faster...
         //
-        // FIXME: It may be faster if we build just a stage 1 compiler and then
-        //        use that to bootstrap this compiler forward.
+        // FIXME: it may be faster if we build just a stage 1 compiler and then
+        // use that to bootstrap this compiler forward.
         let build_compiler =
             builder.compiler(target_compiler.stage - 1, builder.config.build);
 
         // Build the libraries for this compiler to link to (i.e., the libraries
         // it uses at runtime). NOTE: Crates the target compiler compiles don't
-        // link to these. (FIXME: Is that correct? It seems to be correct most
+        // link to these. (FIXME: is that correct? It seems to be correct most
         // of the time but I think we do link to these for stage2/bin compilers
         // when not performing a full bootstrap).
         builder.ensure(Rustc {

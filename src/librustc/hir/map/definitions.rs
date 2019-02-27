@@ -678,7 +678,7 @@ impl DefPathData {
             GlobalMetaData(name) => {
                 return name
             }
-            // note that this does not show up in user printouts
+            // Note that this does not show up in user print-outs.
             CrateRoot => "{{root}}",
             Impl => "{{impl}}",
             Misc => "{{?}}",

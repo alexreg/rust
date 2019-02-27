@@ -31,7 +31,7 @@ use rustc_data_structures::stable_hasher::{HashStable, StableHasher,
 /// Scope represents a statically-describable scope that can be
 /// used to bound the lifetime/region for values.
 ///
-/// `Node(node_id)`: Any AST node that has any scope at all has the
+/// `Node(node_id)`: any AST node that has any scope at all has the
 /// `Node(node_id)` scope. Other variants represent special cases not
 /// immediately derivable from the abstract syntax tree structure.
 ///

@@ -336,7 +336,7 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
                     .region_scope_tree
                     .nearest_common_ancestor(fr_scope, s_id);
                 if r_id == fr_scope {
-                    // if the free region's scope `fr.scope` is bigger than
+                    // If the free region's scope `fr.scope` is bigger than
                     // the scope region `s_id`, then the LUB is the free
                     // region itself:
                     match (a, b) {
@@ -553,7 +553,7 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
                     graph.add_edge(NodeIndex(a_id.index() as usize), dummy_sink, *constraint);
                 }
                 Constraint::RegSubReg(..) => {
-                    // this would be an edge from `dummy_source` to
+                    // This would be an edge from `dummy_source` to
                     // `dummy_sink`; just ignore it.
                 }
             }

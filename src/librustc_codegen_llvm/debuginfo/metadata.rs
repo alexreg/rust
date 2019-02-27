@@ -489,7 +489,7 @@ pub fn type_metadata(
     t: Ty<'tcx>,
     usage_site_span: Span,
 ) -> &'ll DIType {
-    // Get the unique type id of this type.
+    // Get the unique type ID of this type.
     let unique_type_id = {
         let mut type_map = debug_context(cx).type_map.borrow_mut();
         // First, try to find the type in `TypeMap`. If we have seen it before, we
@@ -501,7 +501,7 @@ pub fn type_metadata(
             None => {
                 // The `Ty` is not in the `TypeMap` but maybe we have already seen
                 // an equivalent type (e.g., only differing in region arguments).
-                // In order to find out, generate the unique type id and look
+                // In order to find out, generate the unique type ID and look
                 // that up.
                 let unique_type_id = type_map.get_unique_type_id_of_type(cx, t);
                 match type_map.find_metadata_for_unique_id(unique_type_id) {
@@ -1520,7 +1520,7 @@ fn prepare_enum_metadata(
     let enum_name = compute_debuginfo_type_name(cx, enum_type, false);
 
     let containing_scope = get_namespace_for_item(cx, enum_def_id);
-    // FIXME: This should emit actual file metadata for the enum, but we
+    // FIXME: this should emit actual file metadata for the enum, but we
     // currently can't get the necessary information when it comes to types
     // imported from other crates. Formerly we violated the ODR when performing
     // LTO because we emitted debuginfo for the same type with varying file

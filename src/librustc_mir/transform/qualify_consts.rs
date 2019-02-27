@@ -409,7 +409,7 @@ impl Qualif for IsNotConst {
                 match (cast_in, cast_out) {
                     (CastTy::Ptr(_), CastTy::Int(_)) |
                     (CastTy::FnPtr, CastTy::Int(_)) => {
-                        // in normal functions, mark such casts as not promotable
+                        // In normal functions, mark such casts as non-promotable.
                         return true;
                     }
                     _ => {}
@@ -1221,7 +1221,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                                     .debugging_opts
                                     .unleash_the_miri_inside_of_you;
                                 if self.tcx.is_const_fn(def_id) || unleash_miri {
-                                    // stable const fns or unstable const fns
+                                    // Stable const fns or unstable const fns
                                     // with their feature gate active
                                     // FIXME(eddyb) move stability checks from `is_const_fn` here.
                                 } else if self.is_const_panic_fn(def_id) {
@@ -1527,7 +1527,7 @@ impl MirPass for QualifyAndPromoteConstants {
                             *span,
                             &format!("use of {} here does not actually short circuit due to \
                             the const evaluator presently not being able to do control flow. \
-                            See https://github.com/rust-lang/rust/issues/49146 for more \
+                            see <https://github.com/rust-lang/rust/issues/49146> for more \
                             information.", kind),
                         );
                     }

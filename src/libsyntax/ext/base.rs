@@ -949,7 +949,7 @@ impl<'a> ExtCtxt<'a> {
             }
             db.emit();
         }
-        // Fixme: does this result in errors?
+        // FIXME: does this result in errors?
         self.expansions.clear();
     }
     pub fn bug(&self, msg: &str) -> ! {

@@ -79,7 +79,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> HasDataLayout
     }
 }
 
-// FIXME: Really we shouldn't clone memory, ever. Snapshot machinery should instead
+// FIXME: really we shouldn't clone memory, ever. Snapshot machinery should instead
 // carefully copy only the reachable parts.
 impl<'a, 'mir, 'tcx, M>
     Clone
@@ -633,13 +633,13 @@ where
             MemoryKind::Machine(_) => bug!("Static cannot refer to machine memory"),
             MemoryKind::Stack | MemoryKind::Vtable => {},
         }
-        // ensure llvm knows not to put this into immutable memory
+        // Ensure that LLVM knows not to put this into immutable memory.
         alloc.mutability = mutability;
         let alloc = self.tcx.intern_const_alloc(alloc);
         self.tcx.alloc_map.lock().set_alloc_id_memory(alloc_id, alloc);
         // recurse into inner allocations
         for &(_, alloc) in alloc.relocations.values() {
-            // FIXME: Reusing the mutability here is likely incorrect.  It is originally
+            // FIXME: reusing the mutability here is likely incorrect. It is originally
             // determined via `is_freeze`, and data is considered frozen if there is no
             // `UnsafeCell` *immediately* in that data -- however, this search stops
             // at references.  So whenever we follow a reference, we should likely
@@ -773,7 +773,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> Memory<'a, 'mir, 'tcx, M> {
 
 /// Undefined bytes
 impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> Memory<'a, 'mir, 'tcx, M> {
-    // FIXME: Add a fast version for the common, nonoverlapping case
+    // FIXME: add a fast version for the common, nonoverlapping case
     fn copy_undef_mask(
         &mut self,
         src: Pointer<M::PointerTag>,

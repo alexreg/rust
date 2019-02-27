@@ -1043,8 +1043,7 @@ impl<'hir> Map<'hir> {
             Some(Node::Expr(ref e)) => Some(&*e.attrs),
             Some(Node::Stmt(ref s)) => Some(s.node.attrs()),
             Some(Node::GenericParam(param)) => Some(&param.attrs[..]),
-            // unit/tuple structs take the attributes straight from
-            // the struct definition.
+            // Unit/tuple structs take the attributes straight from the struct definition.
             Some(Node::StructCtor(_)) => return self.attrs(self.get_parent(id)),
             _ => None
         };

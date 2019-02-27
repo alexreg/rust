@@ -682,7 +682,7 @@ impl<O: ForestObligation> ObligationForest<O> {
             if let Some(index) = node.parent {
                 let new_index = node_rewrites[index.get()];
                 if new_index >= nodes_len {
-                    // parent dead due to error
+                    // Parent is dead due to error.
                     node.parent = None;
                 } else {
                     node.parent = Some(NodeIndex::new(new_index));

@@ -1257,7 +1257,7 @@ fn confirm_object_candidate<'cx, 'gcx, 'tcx>(
             _ => None
         });
 
-        // select those with a relevant trait-ref
+        // Select those with a relevant trait ref.
         let mut env_predicates = env_predicates.filter(|data| {
             let data_poly_trait_ref = data.to_poly_trait_ref(selcx.tcx());
             let obligation_poly_trait_ref = obligation_trait_ref.to_poly_trait_ref();
@@ -1268,7 +1268,7 @@ fn confirm_object_candidate<'cx, 'gcx, 'tcx>(
             )
         });
 
-        // select the first matching one; there really ought to be one or
+        // Select the first matching one; there really ought to be one or
         // else the object type is not WF, since an object type should
         // include all of its projections explicitly
         match env_predicates.next() {

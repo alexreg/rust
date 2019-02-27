@@ -185,12 +185,11 @@ impl<T: PartialEq> Set1<T> {
 
 pub type ObjectLifetimeDefault = Set1<Region>;
 
-/// Maps the id of each lifetime reference to the lifetime decl
+/// Maps the ID of each lifetime reference to the lifetime declaration
 /// that it corresponds to.
-///
-/// FIXME. This struct gets converted to a `ResolveLifetimes` for
-/// actual use. It has the same data, but indexed by `DefIndex`.  This
-/// is silly.
+//
+// FIXME: this struct gets converted to a `ResolveLifetimes` for
+// actual use. It has the same data, but indexed by `DefIndex`. This is silly.
 #[derive(Default)]
 struct NamedRegionMap {
     // maps from every use of a named (not anonymous) lifetime to a
@@ -263,7 +262,7 @@ enum Scope<'a> {
     Binder {
         lifetimes: FxHashMap<hir::ParamName, Region>,
 
-        /// if we extend this scope with another scope, what is the next index
+        /// If we extend this scope with another scope, what is the next index
         /// we should use for an early-bound region?
         next_early_index: u32,
 
@@ -589,7 +588,7 @@ impl<'a, 'tcx> Visitor<'tcx> for LifetimeContext<'a, 'tcx> {
                     abstract_type_parent: false,
                 };
                 self.with(scope, |old_scope, this| {
-                    // a bare fn has no bounds, so everything
+                    // A bare fn has no bounds, so everything
                     // contained within is scoped within its binder.
                     this.check_lifetime_params(old_scope, &c.generic_params);
                     intravisit::walk_ty(this, ty);
@@ -1147,7 +1146,7 @@ fn signal_shadowing_problem(
             orig.kind.desc()
         )
     } else {
-        // shadowing involving a label is only a warning, due to issues with
+        // Shadowing involving a label is only a warning, due to issues with
         // labels and lifetimes not being macro-hygienic.
         tcx.sess.struct_span_warn(
             shadower.span,
@@ -1519,7 +1518,7 @@ impl<'a, 'tcx> LifetimeContext<'a, 'tcx> {
         }
 
         if let (Some(decl_span), Some(use_span)) = (remove_decl, remove_use) {
-            // if both declaration and use deletion spans start at the same
+            // If both declaration and use deletion spans start at the same
             // place ("start at" because the latter includes trailing
             // whitespace), then this is an in-band lifetime
             if decl_span.shrink_to_lo() == use_span.shrink_to_lo() {
@@ -2178,7 +2177,7 @@ impl<'a, 'tcx> LifetimeContext<'a, 'tcx> {
                 lifetime_count += gather.lifetimes.len();
 
                 if lifetime_count == 1 && gather.lifetimes.len() == 1 {
-                    // there's a chance that the unique lifetime of this
+                    // There's a chance that the unique lifetime of this
                     // iteration will be the appropriate lifetime for output
                     // parameters, so lets store it.
                     possible_implied_output_region = gather.lifetimes.iter().cloned().next();
@@ -2778,7 +2777,7 @@ fn insert_late_bound_lifetimes(
             continue;
         }
 
-        // does not appear in the inputs, but appears in the return type? early-bound.
+        // Does not appear in the inputs, but appears in the return type? Must be early-bound.
         if !constrained_by_input.regions.contains(&lt_name)
             && appears_in_output.regions.contains(&lt_name)
         {

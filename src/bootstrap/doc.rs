@@ -745,7 +745,7 @@ impl Step for Rustc {
         for krate in &compiler_crates {
             // Create all crate output directories first to make sure rustdoc uses
             // relative links.
-            // FIXME: Cargo should probably do this itself.
+            // FIXME: cargo should probably do this itself.
             t!(fs::create_dir_all(out_dir.join(krate)));
             cargo.arg("-p").arg(krate);
         }
@@ -944,7 +944,7 @@ fn symlink_dir_force(config: &Config, src: &Path, dst: &Path) -> io::Result<()> 
         if m.file_type().is_dir() {
             fs::remove_dir_all(dst)?;
         } else {
-            // handle directory junctions on windows by falling back to
+            // Handle directory junctions on Windows by falling back to
             // `remove_dir`.
             fs::remove_file(dst).or_else(|_| {
                 fs::remove_dir(dst)

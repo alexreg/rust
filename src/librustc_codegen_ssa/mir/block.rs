@@ -75,7 +75,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                     if f == t_f || !base::wants_msvc_seh(tcx.sess)
                     => (lltarget, false),
                 (None, Some(_)) => {
-                    // jump *into* cleanup - need a landing pad if GNU
+                    // Jump *into* cleanup -- need a landing pad if GNU.
                     (this.landing_pad_to(target), false)
                 }
                 (Some(_), None) => span_bug!(span, "{:?} - jump out of cleanup?", terminator),
@@ -492,7 +492,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                         bx.new_vtable(sig, &extra_args)
                     }
                     Some(ty::InstanceDef::DropGlue(_, None)) => {
-                        // empty drop glue - a nop.
+                        // Empty drop glue; a no-op.
                         let &(_, target) = destination.as_ref().unwrap();
                         funclet_br(self, &mut bx, target);
                         return;
@@ -675,7 +675,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                                 'iter_fields: for i in 0..op.layout.fields.count() {
                                     let field = op.extract_field(&mut bx, i);
                                     if !field.layout.is_zst() {
-                                        // we found the one non-zero-sized field that is allowed
+                                        // We found the one non-zero-sized field that is allowed
                                         // now find *its* non-zero-sized field, or stop if it's a
                                         // pointer
                                         op = field;
@@ -686,7 +686,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                                 span_bug!(span, "receiver has no non-zero-sized fields {:?}", op);
                             }
 
-                            // now that we have `*dyn Trait` or `&dyn Trait`, split it up into its
+                            // Now that we have `*dyn Trait` or `&dyn Trait`, split it up into its
                             // data pointer and vtable. Look up the method in the vtable, and pass
                             // the data pointer as the first argument
                             match op.val {

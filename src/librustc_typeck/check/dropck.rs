@@ -118,8 +118,8 @@ fn ensure_drop_params_and_item_params_correspond<'a, 'tcx>(
 
         let region_scope_tree = region::ScopeTree::default();
 
-        // NB. It seems a bit... suspicious to use an empty param-env
-        // here. The correct thing, I imagine, would be
+        // FIXMKE(nmatsakis): it seems a bit suspicious to use an empty
+        // param-env here. The correct thing, I imagine, would be
         // `OutlivesEnvironment::new(impl_param_env)`, which would
         // allow region solving to take any `a: 'b` relations on the
         // impl into account. But I could not create a test case where

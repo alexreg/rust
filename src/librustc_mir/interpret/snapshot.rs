@@ -431,8 +431,8 @@ impl<'a, 'mir, 'tcx> Eq for EvalSnapshot<'a, 'mir, 'tcx>
 impl<'a, 'mir, 'tcx> PartialEq for EvalSnapshot<'a, 'mir, 'tcx>
 {
     fn eq(&self, other: &Self) -> bool {
-        // FIXME: This looks to be a *ridicolously expensive* comparison operation.
-        // Doesn't this make tons of copies?  Either `snapshot` is very badly named,
+        // FIXME: this looks to be a *ridicolously expensive* comparison operation.
+        // Doesn't this make tons of copies? Either `snapshot` is very badly named,
         // or it does!
         self.snapshot() == other.snapshot()
     }

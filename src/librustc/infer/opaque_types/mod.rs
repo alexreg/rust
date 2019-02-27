@@ -750,7 +750,7 @@ impl<'a, 'gcx, 'tcx> Instantiator<'a, 'gcx, 'tcx> {
             def_id, substs
         );
 
-        // Use the same type variable if the exact same Opaque appears more
+        // Use the same type variable if the exact same opaque type appears more
         // than once in the return type (e.g., if it's passed to a type alias).
         if let Some(opaque_defn) = self.opaque_types.get(&def_id) {
             return opaque_defn.concrete_ty;
@@ -772,9 +772,9 @@ impl<'a, 'gcx, 'tcx> Instantiator<'a, 'gcx, 'tcx> {
             required_region_bounds
         );
 
-        // make sure that we are in fact defining the *entire* type
-        // e.g., `existential type Foo<T: Bound>: Bar;` needs to be
-        // defined by a function like `fn foo<T: Bound>() -> Foo<T>`.
+        // Make sure that we are in fact defining the *entire* type
+        // (e.g., `existential type Foo<T: Bound>: Bar;` needs to be
+        // defined by a function like `fn foo<T: Bound>() -> Foo<T>`).
         debug!(
             "instantiate_opaque_types: param_env: {:#?}",
             self.param_env,

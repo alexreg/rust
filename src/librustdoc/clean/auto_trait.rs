@@ -684,7 +684,7 @@ impl<'a, 'tcx, 'rcx> AutoTraitFinder<'a, 'tcx, 'rcx> {
                                         continue;
                                     }
 
-                                    // FIXME: Remove this scope when NLL lands
+                                    // FIXME: remove this scope when NLL lands
                                     {
                                         let args =
                                             &mut new_trait_path.segments

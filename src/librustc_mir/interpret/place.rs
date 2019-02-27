@@ -304,7 +304,7 @@ impl<'tcx, Tag: ::std::fmt::Debug> PlaceTy<'tcx, Tag> {
     }
 }
 
-// separating the pointer tag for `impl Trait`, see https://github.com/rust-lang/rust/issues/54385
+// Separating the pointer tag for `impl Trait`, see issue #54385.
 impl<'a, 'mir, 'tcx, Tag, M> EvalContext<'a, 'mir, 'tcx, M>
 where
     // FIXME: Working around https://github.com/rust-lang/rust/issues/54385
@@ -386,7 +386,7 @@ where
                 Size::from_bytes(0)
             }
         };
-        // the only way conversion can fail if is this is an array (otherwise we already panicked
+        // The only way conversion can fail if is this is an array (otherwise we already panicked
         // above). In that case, all fields are equal.
         let field_layout = base.layout.field(self, usize::try_from(field).unwrap_or(0))?;
 
@@ -399,8 +399,8 @@ where
                 Some((_, align)) => align,
                 None if offset == Size::ZERO =>
                     // An extern type at offset 0, we fall back to its static alignment.
-                    // FIXME: Once we have made decisions for how to handle size and alignment
-                    // of `extern type`, this should be adapted.  It is just a temporary hack
+                    // FIXME: once we have made decisions for how to handle size and alignment
+                    // of `extern type`, this should be adapted. It is just a temporary hack
                     // to get some code to work that probably ought to work.
                     field_layout.align.abi,
                 None =>
@@ -532,7 +532,7 @@ where
         base: PlaceTy<'tcx, M::PointerTag>,
         field: u64,
     ) -> EvalResult<'tcx, PlaceTy<'tcx, M::PointerTag>> {
-        // FIXME: We could try to be smarter and avoid allocation for fields that span the
+        // FIXME: we could try to be smarter and avoid allocation for fields that span the
         // entire place.
         let mplace = self.force_allocation(base)?;
         Ok(self.mplace_field(mplace, field)?.into())
@@ -701,7 +701,7 @@ where
                         "Size mismatch when writing bits"),
                 Immediate::Scalar(ScalarMaybeUndef::Undef) => {}, // undef can have any size
                 Immediate::ScalarPair(_, _) => {
-                    // FIXME: Can we check anything here?
+                    // FIXME: can we check anything here?
                 }
             }
         }
@@ -905,8 +905,8 @@ where
                     Operand::Indirect(mplace) => mplace,
                     Operand::Immediate(value) => {
                         // We need to make an allocation.
-                        // FIXME: Consider not doing anything for a ZST, and just returning
-                        // a fake pointer?  Are we even called for ZST?
+                        // FIXME: consider not doing anything for a ZST, and just returning
+                        // a fake pointer? Are we even called for ZST?
 
                         // We need the layout of the local.  We can NOT use the layout we got,
                         // that might e.g., be an inner field of a struct with `Scalar` layout,
@@ -937,7 +937,7 @@ where
     ) -> MPlaceTy<'tcx, M::PointerTag> {
         if layout.is_unsized() {
             assert!(self.tcx.features().unsized_locals, "cannot alloc memory for unsized type");
-            // FIXME: What should we do here? We should definitely also tag!
+            // FIXME: what should we do here? We should definitely also tag!
             MPlaceTy::dangling(layout, self)
         } else {
             let ptr = self.memory.allocate(layout.size, layout.align.abi, kind);

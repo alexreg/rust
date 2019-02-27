@@ -991,7 +991,7 @@ impl<'l, 'tcx: 'l, 'll, O: DumpOutput + 'll> DumpVisitor<'l, 'tcx, 'll, O> {
                 None => String::new(),
             };
 
-            // Rust uses the id of the pattern for var lookups, so we'll use it too.
+            // Rust uses the ID of the pattern for var lookups, so we'll use it too.
             if !self.span.filter_generated(ident.span) {
                 let qualname = format!("{}${}", ident.to_string(), id);
                 let id = id_from_node_id(id, &self.save_ctxt);

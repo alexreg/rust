@@ -217,7 +217,7 @@ impl<'a> Resolver<'a> {
                         return Ok(binding);
                     } else if ident.name == keywords::Super.name() ||
                                 ident.name == keywords::SelfLower.name() {
-                        // FIXME: Implement these with renaming requirements so that e.g.
+                        // FIXME: implement these with renaming requirements so that e.g.
                         // `use super;` doesn't work, but `use super as name;` does.
                         // Fall through here to get an error from `early_resolve_...`.
                     }
@@ -1011,7 +1011,7 @@ impl<'a, 'b:'a> ImportResolver<'a, 'b> {
                     }
                 }
                 Err(..) => {
-                    // FIXME: This assert may fire if public glob is later shadowed by a private
+                    // FIXME: this assert may fire if public glob is later shadowed by a private
                     // single import (see test `issue-55884-2.rs`). In theory single imports should
                     // always block globs, even if they are not yet resolved, so that this kind of
                     // self-inconsistent resolution never happens.

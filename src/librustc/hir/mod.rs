@@ -2154,13 +2154,13 @@ impl StructField {
 
 /// Fields and Ids of enum variants and structs
 ///
-/// For enum variants: `NodeId` represents both an Id of the variant itself (relevant for all
-/// variant kinds) and an Id of the variant's constructor (not relevant for `Struct`-variants).
-/// One shared Id can be successfully used for these two purposes.
-/// Id of the whole enum lives in `Item`.
+/// For enum variants: `NodeId` represents both an idd of the variant itself (relevant for all
+/// variant kinds) and an ID of the variant's constructor (not relevant for `Struct`-variants).
+/// A single shared ID can be successfully used for these two purposes.
+/// The ID of the enum itself lives in `Item`.
 ///
-/// For structs: `NodeId` represents an Id of the structure's constructor, so it is not actually
-/// used for `Struct`-structs (but still present). Structures don't have an analogue of "Id of
+/// For structs: `NodeId` represents an ID of the structure's constructor, so it is not actually
+/// used for `Struct`-"variants" (but still present). Structures don't have an analogue of "ID of
 /// the variant itself" from enum variants.
 /// Id of the whole struct lives in `Item`.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
@@ -2552,8 +2552,7 @@ impl CodegenFnAttrs {
         self.flags.contains(CodegenFnAttrFlags::NO_MANGLE) ||
             self.export_name.is_some() ||
             match self.linkage {
-                // these are private, make sure we don't try to consider
-                // them external
+                // These are private, so make sure we don't try to consider them external.
                 None |
                 Some(Linkage::Internal) |
                 Some(Linkage::Private) => false,

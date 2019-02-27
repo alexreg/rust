@@ -22,7 +22,7 @@ fn check_fn_for_unconditional_recursion(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                         mir: &Mir<'tcx>,
                                         def_id: DefId) {
     if let FnKind::Closure(_) = fn_kind {
-        // closures can't recur, so they don't matter.
+        // Closures can't recur, so they don't matter.
         return;
     }
 

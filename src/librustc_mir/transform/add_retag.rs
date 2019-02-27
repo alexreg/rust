@@ -86,7 +86,7 @@ impl MirPass for AddRetag {
         let (span, arg_count) = (mir.span, mir.arg_count);
         let (basic_blocks, local_decls) = mir.basic_blocks_and_local_decls_mut();
         let needs_retag = |place: &Place<'tcx>| {
-            // FIXME: Instead of giving up for unstable places, we should introduce
+            // FIXME: instead of giving up for unstable places, we should introduce
             // a temporary and retag on that.
             is_stable(place) && may_have_reference(place.ty(&*local_decls, tcx).to_ty(tcx), tcx)
         };

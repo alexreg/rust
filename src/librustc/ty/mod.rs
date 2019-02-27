@@ -202,7 +202,7 @@ impl AssociatedItem {
             AssociatedKind::Existential |
             AssociatedKind::Const |
             AssociatedKind::Type => true,
-            // FIXME(canndrew): Be more thorough here, check if any argument is uninhabited.
+            // FIXME(canndrew): be more thorough here, check if any argument is uninhabited.
             AssociatedKind::Method => !self.method_has_self_argument,
         }
     }
@@ -430,7 +430,7 @@ bitflags! {
         const HAS_TY_ERR         = 1 << 7;
         const HAS_PROJECTION     = 1 << 8;
 
-        // FIXME: Rename this to the actual property since it's used for generators too
+        // FIXME: rename this to the actual property since it's used for generators too
         const HAS_TY_CLOSURE     = 1 << 9;
 
         // `true` if there are "names" of types and regions and so forth
@@ -2269,7 +2269,7 @@ impl<'a, 'gcx, 'tcx> AdtDef {
         };
         match tcx.const_eval(param_env.and(cid)) {
             Ok(val) => {
-                // FIXME: Find the right type and use it instead of `val.ty` here
+                // FIXME: find the right type and use it instead of `val.ty` here
                 if let Some(b) = val.assert_bits(tcx.global_tcx(), param_env.and(val.ty)) {
                     trace!("discriminants: {} ({:?})", b, repr_type);
                     Some(Discr {
@@ -2399,7 +2399,7 @@ impl<'a, 'gcx, 'tcx> AdtDef {
             Foreign(..) |
             Error |
             GeneratorWitness(..) => {
-                // these are never sized - return the target type
+                // These are never sized; return the target type.
                 vec![ty]
             }
 
@@ -2422,7 +2422,7 @@ impl<'a, 'gcx, 'tcx> AdtDef {
             }
 
             Projection(..) | Opaque(..) => {
-                // must calculate explicitly.
+                // Must calculate explicitly.
                 // FIXME: consider special-casing always-Sized projections
                 vec![ty]
             }

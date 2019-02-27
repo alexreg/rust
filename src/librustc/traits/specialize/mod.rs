@@ -227,7 +227,7 @@ fn fulfill_implication<'a, 'gcx, 'tcx>(infcx: &InferCtxt<'a, 'gcx, 'tcx>,
     debug!("fulfill_implication: target_trait_ref={:?}, obligations={:?}",
            target_trait_ref, obligations);
 
-    // do the impls unify? If not, no specialization.
+    // Do the impls unify? If not, no specialization.
     match infcx.at(&ObligationCause::dummy(), param_env)
                .eq(source_trait_ref, target_trait_ref) {
         Ok(InferOk { obligations: o, .. }) => {
@@ -262,7 +262,7 @@ fn fulfill_implication<'a, 'gcx, 'tcx>(infcx: &InferCtxt<'a, 'gcx, 'tcx>,
         }
         match fulfill_cx.select_all_or_error(infcx) {
             Err(errors) => {
-                // no dice!
+                // No dice!
                 debug!("fulfill_implication: for impls on {:?} and {:?}, \
                         could not fulfill: {:?} given {:?}",
                        source_trait_ref,
@@ -401,7 +401,7 @@ fn to_pretty_impl_header(tcx: TyCtxt<'_, '_, '_>, impl_def_id: DefId) -> Option<
 
     let substs = InternalSubsts::identity_for_item(tcx, impl_def_id);
 
-    // FIXME: Currently only handles ?Sized.
+    // FIXME: currently only handles ?Sized.
     //        Needs to support ?Move and ?DynSized when they are implemented.
     let mut types_without_default_bounds = FxHashSet::default();
     let sized_trait = tcx.lang_items().sized_trait();

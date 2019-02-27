@@ -612,10 +612,10 @@ impl<'cx, 'gcx, 'tcx> WritebackCx<'cx, 'gcx, 'tcx> {
             self.tables.type_dependent_defs_mut().insert(hir_id, def);
         }
 
-        // Resolve any borrowings for the node with id `node_id`
+        // Resolve any borrowings for the node with ID `node_id`
         self.visit_adjustments(span, hir_id);
 
-        // Resolve the type of the node with id `node_id`
+        // Resolve the type of the node with ID `node_id`
         let n_ty = self.fcx.node_ty(hir_id);
         let n_ty = self.resolve(&n_ty, &span);
         self.write_ty_to_tables(hir_id, n_ty);

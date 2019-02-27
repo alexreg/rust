@@ -377,8 +377,8 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
                     None => {
                         // A field with extern type.  If this field is at offset 0, we behave
                         // like the underlying extern type.
-                        // FIXME: Once we have made decisions for how to handle size and alignment
-                        // of `extern type`, this should be adapted.  It is just a temporary hack
+                        // FIXME: once we have made decisions for how to handle size and alignment
+                        // of `extern type`, this should be adapted. It is just a temporary hack
                         // to get some code to work that probably ought to work.
                         if sized_size == Size::ZERO {
                             return Ok(None)

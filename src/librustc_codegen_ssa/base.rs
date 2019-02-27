@@ -484,7 +484,7 @@ pub fn maybe_create_entry_wrapper<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
         );
 
         if cx.get_defined_value("main").is_some() {
-            // FIXME: We should be smart and show a better diagnostic here.
+            // FIXME: we should be smart and show a better diagnostic here.
             cx.sess().struct_span_err(sp, "entry symbol `main` defined multiple times")
                      .help("did you use #[no_mangle] on `fn main`? Use #[start] instead")
                      .emit();

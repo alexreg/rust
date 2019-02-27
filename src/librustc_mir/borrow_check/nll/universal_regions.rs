@@ -317,7 +317,7 @@ impl<'tcx> UniversalRegions<'tcx> {
                     &substs.substs[..]
                 ));
 
-                // FIXME: It'd be nice to print the late-bound regions
+                // FIXME: it'd be nice to print the late-bound regions
                 // here, but unfortunately these wind up stored into
                 // tests, and the resulting print-outs include `DefId`s
                 // and other things that are not stable across tests!
@@ -337,7 +337,7 @@ impl<'tcx> UniversalRegions<'tcx> {
                     &substs.substs[..]
                 ));
 
-                // FIXME: As above, we'd like to print out the region
+                // FIXME: as above, we'd like to print out the region
                 // `r` but doing so is not stable across architectures
                 // and so forth.
                 let closure_base_def_id = tcx.closure_base_def_id(def_id);

@@ -165,7 +165,7 @@ impl<'a, 'gcx, 'tcx> Borrows<'a, 'gcx, 'tcx> {
     fn kill_loans_out_of_scope_at_location(&self,
                                            sets: &mut BlockSets<'_, BorrowIndex>,
                                            location: Location) {
-        // NOTE: The state associated with a given `location`
+        // NOTE: the state associated with a given `location`
         // reflects the dataflow on entry to the statement.
         // Iterate over each of the borrows that we've precomputed
         // to have went out of scope at this location and kill them.

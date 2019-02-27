@@ -731,7 +731,7 @@ impl<'a> CrateLoader<'a> {
 
             // firstyear 2017 - during testing I was unable to access an OSX machine
             // to make this work on different crate types. As a result, today I have
-            // only been able to test and support linux as a target.
+            // only been able to test and support Linux as a target.
             if self.sess.target.target.llvm_target == "x86_64-unknown-linux-gnu" {
                 if !self.sess.crate_types.borrow().iter().all(|ct| {
                     match *ct {

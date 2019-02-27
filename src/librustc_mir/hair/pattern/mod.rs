@@ -672,7 +672,7 @@ impl<'a, 'tcx> PatternContext<'a, 'tcx> {
         let orig_prefix = prefix;
         let orig_suffix = suffix;
 
-        // dance because of intentional borrow-checker stupidity.
+        // Dance because of intentional borrow-checker stupidity.
         let kind = *orig_slice.kind;
         match kind {
             PatternKind::Slice { prefix, slice, mut suffix } |
@@ -1243,7 +1243,7 @@ pub fn compare_const_vals<'a, 'gcx, 'tcx>(
     let tcx = tcx.global_tcx();
     let (a, b, ty) = (a, b, ty).lift_to_tcx(tcx).unwrap();
 
-    // FIXME: This should use assert_bits(ty) instead of use_bits
+    // FIXME: this should use assert_bits(ty) instead of use_bits
     // but triggers possibly bugs due to mismatching of arrays and slices
     if let (Some(a), Some(b)) = (a.to_bits(tcx, ty), b.to_bits(tcx, ty)) {
         use ::rustc_apfloat::Float;

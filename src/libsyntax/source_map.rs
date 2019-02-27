@@ -1002,9 +1002,9 @@ impl FilePathMapping {
     /// The return value is the remapped path and a boolean indicating whether
     /// the path was affected by the mapping.
     pub fn map_prefix(&self, path: PathBuf) -> (PathBuf, bool) {
-        // NOTE: We are iterating over the mapping entries from last to first
-        //       because entries specified later on the command line should
-        //       take precedence.
+        // NOTE: we are iterating over the mapping entries from last to first
+        // because entries specified later on the command line should
+        // take precedence.
         for &(ref from, ref to) in self.mapping.iter().rev() {
             if let Ok(rest) = path.strip_prefix(from) {
                 return (to.join(rest), true);

@@ -834,7 +834,7 @@ pub fn in_external_macro(sess: &Session, span: Span) -> bool {
 
     match sess.source_map().span_to_snippet(def_site) {
         Ok(code) => !code.starts_with("macro_rules"),
-        // no snippet = external macro or compiler-builtin expansion
+        // No snippet means external macro or compiler-builtin expansion.
         Err(_) => true,
     }
 }

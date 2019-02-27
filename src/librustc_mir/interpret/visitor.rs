@@ -271,7 +271,7 @@ macro_rules! make_value_visitor {
                 // Things can be aggregates and have scalar layout at the same time, and that
                 // is very relevant for `NonNull` and similar structs: We need to visit them
                 // at their scalar layout *before* descending into their fields.
-                // FIXME: We could avoid some redundant checks here. For newtypes wrapping
+                // FIXME: we could avoid some redundant checks here. For newtypes wrapping
                 // scalars, we do the same check on every "level" (e.g., first we check
                 // MyNewtype and then the scalar in there).
                 match v.layout().abi {
@@ -323,7 +323,7 @@ macro_rules! make_value_visitor {
                                 Ok(())
                             }
                             _ => {
-                                // FIXME: We collect in a vec because otherwise there are lifetime
+                                // FIXME: we collect in a vec because otherwise there are lifetime
                                 // errors: Projecting to a field needs access to `ecx`.
                                 let fields: Vec<EvalResult<'tcx, Self::V>> =
                                     (0..offsets.len()).map(|i| {

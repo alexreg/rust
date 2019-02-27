@@ -421,7 +421,7 @@ pub fn super_relate_tys<'a, 'gcx, 'tcx, R>(relation: &mut R,
          &ty::Generator(b_id, b_substs, _))
             if a_id == b_id =>
         {
-            // All Generator types with the same id represent
+            // All Generator types with the same ID represent
             // the (anonymous) type of the same generator expression. So
             // all of their regions should be equated.
             let substs = relation.relate(&a_substs, &b_substs)?;

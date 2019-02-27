@@ -462,12 +462,12 @@ impl<'a> Context<'a> {
         // exact crate name and a possibly an exact hash.
         //
         // During this step, we can filter all found libraries based on the
-        // name and id found in the crate id (we ignore the path portion for
+        // name and ID found in the crate ID (we ignore the path portion for
         // filename matching), as well as the exact hash (if specified). If we
         // end up having many candidates, we must look at the metadata to
-        // perform exact matches against hashes/crate ids. Note that opening up
+        // perform exact matches against hashes/crate IDs. Note that opening up
         // the metadata is where we do an exact match against the full contents
-        // of the crate id (path/name/id).
+        // of the crate ID (path/name/ID).
         //
         // The goal of this step is to look at as little metadata as possible.
         self.filesearch.search(|path, kind| {
@@ -521,7 +521,7 @@ impl<'a> Context<'a> {
         // (per hash), to a Library candidate for returning.
         //
         // A Library candidate is created if the metadata for the set of
-        // libraries corresponds to the crate id and hash criteria that this
+        // libraries corresponds to the crate ID and hash criteria that this
         // search is being performed for.
         let mut libraries = FxHashMap::default();
         for (_hash, (rlibs, rmetas, dylibs)) in candidates {

@@ -126,7 +126,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
                 if let ObjectSafetyViolation::Method(_,
                     MethodViolationCode::WhereClauseReferencesSelf(span)) = violation
                 {
-                    // Using `CRATE_NODE_ID` is wrong, but it's hard to get a more precise id.
+                    // Using `CRATE_NODE_ID` is wrong, but it's hard to get a more precise ID.
                     // It's also hard to get a use site span, so we use the method definition span.
                     self.lint_node_note(
                         lint::builtin::WHERE_CLAUSES_OBJECT_SAFETY,
@@ -333,7 +333,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             &sig.map_bound(|sig| sig.inputs()[0]),
         );
 
-        // until `unsized_locals` is fully implemented, `self: Self` can't be dispatched on.
+        // Until `unsized_locals` is fully implemented, `self: Self` can't be dispatched on.
         // However, this is already considered object-safe. We allow it as a special case here.
         // FIXME(mikeyhew) get rid of this `if` statement once `receiver_is_dispatchable` allows
         // `Receiver: Unsize<Receiver[Self => dyn Trait]>`
@@ -448,7 +448,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             // We *can* get bound lifetimes here in cases like
             // `trait MyTrait: for<'s> OtherTrait<&'s T, Output=bool>`.
             //
-            // binder moved to (*)...
+            // Binder moved to (*) ...
             let super_trait_ref = super_trait_ref.skip_binder();
             ty::ExistentialPredicate::Projection(ty::ExistentialProjection {
                 ty: self.mk_projection(item.def_id, super_trait_ref.substs),
@@ -501,7 +501,7 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
     /// In practice, we cannot use `dyn Trait` explicitly in the obligation because it would result
     /// in a new check that `Trait` is object safe, creating a cycle. So instead, we fudge a little
     /// by introducing a new type parameter `U` such that `Self: Unsize<U>` and `U: Trait + ?Sized`,
-    /// and use `U` in place of `dyn Trait`. Written as a chalk-style query:
+    /// and use `U` in place of `dyn Trait`. Written as a Chalk-style query:
     ///
     /// ```
     /// forall (U: Trait + ?Sized) {
@@ -547,8 +547,8 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             receiver_ty, unsized_self_ty, method.def_id
         );
 
-        // create a modified param env, with `Self: Unsize<U>` and `U: Trait` added to caller bounds
-        // `U: ?Sized` is already implied here
+        // Create a modified param env, with `Self: Unsize<U>` and `U: Trait` added to caller
+        // bounds. `U: ?Sized` is already implied here.
         let param_env = {
             let mut param_env = self.param_env(method.def_id);
 

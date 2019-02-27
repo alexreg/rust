@@ -232,7 +232,7 @@ impl SyntaxContext {
 
     // Allocate a new SyntaxContext with the given ExpnInfo. This is used when
     // deserializing Spans from the incr. comp. cache.
-    // FIXME(mw): This method does not restore MarkData::parent or
+    // FIXME(mw): this method does not restore MarkData::parent or
     // SyntaxContextData::prev_ctxt or SyntaxContextData::opaque. These things
     // don't seem to be used after HIR lowering, so everything should be fine
     // as long as incremental compilation does not kick in before that.

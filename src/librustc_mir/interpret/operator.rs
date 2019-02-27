@@ -53,7 +53,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
             Le => l <= r,
             Gt => l > r,
             Ge => l >= r,
-            _ => bug!("Invalid operation on char: {:?}", bin_op),
+            _ => bug!("invalid operation on char: {:?}", bin_op),
         };
         return Ok((Scalar::from_bool(res), false));
     }
@@ -76,7 +76,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
             BitAnd => l & r,
             BitOr => l | r,
             BitXor => l ^ r,
-            _ => bug!("Invalid operation on bool: {:?}", bin_op),
+            _ => bug!("invalid operation on bool: {:?}", bin_op),
         };
         return Ok((Scalar::from_bool(res), false));
     }
@@ -336,14 +336,14 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
 
         let layout = val.layout;
         let val = val.to_scalar()?;
-        trace!("Running unary op {:?}: {:?} ({:?})", un_op, val, layout.ty.sty);
+        trace!("running unary op {:?}: {:?} ({:?})", un_op, val, layout.ty.sty);
 
         match layout.ty.sty {
             ty::Bool => {
                 let val = val.to_bool()?;
                 let res = match un_op {
                     Not => !val,
-                    _ => bug!("Invalid bool op {:?}", un_op)
+                    _ => bug!("invalid bool op {:?}", un_op)
                 };
                 Ok(Scalar::from_bool(res))
             }
@@ -352,7 +352,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
                 let res = match (un_op, fty) {
                     (Neg, FloatTy::F32) => Single::to_bits(-Single::from_bits(val)),
                     (Neg, FloatTy::F64) => Double::to_bits(-Double::from_bits(val)),
-                    _ => bug!("Invalid float op {:?}", un_op)
+                    _ => bug!("invalid float op {:?}", un_op)
                 };
                 Ok(Scalar::from_uint(res, layout.size))
             }

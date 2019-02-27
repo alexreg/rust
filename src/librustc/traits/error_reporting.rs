@@ -1359,7 +1359,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
                     // No need to overload user in such `cases.need_type_info_err`.
                 } else {
                     let &SubtypePredicate { a_is_expected: _, a, b } = data.skip_binder();
-                    // both must be type variables, or the other would've been instantiated
+                    // Both must be type variables, else the other would've been instantiated.
                     assert!(a.is_ty_var() && b.is_ty_var());
                     self.need_type_info_err(body_id,
                                             obligation.cause.span,

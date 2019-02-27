@@ -991,7 +991,7 @@ impl<'a> AstBuilder for ExtCtxt<'a> {
 
     fn item(&self, span: Span, name: Ident,
             attrs: Vec<ast::Attribute>, node: ast::ItemKind) -> P<ast::Item> {
-        // FIXME: Would be nice if our generated code didn't violate
+        // FIXME: would be nice if our generated code didn't violate
         // Rust coding conventions
         P(ast::Item {
             ident: name,

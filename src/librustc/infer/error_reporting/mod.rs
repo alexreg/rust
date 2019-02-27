@@ -1,4 +1,4 @@
-//! Error Reporting Code for the inference engine
+//! Error reporting for the inference engine.
 //!
 //! Because of the way inference, and in particular region inference,
 //! works, it often happens that errors are not detected until far after
@@ -428,7 +428,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
             .collect()
         };
 
-        // sort the errors by span, for better error message stability.
+        // Sort the errors by span, for better error message stability.
         errors.sort_by_key(|u| match *u {
             RegionResolutionError::ConcreteFailure(ref sro, _, _) => sro.span(),
             RegionResolutionError::GenericBoundFailure(ref sro, _, _) => sro.span(),

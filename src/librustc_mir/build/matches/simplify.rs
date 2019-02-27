@@ -186,7 +186,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
             }
 
             PatternKind::Leaf { ref subpatterns } => {
-                // tuple struct, match subpats (if any)
+                // Tuple struct; match subpatterns (if any).
                 candidate.match_pairs
                          .extend(self.field_match_pairs(match_pair.place, subpatterns));
                 Ok(())

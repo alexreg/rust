@@ -78,7 +78,7 @@ pub struct ModuleConfig {
     pub inline_threshold: Option<usize>,
     // Instead of creating an object file by doing LLVM codegen, just
     // make the object file bitcode. Provides easy compatibility with
-    // emscripten's ecc compiler, when used as the linker.
+    // Emscripten's ecc compiler, when used as the linker.
     pub obj_is_bitcode: bool,
     pub no_integrated_as: bool,
     pub embed_bitcode: bool,
@@ -652,7 +652,7 @@ fn produce_final_output_artifacts(sess: &Session,
 }
 
 pub fn dump_incremental_data(_codegen_results: &CodegenResults) {
-    // FIXME(mw): This does not work at the moment because the situation has
+    // FIXME(mw): this does not work at the moment because the situation has
     //            become more complicated due to incremental LTO. Now a CGU
     //            can have more than two caching states.
     // println!("[incremental] Re-using {} out of {} modules",
@@ -768,7 +768,7 @@ fn execute_optimize_work_item<B: ExtraBackendMethods>(
     let is_rlib = cgcx.crate_types.len() == 1
         && cgcx.crate_types[0] == config::CrateType::Rlib;
 
-    // Metadata modules never participate in LTO regardless of the lto
+    // Metadata modules never participate in LTO regardless of the LTO
     // settings.
     let lto_type = if module.kind == ModuleKind::Metadata {
         ComputedLtoType::No

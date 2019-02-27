@@ -423,7 +423,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                         _ => bug!("promoteds should have an allocation: {:?}", val),
                     },
                     Err(_) => {
-                        // this is unreachable as long as runtime
+                        // This is unreachable as long as runtime
                         // and compile-time agree on values
                         // With floats that won't always be true
                         // so we generate an abort

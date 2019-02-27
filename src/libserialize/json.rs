@@ -2435,7 +2435,7 @@ impl ToJson for string::String {
 macro_rules! tuple_impl {
     // use variables to indicate the arity of the tuple
     ($($tyvar:ident),* ) => {
-        // the trailing commas are for the 1 tuple
+        // The trailing commas are for the 1-tuple.
         impl<
             $( $tyvar : ToJson ),*
             > ToJson for ( $( $tyvar ),* , ) {

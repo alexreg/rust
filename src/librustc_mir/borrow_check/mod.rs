@@ -516,7 +516,7 @@ impl<'cx, 'gcx, 'tcx> DataflowResultsConsumer<'cx, 'tcx> for MirBorrowckCtxt<'cx
                 // assert that a place is safe and live. So we don't have to
                 // do any checks here.
                 //
-                // FIXME: Remove check that the place is initialized. This is
+                // FIXME: remove check that the place is initialized. This is
                 // needed for now because matches don't have never patterns yet.
                 // So this is the only place we prevent
                 //      let x: !;
@@ -1010,7 +1010,7 @@ impl<'cx, 'gcx, 'tcx> MirBorrowckCtxt<'cx, 'gcx, 'tcx> {
                 }
 
                 (Read(kind), BorrowKind::Unique) | (Read(kind), BorrowKind::Mut { .. }) => {
-                    // Reading from mere reservations of mutable-borrows is OK.
+                    // Reading from mere reservations of mutable-borrows is ok.
                     if !is_active(&this.dominators, borrow, context.loc) {
                         assert!(allow_two_phase_borrow(&this.infcx.tcx, borrow.kind));
                         return Control::Continue;

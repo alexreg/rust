@@ -600,7 +600,7 @@ impl PartialEq for Nonterminal {
                 ident_lhs == ident_rhs && is_raw_lhs == is_raw_rhs,
             (NtLifetime(ident_lhs), NtLifetime(ident_rhs)) => ident_lhs == ident_rhs,
             (NtTT(tt_lhs), NtTT(tt_rhs)) => tt_lhs == tt_rhs,
-            // FIXME: Assume that all "complex" nonterminal are not equal, we can't compare them
+            // FIXME: assume that all "complex" non-terminal are not equal, we can't compare them
             // correctly based on data from AST. This will prevent them from matching each other
             // in macros. The comparison will become possible only when each nonterminal has an
             // attached token stream from which it was parsed.

@@ -597,7 +597,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
     /// This function is particularly useful when executing passes for their
     /// side-effects -- e.g., in order to report errors for erroneous programs.
     ///
-    /// Note: The optimization is only available during incr. comp.
+    /// Note: the optimization is only available during incremental compilation.
     pub(super) fn ensure_query<Q: QueryDescription<'gcx>>(self, key: Q::Key) -> () {
         let dep_node = Q::to_dep_node(self, &key);
 
@@ -1178,8 +1178,7 @@ pub fn force_from_dep_node<'a, 'gcx, 'lcx>(tcx: TyCtxt<'a, 'gcx, 'lcx>,
         }
     };
 
-    // FIXME(#45015): We should try move this boilerplate code into a macro
-    //                somehow.
+    // FIXME(#45015): we should try move this boilerplate code into a macro somehow.
     match dep_node.kind {
         // These are inputs that are expected to be pre-allocated and that
         // should therefore always be red or green already

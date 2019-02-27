@@ -151,7 +151,7 @@ macro_rules! define_dep_nodes {
                 }
             }
 
-            // FIXME: Make `is_anon`, `is_input`, `is_eval_always` and `has_params` properties
+            // FIXME: make `is_anon`, `is_input`, `is_eval_always` and `has_params` properties
             // of queries
             #[inline(always)]
             pub fn is_anon(&self) -> bool {

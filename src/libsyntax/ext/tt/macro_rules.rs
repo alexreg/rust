@@ -359,7 +359,7 @@ pub fn compile(
         valid &= check_rhs(sess, rhs);
     }
 
-    // don't abort iteration early, so that errors for multiple lhses can be reported
+    // Don't abort iteration early, so that errors for multiple LHSs can be reported.
     for lhs in &lhses {
         valid &= check_lhs_no_empty_seq(sess, &[lhs.clone()]);
         valid &= check_lhs_duplicate_matcher_bindings(
@@ -452,7 +452,7 @@ fn check_lhs_nt_follows(sess: &ParseSess,
     // after parsing/expansion. we can report every error in every macro this way.
 }
 
-/// Checks that the lhs contains no repetition which could match an empty token
+/// Checks that the LHS contains no repetition which could match an empty token
 /// tree, because then the matcher would hang indefinitely.
 fn check_lhs_no_empty_seq(sess: &ParseSess, tts: &[quoted::TokenTree]) -> bool {
     use quoted::TokenTree;
@@ -583,7 +583,7 @@ impl FirstSets {
         build_recur(&mut sets, tts);
         return sets;
 
-        // walks backward over `tts`, returning the FIRST for `tts`
+        // Walks backward over `tts`, returning the FIRST for `tts`
         // and updating `sets` at the same time for all sequence
         // substructure we find within `tts`.
         fn build_recur(sets: &mut FirstSets, tts: &[TokenTree]) -> TokenSet {
@@ -623,7 +623,7 @@ impl FirstSets {
                             first.add_one_maybe(TokenTree::Token(sp.entire(), sep.clone()));
                         }
 
-                        // Reverse scan: Sequence comes before `first`.
+                        // Reverse scan: sequence comes before `first`.
                         if subfirst.maybe_empty
                            || seq_rep.op == quoted::KleeneOp::ZeroOrMore
                            || seq_rep.op == quoted::KleeneOp::ZeroOrOne
@@ -644,8 +644,7 @@ impl FirstSets {
         }
     }
 
-    // walks forward over `tts` until all potential FIRST tokens are
-    // identified.
+    // Walks forward over `tts` until all potential *first* tokens are identified.
     fn first(&self, tts: &[quoted::TokenTree]) -> TokenSet {
         use quoted::TokenTree;
 
@@ -679,9 +678,8 @@ impl FirstSets {
                                || seq_rep.op == quoted::KleeneOp::ZeroOrMore
                                || seq_rep.op == quoted::KleeneOp::ZeroOrOne
                             {
-                                // continue scanning for more first
-                                // tokens, but also make sure we
-                                // restore empty-tracking state
+                                // Continue scanning for more first tokens, but also make sure we
+                                // restore empty-tracking state.
                                 first.maybe_empty = true;
                                 continue;
                             } else {
@@ -818,7 +816,7 @@ fn check_matcher_core(sess: &ParseSess,
             s
         };
 
-        // (we build `suffix_first` on demand below; you can tell
+        // (We build `suffix_first` on demand below; you can tell
         // which cases are supposed to fall through by looking for the
         // initialization of this variable.)
         let suffix_first;
@@ -914,7 +912,7 @@ fn check_matcher_core(sess: &ParseSess,
                         IsInFollow::Invalid(msg, help) => {
                             sess.span_diagnostic.struct_span_err(next_token.span(), &msg)
                                 .help(help).emit();
-                            // don't bother reporting every source of
+                            // Don't bother reporting every source of
                             // conflict for a particular element of `last`.
                             continue 'each_last;
                         }
@@ -1034,8 +1032,8 @@ fn is_in_follow(tok: &quoted::TokenTree, frag: &str) -> IsInFollow {
                 IsInFollow::Yes
             },
             "block" => {
-                // anything can follow block, the braces provide an easy boundary to
-                // maintain
+                // Anything can follow a block, since the braces provide an easy boundary
+                // to maintain.
                 IsInFollow::Yes
             },
             "stmt" | "expr"  => {
@@ -1078,7 +1076,7 @@ fn is_in_follow(tok: &quoted::TokenTree, frag: &str) -> IsInFollow {
                 }
             },
             "ident" | "lifetime" => {
-                // being a single token, idents and lifetimes are harmless
+                // Being a single tokens, an ident or lifetime is harmless.
                 IsInFollow::Yes
             },
             "literal" => {
@@ -1086,8 +1084,7 @@ fn is_in_follow(tok: &quoted::TokenTree, frag: &str) -> IsInFollow {
                 IsInFollow::Yes
             },
             "meta" | "tt" => {
-                // being either a single token or a delimited sequence, tt is
-                // harmless
+                // Being either a single token or a delimited sequence, a token tree is harmless.
                 IsInFollow::Yes
             },
             "vis" => {

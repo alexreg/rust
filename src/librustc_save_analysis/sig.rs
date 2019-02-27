@@ -1,5 +1,5 @@
 // A signature is a string representation of an item's type signature, excluding
-// any body. It also includes ids for any defs or refs in the signature. For
+// any body. It also includes IDs for any defs or refs in the signature. For
 // example:
 //
 // ```

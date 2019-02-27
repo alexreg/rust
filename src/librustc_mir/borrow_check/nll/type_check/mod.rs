@@ -1739,7 +1739,7 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
     fn check_local(&mut self, mir: &Mir<'tcx>, local: Local, local_decl: &LocalDecl<'tcx>) {
         match mir.local_kind(local) {
             LocalKind::ReturnPointer | LocalKind::Arg => {
-                // return values of normal functions are required to be
+                // Return values of normal functions are required to be
                 // sized by typeck, but return values of ADT constructors are
                 // not because we don't include a `Self: Sized` bounds on them.
                 //
@@ -1992,7 +1992,7 @@ impl<'a, 'gcx, 'tcx> TypeChecker<'a, 'gcx, 'tcx> {
                 self.add_reborrow_constraint(location, region, borrowed_place);
             }
 
-            // FIXME: These other cases have to be implemented in future PRs
+            // FIXME: these other cases have to be implemented in future PRs
             Rvalue::Use(..)
             | Rvalue::Len(..)
             | Rvalue::BinaryOp(..)
@@ -2443,7 +2443,7 @@ impl MirPass for TypeckMir {
         }
 
         if tcx.sess.err_count() > 0 {
-            // compiling a broken program can obviously result in a
+            // Compiling a broken program can obviously result in a
             // broken MIR, so try not to report duplicate errors.
             return;
         }

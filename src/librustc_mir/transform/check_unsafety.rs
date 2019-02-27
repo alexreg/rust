@@ -156,7 +156,7 @@ impl<'a, 'tcx> Visitor<'tcx> for UnsafetyChecker<'a, 'tcx> {
                     }
                 }
             },
-            // casting pointers to ints is unsafe in const fn because the const evaluator cannot
+            // Casting pointers to ints is unsafe in const fn because the const evaluator cannot
             // possibly know what the result of various operations like `address / 2` would be
             // pointers during const evaluation have no integral address, only an abstract one
             Rvalue::Cast(CastKind::Misc, ref operand, cast_ty)
@@ -629,7 +629,7 @@ fn builtin_derive_def_id<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -
 pub fn check_unsafety<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) {
     debug!("check_unsafety({:?})", def_id);
 
-    // closures are handled by their parent fn.
+    // Closures are handled by their parent fn.
     if tcx.is_closure(def_id) {
         return;
     }

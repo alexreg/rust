@@ -79,7 +79,7 @@ pub struct QueryMsg {
 }
 
 /// A sequence of these messages induce a trace of query-based incremental compilation.
-/// FIXME(matthewhammer): Determine whether we should include cycle detection here or not.
+// FIXME(matthewhammer): determine whether we should include cycle detection here or not.
 #[derive(Clone,Debug)]
 pub enum ProfileQueriesMsg {
     /// begin a timed pass
@@ -95,7 +95,7 @@ pub enum ProfileQueriesMsg {
     QueryBegin(SpanData, QueryMsg),
     /// query is satisfied by using an already-known value for the given key
     CacheHit,
-    /// query requires running a provider; providers may nest, permitting queries to nest.
+    /// Query requires running a provider; providers may nest, permitting queries to nest.
     ProviderBegin,
     /// query is satisfied by a provider terminating with a value
     ProviderEnd,

@@ -329,7 +329,7 @@ impl<'a, 'tcx> ReachableContext<'a, 'tcx> {
 // reachable if they are called from inlinable code. Generally, it's not known until
 // monomorphization if a specific trait impl item can be reachable or not. So, we
 // conservatively mark all of them as reachable.
-// FIXME: One possible strategy for pruning the reachable set is to avoid marking impl
+// FIXME: one possible strategy for pruning the reachable set is to avoid marking impl
 // items of non-exported traits (or maybe all local traits?) unless their respective
 // trait items are used from inlinable code through method call syntax or UFCS, or their
 // trait is a lang item.

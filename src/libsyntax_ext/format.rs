@@ -368,7 +368,7 @@ impl<'a, 'b> Context<'a, 'b> {
 
     /// Builds the mapping between format placeholders and argument objects.
     fn build_index_map(&mut self) {
-        // NOTE: Keep the ordering the same as `into_expr`'s expansion would do!
+        // NOTE: keep the ordering the same as `into_expr`'s expansion would do!
         let args_len = self.args.len();
         self.arg_index_map.reserve(args_len);
 
@@ -467,8 +467,8 @@ impl<'a, 'b> Context<'a, 'b> {
                             pos("At", Some(arg_idx))
                         }
 
-                        // should never be the case, because names are already
-                        // resolved.
+                        // Should never be the case, because names are already
+                        // resolved by now.
                         parse::ArgumentNamed(_) => panic!("should never happen"),
                     }
                 };

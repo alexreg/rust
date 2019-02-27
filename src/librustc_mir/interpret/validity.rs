@@ -288,7 +288,7 @@ impl<'rt, 'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>>
                     value, self.path, "a valid unicode codepoint");
             },
             ty::Float(_) | ty::Int(_) | ty::Uint(_) => {
-                // NOTE: Keep this in sync with the array optimization for int/float
+                // NOTE: keep this in sync with the array optimization for int/float
                 // types below!
                 let size = value.layout.size;
                 let value = value.to_scalar_or_undef();
@@ -303,7 +303,7 @@ impl<'rt, 'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>>
             }
             ty::RawPtr(..) => {
                 if self.const_mode {
-                    // Integers/floats in CTFE: For consistency with integers, we do not
+                    // Integers/floats in CTFE: for consistency with integers, we do not
                     // accept undef.
                     let _ptr = try_validation!(value.to_scalar_ptr(),
                         "undefined address in raw pointer", self.path);
@@ -331,7 +331,7 @@ impl<'rt, 'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>>
                                 "invalid drop fn in vtable", self.path);
                             try_validation!(self.ecx.read_size_and_align_from_vtable(vtable),
                                 "invalid size or align in vtable", self.path);
-                            // FIXME: More checks for the vtable.
+                            // FIXME: more checks for the vtable.
                         }
                         ty::Slice(..) | ty::Str => {
                             try_validation!(meta.unwrap().to_usize(self.ecx),
@@ -382,7 +382,7 @@ impl<'rt, 'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>>
                         let alloc_kind = self.ecx.tcx.alloc_map.lock().get(ptr.alloc_id);
                         if let Some(AllocKind::Static(did)) = alloc_kind {
                             // `extern static` cannot be validated as they have no body.
-                            // FIXME: Statics from other crates are also skipped.
+                            // FIXME: statics from other crates are also skipped.
                             // They might be checked at a different type, but for now we
                             // want to avoid recursing too deeply.  This is not sound!
                             if !did.is_local() || self.ecx.tcx.is_foreign_item(did) {
@@ -419,7 +419,7 @@ impl<'rt, 'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>>
                     value, self.path, "a pointer");
                 let _fn = try_validation!(self.ecx.memory.get_fn(ptr),
                     value, self.path, "a function pointer");
-                // FIXME: Check if the signature matches
+                // FIXME: check if the signature matches
             }
             // This should be all the primitive types
             _ => bug!("Unexpected primitive type {}", value.layout.ty)
@@ -541,7 +541,7 @@ impl<'rt, 'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>>
 
                 let ptr = mplace.ptr.to_ptr()?;
 
-                // NOTE: Keep this in sync with the handling of integer and float
+                // NOTE: keep this in sync with the handling of integer and float
                 // types above, in `visit_primitive`.
                 // In run-time mode, we accept pointers in here.  This is actually more
                 // permissive than a per-element check would be, e.g., we accept

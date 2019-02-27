@@ -1469,7 +1469,7 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
                         cmd.link_staticlib(&name.as_str())
                     }
                 },
-                // ignore statically included native libraries here as we've
+                // Ignore statically included native libraries here as we've
                 // already included them when we included the rust library
                 // previously
                 NativeLibraryKind::NativeStatic => {}

@@ -912,7 +912,7 @@ pub fn compare_const_impl<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         let trait_ty = tcx.type_of(trait_c.def_id).subst(tcx, trait_to_impl_substs);
         let mut cause = ObligationCause::misc(impl_c_span, impl_c_hir_id);
 
-        // There is no "body" here, so just pass dummy id.
+        // There is no "body" here, so just pass dummy ID.
         let impl_ty = inh.normalize_associated_types_in(impl_c_span,
                                                         impl_c_hir_id,
                                                         param_env,

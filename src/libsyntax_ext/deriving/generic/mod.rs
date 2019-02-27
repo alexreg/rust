@@ -898,8 +898,7 @@ impl<'a> MethodDef<'a> {
             let arg_expr = cx.expr_ident(trait_.span, ident);
 
             match *ty {
-                // for static methods, just treat any Self
-                // arguments as a normal arg
+                // For static methods, just treat any Self arguments as normal args.
                 Self_ if nonstatic => {
                     self_args.push(arg_expr);
                 }
@@ -926,7 +925,7 @@ impl<'a> MethodDef<'a> {
                      body: P<Expr>)
                      -> ast::ImplItem {
 
-        // create the generics that aren't for Self
+        // Create the generics that aren't for Self.
         let fn_generics = self.generics.to_generics(cx, trait_.span, type_ident, generics);
 
         let args = {
@@ -1068,7 +1067,7 @@ impl<'a> MethodDef<'a> {
                                                      nonself_args,
                                                      &Struct(struct_def, fields));
 
-        // make a series of nested matches, to destructure the
+        // Make a series of nested matches, to destructure the
         // structs. This is actually right-to-left, but it shouldn't
         // matter.
         for (arg_expr, pat) in self_args.iter().zip(patterns) {
@@ -1334,7 +1333,7 @@ impl<'a> MethodDef<'a> {
             _ if variants.len() > 1 && self_args.len() > 1 => {
                 // Since we know that all the arguments will match if we reach
                 // the match expression we add the unreachable intrinsics as the
-                // result of the catch all which should help llvm in optimizing it
+                // result of the catch all which should help LLVM in optimizing it.
                 Some(deriving::call_intrinsic(cx, sp, "unreachable", vec![]))
             }
             _ => None,
@@ -1529,7 +1528,7 @@ impl<'a> MethodDef<'a> {
     }
 }
 
-// general helper methods.
+// General helper methods.
 impl<'a> TraitDef<'a> {
     fn summarise_struct(&self, cx: &mut ExtCtxt<'_>, struct_def: &VariantData) -> StaticFields {
         let mut named_idents = Vec::new();

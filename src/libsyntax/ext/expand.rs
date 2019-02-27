@@ -1301,7 +1301,7 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
             return placeholder;
         }
 
-        // The placeholder expander gives ids to statements, so we avoid folding the id here.
+        // The placeholder expander gives IDs to statements, so we avoid folding the ID here.
         let ast::Stmt { id, node, span } = stmt;
         noop_flat_map_stmt_kind(node, self).into_iter().map(|node| {
             ast::Stmt { id, node, span }
@@ -1508,7 +1508,7 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
                     let err_count = self.cx.parse_sess.span_diagnostic.err_count();
                     self.check_attribute(&at);
                     if self.cx.parse_sess.span_diagnostic.err_count() > err_count {
-                        // avoid loading the file if they haven't enabled the feature
+                        // Avoid loading the file if user hasn't enabled the feature.
                         return noop_visit_attribute(at, self);
                     }
 

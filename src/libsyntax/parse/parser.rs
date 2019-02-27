@@ -1874,7 +1874,7 @@ impl<'a> Parser<'a> {
         self.parse_path_segments(&mut segments, T::PATH_STYLE, true)?;
 
         let span = ty.span.to(self.prev_span);
-        let path_span = span.to(span); // use an empty path since `position` == 0
+        let path_span = span.to(span); // Use an empty path, since `position == 0`.
         let recovered = base.to_recovered(
             Some(QSelf { ty, path_span, position: 0 }),
             ast::Path { segments, span },
@@ -3784,7 +3784,7 @@ impl<'a> Parser<'a> {
 
     fn is_at_start_of_range_notation_rhs(&self) -> bool {
         if self.token.can_begin_expr() {
-            // parse `for i in 1.. { }` as infinite loop, not as `for i in (1..{})`.
+            // Parse `for i in 1.. { }` as infinite loop, not as `for i in (1..{})`.
             if self.token == token::OpenDelim(token::Brace) {
                 return !self.restrictions.contains(Restrictions::NO_STRUCT_LITERAL);
             }
@@ -3920,7 +3920,7 @@ impl<'a> Parser<'a> {
         }
         let in_span = self.prev_span;
         if self.eat_keyword(keywords::In) {
-            // a common typo: `for _ in in bar {}`
+            // A common typo: `for _ in in bar {}`
             let mut err = self.sess.span_diagnostic.struct_span_err(
                 self.prev_span,
                 "expected iterable, found keyword `in`",
@@ -4889,8 +4889,8 @@ impl<'a> Parser<'a> {
         Err(err)
     }
 
-    /// Parse a statement. This stops just before trailing semicolons on everything but items.
-    /// e.g., a `StmtKind::Semi` parses to a `StmtKind::Expr`, leaving the trailing `;` unconsumed.
+    /// Parses a statement. This stops just before trailing semicolons on everything but items.
+    /// E.g., a `StmtKind::Semi` parses to a `StmtKind::Expr`, leaving the trailing `;` unconsumed.
     pub fn parse_stmt(&mut self) -> PResult<'a, Option<Stmt>> {
         Ok(self.parse_stmt_(true))
     }
@@ -5017,7 +5017,7 @@ impl<'a> Parser<'a> {
         self.token.is_keyword(keywords::Try) &&
         self.look_ahead(1, |t| *t == token::OpenDelim(token::Brace)) &&
         self.span.rust_2018() &&
-        // prevent `while try {} {}`, `if try {} {} else {}`, etc.
+        // Prevent `while try {} {}`, `if try {} {} else {}`, etc.
         !self.restrictions.contains(Restrictions::NO_STRUCT_LITERAL)
     }
 
@@ -5036,10 +5036,10 @@ impl<'a> Parser<'a> {
     }
 
     fn is_auto_trait_item(&mut self) -> bool {
-        // auto trait
+        // Auto trait
         (self.token.is_keyword(keywords::Auto)
             && self.look_ahead(1, |t| t.is_keyword(keywords::Trait)))
-        || // unsafe auto trait
+        || // Unsafe auto trait
         (self.token.is_keyword(keywords::Unsafe) &&
          self.look_ahead(1, |t| t.is_keyword(keywords::Auto)) &&
          self.look_ahead(2, |t| t.is_keyword(keywords::Trait)))
@@ -5173,8 +5173,7 @@ impl<'a> Parser<'a> {
             match self.token {
                 token::OpenDelim(_) => {}
                 _ => {
-                    // we only expect an ident if we didn't parse one
-                    // above.
+                    // We only expect an ident if we didn't parse one above.
                     let ident_str = if id.name == keywords::Invalid.name() {
                         "identifier, "
                     } else {
@@ -5255,7 +5254,7 @@ impl<'a> Parser<'a> {
                 }
             }
         } else {
-            // FIXME: Bad copy of attrs
+            // FIXME: bad copy of attrs
             let old_directory_ownership =
                 mem::replace(&mut self.directory.ownership, DirectoryOwnership::UnownedViaBlock);
             let item = self.parse_item_(attrs.clone(), false, true)?;
@@ -5344,7 +5343,7 @@ impl<'a> Parser<'a> {
             //    if (cond)
             //      bar;
             //
-            // Which is valid in other languages, but not Rust.
+            // which is valid in other languages, but not in Rust.
             match self.parse_stmt_without_recovery(false) {
                 Ok(Some(stmt)) => {
                     if self.look_ahead(1, |t| t == &token::OpenDelim(token::Brace))
@@ -5370,7 +5369,7 @@ impl<'a> Parser<'a> {
                         stmt_span,
                         "try placing this code inside a block",
                         sugg,
-                        // speculative, has been misleading in the past (closed Issue #46836)
+                        // Speculative; has been misleading in the past (see issue #46836).
                         Applicability::MaybeIncorrect
                     );
                 }
@@ -6565,7 +6564,7 @@ impl<'a> Parser<'a> {
                              ast::ImplItemKind)> {
         // FIXME: code copied from `parse_macro_use_or_failure` -- abstraction needed!
         if let Some(mac) = self.parse_assoc_macro_invoc("impl", Some(vis), at_end)? {
-            // method macro
+            // Method macro
             Ok((keywords::Invalid.ident(), vec![], ast::Generics::default(),
                 ast::ImplItemKind::Macro(mac)))
         } else {
@@ -6945,7 +6944,7 @@ impl<'a> Parser<'a> {
             token::DocComment(_) => {
                 let previous_span = self.prev_span;
                 let mut err = self.span_fatal_err(self.span, Error::UselessDocComment);
-                self.bump(); // consume the doc comment
+                self.bump(); // Consume the doc comment.
                 let comma_after_doc_seen = self.eat(&token::Comma);
                 // `seen_comma` is always false, because we are inside doc block
                 // condition is here to make code more readable
@@ -7194,7 +7193,7 @@ impl<'a> Parser<'a> {
         let (in_cfg, outer_attrs) = {
             let mut strip_unconfigured = crate::config::StripUnconfigured {
                 sess: self.sess,
-                features: None, // don't perform gated feature checking
+                features: None, // Don't perform gated feature checking.
             };
             let mut outer_attrs = outer_attrs.to_owned();
             strip_unconfigured.process_cfg_attrs(&mut outer_attrs);

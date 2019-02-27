@@ -589,9 +589,9 @@ impl Clean<Item> for doctree::Module {
             String::new()
         };
 
-        // maintain a stack of mod ids, for doc comment path resolution
-        // but we also need to resolve the module's own docs based on whether its docs were written
-        // inside or outside the module, so check for that
+        // Maintain a stack of module IDs, for doc comment path resolution.
+        // However, we also need to resolve the module's own docs based on whether its docs were
+        // written inside or outside the module, so check for that.
         let attrs = self.attrs.clean(cx);
 
         let mut items: Vec<Item> = vec![];
@@ -1151,7 +1151,7 @@ impl<'a, 'tcx> Clean<GenericBound> for (&'a ty::TraitRef<'tcx>, Vec<TypeBinding>
 
         debug!("ty::TraitRef\n  subst: {:?}\n", trait_ref.substs);
 
-        // collect any late bound regions
+        // Collect any late-bound regions.
         let mut late_bounds = vec![];
         for ty_s in trait_ref.input_types().skip(1) {
             if let ty::Tuple(ts) = ty_s.sty {

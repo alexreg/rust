@@ -231,7 +231,7 @@ impl<'a, 'tcx> AstConv<'tcx, 'tcx> for ItemCtxt<'a, 'tcx> {
     }
 
     fn normalize_ty(&self, _span: Span, ty: Ty<'tcx>) -> Ty<'tcx> {
-        // types in item signatures are not normalized, to avoid undue
+        // Types in item signatures are not normalized, to avoid undue
         // dependencies.
         ty
     }
@@ -241,7 +241,7 @@ impl<'a, 'tcx> AstConv<'tcx, 'tcx> for ItemCtxt<'a, 'tcx> {
     }
 
     fn record_ty(&self, _hir_id: hir::HirId, _ty: Ty<'tcx>, _span: Span) {
-        // no place to record types from signatures?
+        // No place to record types from signatures?
     }
 }
 
@@ -650,7 +650,7 @@ fn adt_def<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> &'tcx ty::Ad
             )
         }
         ItemKind::Struct(ref def, _) => {
-            // Use separate constructor id for unit/tuple structs and reuse did for braced structs.
+            // Use separate constructor ID for unit/tuple structs and reuse did for braced structs.
             let ctor_id = if !def.is_struct() {
                 Some(tcx.hir().local_def_id(def.id()))
             } else {
@@ -1372,7 +1372,7 @@ fn find_existential_constraints<'a, 'tcx>(
                 let span = self.tcx.def_span(def_id);
                 // used to quickly look up the position of a generic parameter
                 let mut index_map: FxHashMap<ty::ParamTy, usize> = FxHashMap::default();
-                // skip binder is ok, since we only use this to find generic parameters and their
+                // Skip binder is ok, since we only use this to find generic parameters and their
                 // positions.
                 for (idx, subst) in substs.iter().enumerate() {
                     if let UnpackedKind::Type(ty) = subst.unpack() {
@@ -1420,7 +1420,7 @@ fn find_existential_constraints<'a, 'tcx>(
                     let mut ty = concrete_type.walk().fuse();
                     let mut p_ty = prev_ty.walk().fuse();
                     let iter_eq = (&mut ty).zip(&mut p_ty).all(|(t, p)| match (&t.sty, &p.sty) {
-                        // type parameters are equal to any other type parameter for the purpose of
+                        // Type parameters are equal to any other type parameter for the purpose of
                         // concrete type equality, as it is possible to obtain the same type just
                         // by passing matching parameters to a function.
                         (ty::Param(_), ty::Param(_)) => true,
@@ -1756,7 +1756,7 @@ fn predicates_of<'a, 'tcx>(
         // is something that one must prove in order to invoke a
         // method or project an associated type.
         //
-        // In the chalk setup, this predicate is not part of the
+        // In the Chalk setup, this predicate is not part of the
         // "predicates" for a trait item. But it is useful in
         // rustc because if you directly (e.g.) invoke a trait
         // method like `Trait::method(...)`, you must naturally

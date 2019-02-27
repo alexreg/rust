@@ -203,7 +203,7 @@ pub enum ObligationCauseCode<'tcx> {
     /// Constant expressions must be `Sized`.
     ConstSized,
 
-    /// static items must have `Sync` type
+    /// Static items must be `Sync`.
     SharedStatic,
 
     BuiltinDerivedObligation(DerivedObligationCause<'tcx>),
@@ -722,8 +722,8 @@ fn do_normalize_predicates<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
     );
     let span = cause.span;
     tcx.infer_ctxt().enter(|infcx| {
-        // FIXME. We should really... do something with these region
-        // obligations. But this call just continues the older
+        // FIXME(nmatsakis): we should really do something with these
+        // region obligations. But this call just continues the older
         // behavior (i.e., doesn't cause any new bugs), and it would
         // take some further refactoring to actually solve them. In
         // particular, we would have to handle implied bounds
@@ -731,8 +731,8 @@ fn do_normalize_predicates<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         // regionck (though I made some efforts to extract it
         // out). -nmatsakis
         //
-        // @arielby: In any case, these obligations are checked
-        // by wfcheck anyway, so I'm not sure we have to check
+        // NOTE(arielby): in any case, these obligations are checked
+        // by wfcheck, so I'm not sure we have to check
         // them here too, and we will remove this function when
         // we move over to lazy normalization *anyway*.
         let fulfill_cx = FulfillmentContext::new_ignoring_regions();

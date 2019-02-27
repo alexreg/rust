@@ -134,7 +134,7 @@ fn insert_required_predicates_to_be_wf<'tcx>(
                 insert_outlives_predicate(tcx, rty.into(), region, required_predicates);
             }
 
-            // For each Adt (struct/enum/union) type `Foo<'a, T>`, we
+            // For each ADT (i.e., struct/enum/union) type `Foo<'a, T>`, we
             // can load the current set of inferred and explicit
             // predicates from `global_inferred_outlives` and filter the
             // ones that are `TypeOutlives`.

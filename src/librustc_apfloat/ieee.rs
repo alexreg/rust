@@ -373,7 +373,7 @@ impl<S: Semantics> fmt::Display for IeeeFloat<S> {
         // We use enough digits so the number can be round-tripped back to an
         // APFloat. The formula comes from "How to Print Floating-Point Numbers
         // Accurately" by Steele and White.
-        // FIXME: Using a formula based purely on the precision is conservative;
+        // FIXME: using a formula based purely on the precision is conservative;
         // we can print fewer digits depending on the actual value being printed.
 
         // precision = 2 + floor(S::PRECISION / lg_2(10))

@@ -629,7 +629,7 @@ impl UserIdentifiedItem {
 
 // Note: Also used by librustdoc, see PR #43348. Consider moving this struct elsewhere.
 //
-// FIXME: Currently the `everybody_loops` transformation is not applied to:
+// FIXME: currently the `everybody_loops` transformation is not applied to:
 //  * `const fn`, due to issue #43636 that `loop` is not supported for const evaluation. We are
 //    waiting for miri to fix that.
 //  * `impl Trait`, due to issue #43869 that functions returning impl Trait cannot be diverging.
@@ -818,7 +818,7 @@ impl<'a> MutVisitor for ReplaceBodyWithLoop<'a> {
         }
     }
 
-    // in general the pretty printer processes unexpanded code, so
+    // In general, the pretty-printer processes unexpanded code, so
     // we override the default `visit_mac` method which panics.
     fn visit_mac(&mut self, mac: &mut ast::Mac) {
         noop_visit_mac(mac, self)

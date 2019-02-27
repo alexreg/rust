@@ -161,7 +161,7 @@ impl<'f, 'gcx, 'tcx> Coerce<'f, 'gcx, 'tcx> {
         }
 
         if a.is_never() {
-            // Subtle: If we are coercing from `!` to `?T`, where `?T` is an unbound
+            // Subtle: if we are coercing from `!` to `?T`, where `?T` is an unbound
             // type variable, we want `?T` to fallback to `!` if not
             // otherwise constrained. An example where this arises:
             //
@@ -170,7 +170,7 @@ impl<'f, 'gcx, 'tcx> Coerce<'f, 'gcx, 'tcx> {
             // here, we would coerce from `!` to `?T`.
             let b = self.shallow_resolve(b);
             return if self.shallow_resolve(b).is_ty_var() {
-                // micro-optimization: no need for this if `b` is
+                // Micro-optimization: no need for this if `b` is
                 // already resolved in some way.
                 let diverging_ty = self.next_diverging_ty_var(
                     TypeVariableOrigin::AdjustmentType(self.cause.span));

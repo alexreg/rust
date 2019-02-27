@@ -240,7 +240,7 @@ impl Session {
     ) -> DiagnosticBuilder<'a> {
         self.diagnostic().struct_span_err_with_code(sp, msg, code)
     }
-    // FIXME: This method should be removed (every error should have an associated error code).
+    // FIXME: this method should be removed (every error should have an associated error code).
     pub fn struct_err<'a>(&'a self, msg: &str) -> DiagnosticBuilder<'a> {
         self.diagnostic().struct_err(msg)
     }
@@ -1034,7 +1034,7 @@ pub fn build_session_with_source_map(
     source_map: Lrc<source_map::SourceMap>,
     emitter_dest: Option<Box<dyn Write + Send>>,
 ) -> Session {
-    // FIXME: This is not general enough to make the warning lint completely override
+    // FIXME: this is not general enough to make the warning lint completely override
     // normal diagnostic warnings, since the warning lint can also be denied and changed
     // later via the source code.
     let warnings_allow = sopts

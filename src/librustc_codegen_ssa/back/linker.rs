@@ -568,18 +568,18 @@ impl<'a> Linker for MsvcLinker<'a> {
     }
 
     fn framework_path(&mut self, _path: &Path) {
-        bug!("frameworks are not supported on windows")
+        bug!("frameworks are not supported on Windows")
     }
     fn link_framework(&mut self, _framework: &str) {
-        bug!("frameworks are not supported on windows")
+        bug!("frameworks are not supported on Windows")
     }
 
     fn link_whole_staticlib(&mut self, lib: &str, _search_path: &[PathBuf]) {
-        // not supported?
+        // Not supported?
         self.link_staticlib(lib);
     }
     fn link_whole_rlib(&mut self, path: &Path) {
-        // not supported?
+        // Not supported?
         self.link_rlib(path);
     }
     fn optimize(&mut self) {
@@ -731,12 +731,12 @@ impl<'a> Linker for EmLinker<'a> {
     }
 
     fn link_whole_staticlib(&mut self, lib: &str, _search_path: &[PathBuf]) {
-        // not supported?
+        // Not supported?
         self.link_staticlib(lib);
     }
 
     fn link_whole_rlib(&mut self, lib: &Path) {
-        // not supported?
+        // Not supported?
         self.link_rlib(lib);
     }
 
@@ -799,7 +799,7 @@ impl<'a> Linker for EmLinker<'a> {
     }
 
     fn pgo_gen(&mut self) {
-        // noop, but maybe we need something like the gnu linker?
+        // No-op, but maybe we need something like the GNU linker?
     }
 
     fn debuginfo(&mut self) {

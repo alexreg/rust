@@ -176,7 +176,7 @@ impl<'tcx> TraitEngine<'tcx> for FulfillmentContext<'tcx> {
                                      infcx: &InferCtxt<'a, 'gcx, 'tcx>,
                                      obligation: PredicateObligation<'tcx>)
     {
-        // this helps to reduce duplicate errors, as well as making
+        // This helps to reduce duplicate errors, as well as making
         // debug output much nicer to read and so on.
         let obligation = infcx.resolve_type_vars_if_possible(&obligation);
 

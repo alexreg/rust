@@ -271,7 +271,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     let opt_ref_test_ty = unsize(value.ty);
                     let mut place = place.clone();
                     match (opt_ref_ty, opt_ref_test_ty) {
-                        // nothing to do, neither is an array
+                        // Nothing to do, since neither is an array.
                         (None, None) => {},
                         (Some((region, elem_ty, _)), _) |
                         (None, Some((region, elem_ty, _))) => {
@@ -334,8 +334,8 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                             span: test.span,
                             ty: mty,
 
-                            // FIXME(#54571): This constant comes from user
-                            // input (a constant in a pattern).  Are
+                            // FIXME(#54571): this constant comes from user
+                            // input (a constant in a pattern). Are
                             // there forms where users can add type
                             // annotations here?  For example, an
                             // associated constant? Need to

@@ -2259,7 +2259,7 @@ impl<'a> Resolver<'a> {
             // When resolving `$crate` from a `macro_rules!` invoked in a `macro`,
             // we don't want to pretend that the `macro_rules!` definition is in the `macro`
             // as described in `SyntaxContext::apply_mark`, so we ignore prepended modern marks.
-            // FIXME: This is only a guess and it doesn't work correctly for `macro_rules!`
+            // FIXME: this is only a guess and it doesn't work correctly for `macro_rules!`
             // definitions actually produced by `macro` and `macro` definitions produced by
             // `macro_rules!`, but at least such configurations are not stable yet.
             ctxt = ctxt.modern_and_legacy();
@@ -2694,7 +2694,7 @@ impl<'a> Resolver<'a> {
     {
         let mut self_type_rib = Rib::new(NormalRibKind);
 
-        // plain insert (no renaming, types are not currently hygienic....)
+        // Plain insert (no renaming, since types are not currently hygienic).
         self_type_rib.bindings.insert(keywords::SelfUpper.ident(), self_def);
         self.ribs[TypeNS].push(self_type_rib);
         f(self);
@@ -2841,7 +2841,7 @@ impl<'a> Resolver<'a> {
         self.resolve_pattern(&local.pat, PatternSource::Let, &mut FxHashMap::default());
     }
 
-    // build a map from pattern identifiers to binding-info's.
+    // Build a map from pattern identifiers to binding-info's.
     // this is done hygienically. This could arise for a macro
     // that expands into an or-pattern where one 'x' was from the
     // user and one 'x' came from the macro.
@@ -2864,7 +2864,7 @@ impl<'a> Resolver<'a> {
         binding_map
     }
 
-    // check that all of the arms in an or-pattern have exactly the
+    // Check that all of the arms in an or-pattern have exactly the
     // same set of bindings, with the same binding modes for each.
     fn check_consistent_bindings(&mut self, pats: &[P<Pat>]) {
         if pats.is_empty() {
@@ -4127,7 +4127,7 @@ impl<'a> Resolver<'a> {
                     }
                 }
 
-                // visit `break` argument if any
+                // Visit `break` argument, if there is one.
                 visit::walk_expr(self, expr);
             }
 
@@ -4260,7 +4260,7 @@ impl<'a> Resolver<'a> {
     fn record_candidate_traits_for_expr_if_necessary(&mut self, expr: &Expr) {
         match expr.node {
             ExprKind::Field(_, ident) => {
-                // FIXME(#6890): Even though you can't treat a method like a
+                // FIXME(#6890): even though you can't treat a method like a
                 // field, we need to add any trait methods we find that match
                 // the field name so that we can do some nice error reporting
                 // later on in typeck.
@@ -4396,7 +4396,7 @@ impl<'a> Resolver<'a> {
                         // create the path
                         let mut segms = path_segments.clone();
                         if lookup_ident.span.rust_2018() {
-                            // crate-local absolute paths start with `crate::` in edition 2018
+                            // Crate-local absolute paths start with `crate::` in edition 2018
                             // FIXME: may also be stabilized for Rust 2015 (Issues #45477, #44660)
                             segms.insert(
                                 0, ast::PathSegment::from_ident(crate_name)
@@ -5179,7 +5179,7 @@ fn show_candidates(err: &mut DiagnosticBuilder<'_>,
 
     if let Some(span) = span {
         for candidate in &mut path_strings {
-            // produce an additional newline to separate the new use statement
+            // Produce an additional newline to separate the new use-statement
             // from the directly following item.
             let additional_newline = if found_use {
                 ""

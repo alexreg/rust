@@ -154,7 +154,7 @@ pub fn mir_build<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> Mir<'t
             build::construct_const(cx, body_id, return_ty_span)
         };
 
-        // Convert the Mir to global types.
+        // Convert the MIR to global types.
         let mut globalizer = GlobalizeMir {
             tcx,
             span: mir.span
@@ -233,7 +233,7 @@ fn create_constructor_shim<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         tcx.infer_ctxt().enter(|infcx| {
             let mut mir = shim::build_adt_ctor(&infcx, ctor_id, fields, span);
 
-            // Convert the Mir to global types.
+            // Convert the MIR to global types.
             let tcx = infcx.tcx.global_tcx();
             let mut globalizer = GlobalizeMir {
                 tcx,
@@ -587,7 +587,7 @@ fn should_abort_on_panic<'a, 'gcx, 'tcx>(tcx: TyCtxt<'a, 'gcx, 'tcx>,
     // We cannot add landing pads, so don't add one
     if tcx.sess.no_landing_pads() { return false; }
 
-    // This is a special case: some functions have a C abi but are meant to
+    // This is a special case: some functions have a C ABI but are meant to
     // unwind anyway. Don't stop them.
     let attrs = &tcx.get_attrs(fn_def_id);
     match attr::find_unwind_attr(Some(tcx.sess.diagnostic()), attrs) {

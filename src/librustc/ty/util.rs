@@ -496,7 +496,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
                         !impl_generics.type_param(pt, self).pure_wrt_drop
                     }
                     UnpackedKind::Lifetime(_) | UnpackedKind::Type(_) => {
-                        // not a type or region param - this should be reported
+                        // Not a type or region param; this should be reported
                         // as an error.
                         false
                     }
@@ -1022,7 +1022,7 @@ fn needs_drop_raw<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         // `ManuallyDrop` doesn't have a destructor regardless of field types.
         ty::Adt(def, _) if Some(def.did) == tcx.lang_items().manually_drop() => false,
 
-        // Issue #22536: We first query `is_copy_modulo_regions`.  It sees a
+        // Issue #22536: we first query `is_copy_modulo_regions`. It sees a
         // normalized version of the type, and therefore will definitely
         // know whether the type implements Copy (and thus needs no
         // cleanup/drop/zeroing) ...
@@ -1031,7 +1031,7 @@ fn needs_drop_raw<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         // ... (issue #22536 continued) but as an optimization, still use
         // prior logic of asking for the structural "may drop".
 
-        // FIXME(#22815): Note that this is a conservative heuristic;
+        // FIXME(#22815): note that this is a conservative heuristic;
         // it may report that the type "may drop" when actual type does
         // not actually have a destructor associated with it. But since
         // the type absolutely did not have the `Copy` bound attached
@@ -1059,7 +1059,7 @@ fn needs_drop_raw<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
 
         ty::Tuple(ref tys) => tys.iter().cloned().any(needs_drop),
 
-        // unions don't have destructors because of the child types,
+        // Unions don't have destructors because of the child types,
         // only if they manually implement `Drop` (handled above).
         ty::Adt(def, _) if def.is_union() => false,
 

@@ -94,10 +94,10 @@ impl<'tcx> AllArenas<'tcx> {
 /// Internal storage
 #[derive(Default)]
 pub struct GlobalArenas<'tcx> {
-    // internings
+    // Internings
     layout: TypedArena<LayoutDetails>,
 
-    // references
+    // References
     generics: TypedArena<ty::Generics>,
     trait_def: TypedArena<ty::TraitDef>,
     adt_def: TypedArena<ty::AdtDef>,
@@ -1308,7 +1308,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         self.get_lang_items(LOCAL_CRATE)
     }
 
-    /// Due to missing llvm support for lowering 128 bit math to software emulation
+    /// Due to missing LLVM support for lowering 128-bit math to software emulation
     /// (on some targets), the lowering can be done in MIR.
     ///
     /// This function only exists until said support is implemented.
@@ -2115,8 +2115,7 @@ pub mod tls {
 
 macro_rules! sty_debug_print {
     ($ctxt: expr, $($variant: ident),*) => {{
-        // curious inner module to allow variant names to be used as
-        // variable names.
+        // Curious inner module to allow variant names to be used as variable names.
         #[allow(non_snake_case)]
         mod inner {
             use crate::ty::{self, TyCtxt};

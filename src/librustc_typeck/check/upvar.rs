@@ -154,7 +154,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                     .upvar_capture_map
                     .insert(upvar_id, capture_kind);
             }
-            // Add the vector of freevars to the map keyed with the closure id.
+            // Add the vector of freevars to the map keyed with the closure ID.
             // This gives us an easier access to them without having to call
             // `with_freevars` again.
             if !freevar_list.is_empty() {

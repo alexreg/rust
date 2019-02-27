@@ -441,7 +441,7 @@ impl<'cg, 'cx, 'tcx, 'gcx> InvalidationGenerator<'cx, 'tcx, 'gcx> {
                     }
 
                     (Read(_), BorrowKind::Unique) | (Read(_), BorrowKind::Mut { .. }) => {
-                        // Reading from mere reservations of mutable-borrows is OK.
+                        // Reading from mere reservations of mutable-borrows is ok.
                         if !is_active(&this.dominators, borrow, context.loc) {
                             // If the borrow isn't active yet, reads don't invalidate it
                             assert!(allow_two_phase_borrow(&this.tcx, borrow.kind));
@@ -457,7 +457,7 @@ impl<'cg, 'cx, 'tcx, 'gcx> InvalidationGenerator<'cx, 'tcx, 'gcx> {
                         | (Reservation(_), BorrowKind::Mut { .. })
                         | (Activation(_, _), _)
                         | (Write(_), _) => {
-                            // unique or mutable borrows are invalidated by writes.
+                            // Unique or mutable borrows are invalidated by writes.
                             // Reservations count as writes since we need to check
                             // that activating the borrow will be OK
                             // FIXME(bob_twinkles) is this actually the right thing to do?
@@ -484,13 +484,13 @@ impl<'cg, 'cx, 'tcx, 'gcx> InvalidationGenerator<'cx, 'tcx, 'gcx> {
             return;
         }
 
-        // Two-phase borrow support: For each activation that is newly
+        // Two-phase borrow support: for each activation that is newly
         // generated at this statement, check if it interferes with
         // another borrow.
         for &borrow_index in self.borrow_set.activations_at_location(location) {
             let borrow = &self.borrow_set[borrow_index];
 
-            // only mutable borrows should be 2-phase
+            // Only mutable borrows should be two-phase.
             assert!(match borrow.kind {
                 BorrowKind::Shared | BorrowKind::Shallow => false,
                 BorrowKind::Unique | BorrowKind::Mut { .. } => true,

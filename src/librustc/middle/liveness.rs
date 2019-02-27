@@ -1020,7 +1020,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                 debug!("{} is an ExprKind::Closure",
                        self.ir.tcx.hir().hir_to_pretty_string(expr.hir_id));
 
-                // the construction of a closure itself is not important,
+                // The construction of a closure itself is not important,
                 // but we have to consider the closed over variables.
                 let caps = self.ir.capture_info_map.get(&expr.hir_id).cloned().unwrap_or_else(||
                     span_bug!(expr.span, "no registered caps"));
@@ -1090,7 +1090,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                         arm.guard.as_ref().map(|hir::Guard::If(e)| &**e),
                         body_succ
                     );
-                    // only consider the first pattern; any later patterns must have
+                    // Only consider the first pattern; any later patterns must have
                     // the same bindings, and we also consider the first pattern to be
                     // the "authoritative" set of ids
                     let arm_succ =
@@ -1593,7 +1593,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
         if !self.used_on_entry(ln, var) {
             let r = self.should_warn(var);
             if let Some(name) = r {
-                // annoying: for parameters in funcs like `fn(x: i32)
+                // Annoying: for parameters in funcs like `fn(x: i32)
                 // {ret}`, there is only one node, so asking about
                 // `assigned_on_exit()` is not meaningful.
                 let is_assigned = if ln == self.s.exit_ln {

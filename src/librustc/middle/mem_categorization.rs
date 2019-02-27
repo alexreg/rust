@@ -192,7 +192,7 @@ pub struct cmt_<'tcx> {
     pub cat: Categorization<'tcx>, // categorization of expr
     pub mutbl: MutabilityCategory, // mutability of expr as place
     pub ty: Ty<'tcx>,              // type of the expr (*see WARNING above*)
-    pub note: Note,                // Note about the provenance of this cmt
+    pub note: Note,                // note about the provenance of this cmt
 }
 
 pub type cmt<'tcx> = Rc<cmt_<'tcx>>;
@@ -928,7 +928,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
         ret
     }
 
-    /// Returns the lifetime of a temporary created by expr with id `id`.
+    /// Returns the lifetime of a temporary created by expr with ID `id`.
     /// This could be `'static` if `id` is part of a constant expression.
     pub fn temporary_scope(&self, id: hir::ItemLocalId) -> ty::Region<'tcx> {
         let scope = self.region_scope_tree.temporary_scope(id);
@@ -1179,8 +1179,8 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
         // come back and I'll dive into a bit more detail here. :) OK,
         // back?
         //
-        // In general, the id of the cmt should be the node that
-        // "produces" the value---patterns aren't executable code
+        // In general, the ID  of the cmt should be the node that
+        // "produces" the value -- patterns aren't executable code
         // exactly, but I consider them to "execute" when they match a
         // value, and I consider them to produce the value that was
         // matched. So if you have something like:
@@ -1201,9 +1201,9 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
         //     ^~~~~~~~~~^     `@@y` pattern node  @@int      @int
         //     ^~~~~~~~~~~~~^  `@y` pattern node   @int       int
         //
-        // You can see that the types of the id and the cmt are in
-        // sync in the first line, because that id is actually the id
-        // of an expression. But once we get to pattern ids, the types
+       // You can see that the types of the ID  and the cmt are in
+       // sync in the first line, because that ID  is actually the ID
+        // of an expression. But once we get to pattern IDs, the types
         // step out of sync again. So you'll see below that we always
         // get the type of the *subpattern* and use that.
 

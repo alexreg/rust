@@ -211,7 +211,7 @@ impl<'infcx, 'gcx, 'tcx> CombineFields<'infcx, 'gcx, 'tcx> {
 
         // Finally, relate `b_ty` to `a_ty`, as described in previous comment.
         //
-        // FIXME(#16847): This code is non-ideal because all these subtype
+        // FIXME(#16847): this code is non-ideal because all these subtype
         // relations wind up attributed to the same spans. We need
         // to associate causes/spans with each of the relations in
         // the stack to get this right.
@@ -513,7 +513,7 @@ impl<'cx, 'gcx, 'tcx> TypeRelation<'cx, 'gcx, 'tcx> for Generalizer<'cx, 'gcx, '
             }
         }
 
-        // FIXME: This is non-ideal because we don't give a
+        // FIXME: this is non-ideal because we don't give a
         // very descriptive origin for this region variable.
         Ok(self.infcx.next_region_var_in_universe(MiscVariable(self.span), self.for_universe))
     }

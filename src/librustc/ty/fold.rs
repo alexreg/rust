@@ -887,7 +887,7 @@ impl<'tcx> TypeVisitor<'tcx> for LateBoundRegionsCollector {
     }
 
     fn visit_ty(&mut self, t: Ty<'tcx>) -> bool {
-        // if we are only looking for "constrained" region, we have to
+        // If we are only looking for "constrained" region, we have to
         // ignore the inputs to a projection, as they may not appear
         // in the normalized form
         if self.just_constrained {

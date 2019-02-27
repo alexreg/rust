@@ -422,7 +422,7 @@ pub fn str_lit(lit: &str, diag: Option<(Span, &Handler)>) -> String {
         }
     }
 
-    res.shrink_to_fit(); // probably not going to do anything, unless there was an escape.
+    res.shrink_to_fit(); // Probably not going to do anything, unless there was an escape.
     debug!("parse_str_lit: returning {}", res);
     res
 }

@@ -74,7 +74,7 @@ const HIR_ID_COUNTER_LOCKED: u32 = 0xFFFFFFFF;
 pub struct LoweringContext<'a> {
     crate_root: Option<&'static str>,
 
-    // Used to assign ids to HIR nodes that do not directly correspond to an AST node.
+    // Used to assign IDs to HIR nodes that do not directly correspond to an AST node.
     sess: &'a Session,
 
     cstore: &'a dyn CrateStore,
@@ -1535,7 +1535,7 @@ impl<'a> LoweringContext<'a> {
                         name,
                     }));
 
-                    // We need to manually create the ids here, because the
+                    // We need to manually create the IDs here, because the
                     // definitions will go into the explicit `existential type`
                     // declaration and thus need to have their owner set to that item
                     let def_node_id = self.context.sess.next_node_id();

@@ -674,7 +674,7 @@ impl<'a> StringReader<'a> {
                 let loc = smap.lookup_char_pos_adj(self.pos);
                 debug!("Skipping a shebang");
                 if loc.line == 1 && loc.col == CharPos(0) {
-                    // FIXME: Add shebang "token", return it
+                    // FIXME: add shebang "token", return it
                     let start = self.pos;
                     while !self.ch_is('\n') && !self.is_eof() {
                         self.bump();
@@ -1961,7 +1961,7 @@ mod tests {
             assert_eq!(tok1.tok, tok2.tok);
             assert_eq!(tok1.sp, tok2.sp);
             assert_eq!(string_reader.next_token().tok, token::Whitespace);
-            // the 'main' id is already read:
+            // the 'main' ID is already read:
             assert_eq!(string_reader.pos.clone(), BytePos(28));
             // read another token:
             let tok3 = string_reader.next_token();

@@ -476,7 +476,7 @@ impl Handler {
         result.code(code);
         result
     }
-    // FIXME: This method should be removed (every error should have an associated error code).
+    // FIXME: this method should be removed (every error should have an associated error code).
     pub fn struct_err<'a>(&'a self, msg: &str) -> DiagnosticBuilder<'a> {
         DiagnosticBuilder::new(self, Level::Error, msg)
     }

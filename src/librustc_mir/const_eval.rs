@@ -113,8 +113,8 @@ fn eval_body_and_ecx<'a, 'mir, 'tcx>(
     mir: Option<&'mir mir::Mir<'tcx>>,
     param_env: ty::ParamEnv<'tcx>,
 ) -> (EvalResult<'tcx, MPlaceTy<'tcx>>, CompileTimeEvalContext<'a, 'mir, 'tcx>) {
-    // we start out with the best span we have
-    // and try improving it down the road when more information is available
+    // We start out with the best span we have, and try improving it down the road when more
+    // information becomes available.
     let span = tcx.def_span(cid.instance.def_id());
     let span = mir.map(|mir| mir.span).unwrap_or(span);
     let mut ecx = EvalContext::new(tcx.at(span), param_env, CompileTimeInterpreter::new());
@@ -656,12 +656,13 @@ pub fn const_eval_raw_provider<'a, 'tcx>(
             }
             reported_err
         } else if def_id.is_local() {
-            // constant defined in this crate, we can figure out a lint level!
+            // Constant defined in this crate -- we can figure out a lint level!
             match tcx.describe_def(def_id) {
-                // constants never produce a hard error at the definition site. Anything else is
-                // a backwards compatibility hazard (and will break old versions of winapi for sure)
+                // Constants never produce a hard error at the definition site. Anything else is
+                // a backwards compatibility hazard (and will break old versions of WINAPI for
+                // sure).
                 //
-                // note that validation may still cause a hard error on this very same constant,
+                // Note that validation may still cause a hard error on this very same constant,
                 // because any code that existed before validation could not have failed validation
                 // thus preventing such a hard error from being a backwards compatibility hazard
                 Some(Def::Const(_)) | Some(Def::AssociatedConst(_)) => {

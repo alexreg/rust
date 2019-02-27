@@ -391,7 +391,7 @@ impl ToInteriorKind for mc::InteriorKind {
 // `DefId` is present when the field is part of struct that is in
 // a variant of an enum. For instance in:
 // `enum E { X { foo: u32 }, Y { foo: u32 }}`
-// each `foo` is qualified by the definitition id of the variant (`X` or `Y`).
+// each `foo` is qualified by the definitition ID of the variant (`X` or `Y`).
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum LoanPathElem<'tcx> {
     LpDeref(mc::PointerKind<'tcx>),

@@ -1293,7 +1293,7 @@ fn check_struct<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                           span: Span) {
     let def_id = tcx.hir().local_def_id(id);
     let def = tcx.adt_def(def_id);
-    def.destructor(tcx); // force the destructor to be evaluated
+    def.destructor(tcx); // Force the destructor to be evaluated.
     check_representable(tcx, span, def_id);
 
     if def.repr.simd() {
@@ -1309,7 +1309,7 @@ fn check_union<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                          span: Span) {
     let def_id = tcx.hir().local_def_id(id);
     let def = tcx.adt_def(def_id);
-    def.destructor(tcx); // force the destructor to be evaluated
+    def.destructor(tcx); // Force the destructor to be evaluated.
     check_representable(tcx, span, def_id);
 
     check_packed(tcx, span, def_id);
@@ -1477,7 +1477,7 @@ fn check_on_unimplemented<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                     trait_def_id: DefId,
                                     item: &hir::Item) {
     let item_def_id = tcx.hir().local_def_id(item.id);
-    // an error would be reported if this fails.
+    // An error would be reported if this fails.
     let _ = traits::OnUnimplementedDirective::of_item(tcx, trait_def_id, item_def_id);
 }
 
@@ -1844,7 +1844,7 @@ pub fn check_enum<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                             id: ast::NodeId) {
     let def_id = tcx.hir().local_def_id(id);
     let def = tcx.adt_def(def_id);
-    def.destructor(tcx); // force the destructor to be evaluated
+    def.destructor(tcx); // Force the destructor to be evaluated.
 
     if vs.is_empty() {
         let attributes = tcx.get_attrs(def_id);
@@ -2953,7 +2953,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                 self.err_args(supplied_arg_count)
             }
         } else {
-            // is the missing argument of type `()`?
+            // Is the missing argument of type `()`?
             let sugg_unit = if expected_arg_tys.len() == 1 && supplied_arg_count == 0 {
                 self.resolve_type_vars_if_possible(&expected_arg_tys[0]).is_unit()
             } else if fn_inputs.len() == 1 && supplied_arg_count == 0 {
@@ -3188,7 +3188,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                                     expr: &'gcx hir::Expr,
                                     expected: Ty<'tcx>) -> Ty<'tcx> {
         let ty = self.check_expr_with_hint(expr, expected);
-        // checks don't need two phase
+        // Checks don't need two phases.
         self.demand_coerce(expr, ty, expected, AllowTwoPhase::No)
     }
 
@@ -3657,7 +3657,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                           skip: Vec<LocalInternedString>)
                           -> Option<Symbol> {
         let names = variant.fields.iter().filter_map(|field| {
-            // ignore already set fields and private fields from non-local crates
+            // Ignore already-set fields and private fields from non-local crates.
             if skip.iter().any(|x| *x == field.ident.as_str()) ||
                (variant.did.krate != LOCAL_CRATE && field.vis != Visibility::Public) {
                 None
@@ -3764,7 +3764,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
         let adt_ty_hint =
             self.expected_inputs_for_expected_output(span, expected, adt_ty, &[adt_ty])
                 .get(0).cloned().unwrap_or(adt_ty);
-        // re-link the regions that EIfEO can erase.
+        // Re-link the regions that EIfEO can erase.
         self.demand_eqtype(span, adt_ty_hint, adt_ty);
 
         let (substs, adt_kind, kind_name) = match &adt_ty.sty {
@@ -4210,7 +4210,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                     if !tcx.features().unsized_locals {
                         // We want to remove some Sized bounds from std functions,
                         // but don't want to expose the removal to stable Rust.
-                        // i.e., we don't want to allow
+                        // I.e., we don't want to allow
                         //
                         //     drop as fn(str);
                         //
@@ -4937,7 +4937,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                 self.check_stmt(s);
             }
 
-            // check the tail expression **without** holding the
+            // Check the tail expression **without** holding the
             // `enclosing_breakables` lock below.
             let tail_expr_ty = tail_expr.map(|t| self.check_expr_with_expectation(t, expected));
 

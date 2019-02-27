@@ -47,8 +47,8 @@ pub struct DataFlowContext<'a, 'tcx: 'a, O> {
     // FIXME (#6298): Shouldn't this go with CFG?
     local_id_to_index: FxHashMap<hir::ItemLocalId, Vec<CFGIndex>>,
 
-    // Bit sets per cfg node.  The following three fields (`gens`, `kills`,
-    // and `on_entry`) all have the same structure. For each id in
+    // Bit sets per cfg node. The following three fields (`gens`, `kills`,
+    // and `on_entry`) all have the same structure. For each ID in
     // `id_range`, there is a range of words equal to `words_per_id`.
     // So, to access the bits for any given id, you take a slice of
     // the full vector (see the method `compute_id_range()`).
