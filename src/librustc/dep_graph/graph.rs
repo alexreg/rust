@@ -837,14 +837,14 @@ impl DepGraph {
         self.node_color(dep_node).map(|c| c.is_green()).unwrap_or(false)
     }
 
-    // This method loads all on-disk cacheable query results into memory, so
-    // they can be written out to the new cache file again. Most query results
-    // will already be in memory but in the case where we marked something as
-    // green but then did not need the value, that value will never have been
-    // loaded from disk.
-    //
-    // This method will only load queries that will end up in the disk cache.
-    // Other queries will not be executed.
+    /// Loads all on-disk cacheable query results into memory, so
+    /// they can be written out to the new cache file again. Most query results
+    /// will already be in memory but in the case where we marked something as
+    /// green but then did not need the value, that value will never have been
+    /// loaded from disk.
+    ///
+    /// This method will only load queries that will end up in the disk cache.
+    /// Other queries will not be executed.
     pub fn exec_cache_promotions<'a, 'tcx>(&self, tcx: TyCtxt<'a, 'tcx, 'tcx>) {
         let green_nodes: Vec<DepNode> = {
             let data = self.data.as_ref().unwrap();

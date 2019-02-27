@@ -347,8 +347,8 @@ trait VisibilityLike: Sized {
     const SHALLOW: bool = false;
     fn new_min<'a, 'tcx>(find: &FindMin<'a, 'tcx, Self>, def_id: DefId) -> Self;
 
-    // Returns an over-approximation (`skip_assoc_tys` = true) of visibility due to
-    // associated types for which we can't determine visibility precisely.
+    /// Returns an over-approximation (`skip_assoc_tys = true`) of visibility due to
+    /// associated types for which we can't determine visibility precisely.
     fn of_impl<'a, 'tcx>(node_id: ast::NodeId, tcx: TyCtxt<'a, 'tcx, 'tcx>,
                          access_levels: &'a AccessLevels) -> Self {
         let mut find = FindMin { tcx, access_levels, min: Self::MAX };
