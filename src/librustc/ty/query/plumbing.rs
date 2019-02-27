@@ -61,7 +61,7 @@ impl<'tcx, M: QueryConfig<'tcx>> Default for QueryCache<'tcx, M> {
     }
 }
 
-// If enabled, send a message to the profile-queries thread
+// If enabled, sends a message to the profile-queries thread.
 macro_rules! profq_msg {
     ($tcx:expr, $msg:expr) => {
         if cfg!(debug_assertions) {
@@ -72,7 +72,7 @@ macro_rules! profq_msg {
     }
 }
 
-// If enabled, format a key using its debug string, which can be
+// If enabled, formats a key using its debug string, which can be
 // expensive to compute (in terms of time).
 macro_rules! profq_query_msg {
     ($query:expr, $tcx:expr, $key:expr) => {{
@@ -221,8 +221,7 @@ impl<'a, 'tcx, Q: QueryDescription<'tcx>> Drop for JobOwner<'a, 'tcx, Q> {
     fn drop(&mut self) {
         // Poison the query so jobs waiting on it panic
         self.cache.borrow_mut().active.insert(self.key.clone(), QueryResult::Poisoned);
-        // Also signal the completion of the job, so waiters
-        // will continue execution
+        // Also signal the completion of the job, so waiters will continue execution.
         self.job.signal_complete();
     }
 }

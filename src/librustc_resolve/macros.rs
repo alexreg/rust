@@ -458,7 +458,7 @@ impl<'a> Resolver<'a> {
         }
     }
 
-    // Resolve an identifier in lexical scope.
+    // Resolves an identifier in lexical scope.
     // This is a variation of `fn resolve_ident_in_lexical_scope` that can be run during
     // expansion and import resolution (perhaps they can be merged in the future).
     // The function is used for resolving initial segments of macro paths (e.g., `foo` in

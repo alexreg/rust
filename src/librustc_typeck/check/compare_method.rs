@@ -253,7 +253,7 @@ fn compare_predicate_entailment<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         // any associated types appearing in the fn arguments or return
         // type.
 
-        // Compute placeholder form of impl and trait method tys.
+        // Compute placeholder forms of impl and trait method types.
         let tcx = infcx.tcx;
 
         let (impl_sig, _) = infcx.replace_bound_vars_with_fresh_vars(

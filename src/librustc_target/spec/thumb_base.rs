@@ -47,7 +47,7 @@ pub fn opts() -> TargetOptions {
         // volatile load is a footgun as it can end up loading an invalid memory address, depending
         // on how the user set up their linker scripts. This section adds pretty printer for stuff
         // like std::Vec, which is not that used in no-std context, so it's best to left it out
-        // until we figure a way to add the pretty printers without requiring a volatile load cf.
+        // until we figure a way to add the pretty-printers without requiring a volatile load cf.
         // rust-lang/rust#44993.
         emit_debug_gdb_scripts: false,
         .. Default::default()

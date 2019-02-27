@@ -2311,7 +2311,7 @@ impl<'tcx> AnnotatedBorrowFnSignature<'tcx> {
         }
     }
 
-    /// Return the name of the provided `Ty` (that must be a reference) with a synthesized lifetime
+    /// Returns the name of the provided `Ty` (that must be a reference) with a synthesized lifetime
     /// name where required.
     fn get_name_for_ty(&self, ty: ty::Ty<'tcx>, counter: usize) -> String {
         // We need to add synthesized lifetimes where appropriate. We do

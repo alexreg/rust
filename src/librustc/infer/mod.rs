@@ -1112,7 +1112,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         self.tainted_by_errors_flag.get()
     }
 
-    /// Set the "tainted by errors" flag to true. We call this when we
+    /// Sets the "tainted by errors" flag to true. We call this when we
     /// observe an error from a prior pass.
     pub fn set_tainted_by_errors(&self) {
         debug!("set_tainted_by_errors()");

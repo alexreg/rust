@@ -340,7 +340,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         })
     }
 
-    /// Read an immediate from a place, asserting that that is possible with the given layout.
+    /// Reads an immediate from a place, asserting that that is possible with the given layout.
     #[inline(always)]
     pub fn read_immediate(
         &self,
@@ -353,7 +353,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         }
     }
 
-    /// Read a scalar from a place
+    /// Reads a scalar from a place.
     pub fn read_scalar(
         &self,
         op: OpTy<'tcx, M::PointerTag>
@@ -507,7 +507,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         Ok(OpTy { op, layout: place.layout })
     }
 
-    // Evaluate a place with the goal of reading from it.  This lets us sometimes
+    // Evaluates a place with the goal of reading from it. This lets us sometimes
     // avoid allocations.
     pub(super) fn eval_place_to_op(
         &self,
@@ -531,7 +531,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         Ok(op)
     }
 
-    /// Evaluate the operand, returning a place where you can then find the data.
+    /// Evaluates the operand, returning a place where you can then find the data.
     /// if you already know the layout, you can save two some table lookups
     /// by passing it in here.
     pub fn eval_operand(
@@ -552,7 +552,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         Ok(op)
     }
 
-    /// Evaluate a bunch of operands at once
+    /// Evaluates a collection of operands at once.
     pub(super) fn eval_operands(
         &self,
         ops: &[mir::Operand<'tcx>],
@@ -614,7 +614,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         })
     }
 
-    /// Read discriminant, return the runtime value as well as the variant index.
+    /// Reads discriminant, return the runtime value as well as the variant index.
     pub fn read_discriminant(
         &self,
         rval: OpTy<'tcx, M::PointerTag>,

@@ -1099,8 +1099,8 @@ enum ReturnDest<'tcx, V> {
     Nothing,
     // Store the return value to the pointer
     Store(PlaceRef<'tcx, V>),
-    // Stores an indirect return value to an operand local place
+    // Store an indirect return value to an operand local place.
     IndirectOperand(PlaceRef<'tcx, V>, mir::Local),
-    // Stores a direct return value to an operand local place
+    // Store a direct return value to an operand local place.
     DirectOperand(mir::Local)
 }

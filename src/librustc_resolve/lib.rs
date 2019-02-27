@@ -3136,7 +3136,7 @@ impl<'a> Resolver<'a> {
 
     // High-level and context dependent path resolution routine.
     // Resolves the path and records the resolution into definition map.
-    // If resolution fails tries several techniques to find likely
+    // If resolution fails, then tries several techniques to find likely
     // resolution candidates, suggest imports or other help, and report
     // errors in user friendly way.
     fn smart_resolve_path(&mut self,
@@ -3300,7 +3300,7 @@ impl<'a> Resolver<'a> {
         if let Some(LexicalScopeBinding::Def(def)) = binding { def != Def::Err } else { false }
     }
 
-    // Resolve in alternative namespaces if resolution in the primary namespace fails.
+    // Resolves in alternative namespaces if resolution in the primary namespace fails.
     fn resolve_qpath_anywhere(&mut self,
                               id: NodeId,
                               qself: Option<&QSelf>,
@@ -3765,7 +3765,7 @@ impl<'a> Resolver<'a> {
             diag);
     }
 
-    // Resolve a local definition, potentially adjusting for closures.
+    // Resolves a local definition, potentially adjusting for closures.
     fn adjust_local_def(&mut self,
                         ns: Namespace,
                         rib_index: usize,
@@ -4414,7 +4414,7 @@ impl<'a> Resolver<'a> {
                         // 2. if it's defined in another crate, it's accessible
                         // only if both the module is public and the entity is
                         // declared as public (due to pruning, we don't explore
-                        // outside crate private modules => no need to check this)
+                        // outside crate private modules, so no need to check this).
                         if !in_module_is_extern || name_binding.vis == ty::Visibility::Public {
                             let did = match def {
                                 Def::StructCtor(did, _) | Def::VariantCtor(did, _) =>

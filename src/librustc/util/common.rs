@@ -114,7 +114,7 @@ pub fn profq_msg(sess: &Session, msg: ProfileQueriesMsg) {
     }
 }
 
-/// Set channel for profile queries channel
+/// Sets channel for profile queries channel.
 pub fn profq_set_chan(sess: &Session, s: Sender<ProfileQueriesMsg>) -> bool {
     let mut channel = sess.profile_channel.borrow_mut();
     if channel.is_none() {

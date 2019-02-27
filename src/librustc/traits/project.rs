@@ -1501,7 +1501,7 @@ fn confirm_impl_candidate<'cx, 'gcx, 'tcx>(
     }
 }
 
-/// Locate the definition of an associated type in the specialization hierarchy,
+/// Locates the definition of an associated type in the specialization hierarchy,
 /// starting from the given impl.
 ///
 /// Based on the "projection mode", this lookup may in fact only examine the

@@ -165,13 +165,13 @@ impl<'a> ArchiveBuilder<'a> {
         });
     }
 
-    /// Indicate that the next call to `build` should update all symbols in
+    /// Indicates that the next call to `build` should update all symbols in
     /// the archive (equivalent to running 'ar s' over it).
     pub fn update_symbols(&mut self) {
         self.should_update_symbols = true;
     }
 
-    /// Combine the provided files, rlibs, and native libraries into a single
+    /// Combines the provided files, rlibs, and native libraries into a single
     /// `Archive`.
     pub fn build(&mut self) {
         let kind = self.llvm_archive_kind().unwrap_or_else(|kind|

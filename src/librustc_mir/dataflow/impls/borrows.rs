@@ -160,7 +160,7 @@ impl<'a, 'gcx, 'tcx> Borrows<'a, 'gcx, 'tcx> {
         &self.borrow_set.borrows[idx].reserve_location
     }
 
-    /// Add all borrows to the kill set, if those borrows are out of scope at `location`.
+    /// Adds all borrows to the kill set, if those borrows are out of scope at `location`.
     /// That means they went out of a nonlexical scope
     fn kill_loans_out_of_scope_at_location(&self,
                                            sets: &mut BlockSets<'_, BorrowIndex>,

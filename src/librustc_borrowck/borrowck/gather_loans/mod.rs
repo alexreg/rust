@@ -337,7 +337,7 @@ impl<'a, 'tcx> GatherLoanCtxt<'a, 'tcx> {
         // Create the loan record (if needed).
         let loan = match restr {
             RestrictionResult::Safe => {
-                // No restrictions---no loan record necessary
+                // No restrictions -- no loan record necessary.
                 return;
             }
 

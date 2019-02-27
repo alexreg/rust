@@ -1780,7 +1780,7 @@ impl Niche {
 }
 
 impl<'a, 'tcx> LayoutCx<'tcx, TyCtxt<'a, 'tcx, 'tcx>> {
-    /// Find the offset of a niche leaf field, starting from
+    /// Finds the offset of a niche leaf field, starting from
     /// the given type and recursing through aggregates.
     // FIXME(eddyb) traverse already optimized enums.
     fn find_niche(&self, layout: TyLayout<'tcx>) -> Result<Option<Niche>, LayoutError<'tcx>> {

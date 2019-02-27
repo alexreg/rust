@@ -474,8 +474,8 @@ fn sub_bound_free_true() {
     })
 }
 
-/// Test substituting a bound region into a function, which introduces another level of binding.
-/// This requires adjusting the Debruijn index.
+/// Tests substituting a bound region into a function, which introduces another level of binding.
+/// This requires adjusting the De Bruijn index.
 #[test]
 fn subst_ty_renumber_bound() {
     test_env(EMPTY_SOURCE_STR, errors(&[]), |env| {

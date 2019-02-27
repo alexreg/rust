@@ -438,7 +438,7 @@ enum FfiResult<'tcx> {
     },
 }
 
-/// Check if this enum can be safely exported based on the
+/// Checks if this enum can be safely exported based on the
 /// "nullable pointer optimization". Currently restricted
 /// to function pointers and references, but could be
 /// expanded to cover `NonZero` raw pointers and newtypes.

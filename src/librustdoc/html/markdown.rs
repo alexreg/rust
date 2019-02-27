@@ -116,7 +116,7 @@ fn map_line(s: &str) -> Line<'_> {
     }
 }
 
-/// Convert chars from a title for an id.
+/// Converts chars from a title, for use as an ID.
 ///
 /// "Hello, world!" -> "hello-world"
 fn slugify(c: char) -> Option<char> {

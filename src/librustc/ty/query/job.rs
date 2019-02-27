@@ -331,7 +331,7 @@ fn connected_to_root<'tcx>(
     }).is_some()
 }
 
-// Deterministically pick an query from a list
+/// Deterministically picks a query from a list.
 #[cfg(parallel_compiler)]
 fn pick_query<'a, 'tcx, T, F: Fn(&T) -> (Span, Lrc<QueryJob<'tcx>>)>(
     tcx: TyCtxt<'_, 'tcx, '_>,

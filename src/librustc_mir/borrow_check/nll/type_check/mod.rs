@@ -2470,7 +2470,7 @@ impl MirPass for TypeckMir {
             );
 
             // For verification purposes, we just ignore the resulting
-            // region constraint sets. Not our problem. =)
+            // region constraint sets -- not our problem.
         });
     }
 }

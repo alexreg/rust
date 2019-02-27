@@ -432,7 +432,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
         };
 
         // Simplify the candidate. Since the pattern is irrefutable, this should
-        // always convert all match-pairs into bindings.
+        // always convert all match pairs into bindings.
         self.simplify_candidate(&mut candidate);
 
         if !candidate.match_pairs.is_empty() {
@@ -1033,7 +1033,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
     /// This is the most subtle part of the matching algorithm. At
     /// this point, the input candidates have been fully simplified,
-    /// and so we know that all remaining match-pairs require some
+    /// and so we know that all remaining match pairs require some
     /// sort of test. To decide what test to do, we take the highest
     /// priority candidate (last one in the list) and extract the
     /// first match-pair from the list. From this we decide what kind

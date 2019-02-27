@@ -294,7 +294,7 @@ impl context::ContextOps<ChalkArenas<'gcx>> for ChalkContext<'cx, 'gcx> {
         canon.max_universe.index() + 1
     }
 
-    /// Convert a goal G *from* the canonical universes *into* our
+    /// Converts a goal G *from* the canonical universes *into* our
     /// local universes. This will yield a goal G' that is the same
     /// but for the universes of universally quantified names.
     fn map_goal_from_canonical(

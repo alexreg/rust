@@ -744,9 +744,9 @@ impl<'a> Parser<'a> {
         }
     }
 
-    /// Expect next token to be edible or inedible token.  If edible,
-    /// then consume it; if inedible, then return without consuming
-    /// anything.  Signal a fatal error if next token is unexpected.
+    /// Expects the next token to be an edible or an inedible token; if edible,
+    /// then consumes it; if inedible, then returns without consuming anything.
+    /// Signals a fatal error if next token is unexpected.
     pub fn expect_one_of(
         &mut self,
         edible: &[token::Token],
@@ -1330,7 +1330,7 @@ impl<'a> Parser<'a> {
         Ok(result)
     }
 
-    /// Advance the parser by one token
+    /// Advances the parser by a single token.
     pub fn bump(&mut self) {
         if self.prev_token_kind == PrevTokenKind::Eof {
             // Bumping after EOF is a bad sign, usually an infinite loop.
@@ -1358,8 +1358,8 @@ impl<'a> Parser<'a> {
         self.process_potential_macro_variable();
     }
 
-    /// Advance the parser using provided token as a next one. Use this when
-    /// consuming a part of a token. For example a single `<` from `<<`.
+    /// Advances the parser using provided token as a next one. Use this when
+    /// consuming a part of a token. E.g., a single `<` from `<<`.
     fn bump_with(&mut self, next: token::Token, span: Span) {
         self.prev_span = self.span.with_hi(span.lo());
         // It would be incorrect to record the kind of the current token, but
@@ -1857,7 +1857,7 @@ impl<'a> Parser<'a> {
         Ok(())
     }
 
-    // Try to recover from associated item paths like `[T]::AssocItem`/`(T, U)::AssocItem`.
+    // Tries to recover from associated item paths like `[T]::AssocItem` / `(T, U)::AssocItem`.
     fn maybe_recover_from_bad_qpath<T: RecoverQPath>(&mut self, base: T, allow_recovery: bool)
                                                      -> PResult<'a, T> {
         // Do not add `::` to expected tokens.
@@ -3332,7 +3332,7 @@ impl<'a> Parser<'a> {
         TokenStream::new(result)
     }
 
-    /// Parse a prefix-unary-operator expr
+    /// Parses a prefix-unary-operator expression.
     fn parse_prefix_expr(&mut self,
                              already_parsed_attrs: Option<ThinVec<Attribute>>)
                              -> PResult<'a, P<Expr>> {
@@ -3716,7 +3716,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    /// Produce an error if comparison operators are chained (RFC #558).
+    /// Produces an error if comparison operators are chained (RFC #558).
     /// We only need to check lhs, not rhs, because all comparison ops
     /// have same precedence and are left-associative
     fn check_no_chained_comparison(&mut self, lhs: &Expr, outer_op: &AssocOp) {
@@ -3743,7 +3743,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    /// Parse prefix-forms of range notation: `..expr`, `..`, `..=expr`
+    /// Parses prefix-forms of range notation: `..expr`, `..`, `..=expr`.
     fn parse_prefix_range_expr(&mut self,
                                already_parsed_attrs: Option<ThinVec<Attribute>>)
                                -> PResult<'a, P<Expr>> {
@@ -4895,7 +4895,7 @@ impl<'a> Parser<'a> {
         Ok(self.parse_stmt_(true))
     }
 
-    // Eat tokens until we can be relatively sure we reached the end of the
+    // Eats tokens until we can be relatively sure we reached the end of the
     // statement. This is something of a best-effort heuristic.
     //
     // We terminate when we find an unmatched `}` (without consuming it).
@@ -6559,7 +6559,7 @@ impl<'a> Parser<'a> {
         err
     }
 
-    /// Parse a method or a macro invocation in a trait impl.
+    /// Parses a method or a macro invocation in a trait impl.
     fn parse_impl_method(&mut self, vis: &Visibility, at_end: &mut bool)
                          -> PResult<'a, (Ident, Vec<Attribute>, ast::Generics,
                              ast::ImplItemKind)> {
@@ -7189,7 +7189,7 @@ impl<'a> Parser<'a> {
         Ok((id, item, None))
     }
 
-    /// Parse a `mod <foo> { ... }` or `mod <foo>;` item
+    /// Parses a `mod <foo> { ... }` or `mod <foo>;` item.
     fn parse_item_mod(&mut self, outer_attrs: &[Attribute]) -> PResult<'a, ItemInfo> {
         let (in_cfg, outer_attrs) = {
             let mut strip_unconfigured = crate::config::StripUnconfigured {

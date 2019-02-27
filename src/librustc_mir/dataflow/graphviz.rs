@@ -118,7 +118,7 @@ impl<'a, 'tcx, MWF, P> Graph<'a, 'tcx, MWF, P>
 where MWF: MirWithFlowState<'tcx>,
       P: Fn(&MWF::BD, <MWF::BD as BitDenotation<'tcx>>::Idx) -> DebugFormatted,
 {
-    /// Generate the node label
+    /// Generates the node label.
     fn node_label_internal<W: io::Write>(&self,
                                          n: &Node,
                                          w: &mut W,

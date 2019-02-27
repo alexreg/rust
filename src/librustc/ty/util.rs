@@ -772,7 +772,7 @@ impl<'a, 'tcx> ty::TyS<'tcx> {
         }
     }
 
-    /// Check whether a type is representable. This means it cannot contain unboxed
+    /// Checks whether a type is representable. This means it cannot contain unboxed
     /// structural recursion. This check is needed for structs and enums.
     pub fn is_representable(&'tcx self,
                             tcx: TyCtxt<'a, 'tcx, 'tcx>,

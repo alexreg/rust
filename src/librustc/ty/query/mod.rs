@@ -188,7 +188,7 @@ define_queries! { <'tcx>
         /// Returns `true` if this is a foreign item (i.e., linked via `extern { ... }`).
         [] fn is_foreign_item: IsForeignItem(DefId) -> bool,
 
-        /// Get a map with the variance of every item; use `item_variance`
+        /// Gets a map with the variance of every item; use `item_variance`
         /// instead.
         [] fn crate_variances: crate_variances(CrateNum) -> Lrc<ty::CrateVariancesMap>,
 

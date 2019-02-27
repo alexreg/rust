@@ -47,7 +47,7 @@ impl From<Kind> for TestKind {
 }
 
 impl TestKind {
-    // Return the cargo subcommand for this test kind
+    // Returns the cargo subcommand for this test kind.
     fn subcommand(self) -> &'static str {
         match self {
             TestKind::Test => "test",

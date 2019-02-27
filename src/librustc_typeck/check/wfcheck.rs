@@ -432,7 +432,7 @@ fn check_where_clauses<'a, 'gcx, 'fcx, 'tcx>(
         }
     };
 
-    // Check that concrete defaults are well-formed. See test `type-check-defaults.rs`.
+    // Checks that concrete defaults are well-formed. See test `type-check-defaults.rs`.
     // For example this forbids the declaration:
     // struct Foo<T = Vec<[u32]>> { .. }
     // Here the default `Vec<[u32]>` is not WF because `[u32]: Sized` does not hold.
@@ -451,7 +451,7 @@ fn check_where_clauses<'a, 'gcx, 'fcx, 'tcx>(
         }
     }
 
-    // Check that trait predicates are WF when params are substituted by their defaults.
+    // Checks that trait predicates are WF when params are substituted by their defaults.
     // We don't want to overly constrain the predicates that may be written but we want to
     // catch cases where a default my never be applied such as `struct Foo<T: Copy = String>`.
     // Therefore we check if a predicate which contains a single type param

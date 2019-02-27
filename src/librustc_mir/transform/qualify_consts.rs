@@ -137,13 +137,13 @@ enum ValueSource<'a, 'tcx> {
 trait Qualif {
     const IDX: usize;
 
-    /// Return the qualification that is (conservatively) correct for any value
+    /// Returns the qualification that is (conservatively) correct for any value
     /// of the type, or `None` if the qualification is not value/type-based.
     fn in_any_value_of_ty(_cx: &ConstCx<'_, 'tcx>, _ty: Ty<'tcx>) -> Option<bool> {
         None
     }
 
-    /// Return a mask for the qualification, given a type. This is `false` iff
+    /// Returns a mask for the qualification, given a type. This is `false` if
     /// no value of that type can have the qualification.
     fn mask_for_ty(cx: &ConstCx<'_, 'tcx>, ty: Ty<'tcx>) -> bool {
         Self::in_any_value_of_ty(cx, ty).unwrap_or(true)
@@ -527,7 +527,7 @@ impl Qualif for IsNotPromotable {
     }
 }
 
-// Ensure the `IDX` values are sequential (`0..QUALIF_COUNT`).
+// Ensures the `IDX` values are sequential (i.e., `0..QUALIF_COUNT`).
 macro_rules! static_assert_seq_qualifs {
     ($i:expr => $first:ident $(, $rest:ident)*) => {
         static_assert!(SEQ_QUALIFS: {

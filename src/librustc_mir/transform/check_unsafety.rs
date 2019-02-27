@@ -360,9 +360,9 @@ impl<'a, 'tcx> UnsafetyChecker<'a, 'tcx> {
                         UnsafetyViolationKind::General => {},
                         UnsafetyViolationKind::BorrowPacked(_) |
                         UnsafetyViolationKind::ExternStatic(_) => if self.min_const_fn {
-                            // const fns don't need to be backwards compatible and can
-                            // emit these violations as a hard error instead of a backwards
-                            // compat lint
+                            // Const fns don't need to be backwards-compatible, and can
+                            // emit these violations as a hard error instead of a backwards-
+                            // compatibility lint.
                             violation.kind = UnsafetyViolationKind::General;
                         },
                     }
@@ -390,9 +390,9 @@ impl<'a, 'tcx> UnsafetyChecker<'a, 'tcx> {
                             UnsafetyViolationKind::BorrowPacked(_) |
                             UnsafetyViolationKind::ExternStatic(_) => {
                                 let mut violation = violation.clone();
-                                // const fns don't need to be backwards compatible and can
-                                // emit these violations as a hard error instead of a backwards
-                                // compat lint
+                                // Const fns don't need to be backwards-compatible, and can
+                                // emit these violations as a hard error instead of a backwards-
+                                // compatibility lint.
                                 violation.kind = UnsafetyViolationKind::General;
                                 if !self.violations.contains(&violation) {
                                     self.violations.push(violation)

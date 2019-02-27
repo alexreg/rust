@@ -149,7 +149,7 @@ impl<'gcx: 'tcx, 'tcx> CtxtInterners<'tcx> {
         }
     }
 
-    /// Intern a type
+    /// Interns a type.
     #[inline(never)]
     fn intern_ty(
         local: &CtxtInterners<'tcx>,

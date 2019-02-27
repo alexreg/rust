@@ -481,7 +481,7 @@ where
         Ok(MPlaceTy { layout: base.layout.for_variant(self, variant), ..base })
     }
 
-    /// Project into an mplace
+    /// Projects into an mplace.
     pub fn mplace_projection(
         &self,
         base: MPlaceTy<'tcx, M::PointerTag>,

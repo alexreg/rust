@@ -718,7 +718,7 @@ impl<'hir> Map<'hir> {
         self.node_to_hir_id(parent_node_id)
     }
 
-    /// Check if the node is an argument. An argument is a local variable whose
+    /// Checks if the node is an argument. An argument is a local variable whose
     /// immediate parent is an item or a closure.
     pub fn is_argument(&self, id: NodeId) -> bool {
         match self.find(id) {

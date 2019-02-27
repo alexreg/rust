@@ -666,7 +666,7 @@ pub enum WorkItem<B: WriteBackendMethods> {
     /// Copy the post-LTO artifacts from the incremental cache to the output
     /// directory.
     CopyPostLtoArtifacts(CachedModuleCodegen),
-    /// Performs (Thin)LTO on the given module.
+    /// Perform (Thin)LTO on the given module.
     LTO(lto::LtoModuleCodegen<B>),
 }
 

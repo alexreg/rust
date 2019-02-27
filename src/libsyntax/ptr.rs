@@ -62,7 +62,7 @@ impl<T: 'static> P<T> {
         *self.ptr
     }
 
-    /// Produce a new `P<T>` from `self` without reallocating.
+    /// Produces a new `P<T>` from `self` without reallocating.
     pub fn map<F>(mut self, f: F) -> P<T> where
         F: FnOnce(T) -> T,
     {

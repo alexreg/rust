@@ -751,7 +751,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
         }
     }
 
-    // Categorize an upvar, complete with invisible derefs of closure
+    // Categorizes an upvar, complete with invisible derefs of closure
     // environment and upvar reference as appropriate.
     fn cat_upvar(&self,
                  hir_id: hir::HirId,

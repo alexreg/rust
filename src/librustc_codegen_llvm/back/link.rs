@@ -241,7 +241,7 @@ enum RlibFlavor {
     StaticlibBase,
 }
 
-// Create an 'rlib'
+// Creates an 'rlib'.
 //
 // An rlib in its current incarnation is essentially a renamed .a file. The
 // rlib primarily contains the object file of the crate, but it also contains
@@ -349,7 +349,7 @@ fn link_rlib<'a>(sess: &'a Session,
     ab
 }
 
-// Create a static archive
+// Creates a static archive.
 //
 // This is essentially the same thing as an rlib, but it also involves adding
 // all of the upstream crates' objects into the archive. This will slurp in
@@ -462,7 +462,7 @@ fn get_file_path(sess: &Session, name: &str) -> PathBuf {
     PathBuf::from(name)
 }
 
-// Create a dynamic library or executable
+// Creates a dynamic library or executable.
 //
 // This will invoke the system linker/cc to create the resulting file. This
 // links to all upstream files as well.
@@ -1413,7 +1413,7 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
     }
 }
 
-// Link in all of our upstream crates' native dependencies. Remember that
+// Links in all of our upstream crates' native dependencies. Remember that
 // all of these upstream native dependencies are all non-static
 // dependencies. We've got two cases then:
 //

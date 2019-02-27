@@ -297,7 +297,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
         krate
     }
 
-    // Fully expand all macro invocations in this AST fragment.
+    // Fully expands all macro invocations in this AST fragment.
     fn expand_fragment(&mut self, input_fragment: AstFragment) -> AstFragment {
         let orig_expansion_data = self.cx.current_expansion.clone();
         self.cx.current_expansion.depth = 0;
@@ -696,7 +696,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
         }
     }
 
-    /// Expand a macro invocation. Returns the resulting expanded AST fragment.
+    /// Expands a macro invocation. Returns the resulting expanded AST fragment.
     fn expand_bang_invoc(&mut self,
                          invoc: Invocation,
                          ext: &SyntaxExtension)
@@ -1161,14 +1161,14 @@ impl<'a, 'b> InvocationCollector<'a, 'b> {
         self.cfg.configure(node)
     }
 
-    // Detect use of feature-gated or invalid attributes on macro invocations
-    // since they will not be detected after macro expansion.
+    /// Detects use of feature-gated or invalid attributes on macro invocations,
+    /// since they will not be detected after macro expansion.
     fn check_attributes(&mut self, attrs: &[ast::Attribute]) {
         let features = self.cx.ecfg.features.unwrap();
         for attr in attrs.iter() {
             self.check_attribute_inner(attr, features);
 
-            // macros are expanded before any lint passes so this warning has to be hardcoded
+            // Macros are expanded before any lint passes, so this warning has to be hard-coded.
             if attr.path == "derive" {
                 self.cx.struct_span_warn(attr.span, "`#[derive]` does nothing on macro invocations")
                     .note("this may become a hard error in a future release")

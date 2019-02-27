@@ -1828,8 +1828,7 @@ fn set_members_of_composite_type(cx: &CodegenCx<'ll, 'tcx>,
     }
 }
 
-// Compute the type parameters for a type, if any, for the given
-// metadata.
+// Computes the type parameters for a type, if any, for the given metadata.
 fn compute_type_parameters(cx: &CodegenCx<'ll, 'tcx>, ty: Ty<'tcx>) -> Option<&'ll DIArray> {
     if let ty::Adt(def, substs) = ty.sty {
         if !substs.types().next().is_none() {

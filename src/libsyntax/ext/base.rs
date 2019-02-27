@@ -902,7 +902,7 @@ impl<'a> ExtCtxt<'a> {
         self.parse_sess.span_diagnostic.struct_span_fatal(sp, msg)
     }
 
-    /// Emit `msg` attached to `sp`, and stop compilation immediately.
+    /// Emits `msg` attached to `sp`, and stops compilation immediately.
     ///
     /// `span_err` should be strongly preferred where-ever possible:
     /// this should *only* be used when:
@@ -918,8 +918,7 @@ impl<'a> ExtCtxt<'a> {
         self.parse_sess.span_diagnostic.span_fatal(sp, msg).raise();
     }
 
-    /// Emit `msg` attached to `sp`, without immediately stopping
-    /// compilation.
+    /// Emits `msg` attached to `sp`, without immediately stopping compilation.
     ///
     /// Compilation will be stopped in the near future (at the end of
     /// the macro expansion phase).

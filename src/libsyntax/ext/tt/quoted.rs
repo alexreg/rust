@@ -95,7 +95,7 @@ pub enum TokenTree {
 }
 
 impl TokenTree {
-    /// Return the number of tokens in the tree.
+    /// Returns the number of tokens in the tree.
     pub fn len(&self) -> usize {
         match *self {
             TokenTree::Delimited(_, ref delimed) => match delimed.delim {

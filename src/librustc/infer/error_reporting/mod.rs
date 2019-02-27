@@ -552,9 +552,9 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         }
     }
 
-    /// Given that `other_ty` is the same as a type argument for `name` in `sub`, populate `value`
+    /// Given that `other_ty` is the same as a type argument for `name` in `sub`, populates `value`
     /// highlighting `name` and every type argument that isn't at `pos` (which is `other_ty`), and
-    /// populate `other_value` with `other_ty`.
+    /// populates `other_value` with `other_ty`.
     ///
     /// ```text
     /// Foo<Bar<Qux>>
@@ -1042,7 +1042,7 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
     }
 
     /// When encountering a case where `.as_ref()` on a `Result` or `Option` would be appropriate,
-    /// suggest it.
+    /// suggests it.
     fn suggest_as_ref_where_appropriate(
         &self,
         span: Span,

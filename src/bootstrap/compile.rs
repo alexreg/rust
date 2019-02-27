@@ -914,7 +914,7 @@ impl Step for Assemble {
         run.never()
     }
 
-    /// Prepare a new compiler from the artifacts in `stage`
+    /// Prepares a new compiler from the artifacts in `stage`.
     ///
     /// This will assemble a compiler in `build/$host/stage$stage`. The compiler
     /// must have been previously produced by the `stage - 1` builder.build
@@ -1011,7 +1011,7 @@ impl Step for Assemble {
     }
 }
 
-/// Link some files into a rustc sysroot.
+/// Links some files into a rustc sysroot.
 ///
 /// For a particular stage this will link the file listed in `stamp` into the
 /// `sysroot_dst` provided.

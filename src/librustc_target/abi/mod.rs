@@ -510,7 +510,7 @@ impl Integer {
         None
     }
 
-    /// Find the largest integer with the given alignment or less.
+    /// Finds the largest integer with the given alignment or less.
     pub fn approximate_align<C: HasDataLayout>(cx: &C, wanted: Align) -> Integer {
         let dl = cx.data_layout();
 

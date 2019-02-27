@@ -360,7 +360,7 @@ impl Drop for Linker<'a> {
     }
 }
 
-/// Prepare "thin" LTO to get run on these modules.
+/// Prepares "thin" LTO to get run on these modules.
 ///
 /// The general structure of ThinLTO is quite different from the structure of
 /// "fat" LTO above. With "fat" LTO all LLVM modules in question are merged into

@@ -253,7 +253,7 @@ impl<'a, 'b> Context<'a, 'b> {
         }
     }
 
-    /// Handle invalid references to positional arguments. Output different
+    /// Handles invalid references to positional arguments. Outputs different
     /// errors for the case where all arguments are positional and for when
     /// there are named arguments or numbered positional arguments in the
     /// format string.
@@ -416,7 +416,7 @@ impl<'a, 'b> Context<'a, 'b> {
         }
     }
 
-    /// Build a literal expression from the accumulated string literals
+    /// Builds a literal expression from the accumulated string literals.
     fn build_literal_string(&mut self) -> P<ast::Expr> {
         let sp = self.fmtsp;
         let s = Symbol::intern(&self.literal);
@@ -732,7 +732,7 @@ pub fn expand_format_args_nl<'cx>(
     }
 }
 
-/// Take the various parts of `format_args!(efmt, args..., name=names...)`
+/// Takes the various parts of `format_args!(efmt, args..., name=names...)`
 /// and construct the appropriate formatting expression.
 pub fn expand_preparsed_format_args(ecx: &mut ExtCtxt<'_>,
                                     sp: Span,

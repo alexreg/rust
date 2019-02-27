@@ -113,7 +113,7 @@ pub fn finalize(cx: &CodegenCx<'_, '_>) {
     if gdb::needs_gdb_debug_scripts_section(cx) {
         // Add a .debug_gdb_scripts section to this compile-unit. This will
         // cause GDB to try and load the gdb_load_rust_pretty_printers.py file,
-        // which activates the Rust pretty printers for binary this section is
+        // which activates the Rust pretty-printers for binary this section is
         // contained in.
         gdb::get_or_insert_gdb_debug_scripts_section_global(cx);
     }

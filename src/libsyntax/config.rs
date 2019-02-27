@@ -193,7 +193,7 @@ impl<'a> StripUnconfigured<'a> {
         })
     }
 
-    /// Visit attributes on expression and statements (but not attributes on items in blocks).
+    /// Visits attributes on expression and statements (but not attributes on items in blocks).
     fn visit_expr_attrs(&mut self, attrs: &[ast::Attribute]) {
         // flag the offending attributes
         for attr in attrs.iter() {
@@ -201,7 +201,7 @@ impl<'a> StripUnconfigured<'a> {
         }
     }
 
-    /// If attributes are not allowed on expressions, emit an error for `attr`
+    /// If attributes are not allowed on expressions, emits an error for `attr`.
     pub fn maybe_emit_expr_attr_err(&self, attr: &ast::Attribute) {
         if !self.features.map(|features| features.stmt_expr_attributes).unwrap_or(true) {
             let mut err = feature_err(self.sess,
