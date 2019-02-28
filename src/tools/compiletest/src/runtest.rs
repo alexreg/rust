@@ -496,7 +496,7 @@ impl<'test> TestCx<'test> {
         let mut actual = srcs[srcs.len() - 1].clone();
 
         if self.props.pp_exact.is_some() {
-            // Now we have to care about line endings
+            // Now we have to care about line endings.
             let cr = "\r".to_owned();
             actual = actual.replace(&cr, "").to_owned();
             expected = expected.replace(&cr, "").to_owned();
@@ -504,12 +504,12 @@ impl<'test> TestCx<'test> {
 
         self.compare_source(&expected, &actual);
 
-        // If we're only making sure that the output matches then just stop here
+        // If we're only making sure that the output matches then just stop here.
         if self.props.pretty_compare_only {
             return;
         }
 
-        // Finally, let's make sure it actually appears to remain valid code
+        // Finally, let's make sure it actually appears to remain valid code.
         let proc_res = self.typecheck_source(actual);
         if !proc_res.status.success() {
             self.fatal_proc_rec("pretty-printed source does not typecheck", &proc_res);
@@ -650,12 +650,12 @@ impl<'test> TestCx<'test> {
 
     fn run_debuginfo_gdb_test_no_opt(&self) {
         let prefixes = if self.config.gdb_native_rust {
-            // GDB with Rust
+            // GDB with Rust.
             static PREFIXES: &'static [&'static str] = &["gdb", "gdbr"];
             println!("NOTE: compiletest thinks it is using GDB with native rust support");
             PREFIXES
         } else {
-            // Generic GDB
+            // Generic GDB.
             static PREFIXES: &'static [&'static str] = &["gdb", "gdbg"];
             println!("NOTE: compiletest thinks it is using GDB without native rust support");
             PREFIXES
@@ -839,10 +839,10 @@ impl<'test> TestCx<'test> {
             // it just tells GDB to print values on one line.
             script_str.push_str("set print pretty off\n");
 
-            // Add the pretty printer directory to GDB's source-file search path
+            // Add the pretty-printer directory to GDB's source-file search path.
             script_str.push_str(&format!("directory {}\n", rust_pp_module_abs_path));
 
-            // Load the target executable
+            // Load the target executable.
             script_str.push_str(&format!(
                 "file {}\n",
                 exe_file.to_str().unwrap().replace(r"\", r"\\")
@@ -853,7 +853,7 @@ impl<'test> TestCx<'test> {
                 script_str.push_str("set language rust\n");
             }
 
-            // Add line breakpoints
+            // Add line breakpoints.
             for line in &breakpoint_lines {
                 script_str.push_str(&format!(
                     "break '{}':{}\n",
@@ -961,14 +961,14 @@ impl<'test> TestCx<'test> {
             ..
         } = self.parse_debugger_commands(prefixes);
 
-        // Write debugger script:
-        // We don't want to hang when calling `quit` while the process is still running
+        // Write debugger script.
+        // We don't want to hang when calling `quit` while the process is still running.
         let mut script_str = String::from("settings set auto-confirm true\n");
 
-        // Make LLDB emit its version, so we have it documented in the test output
+        // Make LLDB emit its version, so we have it documented in the test output.
         script_str.push_str("version\n");
 
-        // Switch LLDB into "Rust mode"
+        // Switch LLDB into "Rust mode".
         let rust_src_root = self
             .config
             .find_rust_src_root()
@@ -996,16 +996,16 @@ impl<'test> TestCx<'test> {
             ));
         }
 
-        // Append the other commands
+        // Append the other commands.
         for line in &commands {
             script_str.push_str(line);
             script_str.push_str("\n");
         }
 
-        // Finally, quit the debugger
+        // Finally, quit the debugger.
         script_str.push_str("\nquit\n");
 
-        // Write the script into a file
+        // Write the script into a file.
         debug!("script_str = {}", script_str);
         self.dump_output_file(&script_str, "debugger.script");
         let debugger_script = self.make_out_name("debugger.script");
@@ -1026,7 +1026,7 @@ impl<'test> TestCx<'test> {
         debugger_script: &Path,
         rust_src_root: &Path,
     ) -> ProcRes {
-        // Prepare the lldb_batchmode which executes the debugger script
+        // Prepare the lldb_batchmode which executes the debugger script.
         let lldb_script_path = rust_src_root.join("src/etc/lldb_batchmode.py");
         self.cmd2procres(
             Command::new(&self.config.lldb_python)
@@ -1679,7 +1679,7 @@ impl<'test> TestCx<'test> {
         }
         path.insert(0, PathBuf::from(lib_path));
 
-        // Add the new dylib search path var
+        // Add the new dylib search path var.
         let newpath = env::join_paths(&path).unwrap();
         command.env(dylib_env_var(), newpath);
 
@@ -1728,7 +1728,7 @@ impl<'test> TestCx<'test> {
         // FIXME: why is `-L` here?
         rustc.arg(input_file); //.arg("-L").arg(&self.config.build_base);
 
-        // Use a single thread for efficiency and a deterministic error message order
+        // Use a single thread for efficiency and a deterministic error message order.
         rustc.arg("-Zthreads=1");
 
         // Optionally prevent default `--target` if specified in test compile-flags.
@@ -1866,7 +1866,7 @@ impl<'test> TestCx<'test> {
 
     fn make_exe_name(&self) -> PathBuf {
         // Using a single letter here to keep the path length down for
-        // Windows.  Some test names get very long.  rustc creates `rcgu`
+        // Windows. Some test names get very long. rustc creates `rcgu`
         // files with the module name appended to it which can more than
         // double the length.
         let mut f = self.output_base_dir().join("a");
@@ -1886,7 +1886,7 @@ impl<'test> TestCx<'test> {
         // then split apart its command.
         let mut args = self.split_maybe_args(&self.config.runtool);
 
-        // If this is emscripten, then run tests under nodejs
+        // If this is emscripten, then run tests under NodeJS.
         if self.config.target.contains("emscripten") {
             if let Some(ref p) = self.config.nodejs {
                 args.push(p.clone());
@@ -2134,7 +2134,7 @@ impl<'test> TestCx<'test> {
     }
 
     fn charset() -> &'static str {
-        // FreeBSD 10.1 defaults to GDB 6.1.1 which doesn't support "auto" charset
+        // FreeBSD 10.1 defaults to GDB 6.1.1 which doesn't support "auto" charset.
         if cfg!(target_os = "bitrig") {
             "auto"
         } else if cfg!(target_os = "freebsd") {
@@ -2322,7 +2322,7 @@ impl<'test> TestCx<'test> {
 
             if let Some(actual_item) = actual_item_with_same_name {
                 if !expected_item.codegen_units.is_empty() &&
-                   // Also check for codegen units
+                   // Also check for codegen units.
                    expected_item.codegen_units != actual_item.codegen_units
                 {
                     wrong_cgus.push((expected_item.clone(), actual_item.clone()));
@@ -2480,10 +2480,10 @@ impl<'test> TestCx<'test> {
     }
 
     fn init_incremental_test(&self) {
-        // (See `run_incremental_test` for an overview of how incremental tests work.)
+        // See `run_incremental_test` for an overview of how incremental tests work.
 
         // Before any of the revisions have executed, create the
-        // incremental workproduct directory.  Delete any old
+        // incremental workproduct directory. Delete any old
         // incremental work products that may be there from prior
         // runs.
         let incremental_dir = self.incremental_dir();
@@ -2752,7 +2752,7 @@ impl<'test> TestCx<'test> {
         if self.config.compare_mode.is_some() {
             // Don't test rustfix with NLL right now.
         } else if self.props.run_rustfix {
-            // Apply suggestions from rustc to the code itself
+            // Apply suggestions from rustc to the code itself.
             let unfixed_code = self
                 .load_expected_output_from_path(&self.testpaths.file)
                 .unwrap();
@@ -2969,7 +2969,7 @@ impl<'test> TestCx<'test> {
         };
 
         // We expect each non-empty line to appear consecutively, non-consecutive lines
-        // must be separated by at least one Elision
+        // must be separated by at least one elision.
         let mut start_block_line = None;
         while let Some(dumped_line) = dumped_lines.next() {
             match expected_lines.next() {
@@ -3042,7 +3042,7 @@ impl<'test> TestCx<'test> {
 
         let mut normalized = output.replace(&parent_dir_str, "$DIR");
 
-        // Paths into the libstd/libcore
+        // Paths into the libstd/libcore.
         let src_dir = self.config.src_base.parent().unwrap().parent().unwrap();
         let src_dir_str = if json {
             src_dir.display().to_string().replace("\\", "\\\\")
@@ -3051,7 +3051,7 @@ impl<'test> TestCx<'test> {
         };
         normalized = normalized.replace(&src_dir_str, "$SRC_DIR");
 
-        // Paths into the build directory
+        // Paths into the build directory.
         let test_build_dir = &self.config.build_base;
         let parent_build_dir = test_build_dir.parent().unwrap().parent().unwrap().parent().unwrap();
 

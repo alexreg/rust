@@ -145,65 +145,65 @@ pub struct Config {
     pub force_valgrind: bool,
 
     /// The path to the Clang executable to run Clang-based tests with. If
-    /// `None` then these tests will be ignored.
+    /// `None`, then these tests will be ignored.
     pub run_clang_based_tests_with: Option<String>,
 
-    /// The directory containing the tests to run
+    /// The directory containing the tests to run.
     pub src_base: PathBuf,
 
-    /// The directory where programs should be built
+    /// The directory where programs should be built.
     pub build_base: PathBuf,
 
-    /// The name of the stage being built (stage1, etc)
+    /// The name of the stage being built (stage1, etc.)
     pub stage_id: String,
 
-    /// The test mode, compile-fail, run-fail, run-pass
+    /// The test mode, compile-fail, run-fail, run-pass.
     pub mode: Mode,
 
-    /// Run ignored tests
+    /// Run ignored tests.
     pub run_ignored: bool,
 
-    /// Only run tests that match this filter
+    /// Only run tests that match this filter.
     pub filter: Option<String>,
 
-    /// Exactly match the filter, rather than a substring
+    /// Exactly match the filter, rather than a substring.
     pub filter_exact: bool,
 
-    /// Write out a parseable log of tests that were run
+    /// Write out a parseable log of tests that were run.
     pub logfile: Option<PathBuf>,
 
     /// A command line to prefix program execution with,
-    /// for running under valgrind
+    /// for running under valgrind.
     pub runtool: Option<String>,
 
     /// Flags to pass to the compiler when building for the host
     pub host_rustcflags: Option<String>,
 
-    /// Flags to pass to the compiler when building for the target
+    /// Flags to pass to the compiler when building for the target.
     pub target_rustcflags: Option<String>,
 
-    /// Target system to be tested
+    /// Target system to be tested.
     pub target: String,
 
-    /// Host triple for the compiler being invoked
+    /// Host triple for the compiler being invoked.
     pub host: String,
 
-    /// Path to / name of the GDB executable
+    /// Path to / name of the GDB executable.
     pub gdb: Option<String>,
 
     /// Version of GDB, encoded as `((major * 1000) + minor) * 1000 + patch`.
     pub gdb_version: Option<u32>,
 
-    /// Whether GDB has native rust support
+    /// Whether GDB has native rust support.
     pub gdb_native_rust: bool,
 
-    /// Version of LLDB
+    /// Version of LLDB.
     pub lldb_version: Option<String>,
 
     /// `true` if LLDB has native rust support.
     pub lldb_native_rust: bool,
 
-    /// Version of LLVM
+    /// Version of LLVM.
     pub llvm_version: Option<String>,
 
     /// `true` if LLVM is system LLVM.
@@ -212,10 +212,10 @@ pub struct Config {
     /// Path to the Android tools.
     pub android_cross_path: PathBuf,
 
-    /// Extra parameter to run adb on arm-linux-androideabi
+    /// Extra parameter to run adb on arm-linux-androideabi.
     pub adb_path: String,
 
-    /// Extra parameter to run test suite on arm-linux-androideabi
+    /// Extra parameter to run test suite on arm-linux-androideabi.
     pub adb_test_dir: String,
 
     /// Status whether android device available or not.
@@ -227,7 +227,7 @@ pub struct Config {
     /// `true` to enable verbose output.
     pub verbose: bool,
 
-    /// Print one character per test instead of one line
+    /// Print one character per test instead of one line.
     pub quiet: bool,
 
     /// `true` to use colors in test.
