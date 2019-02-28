@@ -611,8 +611,7 @@ impl<'a, 'tcx> Visitor<'tcx> for LifetimeContext<'a, 'tcx> {
                         // If the user writes `'_`, we use the *ordinary* elision
                         // rules. So the `'_` in e.g., `Box<dyn Debug + '_>` will be
                         // resolved the same as the `'_` in `&'_ Foo`.
-                        //
-                        // cc #48468
+                        // See issue #48468.
                         self.resolve_elided_lifetimes(vec![lifetime])
                     }
                     LifetimeName::Param(_) | LifetimeName::Static => {
@@ -1754,7 +1753,7 @@ impl<'a, 'tcx> LifetimeContext<'a, 'tcx> {
         }
     }
 
-    /// Returns the next index one would use for an early-bound-region
+    /// Returns the next index one would use for an early-bound region
     /// if extending the current scope.
     fn next_early_index(&self) -> u32 {
         self.next_early_index_helper(true)
@@ -2115,7 +2114,7 @@ impl<'a, 'tcx> LifetimeContext<'a, 'tcx> {
         // First (determined here), if `self` is by-reference, then the
         // implied output region is the region of the self parameter.
         if has_self {
-            // Look for `self: &'a Self` - also desugared from `&'a self`,
+            // Look for `self: &'a Self` -- also desugared from `&'a self`,
             // and if that matches, use it for elision and return early.
             let is_self_ty = |def: Def| {
                 if let Def::SelfTy(..) = def {

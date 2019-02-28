@@ -201,9 +201,9 @@ impl fmt::Debug for MoveOut {
 /// `Init` represents a point in a program that initializes some L-value.
 #[derive(Copy, Clone)]
 pub struct Init {
-    /// path being initialized
+    /// The path being initialized.
     pub path: MovePathIndex,
-    /// location of initialization
+    /// The location of initialization.
     pub location: InitLocation,
     /// Extra information about this initialization.
     pub kind: InitKind,

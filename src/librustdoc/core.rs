@@ -313,7 +313,7 @@ pub fn new_handler(error_format: ErrorOutputType,
 }
 
 pub fn run_core(options: RustdocOptions) -> (clean::Crate, RenderInfo, RenderOptions, Vec<String>) {
-    // Parse, resolve, and typecheck the given crate.
+    // Parse, resolve, and type-check the given crate.
 
     let RustdocOptions {
         input,

@@ -129,8 +129,8 @@ impl<'a> StripUnconfigured<'a> {
 
         if attr::cfg_matches(&cfg_predicate, self.sess, self.features) {
             // We call `process_cfg_attr` recursively in case there's a
-            // `cfg_attr` inside of another `cfg_attr`. E.g.
-            //  `#[cfg_attr(false, cfg_attr(true, some_attr))]`.
+            // `cfg_attr` inside of another `cfg_attr`.
+            // E.g., `#[cfg_attr(false, cfg_attr(true, some_attr))]`.
             expanded_attrs.into_iter()
             .flat_map(|(path, tokens, span)| self.process_cfg_attr(ast::Attribute {
                 id: attr::mk_attr_id(),

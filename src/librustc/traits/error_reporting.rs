@@ -359,9 +359,9 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         if let ObligationCauseCode::ItemObligation(item) = obligation.cause.code {
             // FIXME: maybe also have some way of handling methods
             // from other traits? That would require name resolution,
-            // which we might want to be some sort of hygienic.
+            // which we might want to be hygienic in some way.
             //
-            // Currently I'm leaving it for what I need for `try`.
+            // For now, this is sufficient for the purposes of `try`.
             if self.tcx.trait_of_item(item) == Some(trait_ref.def_id) {
                 let method = self.tcx.item_name(item);
                 flags.push(("from_method".to_owned(), None));

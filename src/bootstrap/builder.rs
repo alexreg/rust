@@ -240,7 +240,7 @@ pub struct ShouldRun<'a> {
     paths: BTreeSet<PathSet>,
 
     // If this is a default rule, this is an additional constraint placed on
-    // its run. Generally something like compiler docs being enabled.
+    // its run (generally something like compiler docs being enabled).
     is_really_default: bool,
 }
 

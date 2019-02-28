@@ -110,7 +110,7 @@ impl RegionValueElements {
                     .map(|pred_loc| self.point_from_location(pred_loc)),
             );
         } else {
-            // Otherwise, the pred is just the previous statement
+            // Otherwise, the predicate is just the previous statement.
             stack.push(PointIndex::new(index.index() - 1));
         }
     }

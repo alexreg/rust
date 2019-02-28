@@ -469,7 +469,7 @@ impl<'cx, 'gcx, 'tcx> WritebackCx<'cx, 'gcx, 'tcx> {
                 // from being defining.
 
                 // Also replace all generic params with the ones from the existential type
-                // definition so
+                // definition so that
                 // ```rust
                 // existential type Foo<T>: 'static;
                 // fn foo<U>() -> Foo<U> { .. }

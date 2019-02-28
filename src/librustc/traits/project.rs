@@ -1,4 +1,4 @@
-//! Code for projecting associated types out of trait references.
+//! Projecting associated types out of trait references.
 
 use super::elaborate_predicates;
 use super::specialization_graph;
@@ -261,7 +261,7 @@ pub fn normalize<'a, 'b, 'gcx, 'tcx, T>(selcx: &'a mut SelectionContext<'b, 'gcx
     normalize_with_depth(selcx, param_env, cause, 0, value)
 }
 
-/// As `normalize`, but with a custom depth.
+/// Like `normalize`, but with a custom depth.
 pub fn normalize_with_depth<'a, 'b, 'gcx, 'tcx, T>(
     selcx: &'a mut SelectionContext<'b, 'gcx, 'tcx>,
     param_env: ty::ParamEnv<'tcx>,
@@ -534,8 +534,7 @@ fn opt_normalize_projection_type<'a, 'b, 'gcx, 'tcx>(
             // types, which can transition from having a fixed kind to
             // no kind with no visible change in the key.
             //
-            // FIXME(#32286) refactor this so that closure type
-            // changes
+            // FIXME(#32286): refactor this so that closure type changes.
             debug!("opt_normalize_projection_type: \
                     found cache entry: ambiguous");
             if !projection_ty.has_closure_types() {
@@ -949,14 +948,14 @@ fn assemble_candidates_from_trait_def<'cx, 'gcx, 'tcx>(
     debug!("assemble_candidates_from_trait_def(..)");
 
     let tcx = selcx.tcx();
-    // Check whether the self-type is itself a projection.
+    // Check whether the self type is itself a projection.
     let (def_id, substs) = match obligation_trait_ref.self_ty().sty {
         ty::Projection(ref data) => {
             (data.trait_ref(tcx).def_id, data.substs)
         }
         ty::Opaque(def_id, substs) => (def_id, substs),
         ty::Infer(ty::TyVar(_)) => {
-            // If the self-type is an inference variable, then it MAY wind up
+            // If the self type is an inference variable, then it MAY wind up
             // being a projected type, so induce an ambiguity.
             candidate_set.mark_ambiguous();
             return;
@@ -1002,7 +1001,7 @@ fn assemble_candidates_from_predicates<'cx, 'gcx, 'tcx, I>(
                 infcx.at(&obligation.cause, obligation.param_env)
                      .sup(obligation_poly_trait_ref, data_poly_trait_ref)
                      .map(|InferOk { obligations: _, value: () }| {
-                         // FIXME(#32730) -- do we need to take obligations
+                         // FIXME(#32730): do we need to take obligations
                          // into account in any way? At the moment, no.
                      })
                      .is_ok()
@@ -1715,8 +1714,7 @@ impl<'tcx> ProjectionCache<'tcx> {
         assert!(!fresh, "never started projecting `{:?}`", key);
     }
 
-    /// Indicates that trying to normalize `key` resulted in
-    /// error.
+    /// Indicates that trying to normalize `key` resulted in an error.
     fn error(&mut self, key: ProjectionCacheKey<'tcx>) {
         let fresh = self.map.insert(key, ProjectionCacheEntry::Error);
         assert!(!fresh, "never started projecting `{:?}`", key);

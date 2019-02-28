@@ -405,7 +405,7 @@ impl<'a, 'tcx, 'rcx> AutoTraitFinder<'a, 'tcx, 'rcx> {
 
                 regions.into_iter().flat_map(|r| {
                     match r {
-                        // We only care about late bound regions, as we need to add them
+                        // We only care about late-bound regions, as we need to add them
                         // to the 'for<>' section
                         &ty::ReLateBound(_, ty::BoundRegion::BrNamed(_, name)) => {
                             Some(GenericParamDef {

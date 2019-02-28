@@ -95,7 +95,7 @@ pub fn expand_test_or_bench(
     let field = |name, expr| cx.field_imm(sp, cx.ident_of(name), expr);
 
     let test_fn = if is_bench {
-        // A simple ident for a lambda
+        // A simple ident for a closure.
         let b = cx.ident_of("b");
 
         cx.expr_call(sp, cx.expr_path(test_path("StaticBenchFn")), vec![
@@ -186,7 +186,7 @@ pub fn expand_test_or_bench(
     log::debug!("Synthetic test item:\n{}\n", pprust::item_to_string(&test_const));
 
     vec![
-        // Access to libtest under a gensymed name
+        // Access to libtest under a gensym-ed name.
         Annotatable::Item(test_extern),
         // The generated test case.
         Annotatable::Item(test_const),

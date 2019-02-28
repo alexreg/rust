@@ -1,6 +1,6 @@
-// Coherence phase
+// The coherence phase of type-checking.
 //
-// The job of the coherence phase of typechecking is to ensure that
+// The job of the coherence phase of type-checking is to ensure that
 // each trait has at most one implementation for each type. This is
 // done by the orphan and overlap modules. Then we build up various
 // mappings. That mapping code resides here.

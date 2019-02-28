@@ -1041,7 +1041,7 @@ pub fn run_cargo(builder: &Builder<'_>,
                                        .parent().unwrap() // chop off `$target`
                                        .join(target_root_dir.file_name().unwrap());
 
-    // Spawn Cargo slurping up its JSON output. We'll start building up the
+    // Spawn Cargo, collecting its JSON output. We'll start building up the
     // `deps` array of all files it generated along with a `toplevel` array of
     // files we need to probe for later.
     let mut deps = Vec::new();
@@ -1099,7 +1099,7 @@ pub fn run_cargo(builder: &Builder<'_>,
         exit(1);
     }
 
-    // Ok now we need to actually find all the files listed in `toplevel`. We've
+    // Now we need to actually find all the files listed in `toplevel`. We've
     // got a list of prefix/extensions and we basically just need to find the
     // most recent file in the `deps` folder corresponding to each one.
     let contents = t!(target_deps_dir.read_dir())
@@ -1187,7 +1187,7 @@ pub fn stream_cargo(
         Err(e) => panic!("failed to execute command: {:?}\nerror: {}", cargo, e),
     };
 
-    // Spawn Cargo slurping up its JSON output. We'll start building up the
+    // Spawn Cargo, collecting its JSON output. We'll start building up the
     // `deps` array of all files it generated along with a `toplevel` array of
     // files we need to probe for later.
     let stdout = BufReader::new(child.stdout.take().unwrap());

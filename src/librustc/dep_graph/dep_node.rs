@@ -436,7 +436,7 @@ define_dep_nodes!( <'tcx>
     // this fate, do not call `tcx.hir().krate()`; instead, prefer
     // wrappers like `tcx.visit_all_items_in_krate()`.  If there is no
     // suitable wrapper, you can use `tcx.dep_graph.ignore()` to gain
-    // access to the krate, but you must remember to add suitable
+    // access to the crate, but you must remember to add suitable
     // edges yourself for the individual items that you read.
     [input] Krate,
 

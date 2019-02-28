@@ -92,7 +92,7 @@ impl SuppressRegionErrors {
     /// enabled.
     pub fn when_nll_is_enabled(tcx: TyCtxt<'_, '_, '_>) -> Self {
         match tcx.borrowck_mode() {
-            // If we're on AST or Migrate mode, report AST region errors
+            // If we're in AST or Migrate mode, report AST region errors.
             BorrowckMode::Ast | BorrowckMode::Migrate => SuppressRegionErrors { suppressed: false },
 
             // If we're in MIR or Compare mode, don't report AST region errors as they should
@@ -244,7 +244,7 @@ pub struct TypeTrace<'tcx> {
 
 /// The origin of a `r1 <= r2` constraint.
 ///
-/// See `error_reporting` module for more details
+/// See the [`error_reporting`] module for more details.
 #[derive(Clone, Debug)]
 pub enum SubregionOrigin<'tcx> {
     // Arose from a subtyping relation.
@@ -300,7 +300,7 @@ pub enum SubregionOrigin<'tcx> {
     // The type T of an expression E must outlive the lifetime for E.
     ExprTypeIsNotInScope(Ty<'tcx>, Span),
 
-    // A `ref b` whose region does not enclose the decl site
+    // A `ref b` whose region does not enclose the declaration site.
     BindingTypeIsNotValidAtDecl(Span),
 
     // Regions appearing in a method receiver must outlive method call.
@@ -358,7 +358,7 @@ pub enum LateBoundRegionConversionTime {
 
 /// Reasons to create a region inference variable
 ///
-/// See `error_reporting` module for more details
+/// See the [`error_reporting`] module for more details.
 #[derive(Copy, Clone, Debug)]
 pub enum RegionVariableOrigin {
     // Region variables created for ill-categorized reasons,
@@ -922,10 +922,9 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         // variable, and because type variable's can't (at present, at
         // least) capture any of the things bound by this binder.
         //
-        // Really, there is no *particular* reason to do this
-        // `shallow_resolve` here except as a
-        // micro-optimization. Naturally I could not
-        // resist. -nmatsakis
+        // NOTE(nmatsakis): really, there is no *particular* reason to do this
+        // `shallow_resolve` here except as a micro-optimization.
+        // Naturally I could not resist.
         let two_unbound_type_vars = {
             let a = self.shallow_resolve(predicate.skip_binder().a);
             let b = self.shallow_resolve(predicate.skip_binder().b);
@@ -1107,7 +1106,8 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         );
 
         if self.tcx.sess.err_count() > self.err_count_on_creation {
-            return true; // errors reported since this infcx was made
+            // Errors have been reported since this infcx was made.
+            return true;
         }
         self.tainted_by_errors_flag.get()
     }
@@ -1293,7 +1293,8 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
         // at will.
 
         if !value.needs_infer() {
-            return value.clone(); // avoid duplicated subst-folding
+            // Avoid duplicated subst-folding.
+            return value.clone();
         }
         let mut r = resolve::OpportunisticTypeResolver::new(self);
         value.fold_with(&mut r)

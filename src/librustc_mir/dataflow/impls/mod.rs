@@ -477,7 +477,7 @@ impl<'a, 'gcx, 'tcx> BitDenotation<'tcx> for EverInitializedPlaces<'a, 'gcx, 'tc
                 //
                 // FIXME(#46525): We *need* to do this for `StorageLive` as well as
                 // StorageDead, because lifetimes of match bindings with guards are
-                // weird - i.e., this code
+                // weird -- i.e., this code
                 //
                 // ```
                 //     fn main() {

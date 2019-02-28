@@ -118,7 +118,7 @@ impl fmt::Display for HirId {
     }
 }
 
-// hack to ensure that we don't try to access the private parts of `ItemLocalId` in this module
+// HACK: ensure that we don't try to access the private parts of `ItemLocalId` in this module.
 mod item_local_id_inner {
     use rustc_data_structures::indexed_vec::Idx;
     /// An `ItemLocalId` uniquely identifies something within a given "item-like",
@@ -241,8 +241,8 @@ impl LifetimeName {
             LifetimeName::Implicit | LifetimeName::Underscore => true,
 
             // It might seem surprising that `Fresh(_)` counts as
-            // *not* elided -- but this is because, as far as the code
-            // in the compiler is concerned -- `Fresh(_)` variants act
+            // *not* elided, but this is because, as far as the code
+            // in the compiler is concerned, `Fresh(_)` variants act
             // equivalently to "some fresh name". They correspond to
             // early-bound regions on an impl, in other words.
             LifetimeName::Error | LifetimeName::Param(_) | LifetimeName::Static => false,
@@ -1726,7 +1726,7 @@ pub struct ImplItem {
     pub span: Span,
 }
 
-/// Represents different contents within `impl`s
+/// Represents different contents within `impl` blocks.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub enum ImplItemKind {
     /// An associated constant of the given type, set to the constant result
@@ -1740,7 +1740,7 @@ pub enum ImplItemKind {
     Existential(GenericBounds),
 }
 
-// Bind a type to an associated type: `A=Foo`.
+// Binding of a type to an associated type (e.g., `A = Foo`).
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub struct TypeBinding {
     pub id: NodeId,
@@ -2054,7 +2054,7 @@ pub enum UseKind {
 
     /// Degenerate list import, e.g., `use foo::{a, b}` produces
     /// an additional `use foo::{}` for performing checks such as
-    /// unstable feature gating. May be removed in the future.
+    /// unstable feature gating). May be removed in the future.
     ListStem,
 }
 
@@ -2145,7 +2145,7 @@ pub struct StructField {
 }
 
 impl StructField {
-    // Still necessary in couple of places
+    // This is still necessary in couple of places.
     pub fn is_positional(&self) -> bool {
         let first = self.ident.as_str().as_bytes()[0];
         first >= b'0' && first <= b'9'
@@ -2162,7 +2162,7 @@ impl StructField {
 /// For structs: `NodeId` represents an ID of the structure's constructor, so it is not actually
 /// used for `Struct`-"variants" (but still present). Structures don't have an analogue of "ID of
 /// the variant itself" from enum variants.
-/// Id of the whole struct lives in `Item`.
+/// The ID of the struct itself lives in `Item`.
 #[derive(Clone, RustcEncodable, RustcDecodable, Debug)]
 pub enum VariantData {
     Struct(HirVec<StructField>, NodeId, HirId),
@@ -2580,8 +2580,7 @@ pub enum Node<'hir> {
     Block(&'hir Block),
     Local(&'hir Local),
     MacroDef(&'hir MacroDef),
-
-    /// StructCtor represents a tuple struct.
+    /// Represents a tuple struct.
     StructCtor(&'hir VariantData),
 
     Lifetime(&'hir Lifetime),

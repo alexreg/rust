@@ -145,7 +145,7 @@ impl<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                     // Cleanup is always the cold path. Don't inline
                     // drop glue. Also, when there is a deeply-nested
                     // struct, there are "symmetry" issues that cause
-                    // exponential inlining - see issue #41696.
+                    // exponential inlining (see issue #41696).
                     bx.do_not_inline(llret);
                 }
 

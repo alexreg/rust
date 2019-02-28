@@ -1,4 +1,4 @@
-//! A helper class for dealing with static archives
+//! Helper for dealing with static archives.
 
 use std::ffi::{CString, CStr};
 use std::io;

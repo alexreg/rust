@@ -236,7 +236,7 @@ pub struct Parser<'a> {
     crate directory: Directory<'a>,
     /// Whether to parse sub-modules in other files.
     pub recurse_into_file_modules: bool,
-    /// Name of the root module this parser originated from. If `None`, then the
+    /// The name of the root module this parser originated from. If `None`, then the
     /// name is not known. This does not change while the parser is descending
     /// into modules, and sub-parsers have new values for this name.
     pub root_module_name: Option<String>,
@@ -737,7 +737,8 @@ impl<'a> Parser<'a> {
                     Applicability::MaybeIncorrect,
                 );
                 err.emit();
-                self.expected_tokens.clear();  // reduce errors
+                // Reduce errors.
+                self.expected_tokens.clear();
                 Ok(true)
             }
             _ => Err(err),
@@ -820,7 +821,8 @@ impl<'a> Parser<'a> {
                 );
             }
             let sp = if self.token == token::Token::Eof {
-                // This is EOF, don't want to point at the following char, but rather the last token
+                // This is EOF; we don't want to point at the following char, but rather the
+                // last token.
                 self.prev_span
             } else {
                 label_sp
@@ -1541,7 +1543,7 @@ impl<'a> Parser<'a> {
                 // This is somewhat dubious; we don't want to allow
                 // argument names to be left off if there is a definition.
 
-                // We don't allow argument names to be left off in edition 2018.
+                // We don't allow argument names to be left off in the 2018 edition.
                 p.parse_arg_general(p.span.rust_2018(), true)
             })?;
             generics.where_clause = self.parse_where_clause()?;
@@ -1679,7 +1681,7 @@ impl<'a> Parser<'a> {
                 TyKind::Tup(ts)
             }
         } else if self.eat(&token::Not) {
-            // Never type `!`
+            // Never type (i.e., `!`).
             TyKind::Never
         } else if self.eat(&token::BinOp(token::Star)) {
             // Raw pointer
@@ -2373,7 +2375,7 @@ impl<'a> Parser<'a> {
         Ok(if style == PathStyle::Type && check_args_start(self) ||
               style != PathStyle::Mod && self.check(&token::ModSep)
                                       && self.look_ahead(1, |t| is_args_start(t)) {
-            // Generic arguments are found - `<`, `(`, `::<` or `::(`.
+            // Generic arguments are found: `<`, `(`, `::<` or `::(`.
             if self.eat(&token::ModSep) && style == PathStyle::Type && enable_warning {
                 self.diagnostic().struct_span_warn(self.prev_span, "unnecessary path disambiguator")
                                  .span_label(self.prev_span, "try removing `::`").emit();
@@ -3029,7 +3031,7 @@ impl<'a> Parser<'a> {
 
         Ok(match self.token {
             token::OpenDelim(token::Paren) => {
-                // Method call `expr.f()`
+                // Method call (i.e., `expr.f()`)
                 let mut args = self.parse_unspanned_seq(
                     &token::OpenDelim(token::Paren),
                     &token::CloseDelim(token::Paren),
@@ -3042,7 +3044,7 @@ impl<'a> Parser<'a> {
                 self.mk_expr(span, ExprKind::MethodCall(segment, args), ThinVec::new())
             }
             _ => {
-                // Field access `expr.f`
+                // Field access (i.e., `expr.f`)
                 if let Some(args) = segment.args {
                     self.span_err(args.span(),
                                   "field expressions may not have generic arguments");
@@ -3971,7 +3973,7 @@ impl<'a> Parser<'a> {
         return Ok(self.mk_expr(span, ExprKind::WhileLet(pats, expr, body, opt_label), attrs));
     }
 
-    // parse `loop {...}`, `loop` token already eaten
+    // Parses `loop {...}` (`loop` token already eaten).
     fn parse_loop_expr(&mut self, opt_label: Option<Label>,
                            span_lo: Span,
                            mut attrs: ThinVec<Attribute>) -> PResult<'a, P<Expr>> {
@@ -4469,11 +4471,11 @@ impl<'a> Parser<'a> {
         if self.token.is_path_start() {
             let lo = self.span;
             let (qself, path) = if self.eat_lt() {
-                // Parse a qualified path
+                // Parse qualified path.
                 let (qself, path) = self.parse_qpath(PathStyle::Expr)?;
                 (Some(qself), path)
             } else {
-                // Parse an unqualified path
+                // Parse unqualified path.
                 (None, self.parse_path(PathStyle::Expr)?)
             };
             let hi = self.prev_span;
@@ -4622,13 +4624,13 @@ impl<'a> Parser<'a> {
                 let binding_mode = BindingMode::ByValue(Mutability::Immutable);
                 pat = self.parse_pat_ident(binding_mode)?;
             } else if self.token.is_path_start() {
-                // Parse pattern starting with a path
+                // Parse pattern starting with path.
                 let (qself, path) = if self.eat_lt() {
-                    // Parse a qualified path
+                    // Parse qualified path.
                     let (qself, path) = self.parse_qpath(PathStyle::Expr)?;
                     (Some(qself), path)
                 } else {
-                    // Parse an unqualified path
+                    // Parse unqualified path.
                     (None, self.parse_path(PathStyle::Expr)?)
                 };
                 match self.token {
@@ -4904,7 +4906,7 @@ impl<'a> Parser<'a> {
 
     // If `break_on_semi` is `Break`, then we will stop consuming tokens after
     // finding (and consuming) a `;` outside of `{}` or `[]` (note that this is
-    // approximate - it can mean we break too early due to macros, but that
+    // approximate -- it can mean we break too early due to macros, but that
     // should only lead to sub-optimal recovery, not inaccurate parsing).
     //
     // If `break_on_block` is `Break`, then we will stop consuming tokens
@@ -5288,7 +5290,7 @@ impl<'a> Parser<'a> {
                         return Ok(None);
                     }
 
-                    // Remainder are line-expr stmts.
+                    // Remainder are line-expression statements.
                     let e = self.parse_expr_res(
                         Restrictions::STMT_EXPR, Some(attrs.into()))?;
                     Stmt {
@@ -6645,7 +6647,8 @@ impl<'a> Parser<'a> {
         //     `<` (LIFETIME|IDENT) `:` - generic parameter with bounds
         //     `<` (LIFETIME|IDENT) `=` - generic parameter with a default
         //     `<` const                - generic const parameter
-        // The only truly ambiguous case is
+        //
+        // The only truly ambiguous case is:
         //     `<` IDENT `>` `::` IDENT ...
         //
         // We disambiguate it in favor of generics (`impl<T> ::absolute::Path<T> { ... }`)
@@ -6799,10 +6802,10 @@ impl<'a> Parser<'a> {
         let vdata = if self.token.is_keyword(keywords::Where) {
             generics.where_clause = self.parse_where_clause()?;
             if self.eat(&token::Semi) {
-                // If we see a: `struct Foo<T> where T: Copy;` style decl.
+                // Declaration of form `struct Foo<T> where T: Copy;`.
                 VariantData::Unit(ast::DUMMY_NODE_ID)
             } else {
-                // If we see: `struct Foo<T> where T: Copy { ... }`
+                // Declaration of form `struct Foo<T> where T: Copy { ... }`.
                 VariantData::Struct(self.parse_record_struct_body()?, ast::DUMMY_NODE_ID)
             }
         // No `where`, so `struct Foo<T>;`.
@@ -7357,7 +7360,7 @@ impl<'a> Parser<'a> {
                     //
                     // Note that this will produce weirdness when a file named `foo.rs` is
                     // `#[path]` included and contains a `mod foo;` declaration.
-                    // If you encounter this, it's your own darn fault :P
+                    // If you encounter this, it's your own fault!
                     Some(_) => DirectoryOwnership::Owned { relative: None },
                     _ => DirectoryOwnership::UnownedViaMod(true),
                 },
@@ -7560,7 +7563,7 @@ impl<'a> Parser<'a> {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore (only-for-syntax-highlight)
     /// extern crate foo;
     /// extern crate bar as foo;
     /// ```
@@ -7933,7 +7936,7 @@ impl<'a> Parser<'a> {
             return Ok(Some(item));
         }
 
-        // `unsafe async fn` or `async fn`
+        // `unsafe async fn` or `async fn` item.
         if (
             self.check_keyword(keywords::Unsafe) &&
             self.look_ahead(1, |t| t.is_keyword(keywords::Async))

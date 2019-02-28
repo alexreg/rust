@@ -1257,7 +1257,7 @@ impl<'a> MethodDef<'a> {
                     self_pats_idents.push(idents);
                 }
 
-                // Here is the pat = `(&VariantK, &VariantK, ...)`
+                // Here is the pattern: `(&VariantK, &VariantK, ...)`.
                 let single_pat = cx.pat_tuple(sp, subpats);
 
                 // For the `BodyK`, we need to delegate to our caller,

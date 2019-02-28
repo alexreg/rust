@@ -104,7 +104,8 @@ const EXTRA_TRAIT: &[&str] = &[
     label_strs::TraitOfItem,
 ];
 
-// Fully Built Labels
+// Fully-Built Labels
+// ------------------
 
 const LABELS_CONST: &[&[&str]] = &[
     BASE_HIR,
@@ -175,7 +176,7 @@ const LABELS_TRAIT: &[&[&str]] = &[
 ];
 
 
-// FIXME: Struct/Enum/Unions Fields (there is currently no way to attach these)
+// FIXME: there is currently no way to attach struct/enum/union fields.
 //
 // Fields are kind of separate from their containers, as they can change independently from
 // them. We should at least check `TypeOfItem` for these.
@@ -346,7 +347,7 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
                     // A module.
                     HirItem::Mod(..) => ("ItemMod", LABELS_HIR_ONLY),
 
-                    // // An external module
+                    // An external module.
                     HirItem::ForeignMod(..) => ("ItemForeignMod", LABELS_HIR_ONLY),
 
                     // Module-level inline assembly (from `global_asm!`).
@@ -364,7 +365,7 @@ impl<'a, 'tcx> DirtyCleanVisitor<'a, 'tcx> {
                     // A union definition, e.g., `union Foo<A, B> {x: A, y: B}`
                     HirItem::Union(..) => ("ItemUnion", LABELS_ADT),
 
-                    // Represents a Trait Declaration
+                    // A trait declaration.
                     // FIXME(michaelwoerister): trait declaration is buggy because sometimes some of
                     // the depnodes don't exist (because they legitametely didn't need to be
                     // calculated)

@@ -649,7 +649,7 @@ pub enum SyntaxExtension {
         local_inner_macros: bool,
         /// The macro's feature name if it is unstable, and the stability feature
         unstable_feature: Option<(Symbol, u32)>,
-        /// Edition of the crate in which the macro is defined
+        /// The edition of the crate in which the macro is defined.
         edition: Edition,
     },
 
@@ -904,7 +904,7 @@ impl<'a> ExtCtxt<'a> {
 
     /// Emits `msg` attached to `sp`, and stops compilation immediately.
     ///
-    /// `span_err` should be strongly preferred where-ever possible:
+    /// `span_err` should be strongly preferred whereever possible:
     /// this should *only* be used when:
     ///
     /// - continuing has a high risk of flow-on errors (e.g., errors in

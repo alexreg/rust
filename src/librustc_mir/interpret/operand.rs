@@ -275,7 +275,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         mplace: MPlaceTy<'tcx, M::PointerTag>,
     ) -> EvalResult<'tcx, Option<Immediate<M::PointerTag>>> {
         if mplace.layout.is_unsized() {
-            // Don't touch unsized
+            // Don't touch unsized places.
             return Ok(None);
         }
         let (ptr, ptr_align) = mplace.to_scalar_ptr_align();
@@ -491,7 +491,7 @@ impl<'a, 'mir, 'tcx, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tcx, M> 
         Ok(OpTy { op, layout })
     }
 
-    /// Every place can be read from, so we can turm them into an operand
+    /// Converts a place into an operator. Always possible, since every place can be read from.
     #[inline(always)]
     pub fn place_to_op(
         &self,

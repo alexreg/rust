@@ -378,7 +378,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         // Decide whether to print the parent path for the impl.
         // Logically, since impls are global, it's never needed, but
         // users may find it useful. Currently, we omit the parent if
-        // the impl is either in the same module as the self-type or
+        // the impl is either in the same module as the self type or
         // as the trait.
         let self_ty = self.type_of(impl_def_id);
         let in_self_mod = match characteristic_def_id_of_type(self_ty) {
@@ -393,7 +393,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         };
 
         if !in_self_mod && !in_trait_mod {
-            // If the impl is not co-located with either self-type or
+            // If the impl is not co-located with either self type or
             // trait-type, then fallback to a format that identifies
             // the module more clearly.
             self.push_item_path(buffer, parent_def_id, pushed_prelude_crate);
@@ -415,7 +415,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         }
 
         // Inherent impls. Try to print `Foo::bar` for an inherent
-        // impl on `Foo`, but fallback to `<Foo>::bar` if self-type is
+        // impl on `Foo`, but fallback to `<Foo>::bar` if self type is
         // anything other than a simple path.
         match self_ty.sty {
             ty::Adt(adt_def, substs) => {
@@ -452,7 +452,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         where T: ItemPathBuffer + Debug
     {
         // If no type info is available, fall back to
-        // pretty printing some span information. This should
+        // pretty-printing some span information. This should
         // only occur very early in the compiler pipeline.
         let parent_def_id = self.parent_def_id(impl_def_id).unwrap();
         self.push_item_path(buffer, parent_def_id, pushed_prelude_crate);

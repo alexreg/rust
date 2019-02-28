@@ -97,9 +97,9 @@ pub fn identify_constrained_type_params<'tcx>(tcx: TyCtxt<'_, 'tcx, 'tcx>,
 ///   * U: Iterator
 ///   * <U as Iterator>::Item = T -- a desugared ProjectionPredicate
 ///
-/// When we, for example, try to go over the trait-reference
+/// When we, for example, try to go over the trait reference
 /// `IntoIter<u32> as Trait`, we substitute the impl parameters with fresh
-/// variables and match them with the impl trait-ref, so we know that
+/// variables and match them with the impl trait ref, so we know that
 /// `$U = IntoIter<u32>`.
 ///
 /// However, in order to process the `$T: Debug` predicate, we must first
@@ -140,8 +140,8 @@ pub fn setup_constraining_predicates<'tcx>(tcx: TyCtxt<'_, '_, '_>,
     // all of the projections before `i` are topologically sorted
     // and constrain all the parameters in `input_parameters`.
     //
-    // In the example, `input_parameters` starts by containing `U` - which
-    // is constrained by the trait-ref - and so on the first pass we
+    // In the example, `input_parameters` starts by containing `U`, which
+    // is constrained by the trait ref, and so on the first pass we
     // observe that `<U as Iterator>::Item = T` is a "ready" projection that
     // constrains `T` and swap it to front. As it is the sole projection,
     // no more swaps can take place afterwards, with the result being

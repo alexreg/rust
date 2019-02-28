@@ -330,7 +330,8 @@ impl DefPath {
 pub enum DefPathData {
     // Root: these should only be used for the root nodes, because
     // they are treated specially by the `def_path` function.
-    /// The crate root (marker)
+
+    /// The crate root (marker).
     CrateRoot,
     // Catch-all for random `DefId` things like `DUMMY_NODE_ID`.
     Misc,
@@ -347,9 +348,9 @@ pub enum DefPathData {
     AssocTypeInImpl(InternedString),
     /// An existential associated type **value** (i.e., in an impl).
     AssocExistentialInImpl(InternedString),
-    /// Something in the type NS
+    /// Something in the type namespace.
     TypeNs(InternedString),
-    /// Something in the value NS
+    /// Something in the value namespace.
     ValueNs(InternedString),
     /// A module declaration.
     Module(InternedString),
@@ -376,8 +377,9 @@ pub enum DefPathData {
     AnonConst,
     /// An `impl Trait` type node.
     ImplTrait,
-    /// GlobalMetaData identifies a piece of crate metadata that is global to
-    /// a whole crate (as opposed to just one item). GlobalMetaData components
+
+    /// Identifies a piece of crate metadata that is global to
+    /// a whole crate (as opposed to just one item). These components
     /// are only supposed to show up right below the crate root.
     GlobalMetaData(InternedString),
     /// A trait alias.

@@ -718,7 +718,7 @@ impl<'tcx> Visitor<'tcx> for UsePlacementFinder {
                 },
                 // Don't place use before `extern crate` ...
                 ItemKind::ExternCrate(_) => {}
-                // but place them before the first other item
+                // ... but do place them before the first other item.
                 _ => if self.span.map_or(true, |span| item.span < span ) {
                     if item.span.ctxt().outer().expn_info().is_none() {
                         // Don't insert between attributes and an item.
@@ -1512,7 +1512,8 @@ pub struct Resolver<'a> {
     current_module: Module<'a>,
 
     /// The current set of local scopes for types and values.
-    /// FIXME #4948: Reuse ribs to avoid allocation.
+    //
+    // FIXME(#4948): reuse ribs to avoid allocation.
     ribs: PerNS<Vec<Rib<'a>>>,
 
     /// The current set of local scopes, for labels.
@@ -2303,7 +2304,7 @@ impl<'a> Resolver<'a> {
         module
     }
 
-    // AST resolution
+    // # AST resolution
     //
     // We maintain a list of value ribs and type ribs.
     //
@@ -2957,7 +2958,8 @@ impl<'a> Resolver<'a> {
         debug!("(resolving block) entering block");
         // Move down in the graph, if there's an anonymous module rooted here.
         let orig_module = self.current_module;
-        let anonymous_module = self.block_map.get(&block.id).cloned(); // clones a reference
+        // Clones a reference.
+        let anonymous_module = self.block_map.get(&block.id).cloned();
 
         let mut num_macro_definition_ribs = 0;
         if let Some(anonymous_module) = anonymous_module {
@@ -4183,7 +4185,7 @@ impl<'a> Resolver<'a> {
 
             ExprKind::Block(ref block, label) => self.resolve_labeled_block(label, block.id, block),
 
-            // Equivalent to `visit::walk_expr` + passing some context to children.
+            // Equivalent to `visit::walk_expr` plus passing some context to children.
             ExprKind::Field(ref subexpression, _) => {
                 self.resolve_expr(subexpression, Some(expr));
             }
@@ -4226,7 +4228,7 @@ impl<'a> Resolver<'a> {
                 let rib_kind = ClosureRibKind(expr.id);
                 self.ribs[ValueNS].push(Rib::new(rib_kind));
                 self.label_ribs.push(Rib::new(rib_kind));
-                // Resolve arguments:
+                // Resolve the arguments.
                 let mut bindings_list = FxHashMap::default();
                 for argument in &fn_decl.inputs {
                     self.resolve_pattern(&argument.pat, PatternSource::FnParam, &mut bindings_list);
@@ -5158,7 +5160,7 @@ fn import_candidate_to_enum_paths(suggestion: &ImportSuggestion) -> (String, Str
 /// entities with that name in all crates. This method allows outputting the
 /// results of this search in a programmer-friendly way.
 fn show_candidates(err: &mut DiagnosticBuilder<'_>,
-                   // This is `None` if all placement locations are inside expansions
+                   // `None` if all placement locations are inside expansions.
                    span: Option<Span>,
                    candidates: &[ImportSuggestion],
                    better: bool,

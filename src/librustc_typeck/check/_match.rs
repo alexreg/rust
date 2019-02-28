@@ -663,7 +663,7 @@ https://doc.rust-lang.org/reference/types.html#trait-objects");
             }
         }).collect();
 
-        // Now typecheck the blocks.
+        // Now type-check the blocks.
         //
         // The result of the match is the common supertype of all the
         // arms. Start out the value as bottom, since it's the, well,
@@ -946,7 +946,7 @@ https://doc.rust-lang.org/reference/types.html#trait-objects");
         let mut no_field_errors = true;
 
         let mut inexistent_fields = vec![];
-        // Typecheck each field.
+        // Type-check each field.
         for &Spanned { node: ref field, span } in fields {
             let ident = tcx.adjust_ident(field.ident, variant.did, self.body_id).0;
             let field_ty = match used_fields.entry(ident) {

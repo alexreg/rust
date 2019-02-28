@@ -1123,8 +1123,7 @@ pub const BUILTIN_ATTRIBUTES: &[(&str, AttributeType, AttributeTemplate, Attribu
     // FIXME: #14408 whitelist docs since rustdoc looks at them.
     ("doc", Whitelisted, template!(List: "hidden|inline|...", NameValueStr: "string"), Ungated),
 
-    // FIXME: #14406 these are processed in codegen, which happens after the
-    // lint pass
+    // FIXME (#14406): these are processed in codegen, which happens after the lint pass.
     ("cold", Whitelisted, template!(Word), Ungated),
     ("naked", Whitelisted, template!(Word), Gated(Stability::Unstable,
                                  "naked_functions",

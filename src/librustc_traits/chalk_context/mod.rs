@@ -301,14 +301,16 @@ impl context::ContextOps<ChalkArenas<'gcx>> for ChalkContext<'cx, 'gcx> {
         _map: &UniverseMap,
         value: &Canonical<'gcx, InEnvironment<'gcx, Goal<'gcx>>>,
     ) -> Canonical<'gcx, InEnvironment<'gcx, Goal<'gcx>>> {
-        *value // FIXME universe maps not implemented yet
+        // FIXME: universe maps not implemented yet
+        *value
     }
 
     fn map_subst_from_canonical(
         _map: &UniverseMap,
         value: &Canonical<'gcx, ConstrainedSubst<'gcx>>,
     ) -> Canonical<'gcx, ConstrainedSubst<'gcx>> {
-        value.clone() // FIXME universe maps not implemented yet
+        // FIXME: universe maps not implemented yet
+        value.clone()
     }
 }
 

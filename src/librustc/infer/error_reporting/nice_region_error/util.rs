@@ -7,8 +7,7 @@ use crate::ty::{self, Region, Ty};
 use crate::hir::def_id::DefId;
 use syntax_pos::Span;
 
-// The struct contains the information about the anonymous region
-// we are searching for.
+// Contains the information about the anonymous region we are searching for.
 #[derive(Debug)]
 pub(super) struct AnonymousArgInfo<'tcx> {
     /// The argument corresponding to the anonymous region.

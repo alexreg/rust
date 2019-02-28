@@ -729,7 +729,7 @@ impl<'a> CrateLoader<'a> {
                 return
             }
 
-            // firstyear 2017 - during testing I was unable to access an OSX machine
+            // NOTE: in 2017, during testing, I was unable to access an macOS machine
             // to make this work on different crate types. As a result, today I have
             // only been able to test and support Linux as a target.
             if self.sess.target.target.llvm_target == "x86_64-unknown-linux-gnu" {

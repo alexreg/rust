@@ -602,7 +602,7 @@ impl PartialEq for Nonterminal {
             (NtTT(tt_lhs), NtTT(tt_rhs)) => tt_lhs == tt_rhs,
             // FIXME: assume that all "complex" non-terminal are not equal, we can't compare them
             // correctly based on data from AST. This will prevent them from matching each other
-            // in macros. The comparison will become possible only when each nonterminal has an
+            // in macros. The comparison will become possible only when each non-terminal has an
             // attached token stream from which it was parsed.
             _ => false,
         }

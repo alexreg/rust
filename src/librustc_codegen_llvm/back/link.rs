@@ -114,14 +114,14 @@ fn preserve_objects_for_their_debuginfo(sess: &Session) -> bool {
         return false
     }
 
-    // If we're on OSX then the equivalent of split dwarf is turned on by
+    // If we're on macOS then the equivalent of split dwarf is turned on by
     // default. The final executable won't actually have any debug information
     // except it'll have pointers to elsewhere. Historically we've always run
     // `dsymutil` to "link all the dwarf together" but this is actually sort of
     // a bummer for incremental compilation! (the whole point of split dwarf is
     // that you don't do this sort of dwarf link).
     //
-    // Basically as a result this just means that if we're on OSX and we're
+    // Basically as a result this just means that if we're on macOS and we're
     // *not* running dsymutil then the object files are the only source of truth
     // for debug information, so we must preserve them.
     if sess.target.target.options.is_like_osx {
@@ -442,7 +442,7 @@ fn print_native_static_libs(sess: &Session, all_native_libs: &[NativeLibrary]) {
         sess.note_without_error("Link against the following native artifacts when linking \
                                  against this static library. The order and any duplication \
                                  can be significant on some platforms.");
-        // Prefix for greppability
+        // Prefix for grep-ability.
         sess.note_without_error(&format!("native-static-libs: {}", &lib_args.join(" ")));
     }
 }
@@ -561,12 +561,12 @@ fn link_natively(sess: &Session,
     // automatically retry the linker invocation if the linker looks like it
     // segfaulted.
     //
-    // Gee that seems odd, normally segfaults are things we want to know about!
-    // Unfortunately though in rust-lang/rust#38878 we're experiencing the
-    // linker segfaulting on Travis quite a bit which is causing quite a bit of
-    // pain to land PRs when they spuriously fail due to a segfault.
+    // That seems odd... normally segfaults are things we want to know about!
+    // Unfortunately, however, in issue #38878 we're experiencing the
+    // linker segfaulting on Travis quite a bit, which is causing a lot of
+    // pain when trying to land PRs due to them spuriously failing from segfaults.
     //
-    // The issue #38878 has some more debugging information on it as well, but
+    // Issue #38878 has some more debugging information on it as well, but
     // this unfortunately looks like it's just a race condition in macOS's linker
     // with some thread pool working in the background. It seems that no one
     // currently knows a fix for this so in the meantime we're left with this.
@@ -1094,7 +1094,7 @@ fn add_local_native_libraries(cmd: &mut dyn Linker,
     }
 }
 
-// # Rust Crate linking
+// Rust crate linking.
 //
 // Rust crates are not considered at all when creating an rlib output. All
 // dependencies will be linked when producing the final output (instead of
@@ -1201,7 +1201,7 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
         }
     }
 
-    // compiler-builtins are always placed last to ensure that they're
+    // Compiler builtins are always placed last to ensure that they're
     // linked correctly.
     // We must always link the `compiler_builtins` crate statically. Even if it
     // was already "included" in a dylib (e.g., `libstd` when `-C prefer-dynamic`

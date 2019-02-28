@@ -2315,7 +2315,7 @@ impl<'tcx> AnnotatedBorrowFnSignature<'tcx> {
     /// name where required.
     fn get_name_for_ty(&self, ty: ty::Ty<'tcx>, counter: usize) -> String {
         // We need to add synthesized lifetimes where appropriate. We do
-        // this by hooking into the pretty printer and telling it to label the
+        // this by hooking into the pretty-printer and telling it to label the
         // lifetimes without names with the value `'0`.
         match ty.sty {
             ty::TyKind::Ref(ty::RegionKind::ReLateBound(_, br), _, _)

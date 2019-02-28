@@ -976,7 +976,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                 // So now we just check that variables defined w/o an
                 // initializer are not live at the point of their
                 // initialization, which is mildly more complex than checking
-                // once at the func header but otherwise equivalent.
+                // once at the function header, but otherwise equivalent.
 
                 let succ = self.propagate_through_opt_expr(local.init.as_ref().map(|e| &**e), succ);
                 self.define_bindings_in_pat(&local.pat, succ)
@@ -1155,7 +1155,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                 }
             }
 
-            // Uninteresting cases: just propagate in rev exec order
+            // Uninteresting cases: just propagate in reverse execution order.
 
             hir::ExprKind::Array(ref exprs) => {
                 self.propagate_through_exprs(exprs, succ)
@@ -1231,7 +1231,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
                     self.propagate_through_place_components(output, succ)
                 }});
 
-                // Inputs are executed first. Propagate last because of rev order
+                // Inputs are executed first. Propagate last because of reverse order.
                 self.propagate_through_exprs(inputs, succ)
             }
 
@@ -1369,8 +1369,7 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
 
         */
 
-
-        // first iteration:
+        // First iteration.
         let mut first_merge = true;
         let ln = self.live_node(expr.hir_id, expr.span);
         self.init_empty(ln, succ);

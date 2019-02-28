@@ -346,7 +346,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
             self.cx.current_expansion = invoc.expansion_data.clone();
 
             self.cx.current_expansion.mark = scope;
-            // FIXME(jseyfried): Refactor out the following logic
+            // FIXME(jseyfried): factor out the following logic.
             let (expanded_fragment, new_invocations) = if let Some(ext) = ext {
                 if let Some(ext) = ext {
                     let (invoc_fragment_kind, invoc_span) = (invoc.fragment_kind, invoc.span());
@@ -717,8 +717,7 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
                                           // Can't infer this type.
                                           unstable_feature: Option<(Symbol, u32)>,
                                           edition| {
-
-            // feature-gate the macro invocation
+            // Feature-gate the macro invocation.
             if let Some((feature, issue)) = unstable_feature {
                 let crate_span = this.cx.current_expansion.crate_span.unwrap();
                 // Don't stability-check macros in the same crate.
@@ -838,8 +837,8 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
                     self.gate_proc_macro_expansion_kind(span, kind);
                     invoc.expansion_data.mark.set_expn_info(ExpnInfo {
                         call_site: span,
-                        // FIXME procedural macros do not have proper span info
-                        // yet, when they do, we should use it here.
+                        // FIXME: procedural macros do not have proper span info yet --
+                        // when they do, we should use it here.
                         def_site: None,
                         format: macro_bang_format(path),
                         // FIXME: probably want to follow `macro_rules` macros here.
@@ -1143,9 +1142,9 @@ impl<'a, 'b> InvocationCollector<'a, 'b> {
         (attr, traits, after_derive)
     }
 
-    /// Alternative to `classify_item()` that ignores `#[derive]` so invocations fallthrough
-    /// to the unused-attributes lint (making it an error on statements and expressions
-    /// is a breaking change)
+    /// Alternative to `classify_item()` that ignores `#[derive]` so that invocations fall through
+    /// to the unused-attributes lint.
+    /// (Note, making it an error on statements and expressions is a breaking change.)
     fn classify_nonitem<T: HasAttrs>(&mut self, nonitem: &mut T)
                                      -> (Option<ast::Attribute>, /* after_derive */ bool) {
         let (mut attr, mut after_derive) = (None, false);
@@ -1197,8 +1196,8 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
             let (attr, after_derive) = self.classify_nonitem(&mut expr);
 
             if attr.is_some() {
-                // Collect the invoc regardless of whether or not attributes are permitted here
-                // expansion will eat the attribute so it won't error later.
+                // Collect the invocation regardless of whether or not attributes are permitted
+                // here. Expansion will eat the attribute so that it won't error later.
                 attr.as_ref().map(|a| self.cfg.maybe_emit_expr_attr_err(a));
 
                 // `AstFragmentKind::Expr` requires the macro to emit an expression.
@@ -1225,7 +1224,7 @@ impl<'a, 'b> MutVisitor for InvocationCollector<'a, 'b> {
         expr.filter_map(|mut expr| {
             self.cfg.configure_expr_kind(&mut expr.node);
 
-            // Ignore derives so they remain unused.
+            // Ignore derives so that they remain unused.
             let (attr, after_derive) = self.classify_nonitem(&mut expr);
 
             if attr.is_some() {

@@ -1,4 +1,4 @@
-//! The Rust compiler.
+//! The code generation back-end.
 //!
 //! # Note
 //!

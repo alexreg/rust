@@ -513,7 +513,7 @@ impl<'cx, 'gcx, 'tcx> LexicalResolver<'cx, 'gcx, 'tcx> {
                        the mere existence of a conflict in a region variable
                        that is not used is not a problem, so if this rule
                        starts to create problems we'll have to revisit
-                       this portion of the code and think hard about it. =) */
+                       this portion of the code and think hard about it. */
                     self.collect_error_for_expanding_node(graph, &mut dup_vec, node_vid, errors);
                 }
             }

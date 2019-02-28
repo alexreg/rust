@@ -859,8 +859,7 @@ impl<'a, 'tcx> LateLintPass<'a, 'tcx> for PluginAsLibrary {
             Some(cnum) => cx.tcx.plugin_registrar_fn(cnum),
             None => {
                 // Probably means we aren't linking the crate for some reason.
-                //
-                // Not sure if / when this could happen.
+                // Not sure if/when this could happen.
                 return;
             }
         };

@@ -411,7 +411,7 @@ impl<'a, 'gcx, 'tcx> TypeFolder<'gcx, 'tcx> for RegionFolder<'a, 'gcx, 'tcx> {
 ///////////////////////////////////////////////////////////////////////////
 // Bound vars replacer
 
-/// Replaces the escaping bound vars (late bound regions or bound types) in a type.
+/// Replaces the escaping bound vars (late-bound regions or bound types) in a type.
 struct BoundVarReplacer<'a, 'gcx: 'a + 'tcx, 'tcx: 'a> {
     tcx: TyCtxt<'a, 'gcx, 'tcx>,
 
@@ -508,7 +508,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
     /// returned at the end with each bound region and the free region
     /// that replaced it.
     ///
-    /// This method only replaces late bound regions and the result may still
+    /// This method only replaces late-bound regions and the result may still
     /// contain escaping bound types.
     pub fn replace_late_bound_regions<T, F>(
         self,

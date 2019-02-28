@@ -114,7 +114,7 @@ pub struct CtxtInterners<'tcx> {
     /// The arena that types, regions, etc. are allocated from.
     arena: &'tcx SyncDroplessArena,
 
-    /// Specifically use a speedy hash algorithm for these hash sets,
+    /// Specifically use a speedy hash algorithm for these hash sets, since
     /// they're accessed quite often.
     type_: InternedSet<'tcx, TyS<'tcx>>,
     type_list: InternedSet<'tcx, List<Ty<'tcx>>>,
@@ -405,7 +405,7 @@ pub struct TypeckTables<'tcx> {
     liberated_fn_sigs: ItemLocalMap<ty::FnSig<'tcx>>,
 
     /// For each FRU expression, record the normalized types of the fields
-    /// of the struct - this is needed because it is non-trivial to
+    /// of the struct -- this is needed because it is non-trivial to
     /// normalize while preserving regions. This table is used only in
     /// MIR construction and hence is not serialized to metadata.
     fru_field_types: ItemLocalMap<Vec<Ty<'tcx>>>,
@@ -1209,7 +1209,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
                     .chain(iter::once((LOCAL_CRATE, hir.definitions().def_path_table())))
             };
 
-            // Precompute the capacity of the hashmap so we don't have to
+            // Precompute the capacity of the hashmap so that we don't have to
             // re-allocate when populating it.
             let capacity = def_path_tables().map(|(_, t)| t.size()).sum::<usize>();
 
@@ -1463,8 +1463,8 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         self.queries.on_disk_cache.serialize(self.global_tcx(), encoder)
     }
 
-    /// This checks whether one is allowed to have pattern bindings
-    /// that bind-by-move on a match arm that has a guard, e.g.:
+    /// Checks whether one is allowed to have pattern bindings that
+    /// bind-by-move on a match arm that has a guard, e.g.,
     ///
     /// ```rust
     /// match foo { A(inner) if { /* something */ } => ..., ... }
@@ -1538,7 +1538,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         self.sess.opts.debugging_opts.two_phase_borrows
     }
 
-    /// What mode(s) of borrowck should we run? AST? MIR? both?
+    /// Checks what mode(s) of borrowck we should run (i.e., AST, MIR, or both).
     /// (Also considers the `#![feature(nll)]` setting.)
     pub fn borrowck_mode(&self) -> BorrowckMode {
         // Here are the main constraints we need to deal with:
@@ -1661,7 +1661,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
         }
     }
 
-    // Here we check if the bound region is in Impl Item.
+    // Checks if the bound region is in impl item.
     pub fn is_bound_region_in_impl_item(
         &self,
         suitable_region_binding_scope: DefId,
@@ -1675,7 +1675,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
             // change the fn signature, but they may not be free to do so,
             // since the signature must match the trait.
             //
-            // FIXME(#42706) -- in some cases, we could do better here.
+            // FIXME(#42706): in some cases, we could do better here.
             return true;
         }
         false

@@ -650,7 +650,7 @@ impl<'tcx> RegionInferenceContext<'tcx> {
     /// Checks for arguments appearing in the (closure) return type. It
     /// must be a closure since, in a free fn, such an argument would
     /// have to either also appear in an argument (if using elision)
-    /// or be early bound (named, not in argument).
+    /// or be early-bound (named, not in argument).
     fn give_name_if_anonymous_region_appears_in_output(
         &self,
         infcx: &InferCtxt<'_, '_, 'tcx>,

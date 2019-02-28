@@ -685,7 +685,7 @@ impl<'a> Visitor<'a> for AstValidator<'a> {
 
     fn visit_where_predicate(&mut self, p: &'a WherePredicate) {
         if let &WherePredicate::BoundPredicate(ref bound_predicate) = p {
-            // A type binding, eg `for<'c> Foo: Send+Clone+'c`
+            // A type binding (e.g., `for<'c> Foo: Send + Clone + 'c`).
             self.check_late_bound_lifetime_defs(&bound_predicate.bound_generic_params);
         }
         visit::walk_where_predicate(self, p);

@@ -547,7 +547,7 @@ impl<'a, 'b, 'tcx, O:DataFlowOperator> PropagationContext<'a, 'b, 'tcx, O> {
                bits_to_string(in_out), self.dfcx.analysis_name);
         assert!(self.dfcx.bits_per_id > 0);
 
-        // Iterate over nodes in reverse postorder
+        // Iterate over nodes in reverse post-order.
         for &node_index in nodes_po.iter().rev() {
             let node = cfg.graph.node(node_index);
             debug!("DataFlowContext::walk_cfg idx={:?} id={:?} begin in_out={}",

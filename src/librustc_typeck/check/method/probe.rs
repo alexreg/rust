@@ -367,9 +367,8 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                self_ty,
                steps);
 
-
-        // this creates one big transaction so that all type variables etc
-        // that we create during the probe process are removed later
+        // This creates one big transaction so that all type variables, etc.,
+        // that we create during the probe process are removed later.
         self.probe(|_| {
             let mut probe_cx = ProbeContext::new(
                 self, span, mode, method_name, return_type, orig_values,
@@ -543,7 +542,7 @@ impl<'a, 'gcx, 'tcx> ProbeContext<'a, 'gcx, 'tcx> {
                     //
                     // However, in this code, it is OK if we end up with an object type that is
                     // "more general" than the object type that we are evaluating. For *every*
-                    // object type `MY_OBJECT`, a function call that goes through a trait-ref
+                    // object type `MY_OBJECT`, a function call that goes through a trait ref
                     // of the form `<MY_OBJECT as SuperTraitOf(MY_OBJECT)>::func` is a valid
                     // `ObjectCandidate`, and it should be discoverable "exactly" through one
                     // of the iterations in the autoderef loop, so there is no problem with it
@@ -755,7 +754,7 @@ impl<'a, 'gcx, 'tcx> ProbeContext<'a, 'gcx, 'tcx> {
 
     fn assemble_inherent_candidates_from_param(&mut self,
                                                param_ty: ty::ParamTy) {
-        // FIXME -- Do we want to commit to this behavior for param bounds?
+        // FIXME: do we want to commit to this behavior for param bounds?
 
         let bounds = self.param_env
             .caller_bounds
@@ -1312,7 +1311,7 @@ impl<'a, 'gcx, 'tcx> ProbeContext<'a, 'gcx, 'tcx> {
                             //
                             // FIXME: try to find the exact nested subobligation
                             // and point at it rather than reporting the entire
-                            // trait-ref?
+                            // trait ref?
                             result = ProbeResult::NoMatch;
                             let trait_ref = self.resolve_type_vars_if_possible(&trait_ref);
                             possibly_unsatisfied_predicates.push(trait_ref);
@@ -1464,7 +1463,7 @@ impl<'a, 'gcx, 'tcx> ProbeContext<'a, 'gcx, 'tcx> {
                 ty::AssociatedKind::Method | ty::AssociatedKind::Const => true
             },
         }
-        // FIXME -- check for types that deref to `Self`,
+        // FIXME: check for types that deref to `Self`,
         // like `Rc<Self>` and so on.
         //
         // Note also that the current code will break if this type

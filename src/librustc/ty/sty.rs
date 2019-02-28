@@ -3,7 +3,7 @@
 use crate::hir;
 use crate::hir::def_id::DefId;
 use crate::infer::canonical::Canonical;
-use crate::mir::interpret::{ConstValue, truncate};
+use crate::mir::interpret::{ConstValue, Pointer, Scalar, truncate};
 use crate::middle::region;
 use polonius_engine::Atom;
 use rustc_data_structures::indexed_vec::Idx;
@@ -11,7 +11,6 @@ use crate::ty::subst::{InternalSubsts, Subst, SubstsRef, Kind, UnpackedKind};
 use crate::ty::{self, AdtDef, TypeFlags, Ty, TyCtxt, TypeFoldable};
 use crate::ty::{List, TyS, ParamEnvAnd, ParamEnv};
 use crate::util::captures::Captures;
-use crate::mir::interpret::{Scalar, Pointer};
 
 use smallvec::SmallVec;
 use std::iter;
@@ -68,8 +67,8 @@ impl BoundRegion {
     }
 
     /// When canonicalizing, we replace unbound inference variables and free
-    /// regions with anonymous late bound regions. This method asserts that
-    /// we have an anonymous late bound region, which hence may refer to
+    /// regions with anonymous late-bound regions. This method asserts that
+    /// we have an anonymous late-bound region, which hence may refer to
     /// a canonical variable.
     pub fn assert_bound_var(&self) -> BoundVar {
         match *self {
@@ -272,7 +271,7 @@ static_assert!(MEM_SIZE_OF_TY_KIND: ::std::mem::size_of::<TyKind<'_>>() == 24);
 ///
 /// OK, you say, so why not create a more minimal set of parameters
 /// that just includes the extra lifetime parameters? The answer is
-/// primarily that it would be hard --- we don't know at the time when
+/// primarily that it would be hard -- we don't know at the time when
 /// we create the closure type what the full types of the upvars are,
 /// nor do we know which are borrowed and which are not. In this
 /// design, we can just supply a fresh type parameter and figure that
@@ -292,7 +291,7 @@ static_assert!(MEM_SIZE_OF_TY_KIND: ::std::mem::size_of::<TyKind<'_>>() == 24);
 /// don't have to handle cycles where the decisions we make for
 /// closure C wind up influencing the decisions we ought to make for
 /// closure C (which would then require fixed point iteration to
-/// handle). Plus it fixes an ICE. :P
+/// handle). It also fixes an ICE!
 ///
 /// ## Generators
 ///
@@ -661,7 +660,7 @@ impl<'tcx> Binder<&'tcx List<ExistentialPredicate<'tcx>>> {
 ///
 ///     T: Foo<U>
 ///
-/// This would be represented by a trait-reference where the `DefId` is the
+/// This would be represented by a trait reference where the `DefId` is the
 /// `DefId` for the trait `Foo` and the substs define `T` as parameter 0,
 /// and `U` as parameter 1.
 ///
@@ -697,9 +696,9 @@ impl<'tcx> TraitRef<'tcx> {
     }
 
     pub fn input_types<'a>(&'a self) -> impl DoubleEndedIterator<Item = Ty<'tcx>> + 'a {
-        // Select only the "input types" from a trait-reference. For
+        // Select only the "input types" from a trait reference. For
         // now this is all the types that appear in the
-        // trait-reference, but it should eventually exclude
+        // trait reference, but it should eventually exclude
         // associated types.
         self.substs.types()
     }
@@ -749,9 +748,9 @@ pub struct ExistentialTraitRef<'tcx> {
 
 impl<'a, 'gcx, 'tcx> ExistentialTraitRef<'tcx> {
     pub fn input_types<'b>(&'b self) -> impl DoubleEndedIterator<Item=Ty<'tcx>> + 'b {
-        // Select only the "input types" from a trait-reference. For
+        // Select only the "input types" from a trait reference. For
         // now this is all the types that appear in the
-        // trait-reference, but it should eventually exclude
+        // trait reference, but it should eventually exclude
         // associated types.
         self.substs.types()
     }
@@ -769,7 +768,7 @@ impl<'a, 'gcx, 'tcx> ExistentialTraitRef<'tcx> {
     }
 
     /// Object types don't have a self type specified. Therefore, when
-    /// we convert the principal trait-ref into a normal trait-ref,
+    /// we convert the principal trait ref into a normal trait ref,
     /// you must give *some* self type. A common choice is `mk_err()`
     /// or some placeholder type.
     pub fn with_self_ty(&self, tcx: TyCtxt<'a, 'gcx, 'tcx>, self_ty: Ty<'tcx>)
@@ -792,7 +791,7 @@ impl<'tcx> PolyExistentialTraitRef<'tcx> {
     }
 
     /// Object types don't have a self type specified. Therefore, when
-    /// we convert the principal trait-ref into a normal trait-ref,
+    /// we convert the principal trait ref into a normal trait ref,
     /// you must give *some* self type. A common choice is `mk_err()`
     /// or some placeholder type.
     pub fn with_self_ty(&self, tcx: TyCtxt<'_, '_, 'tcx>,
@@ -1534,7 +1533,7 @@ impl RegionKind {
     ///
     /// ```
     /// impl<'a> Foo {
-    ///      ^^ -- early bound, declared on an impl
+    ///      ^^ -- early-bound, declared on an impl
     ///
     ///     fn bar<'b, 'c>(x: &self, y: &'b u32, z: &'c u64) where 'static: 'c
     ///            ^^  ^^     ^ anonymous, late-bound

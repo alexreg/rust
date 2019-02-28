@@ -253,7 +253,7 @@ provide! { <'tcx> tcx, def_id, other, cdata,
 }
 
 pub fn provide<'tcx>(providers: &mut Providers<'tcx>) {
-    // FIXME(#44234) - almost all of these queries have no sub-queries and
+    // FIXME(#44234): almost all of these queries have no subqueries and
     // therefore no actual inputs, they're just reading tables calculated in
     // resolve! Does this work? Unsure! That's what the issue is about
     *providers = Providers {

@@ -116,14 +116,14 @@ where
 {
     cx: LivenessContext<'me, 'typeck, 'flow, 'gcx, 'tcx>,
 
-    /// Set of points that define the current local.
+    /// The set of points that define the current local.
     defs: HybridBitSet<PointIndex>,
 
-    /// Points where the current variable is "use live" -- meaning
+    /// Points where the current variable is "use live", meaning
     /// that there is a future "full use" that may use its value.
     use_live_at: HybridBitSet<PointIndex>,
 
-    /// Points where the current variable is "drop live" -- meaning
+    /// Points where the current variable is "drop live", meaning
     /// that there is no future "full use" that may use its value, but
     /// there is a future drop.
     drop_live_at: HybridBitSet<PointIndex>,
@@ -131,7 +131,7 @@ where
     /// The `Location`s where drops may occur.
     drop_locations: Vec<Location>,
 
-    /// Stack used when doing (reverse) DFS.
+    /// The stack used when doing (reverse) DFS.
     stack: Vec<PointIndex>,
 }
 

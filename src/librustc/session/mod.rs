@@ -82,7 +82,7 @@ pub struct Session {
 
     /// Set of `(DiagnosticId, Option<Span>, message)` tuples tracking
     /// (sub)diagnostics that have been set once, but should not be set again,
-    /// in order to avoid redundantly verbose output (Issue #24690, #44953).
+    /// in order to avoid redundantly verbose output (issues #24690, #44953).
     pub one_time_diagnostics: Lock<FxHashSet<(DiagnosticMessageId, Option<Span>, String)>>,
     pub plugin_llvm_passes: OneThread<RefCell<Vec<String>>>,
     pub plugin_attributes: Lock<Vec<(String, AttributeType)>>,

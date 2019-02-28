@@ -39,7 +39,7 @@ struct Context<'a, 'b: 'a> {
     /// The span of the format string literal.
     fmtsp: Span,
 
-    /// List of parsed argument expressions.
+    /// A list of parsed argument expressions.
     /// Named expressions are resolved early, and are appended to the end of
     /// argument expressions.
     ///
@@ -52,19 +52,19 @@ struct Context<'a, 'b: 'a> {
     /// * `arg_unique_types` (in simplified JSON): `[["o", "x"], ["o", "x"], ["o", "x"]]`
     /// * `names` (in JSON): `{"foo": 2}`
     args: Vec<P<ast::Expr>>,
-    /// Placeholder slot numbers indexed by argument.
+    /// The placeholder slot numbers, indexed by argument.
     arg_types: Vec<Vec<usize>>,
-    /// Unique format specs seen for each argument.
+    /// The unique format specs seen for each argument.
     arg_unique_types: Vec<Vec<ArgumentType>>,
-    /// Map from named arguments to their resolved indices.
+    /// A map from named arguments to their resolved indices.
     names: FxHashMap<String, usize>,
 
     /// The latest consecutive literal strings, or empty if there weren't any.
     literal: String,
 
-    /// Collection of the compiled `rt::Argument` structures
+    /// The collection of the compiled `rt::Argument` structures.
     pieces: Vec<P<ast::Expr>>,
-    /// Collection of string literals
+    /// The collection of string literals.
     str_pieces: Vec<P<ast::Expr>>,
     /// Stays `true` if all formatting parameters are default (as in `{}{}`).
     all_pieces_simple: bool,
@@ -81,7 +81,7 @@ struct Context<'a, 'b: 'a> {
     /// * `arg_index_map` (in JSON): `[[0, 1, 0], [2, 3, 3], [4, 5]]`
     arg_index_map: Vec<Vec<usize>>,
 
-    /// Starting offset of count argument slots.
+    /// The starting offset of count argument slots.
     count_args_index_offset: usize,
 
     /// Count argument slots and tracking data structures.
@@ -95,20 +95,20 @@ struct Context<'a, 'b: 'a> {
     /// * `count_positions` (in JSON): `{0: 0, 5: 1, 3: 2}`
     /// * `count_args`: `vec![Exact(0), Exact(5), Exact(3)]`
     count_args: Vec<Position>,
-    /// Relative slot numbers for count arguments.
+    /// The relative slot numbers for count arguments.
     count_positions: FxHashMap<usize, usize>,
-    /// Number of count slots assigned.
+    /// The number of count slots assigned.
     count_positions_count: usize,
 
-    /// Current position of the implicit positional arg pointer, as if it
+    /// The current position of the implicit positional arg pointer, as if it
     /// still existed in this phase of processing.
     /// Used only for `all_pieces_simple` tracking in `build_piece`.
     curarg: usize,
-    /// Current piece being evaluated, used for error reporting.
+    /// The current piece being evaluated, used for error reporting.
     curpiece: usize,
     /// Keep track of invalid references to positional arguments.
     invalid_refs: Vec<(usize, usize)>,
-    /// Spans of all the formatting arguments, in order.
+    /// The spans of all the formatting arguments, in order.
     arg_spans: Vec<Span>,
     /// `true` if this formatting string is a literal; `false` if it comes from a macro.
     is_literal: bool,
@@ -314,8 +314,7 @@ impl<'a, 'b> Context<'a, 'b> {
         e.emit();
     }
 
-    /// Actually verifies and tracks a given format placeholder
-    /// (a.k.a. argument).
+    /// Actually verifies and tracks a given format placeholder (i.e., argument).
     fn verify_arg_type(&mut self, arg: Position, ty: ArgumentType) {
         match arg {
             Exact(arg) => {
@@ -543,7 +542,7 @@ impl<'a, 'b> Context<'a, 'b> {
         }
     }
 
-    /// Actually builds the expression which the `format_args!` block will be expanded to.
+    /// Actually builds the expression that the `format_args!` block will be expanded to.
     fn into_expr(self) -> P<ast::Expr> {
         let mut locals = Vec::with_capacity(
             (0..self.args.len()).map(|i| self.arg_unique_types[i].len()).sum()

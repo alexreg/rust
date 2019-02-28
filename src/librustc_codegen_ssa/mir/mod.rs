@@ -337,7 +337,7 @@ pub fn codegen_mir<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
     let rpo = traversal::reverse_postorder(&mir);
     let mut visited = BitSet::new_empty(mir.basic_blocks().len());
 
-    // Codegen the body of each block using reverse postorder
+    // Codegen the body of each block using reverse post-order.
     for (bb, _) in rpo {
         visited.insert(bb.index());
         fx.codegen_block(bb);

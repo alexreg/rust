@@ -885,7 +885,7 @@ fn get_metadata_section_imp(target: &Target,
                                    filename.display()));
             }
 
-            // Header is okay -> inflate the actual metadata
+            // Header is ok, so inflate the actual metadata.
             let compressed_bytes = &buf[header_len..];
             debug!("inflating {} bytes of compressed metadata", compressed_bytes.len());
             let mut inflated = Vec::new();
@@ -900,7 +900,7 @@ fn get_metadata_section_imp(target: &Target,
             }
         }
         CrateFlavor::Rmeta => {
-            // mmap the file, because only a small fraction of it is read.
+            // Memory-map the file, because only a small fraction of it is read.
             let file = std::fs::File::open(filename).map_err(|_|
                 format!("failed to open rmeta metadata: '{}'", filename.display()))?;
             let mmap = unsafe { memmap::Mmap::map(&file) };

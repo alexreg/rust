@@ -160,7 +160,7 @@ impl NiceRegionError<'me, 'gcx, 'tcx> {
     }
 
     // error[E0308]: implementation of `Foo` does not apply to enough lifetimes
-    //   --> /home/nmatsakis/tmp/foo.rs:12:5
+    //   --> foo.rs:12:5
     //    |
     // 12 |     all::<&'static u32>();
     //    |     ^^^^^^^^^^^^^^^^^^^ lifetime mismatch

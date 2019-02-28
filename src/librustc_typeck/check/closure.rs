@@ -231,7 +231,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             });
 
         // Even if we can't infer the full signature, we may be able to
-        // infer the kind. This can occur if there is a trait-reference
+        // infer the kind. This can occur if there is a trait reference
         // like `F : Fn<A>`. Note that due to subtyping we could encounter
         // many viable options, so pick the most restrictive.
         let expected_kind = self.obligations_for_self_ty(expected_vid)
@@ -397,7 +397,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             );
         }
 
-        // Create a `PolyFnSig`. Note the oddity that late bound
+        // Create a `PolyFnSig`. Note the oddity that late-bound
         // regions appearing free in `expected_sig` are now bound up
         // in this binder we are creating.
         assert!(!expected_sig.sig.has_vars_bound_above(ty::INNERMOST));

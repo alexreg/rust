@@ -829,7 +829,7 @@ where
         // `self.universe` universe, this also serves to enforce the
         // universe scoping rules.
         //
-        // FIXME(#54105) -- if the ambient variance is bivariant,
+        // FIXME(#54105): if the ambient variance is bivariant,
         // though, we may however need to check well-formedness or
         // risk a problem like #41677 again.
 

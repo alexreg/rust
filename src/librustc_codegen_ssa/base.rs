@@ -336,7 +336,7 @@ fn cast_shift_rhs<'a, 'tcx: 'a, Bx: BuilderMethods<'a, 'tcx>>(
         if lhs_sz < rhs_sz {
             bx.trunc(rhs, lhs_llty)
         } else if lhs_sz > rhs_sz {
-            // FIXME (#1877: If in the future shifting by negative
+            // FIXME (#1877): If in the future shifting by negative
             // values is no longer undefined then this is wrong.
             bx.zext(rhs, lhs_llty)
         } else {

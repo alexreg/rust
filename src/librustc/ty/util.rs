@@ -801,7 +801,7 @@ impl<'a, 'tcx> ty::TyS<'tcx> {
         {
             match ty.sty {
                 Tuple(ref ts) => {
-                    // Find non representable
+                    // Find non-representable.
                     fold_repr(ts.iter().map(|ty| {
                         is_type_structurally_recursive(tcx, sp, seen, representable_cache, ty)
                     }))
@@ -812,7 +812,7 @@ impl<'a, 'tcx> ty::TyS<'tcx> {
                     is_type_structurally_recursive(tcx, sp, seen, representable_cache, ty)
                 }
                 Adt(def, substs) => {
-                    // Find non representable fields with their spans
+                    // Find non-representable fields with their spans.
                     fold_repr(def.all_fields().map(|field| {
                         let ty = field.ty(tcx, substs);
                         let span = tcx.hir().span_if_local(field.did).unwrap_or(sp);
@@ -1028,8 +1028,8 @@ fn needs_drop_raw<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         // cleanup/drop/zeroing) ...
         _ if ty.is_copy_modulo_regions(tcx, param_env, DUMMY_SP) => false,
 
-        // ... (issue #22536 continued) but as an optimization, still use
-        // prior logic of asking for the structural "may drop".
+        // ... but as an optimization, still use the prior logic of asking for
+        // the structural "may drop".
 
         // FIXME(#22815): note that this is a conservative heuristic;
         // it may report that the type "may drop" when actual type does

@@ -1,4 +1,4 @@
-//! Code related to processing overloaded binary and unary operators.
+//! Processing of overloaded binary and unary operators.
 
 use super::{FnCtxt, Needs};
 use super::method::MethodCallee;

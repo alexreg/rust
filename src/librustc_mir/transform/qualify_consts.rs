@@ -31,7 +31,7 @@ use std::usize;
 use crate::transform::{MirPass, MirSource};
 use super::promote_consts::{self, Candidate, TempState};
 
-/// What kind of item we are in.
+/// The kind of item we are in.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Mode {
     Const,
@@ -238,7 +238,7 @@ trait Qualif {
             }
 
             Rvalue::Ref(_, _, ref place) => {
-                // Special-case reborrows to be more like a copy of the reference.
+                // Special-case reborrows to make them more like a copy of the reference.
                 if let Place::Projection(ref proj) = *place {
                     if let ProjectionElem::Deref = proj.elem {
                         let base_ty = proj.base.ty(cx.mir, cx.tcx).to_ty(cx.tcx);
@@ -654,9 +654,8 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
         }
     }
 
-    // FIXME(eddyb) we could split the errors into meaningful
-    // categories, but enabling full miri would make that
-    // slightly pointless (even with feature-gating).
+    // FIXME(eddyb): we could split the errors into meaningful categories, but enabling full Miri
+    // would make that slightly pointless (even with feature-gating).
     fn not_const(&mut self) {
         unleash_miri!(self);
         if self.mode != Mode::Fn {
@@ -760,7 +759,7 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
                 // stricter qualification.
                 Place::Projection(proj) => {
                     // Catch more errors in the destination. `visit_place` also checks various
-                    // projection rules like union field access and raw pointer deref
+                    // projection rules like union field access and raw pointer derefencing.
                     self.visit_place(
                         dest,
                         PlaceContext::MutatingUse(MutatingUseContext::Store),
@@ -892,8 +891,7 @@ impl<'a, 'tcx> Checker<'a, 'tcx> {
 
         let mut qualifs = self.qualifs_in_local(RETURN_PLACE);
 
-        // Account for errors in consts by using the
-        // conservative type qualification instead.
+        // Account for errors in consts by using conservative type qualification instead.
         if qualifs[IsNotConst] {
             qualifs = self.qualifs_in_any_value_of_ty(mir.return_ty());
         }
@@ -1227,7 +1225,7 @@ impl<'a, 'tcx> Visitor<'tcx> for Checker<'a, 'tcx> {
                                 } else if self.is_const_panic_fn(def_id) {
                                     // Check the `const_panic` feature gate.
                                     // FIXME: cannot allow this inside `allow_internal_unstable`
-                                    // because that would make `panic!` insta stable in constants,
+                                    // because that would make `panic!` insta-stable in constants,
                                     // since the macro is marked with the attribute.
                                     if !self.tcx.features().const_panic {
                                         // Don't allow panics in constants without the feature gate.

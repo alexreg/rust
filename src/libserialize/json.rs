@@ -1,5 +1,5 @@
 // Rust JSON serialization library.
-// Copyright (c) 2011 Google Inc.
+// Original version copyright (c) 2011 Google Inc.
 
 #![forbid(non_camel_case_types)]
 #![allow(missing_docs)]
@@ -1419,7 +1419,7 @@ impl<T: Iterator<Item=char>> Iterator for Parser<T> {
 
         if self.state == ParseBeforeFinish {
             self.parse_whitespace();
-            // Make sure there is no trailing characters.
+            // Make sure there are no trailing characters.
             if self.eof() {
                 self.state = ParseFinished;
                 return None;

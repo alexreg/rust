@@ -1637,7 +1637,7 @@ fn check_impl_items_against_trait<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         }
     }
 
-    // Check for missing items from trait
+    // Check for missing items from the trait.
     let mut missing_items = Vec::new();
     let mut invalidated_items = Vec::new();
     let associated_type_overridden = overridden_associated_type.is_some();
@@ -1794,7 +1794,7 @@ fn check_packed_inner<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                     }
                 }
             }
-            // only need to pop if not early out
+            // We only need to pop if we didn't exit early.
             stack.pop();
         }
     }
@@ -2603,7 +2603,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                        needs: Needs)
                        -> Option<(/*index type*/ Ty<'tcx>, /*element type*/ Ty<'tcx>)>
     {
-        // FIXME(#18741) -- this is almost but not quite the same as the
+        // FIXME(#18741): this is almost but not quite the same as the
         // autoderef that normal method probing does. They could likely be
         // consolidated.
 
@@ -3041,8 +3041,8 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             }
         }
 
-        // We also need to make sure we at least write the ty of the other
-        // arguments which we skipped above.
+        // We also need to make sure we at least write the type of the other
+        // arguments that we skipped above.
         if variadic {
             fn variadic_error<'tcx>(s: &Session, span: Span, t: Ty<'tcx>, cast_ty: &str) {
                 use crate::structured_errors::{VariadicError, StructuredDiagnostic};
@@ -3679,7 +3679,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
     }
 
     fn name_series_display(&self, names: Vec<ast::Name>) -> String {
-        // dynamic limit, to never omit just one field
+        // Use dynamic limit, in order to never omit just one field.
         let limit = if names.len() == 6 { 6 } else { 5 };
         let mut display = names.iter().take(limit)
             .map(|n| format!("`{}`", n)).collect::<Vec<_>>().join(", ");
@@ -4332,7 +4332,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                             }
                         }
                     }
-                    // There was an error; make type-check fail.
+                    // There was an error; make type-checking fail.
                     tcx.types.err
                 }
 
@@ -4341,7 +4341,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
                 if destination.target_id.is_ok() {
                     tcx.types.never
                 } else {
-                    // There was an error; make type-check fail.
+                    // There was an error; make type-checking fail.
                     tcx.types.err
                 }
             }
@@ -4997,7 +4997,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
 
         if ctxt.may_break {
             // If we can break from the block, then the block's exit is always reachable
-            // (... as long as the entry is reachable) - regardless of the tail of the block.
+            // (as long as the entry is reachable), regardless of the tail of the block.
             self.diverges.set(prev_diverges);
         }
 

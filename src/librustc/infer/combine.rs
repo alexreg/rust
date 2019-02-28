@@ -439,8 +439,8 @@ impl<'cx, 'gcx, 'tcx> TypeRelation<'cx, 'gcx, 'tcx> for Generalizer<'cx, 'gcx, '
                                 // See comment on `needs_wf` field for more info.
                                 ty::Bivariant => self.needs_wf = true,
 
-                                // Co/contravariant: this will be
-                                // sufficiently constrained later on.
+                                // Co-/contra-variant: this will be sufficiently constrained
+                                // later on.
                                 ty::Covariant | ty::Contravariant => (),
                             }
 

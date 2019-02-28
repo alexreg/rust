@@ -16,8 +16,7 @@ use crate::ty::subst::Subst;
 
 use crate::infer::{InferOk};
 
-/// Whether we do the orphan check relative to this crate or
-/// to some remote crate.
+/// Represents whether to do the orphan check relative to this crate or to some remote crate.
 #[derive(Copy, Clone, Debug)]
 enum InCrate {
     Local,
@@ -34,8 +33,7 @@ pub struct OverlapResult<'tcx> {
     pub impl_header: ty::ImplHeader<'tcx>,
     pub intercrate_ambiguity_causes: Vec<IntercrateAmbiguityCause>,
 
-    /// `true` if the overlap might've been permitted before the shift
-    /// to universes.
+    /// `true` if the overlap might have been permitted before the shift to the universes model.
     pub involves_placeholder: bool,
 }
 
@@ -191,7 +189,7 @@ pub fn trait_ref_is_knowable<'a, 'gcx, 'tcx>(tcx: TyCtxt<'a, 'gcx, 'tcx>,
     debug!("trait_ref_is_knowable(trait_ref={:?})", trait_ref);
     if orphan_check_trait_ref(tcx, trait_ref, InCrate::Remote).is_ok() {
         // A downstream or cousin crate is allowed to implement some
-        // substitution of this trait-ref.
+        // substitution of this trait ref.
 
         // A trait can be implementable for a trait ref by both the current
         // crate and crates downstream of it. Older versions of rustc
@@ -214,7 +212,7 @@ pub fn trait_ref_is_knowable<'a, 'gcx, 'tcx>(tcx: TyCtxt<'a, 'gcx, 'tcx>,
     }
 
     // This is a remote non-fundamental trait, so if another crate
-    // can be the "final owner" of a substitution of this trait-ref,
+    // can be the "final owner" of a substitution of this trait ref,
     // they are allowed to implement it future-compatibly.
     //
     // However, if we are a final owner, then nobody else can be,
@@ -268,9 +266,9 @@ pub fn orphan_check<'a, 'gcx, 'tcx>(tcx: TyCtxt<'a, 'gcx, 'tcx>,
     orphan_check_trait_ref(tcx, trait_ref, InCrate::Local)
 }
 
-/// Checks whether a trait-ref is potentially implementable by a crate.
+/// Checks whether a trait ref is potentially implementable by a crate.
 ///
-/// The current rule is that a trait-ref orphan checks in a crate C:
+/// The current rule is that a trait ref orphan checks in a crate C:
 ///
 /// 1. Order the parameters in the trait ref in subst order -- `Self` first,
 ///    others linearly (e.g., `<U as Foo<V, W>>` is U < V < W).
@@ -307,7 +305,7 @@ pub fn orphan_check<'a, 'gcx, 'tcx>(tcx: TyCtxt<'a, 'gcx, 'tcx>,
 ///
 /// 1. They enable link-safety - i.e., 2 mutually-unknowing crates (where
 ///    every type local to one crate is unknown in the other) can't implement
-///    the same trait-ref. This follows because it can be seen that no such
+///    the same trait ref. This follows because it can be seen that no such
 ///    type can orphan-check in 2 such crates.
 ///
 ///    To check that a local impl follows the orphan rules, we check it in
@@ -465,8 +463,7 @@ fn fundamental_ty(ty: Ty<'_>) -> bool {
 
 fn def_id_is_local(def_id: DefId, in_crate: InCrate) -> bool {
     match in_crate {
-        // The type is local to *this* crate - it will not be
-        // local in any other crate.
+        // The type is local to *this* crate -- it will not be local in any other crate.
         InCrate::Remote => false,
         InCrate::Local => def_id.is_local()
     }

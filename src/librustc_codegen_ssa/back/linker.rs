@@ -136,8 +136,9 @@ pub struct GccLinker<'a> {
     cmd: Command,
     sess: &'a Session,
     info: &'a LinkerInfo,
-    hinted_static: bool, // Keeps track of the current hinting mode.
-    // Link as ld
+    // Keeps track of the current hinting mode.
+    hinted_static: bool,
+    // Link as `ld`.
     is_ld: bool,
     target_cpu: &'a str,
 }
@@ -342,7 +343,7 @@ impl<'a> Linker for GccLinker<'a> {
     }
 
     fn build_dylib(&mut self, out_filename: &Path) {
-        // On mac we need to tell the linker to let this library be rpathed
+        // On macOS we need to tell the linker to let this library be rpath-ed.
         if self.sess.target.target.options.is_like_osx {
             self.cmd.arg("-dynamiclib");
             self.linker_arg("-dylib");
@@ -861,7 +862,7 @@ impl<'a> Linker for EmLinker<'a> {
         ::std::mem::replace(&mut self.cmd, Command::new(""))
     }
 
-    // Appears not necessary on Emscripten
+    // Appears to be unnecessary for Emscripten.
     fn group_start(&mut self) {}
     fn group_end(&mut self) {}
 

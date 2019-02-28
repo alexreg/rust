@@ -426,8 +426,8 @@ impl<'cg, 'cx, 'tcx, 'gcx> InvalidationGenerator<'cx, 'tcx, 'gcx> {
                     // reservation (or even prior activating uses of same
                     // borrow); so don't check if they interfere.
                     //
-                    // NOTE: *reservations* do conflict with themselves;
-                    // thus aren't injecting unsoundenss w/ this check.)
+                    // N.B., *reservations* do conflict with themselves,
+                    // thus aren't injecting unsoundenss with this check.
                     (Activation(_, activating), _) if activating == borrow_index => {
                         // Activating a borrow doesn't generate any invalidations, since we
                         // have already taken the reservation.

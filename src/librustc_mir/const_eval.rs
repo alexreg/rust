@@ -402,7 +402,7 @@ impl<'a, 'mir, 'tcx> interpret::Machine<'a, 'mir, 'tcx>
         alloc: &'b Allocation,
         _memory_extra: &(),
     ) -> Cow<'b, Allocation<Self::PointerTag>> {
-        // We do not use a tag so we can just cheaply forward the reference
+        // We do not use a tag so that we can just cheaply forward the reference.
         Cow::Borrowed(alloc)
     }
 

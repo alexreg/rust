@@ -120,7 +120,7 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             self.param_env,
         );
 
-        // There are no add'l implied bounds when checking a
+        // There are no additional implied bounds when checking a
         // standalone expr (e.g., the `E` in a type like `[u32; E]`).
         rcx.outlives_environment.save_implied_bounds(id);
 
@@ -300,7 +300,8 @@ impl<'a, 'gcx, 'tcx> RegionCtxt<'a, 'gcx, 'tcx> {
     /// `intravisit::Visitor` impl below.)
     fn visit_fn_body(
         &mut self,
-        id: hir::HirId, // the id of the fn itself
+        // The ID of the fn itself.
+        id: hir::HirId,
         body: &'gcx hir::Body,
         span: Span,
     ) {

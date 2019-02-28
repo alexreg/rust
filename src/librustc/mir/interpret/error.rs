@@ -48,7 +48,8 @@ pub struct ConstEvalErr<'tcx> {
 
 #[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct FrameInfo<'tcx> {
-    pub call_site: Span, // this span is in the caller!
+    /// This span is in the caller.
+    pub call_site: Span,
     pub instance: ty::Instance<'tcx>,
     pub lint_root: Option<hir::HirId>,
 }

@@ -1,5 +1,4 @@
-//
-// Unused import checking
+// Checks for unused imports.
 //
 // Although this is mostly a lint pass, it lives in here because it depends on
 // resolve data structures and because it finalises the privacy information for

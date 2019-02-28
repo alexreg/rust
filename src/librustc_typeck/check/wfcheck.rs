@@ -298,7 +298,8 @@ fn check_type_defn<'a, 'tcx, F>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
 
         check_where_clauses(tcx, fcx, item.span, def_id, None);
 
-        vec![] // no implied bounds in a struct def'n
+        // No implied bounds in a struct definiton.
+        vec![]
     });
 }
 
@@ -365,7 +366,8 @@ fn check_item_type<'a, 'tcx>(
             );
         }
 
-        vec![] // no implied bounds in a const etc
+        // No implied bounds in a const, etc.
+        vec![]
     });
 }
 

@@ -483,8 +483,7 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
 
             self.sess.profiler(|p| p.start_query(Q::NAME, Q::CATEGORY));
 
-            // The dep-graph for this computation is already in
-            // place
+            // The dep-graph for this computation is already in place.
             let result = self.dep_graph.with_ignore(|| {
                 Q::compute(self, key)
             });
@@ -1188,11 +1187,10 @@ pub fn force_from_dep_node<'a, 'gcx, 'lcx>(tcx: TyCtxt<'a, 'gcx, 'lcx>,
         DepKind::HirBody |
         DepKind::Hir |
 
-        // This are anonymous nodes
+        // These are anonymous nodes.
         DepKind::TraitSelect |
 
-        // We don't have enough information to reconstruct the query key of
-        // these
+        // We don't have enough information to reconstruct the query key of these.
         DepKind::IsCopy |
         DepKind::IsSized |
         DepKind::IsFreeze |

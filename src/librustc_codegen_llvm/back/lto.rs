@@ -87,7 +87,7 @@ fn prepare_lto(cgcx: &CodegenContext<LlvmCodegenBackend>,
             return Err(FatalError)
         }
 
-        // Make sure we actually can run LTO
+        // Make sure we can actually run LTO.
         for crate_type in cgcx.crate_types.iter() {
             if !crate_type_allows_lto(*crate_type) {
                 let e = diag_handler.fatal("lto can only be run for executables, cdylibs and \
@@ -154,7 +154,7 @@ pub(crate) fn run_fat(cgcx: &CodegenContext<LlvmCodegenBackend>,
 
 /// Performs thin LTO by performing necessary global analysis and returning two
 /// lists, one of the modules that need optimization and another for modules that
-/// can simply be copied over from the incr. comp. cache.
+/// can simply be copied over from the incrimental compilation cache.
 pub(crate) fn run_thin(cgcx: &CodegenContext<LlvmCodegenBackend>,
                        modules: Vec<(String, ThinBuffer)>,
                        cached_modules: Vec<(SerializedModule<ModuleBuffer>, WorkProduct)>,

@@ -1,6 +1,8 @@
-//! Code related to match expressions. These are sufficiently complex to
-//! warrant their own module and submodules. :) This main module includes the
-//! high-level algorithm, the submodules contain the details.
+//! Match expressions.
+//!
+//! This logic is sufficiently complex to warrant its own module and submodules.
+//! This main module includes the high-level algorithm, while the submodules contain
+//! the details.
 //!
 //! This also includes code for pattern bindings in `let` statements and
 //! function parameters.
@@ -474,8 +476,9 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
     /// Declares the bindings of the given patterns and returns the visibility
     /// scope for the bindings in these patterns, if such a scope had to be
-    /// created. NOTE: Declaring the bindings should always be done in their
-    /// drop scope.
+    /// created.
+    ///
+    /// NOTE: declaring the bindings should always be done in their drop scope.
     pub fn declare_bindings(
         &mut self,
         mut visibility_scope: Option<SourceScope>,
@@ -689,7 +692,7 @@ pub struct Candidate<'pat, 'tcx: 'pat> {
     /// The block to which to branch if the guard is evaluated as false.
     otherwise_block: Option<BasicBlock>,
 
-    // ...and the blocks for add false edges between candidates
+    // The blocks for adding false edges between candidates.
     pre_binding_block: BasicBlock,
     next_candidate_pre_binding_block: BasicBlock,
 }
@@ -1036,14 +1039,14 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// and so we know that all remaining match pairs require some
     /// sort of test. To decide what test to do, we take the highest
     /// priority candidate (last one in the list) and extract the
-    /// first match-pair from the list. From this we decide what kind
+    /// first match pair from the list. From this we decide what kind
     /// of test is needed using `test`, defined in the `test` module.
     ///
     /// *Note:* taking the first match pair is somewhat arbitrary, and
     /// we might do better here by choosing more carefully what to
     /// test.
     ///
-    /// For example, consider the following possible match-pairs:
+    /// For example, consider the following possible match pairs:
     ///
     /// 1. `x @ Some(P)` -- we will do a `Switch` to decide what variant `x` has
     /// 2. `x @ 22` -- we will do a `SwitchInt`
@@ -1057,7 +1060,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// candidates. For example, if we are testing the current
     /// variant of `x.0`, and we have a candidate `{x.0 @ Some(v), x.1
     /// @ 22}`, then we would have a resulting candidate of `{(x.0 as
-    /// Some).0 @ v, x.1 @ 22}`. Note that the first match-pair is now
+    /// Some).0 @ v, x.1 @ 22}`. Note that the first match pair is now
     /// simpler (and, in fact, irrefutable).
     ///
     /// But there may also be candidates that the test just doesn't
@@ -1114,7 +1117,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     /// }
     /// ```
     ///
-    /// Here we first test the match-pair `x @ "foo"`, which is an `Eq` test.
+    /// Here we first test the match pair `x @ "foo"`, which is an `Eq` test.
     ///
     /// It might seem that we would end up with 2 disjoint candidate
     /// sets, consisting of the first candidate or the other 3, but our

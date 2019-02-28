@@ -98,8 +98,8 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
 
         // simplify_type(.., false) basically replaces type parameters and
         // projections with infer-variables. This is, of course, done on
-        // the impl trait-ref when it is instantiated, but not on the
-        // predicate trait-ref which is passed here.
+        // the impl trait ref when it is instantiated, but not on the
+        // predicate trait ref which is passed here.
         //
         // for example, if we match `S: Copy` against an impl like
         // `impl<T:Copy> Copy for Option<T>`, we replace the type variable

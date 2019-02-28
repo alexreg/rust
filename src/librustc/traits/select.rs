@@ -859,7 +859,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         //     impl<T:Eq> Eq for Vec<T>
         //
         // and a trait reference like `$0 : Eq` where `$0` is an
-        // unbound variable. When we evaluate this trait-reference, we
+        // unbound variable. When we evaluate this trait reference, we
         // will unify `$0` with `Vec<$1>` (for some fresh variable
         // `$1`), on the condition that `$1 : Eq`. We will then wind
         // up with many candidates (since that are other `Eq` impls
@@ -1057,8 +1057,8 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         dep_node: DepNodeIndex,
         result: EvaluationResult,
     ) {
-        // Avoid caching results that depend on more than just the trait-ref
-        // - the stack can create recursion.
+        // Avoid caching results that depend on more than just the trait ref;
+        // the stack can create recursion.
         if result.is_stack_dependent() {
             return;
         }
@@ -1151,7 +1151,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         self.check_recursion_limit(&stack.obligation, &stack.obligation)?;
 
 
-        // Check the cache. Note that we freshen the trait-ref
+        // Check the cache. Note that we freshen the trait ref
         // separately rather than using `stack.fresh_trait_ref` --
         // this is because we want the unbound variables to be
         // replaced with fresh types starting from index 0.
@@ -1492,7 +1492,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
     /// since it was usually produced directly from a DefId. However,
     /// certain cases (currently only librustdoc's blanket impl finder),
     /// a ParamEnv may be explicitly constructed with inference types.
-    /// When this is the case, we do *not* want to cache the resulting selection
+    /// When this is the case, we do **not** want to cache the resulting selection
     /// candidate. This is due to the fact that it might not always be possible
     /// to equate the obligation's trait ref and the candidate's trait ref,
     /// if more constraints end up getting added to an inference variable.
@@ -1655,7 +1655,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         debug!("assemble_candidates_for_projected_tys({:?})", obligation);
 
         // before we go into the whole placeholder thing, just
-        // quickly check if the self-type is a projection at all.
+        // quickly check if the self type is a projection at all.
         match obligation.predicate.skip_binder().trait_ref.self_ty().sty {
             ty::Projection(_) | ty::Opaque(..) => {}
             ty::Infer(ty::TyVar(_)) => {
@@ -2102,7 +2102,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
                 poly_trait_ref
             );
 
-            // Count only those upcast versions that match the trait-ref
+            // Count only those upcast versions that match the trait ref
             // we are looking for. Specifically, do not only check for the
             // correct trait, but also the correct type parameters.
             // For example, we may be trying to upcast `Foo` to `Bar<i32>`,
@@ -2966,9 +2966,9 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
             impl_def_id, impl_obligations
         );
 
-        // Because of RFC447, the impl-trait-ref and obligations
+        // Because of RFC447, the impl trait ref and obligations
         // are sufficient to determine the impl substs, without
-        // relying on projections in the impl-trait-ref.
+        // relying on projections in the impl trait ref.
         //
         // E.g., `impl<U: Tr, V: Iterator<Item = U>> Foo<<U as Tr>::T> for V`.
         impl_obligations.append(&mut substs.obligations);
@@ -3713,7 +3713,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         );
 
         // (1) Feels icky to skip the binder here, but OTOH we know
-        // that the self-type is an unboxed closure type and hence is
+        // that the self type is an unboxed closure type and hence is
         // in fact unparameterized (or at least does not reference any
         // regions bound in the obligation). Still probably some
         // refactoring could make this nicer.
@@ -3736,7 +3736,7 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         let gen_sig = substs.poly_sig(closure_def_id, self.tcx());
 
         // (1) Feels icky to skip the binder here, but OTOH we know
-        // that the self-type is an generator type and hence is
+        // that the self type is an generator type and hence is
         // in fact unparameterized (or at least does not reference any
         // regions bound in the obligation). Still probably some
         // refactoring could make this nicer.

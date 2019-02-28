@@ -776,8 +776,7 @@ impl<'a> LoweringContext<'a> {
                     DefPathData::LifetimeParam(str_name),
                     DefIndexAddressSpace::High,
                     Mark::root(),
-                    span,
-                );
+                    span);
 
                 hir::GenericParam {
                     hir_id,
@@ -1547,8 +1546,7 @@ impl<'a> LoweringContext<'a> {
                         DefPathData::LifetimeParam(name.ident().as_interned_str()),
                         DefIndexAddressSpace::High,
                         Mark::root(),
-                        lifetime.span,
-                    );
+                        lifetime.span);
 
                     let (name, kind) = match name {
                         hir::LifetimeName::Underscore => (
@@ -1893,11 +1891,11 @@ impl<'a> LoweringContext<'a> {
                 let no_ty_args = generic_args.args.len() == expected_lifetimes;
                 let no_bindings = generic_args.bindings.is_empty();
                 let (incl_angl_brckt, insertion_span, suggestion) = if no_ty_args && no_bindings {
-                    // If there are no (non-implicit) generic args or associated-type
+                    // If there are no (non-implicit) generic args or associated type
                     // bindings, our suggestion includes the angle brackets.
                     (true, path_span.shrink_to_hi(), format!("<{}>", anon_lt_suggestion))
                 } else {
-                    // Otherwise—sorry, this is kind of gross—we need to infer the
+                    // Otherwise (sorry, this is kind of gross) we need to infer the
                     // place to splice in the `'_, ` from the generics that do exist.
                     let first_generic_span = first_generic_span
                         .expect("already checked that type args or bindings exist");
@@ -1947,12 +1945,15 @@ impl<'a> LoweringContext<'a> {
             ast::GenericArg::Type(_) => true,
             _ => false,
         });
-        (hir::GenericArgs {
-            args: args.iter().map(|a| self.lower_generic_arg(a, itctx.reborrow())).collect(),
-            bindings: bindings.iter().map(|b| self.lower_ty_binding(b, itctx.reborrow())).collect(),
-            parenthesized: false,
-        },
-        !has_types && param_mode == ParamMode::Optional)
+        (
+            hir::GenericArgs {
+                args: args.iter().map(|a| self.lower_generic_arg(a, itctx.reborrow())).collect(),
+                bindings: constraints.iter().map(
+                    |b| self.lower_assoc_ty_constraint(b, itctx.reborrow())).collect(),
+                parenthesized: false,
+            },
+            !has_types && param_mode == ParamMode::Optional
+        )
     }
 
     fn lower_parenthesized_parameter_data(
@@ -2168,7 +2169,7 @@ impl<'a> LoweringContext<'a> {
             // Whether to count elided lifetimes.
             // Disabled inside of `Fn` or `fn` syntax.
             collect_elided_lifetimes: bool,
-            // The lifetime found.
+            // The found lifetime.
             // Multiple different or elided lifetimes cannot appear in async fn for now.
             output_lifetime: Option<(hir::LifetimeName, Span)>,
         }

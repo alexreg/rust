@@ -458,7 +458,7 @@ fn convert_item<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, item_id: ast::NodeId) {
             }
         }
 
-        // Desugared from `impl Trait` -> visited by the function's return type
+        // Desugared from `impl Trait`, so visited by the function's return type.
         hir::ItemKind::Existential(hir::ExistTy {
             impl_trait_fn: Some(_),
             ..

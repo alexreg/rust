@@ -593,11 +593,11 @@ newtype_index! {
 /// Classifies locals into categories. See `Mir::local_kind`.
 #[derive(PartialEq, Eq, Debug)]
 pub enum LocalKind {
-    /// User-declared variable binding
+    /// A user-declared variable binding.
     Var,
-    /// Compiler-introduced temporary
+    /// A compiler-introduced temporary.
     Temp,
-    /// Function argument
+    /// A function argument.
     Arg,
     /// The `Location` of the function's return value.
     ReturnPointer,
@@ -621,17 +621,17 @@ pub struct VarBindingForm<'tcx> {
     /// (b) it gives a way to separate this case from the remaining cases
     ///     for diagnostics.
     pub opt_match_place: Option<(Option<Place<'tcx>>, Span)>,
-    /// Span of the pattern in which this variable was bound.
+    /// The span of the pattern in which this variable was bound.
     pub pat_span: Span,
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug, RustcEncodable, RustcDecodable)]
 pub enum BindingForm<'tcx> {
-    /// This is a binding for a non-`self` binding, or a `self` that has an explicit type.
+    /// A binding for a non-`self` binding, or a `self` that has an explicit type.
     Var(VarBindingForm<'tcx>),
-    /// Binding for a `self`/`&self`/`&mut self` binding where the type is implicit.
+    /// A binding for a `self`/`&self`/`&mut self` binding where the type is implicit.
     ImplicitSelf(ImplicitSelfKind),
-    /// Reference used in a guard expression to ensure immutability.
+    /// A reference used in a guard expression to ensure immutability.
     RefForGuard,
 }
 

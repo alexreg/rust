@@ -97,7 +97,7 @@ pub struct TypeMap<'ll, 'tcx> {
     unique_id_interner: Interner,
     // A map from `UniqueTypeId` to debuginfo metadata for that type. This is a one-to-one mapping.
     unique_id_to_metadata: FxHashMap<UniqueTypeId, &'ll DIType>,
-    // A map from types to debuginfo metadata. This is a N:1 mapping.
+    // A map from types to debuginfo metadata. This is a many-to-one mapping.
     type_to_metadata: FxHashMap<Ty<'tcx>, &'ll DIType>,
     // A map from types to `UniqueTypeId`. This is a many-to-one mapping.
     type_to_unique_id: FxHashMap<Ty<'tcx>, UniqueTypeId>

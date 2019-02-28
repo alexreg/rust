@@ -1832,7 +1832,7 @@ impl<'a> State<'a> {
                         self.s.word(" else ")?;
                         self.print_block(b)
                     }
-                    // BLEAH, constraints would be great here
+                    // Constraints would be great here!
                     _ => {
                         panic!("print_if saw if with weird alternative");
                     }

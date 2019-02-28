@@ -197,7 +197,8 @@ pub enum ObligationCauseCode<'tcx> {
     /// `[T,..n] --> T` must be `Copy`.
     RepeatVec,
 
-    /// Types of fields (other than the last, except for packed structs) in a struct must be sized.
+    /// Types of fields (other than the last, except for packed structs) in a struct must be
+    /// `Sized`.
     FieldSized { adt_kind: AdtKind, last: bool },
 
     /// Constant expressions must be `Sized`.
@@ -784,15 +785,16 @@ fn do_normalize_predicates<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         match tcx.lift_to_global(&predicates) {
             Some(predicates) => Ok(predicates),
             None => {
-                // FIXME: shouldn't we, you know, actually report an error here? or an ICE?
+                // FIXME: shouldn't we actually report an error/ICE here?
                 Err(ErrorReported)
             }
         }
     })
 }
 
-// FIXME: this is gonna need to be removed ...
 /// Normalizes the parameter environment, reporting errors if they occur.
+//
+// FIXME: this is gonna need to be removed.
 pub fn normalize_param_env_or_error<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                                               region_context: DefId,
                                               unnormalized_env: ty::ParamEnv<'tcx>,

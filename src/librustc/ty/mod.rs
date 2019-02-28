@@ -823,7 +823,7 @@ impl ty::EarlyBoundRegion {
         ty::BoundRegion::BrNamed(self.def_id, self.name)
     }
 
-    /// Does this early bound region have a name? Early bound regions normally
+    /// Does this early-bound region have a name? Early-bound regions normally
     /// always have names except when using anonymous lifetimes (`'_`).
     pub fn has_name(&self) -> bool {
         self.name != keywords::UnderscoreLifetime.name().as_interned_str()
@@ -1140,9 +1140,9 @@ impl<'a, 'gcx, 'tcx> Predicate<'tcx> {
         // - We start out with `for<'x> T: Foo1<'x>`. In this case, `'x`
         //   has a De Bruijn index of 1. We want to produce `for<'x,'b> T: Bar1<'x,'b>`,
         //   where both `'x` and `'b` would have a DB index of 1.
-        //   The substitution from the input trait-ref is therefore going to be
+        //   The substitution from the input trait ref is therefore going to be
         //   `'a => 'x` (where `'x` has a DB index of 1).
-        // - The super-trait-ref is `for<'b> Bar1<'a,'b>`, where `'a` is an
+        // - The super-trait ref is `for<'b> Bar1<'a, 'b>`, where `'a` is an
         //   early-bound parameter and `'b' is a late-bound parameter with a
         //   DB index of 1.
         // - If we replace `'a` with `'x` from the input, it too will have
@@ -1958,7 +1958,7 @@ bitflags! {
         const IS_C               = 1 << 0;
         const IS_SIMD            = 1 << 1;
         const IS_TRANSPARENT     = 1 << 2;
-        // Internal only for now. If true, don't reorder fields.
+        // Internal only for now. If set, then don't reorder fields.
         const IS_LINEAR          = 1 << 3;
 
         // Any of these flags being set prevent field reordering optimisation.
@@ -2430,7 +2430,7 @@ impl<'a, 'gcx, 'tcx> AdtDef {
             UnnormalizedProjection(..) => bug!("only used with chalk-engine"),
 
             Param(..) => {
-                // perf hack: if there is a `T: Sized` bound, then
+                // Performance hack: if there is a `T: Sized` bound, then
                 // we know that `T` is Sized and do not need to check
                 // it on the impl.
 
@@ -2644,8 +2644,8 @@ pub enum ImplOverlapKind {
     ///
     /// 1. The trait must indeed be a marker-like trait (i.e., no items), and must be
     /// positive impls.
-    /// 2. The trait-ref of both impls must be equal.
-    /// 3. The trait-ref of both impls must be a trait object type consisting only of
+    /// 2. The trait ref of both impls must be equal.
+    /// 3. The trait ref of both impls must be a trait object type consisting only of
     /// marker traits.
     /// 4. Neither of the impls can have any `where` clauses.
     ///
@@ -3150,7 +3150,7 @@ pub fn is_impl_trait_defn(tcx: TyCtxt<'_, '_, '_>, def_id: DefId) -> Option<DefI
     None
 }
 
-/// See `ParamEnv` struct definition for details.
+/// See the [`ParamEnv`] struct definition for details.
 fn param_env<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                        def_id: DefId)
                        -> ParamEnv<'tcx>
@@ -3235,7 +3235,7 @@ fn issue33140_self_ty<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         bug!("issue33140_self_ty called on inherent impl {:?}", def_id)
     });
 
-    debug!("issue33140_self_ty({:?}), trait-ref={:?}", def_id, trait_ref);
+    debug!("issue33140_self_ty({:?}), trait_ref={:?}", def_id, trait_ref);
 
     let is_marker_like =
         tcx.impl_polarity(def_id) == hir::ImplPolarity::Positive &&
@@ -3309,7 +3309,7 @@ pub struct CrateInherentImpls {
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, RustcEncodable, RustcDecodable)]
 pub struct SymbolName {
-    // FIXME: we don't rely on interning or equality here - better have
+    // FIXME: we don't rely on interning or equality here -- better have
     // this be a `&'tcx str`.
     pub name: InternedString
 }

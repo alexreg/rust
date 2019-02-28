@@ -444,7 +444,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
     ///
     /// However, in some cases, the test may just not be relevant to candidate.
     /// For example, suppose we are testing whether `foo.x == 22`, but in one
-    /// match arm we have `Foo { x: _, ... }`... in that case, the test for
+    /// match arm we have `Foo { x: _, ... }` -- in that case, the test for
     /// what value `x` has has no particular relevance to this candidate. In
     /// such cases, this function just returns None without doing anything.
     /// This is used by the overall `match_candidates` algorithm to structure

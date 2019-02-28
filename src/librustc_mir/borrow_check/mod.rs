@@ -94,9 +94,9 @@ fn mir_borrowck<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId) -> BorrowC
         // }
         // ```
         // The problem here is that `(_0.0: Q) = move _1;` is valid only if `Q` is
-        // of statically known size, which is not known to be true because of the
+        // of statically-known size, which is not known to be true because of the
         // `Q: ?Sized` constraint. However, it is true because the constructor can be
-        // called only when `Q` is of statically known size.
+        // called only when `Q` is of statically-known size.
         return_early = true;
     }
 

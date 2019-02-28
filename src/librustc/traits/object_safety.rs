@@ -341,7 +341,8 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             if !self.receiver_is_dispatchable(method, receiver_ty) {
                 return Some(MethodViolationCode::UndispatchableReceiver);
             } else {
-                // sanity check to make sure the receiver actually has the layout of a pointer
+                // Perform sanity check to make sure the receiver actually has the layout of a
+                // pointer.
 
                 use crate::ty::layout::Abi;
 
@@ -508,6 +509,8 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
     ///     if (Self: Unsize<U>) {
     ///         Receiver: DispatchFromDyn<Receiver[Self => U]>
     ///     }
+    /// }
+    /// ```
     ///
     /// For `self: &'a mut Self`, this means `&'a mut Self: DispatchFromDyn<&'a mut U>`.
     /// For `self: Rc<Self>`, this means `Rc<Self>: DispatchFromDyn<Rc<U>>`.

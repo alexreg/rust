@@ -593,7 +593,7 @@ fn inner_parse_loop<'root, 'tt>(
                 // We need to match a metavar with a valid ident... call out to the black-box
                 // parser by adding an item to `bb_items`.
                 TokenTree::MetaVarDecl(_, _, id) => {
-                    // Built-in nonterminals never start with these tokens,
+                    // Built-in non-terminals never start with these tokens,
                     // so we can eliminate them from consideration.
                     if may_begin_with(&*id.as_str(), token) {
                         bb_items.push(item);
@@ -732,7 +732,7 @@ pub fn parse(
         // unnecessary implicit clone later in `Rc::make_mut`.
         drop(eof_items);
 
-        // Another possibility is that we need to call out to parse some rust nonterminal
+        // Another possibility is that we need to call out to parse some rust non-terminal.
         // (black-box) parser. However, if there is not EXACTLY ONE of these, something is wrong.
         if (!bb_items.is_empty() && !next_items.is_empty()) || bb_items.len() > 1 {
             let nts = bb_items
@@ -772,7 +772,7 @@ pub fn parse(
             parser.bump();
         }
         // Finally, we have the case where we need to call the black-box parser to get some
-        // nonterminal.
+        // non-terminal.
         else {
             assert_eq!(bb_items.len(), 1);
 

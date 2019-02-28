@@ -113,7 +113,7 @@ struct RegionDefinition<'tcx> {
 
 /// N.B., the variants in `Cause` are intentionally ordered. Lower
 /// values are preferred when it comes to error messages. Do not
-/// reorder willy nilly.
+/// reorder willy-nilly.
 #[derive(Copy, Clone, Debug, PartialOrd, Ord, PartialEq, Eq)]
 pub(crate) enum Cause {
     /// The point inserted because the `Local` was live at the given `Location`.

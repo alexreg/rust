@@ -609,7 +609,7 @@ impl<'a, 'tcx> AutoTraitFinder<'a, 'tcx> {
                             finished_map.insert(v1, r1);
                         }
                         (&RegionTarget::Region(_), &RegionTarget::RegionVid(_)) => {
-                            // Do nothing - we don't care about regions that are smaller than vids
+                            // Do nothing; we don't care about regions that are smaller than vids.
                         }
                         (&RegionTarget::RegionVid(_), &RegionTarget::RegionVid(_)) => {
                             if let Entry::Occupied(v) = vid_map.entry(*smaller) {

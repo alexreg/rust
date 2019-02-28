@@ -162,10 +162,6 @@ impl<'a, 'tcx: 'a, V: CodegenObject> PlaceRef<'tcx, V> {
         // anyway.
         //
         // To demonstrate:
-        //   struct Foo<T: ?Sized> {
-        //      x: u16,
-        //      y: T
-        //   }
         //
         // The type Foo<Foo<Trait>> is represented in LLVM as { u16, { u16, u8 }}, meaning that
         // the `y` field has 16-bit alignment.

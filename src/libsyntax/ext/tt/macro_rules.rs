@@ -134,7 +134,8 @@ fn generic_extension<'cx>(cx: &'cx mut ExtCtxt<'_>,
     let mut best_fail_tok = None;
     let mut best_fail_text = None;
 
-    for (i, lhs) in lhses.iter().enumerate() { // try each arm's matchers
+    // Try each arm's matchers.
+    for (i, lhs) in lhses.iter().enumerate() {
         let lhs_tt = match *lhs {
             quoted::TokenTree::Delimited(_, ref delim) => &delim.tts[..],
             _ => cx.span_bug(sp, "malformed macro lhs")
@@ -213,7 +214,8 @@ fn generic_extension<'cx>(cx: &'cx mut ExtCtxt<'_>,
 
     // Check whether there's a missing comma in this macro call, like `println!("{}" a);`
     if let Some((arg, comma_span)) = arg.add_comma() {
-        for lhs in lhses { // try each arm's matchers
+        // Try each arm's matchers.
+        for lhs in lhses {
             let lhs_tt = match *lhs {
                 quoted::TokenTree::Delimited(_, ref delim) => &delim.tts[..],
                 _ => continue,
@@ -241,7 +243,8 @@ fn generic_extension<'cx>(cx: &'cx mut ExtCtxt<'_>,
 }
 
 // Note that macro-by-example's input is also matched against a token tree:
-//                   $( $lhs:tt => $rhs:tt );+
+//
+//     $( $lhs:tt => $rhs:tt );+
 //
 // Holy self-referential!
 
@@ -901,7 +904,7 @@ fn check_matcher_core(sess: &ParseSess,
             }
         }
 
-        // (`suffix_first` guaranteed initialized once reaching here.)
+        // (`suffix_first` is guaranteed initialized once we reach here.)
 
         // `last` now holds the complete set of NT tokens that could
         // end the sequence before `SUFFIX`. Check that every one works with `SUFFIX`.
@@ -974,7 +977,7 @@ fn token_can_be_followed_by_any(tok: &quoted::TokenTree) -> bool {
     if let quoted::TokenTree::MetaVarDecl(_, _, frag_spec) = *tok {
         frag_can_be_followed_by_any(&frag_spec.as_str())
     } else {
-        // (Non NT's can always be followed by anthing in matchers.)
+        // Non-NT's can always be followed by anthing in matchers.
         true
     }
 }
@@ -1016,7 +1019,8 @@ enum IsInFollow {
 /// we expanded `expr` to include a new binary operator, we might
 /// break macros that were relying on that binary operator as a
 /// separator.
-// when changing this do not forget to update doc/book/macros.md!
+//
+// NOTE: when changing this, do not forget to update `doc/book/macros.md`.
 fn is_in_follow(tok: &quoted::TokenTree, frag: &str) -> IsInFollow {
     use quoted::TokenTree;
 

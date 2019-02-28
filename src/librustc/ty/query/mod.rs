@@ -178,7 +178,7 @@ define_queries! { <'tcx>
 
         /// Returns `true` if calls to the function may be promoted.
         ///
-        /// This is either because the function is e.g., a tuple-struct or tuple-variant
+        /// This is either because the function is, e.g., a tuple struct or tuple variant
         /// constructor, or because it has the `#[rustc_promotable]` attribute. The attribute should
         /// be removed in the future in favour of some form of check which figures out whether the
         /// function does not inspect the bits of any of its arguments (so is essentially just a

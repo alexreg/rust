@@ -288,7 +288,7 @@ fn cycle_check<'tcx>(query: Lrc<QueryJob<'tcx>>,
         }
     }
 
-    // Query marked as visited is added it to the stack
+    // Add the query marked as visited to the stack.
     stack.push((span, query.clone()));
 
     // Visit all the waiters.

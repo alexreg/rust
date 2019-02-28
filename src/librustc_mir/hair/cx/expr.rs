@@ -803,7 +803,7 @@ fn user_substs_applied_to_def(
     debug!("user_substs_applied_to_def: def={:?}", def);
     let user_provided_type = match def {
         // A reference to something callable -- e.g., a fn, method, or
-        // a tuple-struct or tuple-variant. This has the type of a
+        // a tuple struct or tuple variant. This has the type of a
         // `Fn` but with the user-given substitutions.
         Def::Fn(_) |
         Def::Method(_) |

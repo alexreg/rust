@@ -89,8 +89,10 @@ pub enum TokenTree {
     /// E.g., `$var:expr`. This is only used in the left-hand side of MBE macros.
     MetaVarDecl(
         Span,
-        ast::Ident, /* name to bind */
-        ast::Ident, /* kind of nonterminal */
+        /// The name to bind.
+        ast::Ident,
+        /// The kind of non-terminal.
+        ast::Ident,
     ),
 }
 

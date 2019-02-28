@@ -560,7 +560,7 @@ impl<'o, 'gcx: 'tcx, 'tcx> dyn AstConv<'gcx, 'tcx> + 'o {
         let tcx = self.tcx();
         let generic_params = tcx.generics_of(def_id);
 
-        // If a self-type was declared, one should be provided.
+        // If a self type was declared, one should be provided.
         assert_eq!(generic_params.has_self, self_ty.is_some());
 
         let has_self = generic_params.has_self;
@@ -691,7 +691,7 @@ impl<'o, 'gcx: 'tcx, 'tcx> dyn AstConv<'gcx, 'tcx> + 'o {
                                         trait_ref.path.segments.last().unwrap())
     }
 
-    /// The given trait-ref must actually be a trait.
+    /// The given trait ref must actually be a trait.
     pub(super) fn instantiate_poly_trait_ref_inner(&self,
         trait_ref: &hir::TraitRef,
         self_ty: Ty<'tcx>,
@@ -829,7 +829,7 @@ impl<'o, 'gcx: 'tcx, 'tcx> dyn AstConv<'gcx, 'tcx> + 'o {
             // We want to produce `<B as SuperTrait<int>>::T == foo`.
 
             // Find any late-bound regions declared in `ty` that are not
-            // declared in the trait-ref. These are not wellformed.
+            // declared in the trait ref. These are not well-formed.
             //
             // Example:
             //
@@ -959,7 +959,7 @@ impl<'o, 'gcx: 'tcx, 'tcx> dyn AstConv<'gcx, 'tcx> + 'o {
         debug!("principal: {:?}", principal);
 
         for trait_bound in trait_bounds[1..].iter() {
-            // sanity check for non-principal trait bounds
+            // Perform sanity check for non-principal trait bounds.
             self.instantiate_poly_trait_ref(trait_bound,
                                             dummy_self,
                                             &mut vec![]);

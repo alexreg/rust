@@ -366,7 +366,7 @@ pub fn check_crate<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>)
 }
 
 /// A quasi-deprecated helper used in rustdoc and save-analysis to get
-/// the type from a HIR node.
+/// the type from an HIR node.
 pub fn hir_ty_to_ty<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>, hir_ty: &hir::Ty) -> Ty<'tcx> {
     // In case there are any projections etc, find the "environment"
     // `DefId` that will be used to determine the traits/predicates in

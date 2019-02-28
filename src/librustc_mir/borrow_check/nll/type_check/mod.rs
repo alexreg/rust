@@ -456,7 +456,7 @@ impl<'a, 'b, 'gcx, 'tcx> TypeVerifier<'a, 'b, 'gcx, 'tcx> {
             },
             Place::Promoted(box (_index, sty)) => {
                 let sty = self.sanitize_type(place, sty);
-                // FIXME -- promoted MIR return types reference
+                // FIXME: promoted MIR return types reference
                 // various "free regions" (e.g., scopes and things)
                 // that they ought not to do. We have to figure out
                 // how best to handle that -- probably we want treat

@@ -487,7 +487,7 @@ impl<'a, 'mir, 'tcx: 'mir, M: Machine<'a, 'mir, 'tcx>> EvalContext<'a, 'mir, 'tc
             // Return place is handled specially by the `eval_place` functions, and the
             // entry in `locals` should never be used. Make it dead, to be sure.
             locals[mir::RETURN_PLACE].state = LocalValue::Dead;
-            // Now mark those locals as dead that we do not want to initialize
+            // Now mark those locals that we do not want to initialize as dead.
             match self.tcx.describe_def(instance.def_id()) {
                 // Statics and constants don't have `Storage*` statements; no need to look for them.
                 Some(Def::Static(..)) | Some(Def::Const(..)) | Some(Def::AssociatedConst(..)) => {},

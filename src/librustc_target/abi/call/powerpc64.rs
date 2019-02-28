@@ -1,5 +1,4 @@
-// FIXME:
-// Alignment of 128 bit types is not currently handled, this will
+// FIXME: alignment of 128-bit types is not currently handled -- this will
 // need to be fixed when PowerPC vector support is added.
 
 use crate::abi::call::{FnType, ArgType, Reg, RegKind, Uniform};
