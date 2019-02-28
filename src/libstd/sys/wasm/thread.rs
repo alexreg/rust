@@ -21,7 +21,7 @@ impl Thread {
     }
 
     pub fn set_name(_name: &CStr) {
-        // nope
+        // Do nothing.
     }
 
     #[cfg(not(target_feature = "atomics"))]

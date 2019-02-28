@@ -3575,7 +3575,7 @@ assert_eq!(7", stringify!($SelfT), ".rem_euclid(4), 3); // or any other integer 
         }
 
         doc_comment! {
-            concat!("Returns `true` if and only if `self == 2^k` for some `k`.
+            concat!("Returns `true` if `self == 2^k` for some `k`.
 
 # Examples
 

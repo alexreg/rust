@@ -1,7 +1,6 @@
 use std::str::pattern::*;
 
-// This macro makes it easier to write
-// tests that do a series of iterations
+// This macro makes it easier to write tests that do a series of iterations.
 macro_rules! search_asserts {
     ($haystack:expr, $needle:expr, $testname:expr, [$($func:ident),*], $result:expr) => {
         let mut searcher = $needle.into_searcher($haystack);
@@ -254,8 +253,7 @@ fn test_reverse_search_shared_bytes() {
 
 #[test]
 fn double_ended_regression_test() {
-    // https://github.com/rust-lang/rust/issues/47175
-    // Ensures that double ended searching comes to a convergence
+    // Issue #47175: ensure that double-ended searching comes to a convergence.
     search_asserts!("abcdeabcdeabcde", 'a', "alternating double ended search",
         [next_match,    next_match_back,    next_match,      next_match_back],
         [InRange(0, 1), InRange(10, 11), InRange(5, 6), Done]

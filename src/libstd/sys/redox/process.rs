@@ -363,7 +363,7 @@ impl Command {
                 // FIXME: here we could just reassign `file` directly, if it
                 // wasn't for lexical lifetimes. Remove the whole `let
                 // interpreter = { ... };` hack once NLL lands.
-                // NOTE: Although DO REMEMBER to make sure the interpreter path
+                // NOTE: however, DO REMEMBER to make sure the interpreter path
                 // still lives long enough to reach fexec.
                 Some(interpreter)
             } else {

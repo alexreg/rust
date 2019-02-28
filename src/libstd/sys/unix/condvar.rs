@@ -117,7 +117,7 @@ impl Condvar {
         let max_dur = Duration::from_secs(1000 * 365 * 86400);
 
         if dur > max_dur {
-            // OSX implementation of `pthread_cond_timedwait` is buggy
+            // macOS implementation of `pthread_cond_timedwait` is buggy
             // with super long durations. When duration is greater than
             // 0x100_0000_0000_0000 seconds, `pthread_cond_timedwait`
             // in macOS Sierra return error 316.

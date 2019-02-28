@@ -98,7 +98,7 @@ impl Iterator for Env {
 
                 // Windows allows environment variables to start with an equals
                 // symbol (in any other position, this is the separator between
-                // variable name and value). Since`s` has at least length 1 at
+                // variable name and value). Since `s` has at least length one at
                 // this point (because the empty string terminates the array of
                 // environment variables), we can safely slice.
                 let pos = match s[1..].iter().position(|&u| u == b'=' as u16).map(|p| p + 1) {

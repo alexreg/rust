@@ -3879,7 +3879,8 @@ mod tests {
             // Again, not sure about the following, but I'm assuming `\\.\` should be verbatim.
             tp!("\\\\.\\foo", "..\\bar", "\\\\.\\foo\\..\\bar");
 
-            tp!("\\\\?\\C:", "foo", "\\\\?\\C:\\foo"); // this is a weird one
+            // This is a weird one.
+            tp!("\\\\?\\C:", "foo", "\\\\?\\C:\\foo");
         }
     }
 

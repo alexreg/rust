@@ -1,4 +1,4 @@
-// This is an attempt at an implementation following the ideal
+// This is an attempt at an implementation following the ideal.
 //
 // ```
 // struct BTreeMap<K, V> {
@@ -620,7 +620,7 @@ impl<'a, K: 'a, V: 'a, Type> NodeRef<marker::Immut<'a>, K, V, Type> {
 
     fn into_val_slice(self) -> &'a [V] {
         debug_assert!(!self.is_shared_root());
-        // We cannot be the root, so `as_leaf` is okay
+        // We cannot be the root, so `as_leaf` is okay.
         unsafe {
             slice::from_raw_parts(
                 MaybeUninit::first_ptr(&self.as_leaf().vals),

@@ -168,7 +168,7 @@ impl<T> RawVec<T, Global> {
     ///
     /// # Undefined Behavior
     ///
-    /// The ptr must be allocated (on the system heap), and with the given capacity. The
+    /// The pointer must be allocated (on the system heap), and with the given capacity. The
     /// capacity cannot exceed `isize::MAX` (only a concern on 32-bit systems).
     /// If the pointer and capacity come from a `RawVec`, then this is guaranteed.
     pub unsafe fn from_raw_parts(ptr: *mut T, cap: usize) -> Self {
@@ -537,7 +537,7 @@ impl<T, A: Alloc> RawVec<T, A> {
             // therefore we can safely call `grow_in_place`.
 
             let new_layout = Layout::new::<T>().repeat(new_cap).unwrap().0;
-            // FIXME: may crash and burn on over-reserve
+            // FIXME: may crash and burn on over-reserving.
             alloc_guard(new_layout.size()).unwrap_or_else(|_| capacity_overflow());
             match self.a.grow_in_place(
                 NonNull::from(self.ptr).cast(), old_layout, new_layout.size(),

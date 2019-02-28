@@ -194,8 +194,8 @@ pub trait MetadataExt {
     fn blocks(&self) -> u64;
 }
 
-// Hm, why are there casts here to the returned type, shouldn't the types always
-// be the same? Right you are! Turns out, however, on android at least the types
+// NOTE: why are there casts here to the returned type; shouldn't the types always
+// be the same? Right you are! It turns out, however, on Android at least the types
 // in the raw `stat` structure are not the same as the types being returned. Who
 // knew!
 //

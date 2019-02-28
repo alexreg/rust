@@ -28,8 +28,8 @@ impl Mutex {
         while !self.try_lock() {
             let val = wasm32::i32_atomic_wait(
                 self.ptr(),
-                1,  // we expect our mutex is locked
-                -1, // wait infinitely
+                1,  // We expect our mutex is locked.
+                -1, // Wait infinitely.
             );
             // We should have either woken up (`0`), or got a not-equal due to a
             // race (`1`). We should never time out (`2`).
@@ -40,7 +40,8 @@ impl Mutex {
     pub unsafe fn unlock(&self) {
         let prev = self.locked.swap(0, SeqCst);
         debug_assert_eq!(prev, 1);
-        wasm32::atomic_notify(self.ptr(), 1); // wake up one waiter, if any
+        // Wake up one waiter, if any.
+        wasm32::atomic_notify(self.ptr(), 1);
     }
 
     #[inline]

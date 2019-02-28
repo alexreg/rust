@@ -834,7 +834,7 @@ assert_eq!(n.leading_zeros(), 2);
             }
 
             doc_comment! {
-                concat!("Returns `true` if and only if `self == 2^k` for some `k`.
+                concat!("Returns `true` if `self == 2^k` for some `k`.
 
 # Examples
 

@@ -35,9 +35,12 @@ const MAX_STEALS: isize = 1 << 20;
 
 pub struct Packet<T> {
     queue: mpsc::Queue<T>,
-    cnt: AtomicIsize, // How many items are on this channel
-    steals: UnsafeCell<isize>, // How many times has a port received without blocking?
-    to_wake: AtomicUsize, // SignalToken for wake up
+    // The number of items on this channel.
+    cnt: AtomicIsize,
+    // The number of times a port has received without blocking.
+    steals: UnsafeCell<isize>,
+    // `SignalToken` for wake up.
+    to_wake: AtomicUsize,
 
     // The number of channels which are currently using this packet.
     channels: AtomicUsize,
@@ -344,7 +347,7 @@ impl<T> Packet<T> {
         }
     }
 
-    // Decrement the reference count on a channel. This is called whenever a
+    // Decrements the reference count on a channel. This is called whenever a
     // Chan is dropped and may end up waking up a receiver. It's the receiver's
     // responsibility on the other end to figure out that we've disconnected.
     pub fn drop_chan(&self) {
@@ -403,7 +406,7 @@ impl<T> Packet<T> {
         cnt == DISCONNECTED || cnt - unsafe { *self.steals.get() } > 0
     }
 
-    // increment the count on the channel (used for selection)
+    // Increments the count on the channel (used for selection).
     fn bump(&self, amt: isize) -> isize {
         match self.cnt.fetch_add(amt, Ordering::SeqCst) {
             DISCONNECTED => {

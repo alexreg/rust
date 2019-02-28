@@ -31,20 +31,22 @@ const MAX_STEALS: isize = 5;
 const MAX_STEALS: isize = 1 << 20;
 
 pub struct Packet<T> {
-    // Internal queue for all messages.
+    /// The internal queue for all messages.
     queue: spsc::Queue<Message<T>, ProducerAddition, ConsumerAddition>,
 }
 
 struct ProducerAddition {
-    cnt: AtomicIsize, // How many items are on this channel
-    to_wake: AtomicUsize, // SignalToken for the blocked thread to wake up
-
-    // `true` if the channel has been destroyed.
+    /// The number of items on the channel.
+    cnt: AtomicIsize,
+    /// `SignalToken` for the blocked thread to wake up.
+    to_wake: AtomicUsize,
+    /// `true` if the channel has been destroyed.
     port_dropped: AtomicBool,
 }
 
 struct ConsumerAddition {
-    steals: UnsafeCell<isize>,  // How many times has a port received without blocking?
+    /// The number of times a port received without blocking.
+    steals: UnsafeCell<isize>,
 }
 
 
@@ -66,8 +68,8 @@ pub enum SelectionResult<T> {
     SelUpgraded(SignalToken, Receiver<T>),
 }
 
-// Any message could contain an "upgrade request" to a new shared port, so the
-// internal queue it's a queue of T, but rather Message<T>
+/// Any message could contain an "upgrade request" to a new shared port, so the
+/// internal queue it's a queue of T, but rather Message<T>
 enum Message<T> {
     Data(T),
     GoUp(Receiver<T>),
@@ -147,7 +149,7 @@ impl<T> Packet<T> {
         }
     }
 
-    // Consumes ownership of the 'to_wake' field.
+    /// Consumes ownership of the 'to_wake' field.
     fn take_to_wake(&self) -> SignalToken {
         let ptr = self.queue.producer_addition().to_wake.load(Ordering::SeqCst);
         self.queue.producer_addition().to_wake.store(0, Ordering::SeqCst);
@@ -155,9 +157,9 @@ impl<T> Packet<T> {
         unsafe { SignalToken::cast_from_usize(ptr) }
     }
 
-    // Decrements the count on the channel for a sleeper, returning the sleeper
-    // back if it shouldn't sleep. Note that this is the location where we take
-    // steals into account.
+    /// Decrements the count on the channel for a sleeper, returning the sleeper
+    /// back if it shouldn't sleep. Note that this is the location where we take
+    /// steals into account.
     fn decrement(&self, token: SignalToken) -> Result<(), SignalToken> {
         assert_eq!(self.queue.producer_addition().to_wake.load(Ordering::SeqCst), 0);
         let ptr = unsafe { token.cast_to_usize() };
@@ -188,8 +190,8 @@ impl<T> Packet<T> {
             data => return data,
         }
 
-        // Welp, our channel has no data. Deschedule the current thread and
-        // initiate the blocking protocol.
+        // Our channel has no data! Deschedule the current thread,
+        // and initiate the blocking protocol.
         let (wait_token, signal_token) = blocking::tokens();
         if self.decrement(signal_token).is_ok() {
             if let Some(deadline) = deadline {
@@ -338,9 +340,9 @@ impl<T> Packet<T> {
     // select implementation
     ////////////////////////////////////////////////////////////////////////////
 
-    // Tests to see whether this port can receive without blocking. If Ok is
-    // returned, then that's the answer. If Err is returned, then the returned
-    // port needs to be queried instead (an upgrade happened)
+    /// Tests to see whether this port can receive without blocking. If Ok is
+    /// returned, then that's the answer. If Err is returned, then the returned
+    /// port needs to be queried instead (an upgrade happened)
     pub fn can_recv(&self) -> Result<bool, Receiver<T>> {
         // We peek at the queue to see if there's anything on it, and we use
         // this return value to determine if we should pop from the queue and
@@ -359,7 +361,7 @@ impl<T> Packet<T> {
         }
     }
 
-    // increment the count on the channel (used for selection)
+    /// Increments the count on the channel (used for selection).
     fn bump(&self, amt: isize) -> isize {
         match self.queue.producer_addition().cnt.fetch_add(amt, Ordering::SeqCst) {
             DISCONNECTED => {
@@ -370,8 +372,8 @@ impl<T> Packet<T> {
         }
     }
 
-    // Attempts to start selecting on this port. Like a oneshot, this can fail
-    // immediately because of an upgrade.
+    /// Attempts to start selecting on this port. Like a oneshot, this can fail
+    /// immediately because of an upgrade.
     pub fn start_selection(&self, token: SignalToken) -> SelectionResult<T> {
         match self.decrement(token) {
             Ok(()) => SelSuccess,
@@ -395,7 +397,7 @@ impl<T> Packet<T> {
         }
     }
 
-    // Removes a previous thread from being blocked in this port
+    /// Removes a previous thread from being blocked in this port
     pub fn abort_selection(&self,
                            was_upgrade: bool) -> Result<bool, Receiver<T>> {
         // If we're aborting selection after upgrading from a oneshot, then
@@ -427,7 +429,8 @@ impl<T> Packet<T> {
         // is no thread in to_wake, so just keep going
         let has_data = if prev == DISCONNECTED {
             assert_eq!(self.queue.producer_addition().to_wake.load(Ordering::SeqCst), 0);
-            true // there is data, that data is that we're disconnected
+            // There is data, that data is that we're disconnected.
+            true
         } else {
             let cur = prev + steals + 1;
             assert!(cur >= 0);

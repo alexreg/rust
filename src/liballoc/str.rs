@@ -356,7 +356,7 @@ impl str {
                 // This is the only conditional (contextual) but language-independent mapping
                 // in `SpecialCasing.txt`,
                 // so hard-code it rather than have a generic "condition" mechanism.
-                // See https://github.com/rust-lang/rust/issues/26035
+                // See issue #26035.
                 map_uppercase_sigma(self, i, &mut s)
             } else {
                 match conversions::to_lower(c) {

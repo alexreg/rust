@@ -688,8 +688,7 @@ impl<T> Vec<T> {
             let mut ptr = self.as_mut_ptr().add(self.len);
             // Set the final length at the end, keeping in mind that
             // dropping an element might panic. Works around a missed
-            // optimization, as seen in the following issue:
-            // https://github.com/rust-lang/rust/issues/51802
+            // optimization, as seen in issue #51802.
             let mut local_len = SetLenOnDrop::new(&mut self.len);
 
             // Drop any extra elements.
