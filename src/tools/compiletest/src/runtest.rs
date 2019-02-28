@@ -1764,7 +1764,7 @@ impl<'test> TestCx<'test> {
         match self.config.mode {
             CompileFail | Incremental => {
                 // If we are extracting and matching errors in the new
-                // fashion, then you want JSON mode. Old-skool error
+                // fashion, then you want JSON mode. Old-school error
                 // patterns still match the raw compiler output.
                 if self.props.error_patterns.is_empty() {
                     rustc.args(&["--error-format", "json"]);
@@ -1940,7 +1940,7 @@ impl<'test> TestCx<'test> {
     fn make_cmdline(&self, command: &Command, libpath: &str) -> String {
         use crate::util;
 
-        // Linux and mac don't require adjusting the library search path
+        // Linux and macOS don't require adjusting the library search path.
         if cfg!(unix) {
             format!("{:?}", command)
         } else {
@@ -2714,7 +2714,7 @@ impl<'test> TestCx<'test> {
     fn run_ui_test(&self) {
         // If the user specified a format in the ui test
         // print the output to the stderr file, otherwise extract
-        // the rendered error messages from json and print them
+        // the rendered error messages from the JSON and print them.
         let explicit = self
             .props
             .compile_flags
@@ -3080,10 +3080,11 @@ impl<'test> TestCx<'test> {
         normalized = Regex::new("SRC_DIR(.+):\\d+:\\d+").unwrap()
             .replace_all(&normalized, "SRC_DIR$1:LL:COL").into_owned();
 
-        normalized = normalized.replace("\\\\", "\\") // denormalize for paths on windows
-              .replace("\\", "/") // normalize for paths on windows
-              .replace("\r\n", "\n") // normalize for linebreaks on windows
-              .replace("\t", "\\t"); // makes tabs visible
+        normalized = normalized
+            .replace("\\\\", "\\") // Denormalize for paths on Windows.
+            .replace("\\", "/")    // Normalize for paths on Windows.
+            .replace("\r\n", "\n") // Normalize for linebreaks on Windows.
+            .replace("\t", "\\t"); // Make tabs visible.
         for rule in custom_rules {
             let re = Regex::new(&rule.0).expect("bad regex in custom normalization rule");
             normalized = re.replace_all(&normalized, &rule.1[..]).into_owned();

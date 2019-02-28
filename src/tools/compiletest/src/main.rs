@@ -477,7 +477,7 @@ pub fn run_tests(config: &Config) {
 
     let opts = test_opts(config);
     let tests = make_tests(config);
-    // sadly osx needs some file descriptor limits raised for running tests in
+    // Sadly, macOS needs some file descriptor limits raised for running tests in
     // parallel (especially when we have lots and lots of child processes).
     // For context, see #8904
     unsafe {
