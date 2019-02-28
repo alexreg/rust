@@ -678,7 +678,7 @@ impl Config {
 
     fn parse_env(&self, line: &str, name: &str) -> Option<(String, String)> {
         self.parse_name_value_directive(line, name).map(|nv| {
-            // nv is either FOO or FOO=BAR
+            // `nv` is either `"FOO"` or `"FOO=BAR"`.
             let mut strs: Vec<String> = nv.splitn(2, '=').map(str::to_owned).collect();
 
             match strs.len() {

@@ -668,7 +668,7 @@ impl<'test> TestCx<'test> {
         } = self.parse_debugger_commands(prefixes);
         let mut cmds = commands.join("\n");
 
-        // compile test file (it should have 'compile-flags:-g' in the header)
+        // Compile test file (it should have `compile-flags:-g` in the header).
         let compiler_run_result = self.compile_test();
         if !compiler_run_result.status.success() {
             self.fatal_proc_rec("compilation failed!", &compiler_run_result);
@@ -920,7 +920,7 @@ impl<'test> TestCx<'test> {
     }
 
     fn run_debuginfo_lldb_test_no_opt(&self) {
-        // compile test file (it should have 'compile-flags:-g' in the header)
+        // Compile test file (it should have `compile-flags:-g` in the header).
         let compile_result = self.compile_test();
         if !compile_result.status.success() {
             self.fatal_proc_rec("compilation failed!", &compile_result);
@@ -987,7 +987,7 @@ impl<'test> TestCx<'test> {
         script_str.push_str("-x \".*\" --category Rust\n");
         script_str.push_str("type category enable Rust\n");
 
-        // Set breakpoints on every line that contains the string "#break"
+        // Set breakpoints on every line that contains the string `"#break"`.
         let source_file_name = self.testpaths.file.file_name().unwrap().to_string_lossy();
         for line in &breakpoint_lines {
             script_str.push_str(&format!(
@@ -1010,7 +1010,7 @@ impl<'test> TestCx<'test> {
         self.dump_output_file(&script_str, "debugger.script");
         let debugger_script = self.make_out_name("debugger.script");
 
-        // Let LLDB execute the script via lldb_batchmode.py
+        // Let LLDB execute the script via `lldb_batchmode.py`.
         let debugger_run_result = self.run_lldb(&exe_file, &debugger_script, &rust_src_root);
 
         if !debugger_run_result.status.success() {
@@ -1115,7 +1115,8 @@ impl<'test> TestCx<'test> {
             return None;
         }
 
-        // Remove options that are either unwanted (-O) or may lead to duplicates due to RUSTFLAGS.
+        // Remove options that are either unwanted (`-O`) or may lead to duplicates due to
+        // `RUSTFLAGS`.
         let options_to_remove = ["-O".to_owned(), "-g".to_owned(), "--debuginfo".to_owned()];
         let new_options = self
             .split_maybe_args(options)
@@ -1180,7 +1181,7 @@ impl<'test> TestCx<'test> {
 
         fn check_single_line(line: &str, check_line: &str) -> bool {
             // Allow check lines to leave parts unspecified (e.g., uninitialized
-            // bits in the  wrong case of an enum) with the notation "[...]".
+            // bits in the wrong case of an enum) with the notation `[...]`.
             let line = line.trim();
             let check_line = check_line.trim();
             let can_start_anywhere = check_line.starts_with("[...]");
@@ -1287,11 +1288,11 @@ impl<'test> TestCx<'test> {
             self.fatal_proc_rec("process did not return an error status", proc_res);
         }
 
-        // On Windows, keep all '\' path separators to match the paths reported in the JSON output
-        // from the compiler
+        // On Windows, keep all `\` path separators to match the paths reported in the JSON output
+        // from the compiler.
         let os_file_name = self.testpaths.file.display().to_string();
 
-        // on windows, translate all '\' path separators to '/'
+        // On windows, translate all `\` path separators to `/`.
         let file_name = format!("{}", self.testpaths.file.display()).replace(r"\", "/");
 
         // If the testcase being checked contains at least one expected "help"
@@ -1724,13 +1725,13 @@ impl<'test> TestCx<'test> {
                     .expect("no rustdoc built yet"),
             )
         };
-        // FIXME Why is -L here?
+        // FIXME: why is `-L` here?
         rustc.arg(input_file); //.arg("-L").arg(&self.config.build_base);
 
         // Use a single thread for efficiency and a deterministic error message order
         rustc.arg("-Zthreads=1");
 
-        // Optionally prevent default --target if specified in test compile-flags.
+        // Optionally prevent default `--target` if specified in test compile-flags.
         let custom_target = self
             .props
             .compile_flags
@@ -1869,7 +1870,7 @@ impl<'test> TestCx<'test> {
         // files with the module name appended to it which can more than
         // double the length.
         let mut f = self.output_base_dir().join("a");
-        // FIXME: This is using the host architecture exe suffix, not target!
+        // FIXME: this is using the host architecture `exe` suffix, not target!
         if self.config.target.contains("emscripten") {
             f = f.with_extra_extension("js");
         } else if self.config.target.contains("wasm32") {
@@ -1890,7 +1891,7 @@ impl<'test> TestCx<'test> {
             if let Some(ref p) = self.config.nodejs {
                 args.push(p.clone());
             } else {
-                self.fatal("no NodeJS binary found (--nodejs)");
+                self.fatal("no NodeJS binary found (`--nodejs`)");
             }
         // If this is otherwise wasm, then run tests under nodejs with our
         // shim
@@ -1898,7 +1899,7 @@ impl<'test> TestCx<'test> {
             if let Some(ref p) = self.config.nodejs {
                 args.push(p.clone());
             } else {
-                self.fatal("no NodeJS binary found (--nodejs)");
+                self.fatal("no NodeJS binary found (`--nodejs`)");
             }
 
             let src = self.config.src_base
@@ -1913,7 +1914,7 @@ impl<'test> TestCx<'test> {
         // FIXME (#9639): This needs to handle non-utf8 paths
         args.push(exe_file.to_str().unwrap().to_owned());
 
-        // Add the arguments in the run_flags directive
+        // Add the arguments in the `run_flags` directive.
         args.extend(self.split_maybe_args(&self.props.run_flags));
 
         let prog = args.remove(0);
@@ -1943,8 +1944,8 @@ impl<'test> TestCx<'test> {
         if cfg!(unix) {
             format!("{:?}", command)
         } else {
-            // Build the LD_LIBRARY_PATH variable as it would be seen on the command line
-            // for diagnostic purposes
+            // Build the `LD_LIBRARY_PATH` variable as it would be seen on the command line
+            // for diagnostic purposes.
             fn lib_path_cmd_prefix(path: &str) -> String {
                 format!(
                     "{}=\"{}\"",
@@ -2085,7 +2086,7 @@ impl<'test> TestCx<'test> {
         println!("---------------------------------------------------");
     }
 
-    // codegen tests (using FileCheck)
+    // Codegen tests (using `FileCheck`)
 
     fn compile_test_and_save_ir(&self) -> ProcRes {
         let aux_dir = self.aux_output_dir_name();
@@ -2394,7 +2395,7 @@ impl<'test> TestCx<'test> {
             string: String,
         }
 
-        // [MONO_ITEM] name [@@ (cgu)+]
+        // `[MONO_ITEM] name [@@ (cgu)+]`
         fn str_to_mono_item(s: &str, cgu_has_crate_disambiguator: bool) -> MonoItem {
             let s = if s.starts_with(PREFIX) {
                 (&s[PREFIX.len()..]).trim()
@@ -2451,8 +2452,8 @@ impl<'test> TestCx<'test> {
             string
         }
 
-        // Given a cgu-name-prefix of the form <crate-name>.<crate-disambiguator> or
-        // the form <crate-name1>.<crate-disambiguator1>-in-<crate-name2>.<crate-disambiguator2>,
+        // Given a cgu-name-prefix of the form `<crate-name>.<crate-disambiguator>` or
+        // `<crate-name1>.<crate-disambiguator1>-in-<crate-name2>.<crate-disambiguator2>`,
         // remove all crate-disambiguators.
         fn remove_crate_disambiguator_from_cgu(cgu: &str) -> String {
             lazy_static! {
@@ -2487,8 +2488,8 @@ impl<'test> TestCx<'test> {
         // runs.
         let incremental_dir = self.incremental_dir();
         if incremental_dir.exists() {
-            // Canonicalizing the path will convert it to the //?/ format
-            // on Windows, which enables paths longer than 260 character
+            // Canonicalizing the path will convert it to the `//?/` format
+            // on Windows, which enables paths longer than 260 characters.
             let canonicalized = incremental_dir.canonicalize().unwrap();
             fs::remove_dir_all(canonicalized).unwrap();
         }
@@ -2503,24 +2504,24 @@ impl<'test> TestCx<'test> {
     }
 
     fn run_incremental_test(&self) {
-        // Basic plan for a test incremental/foo/bar.rs:
-        // - load list of revisions rpass1, cfail2, rpass3
+        // Basic plan for a test `incremental/foo/bar.rs`:
+        // - load list of revisions `rpass1`, `cfail2`, `rpass3`
         //   - each should begin with `rpass`, `cfail`, or `rfail`
         //   - if `rpass`, expect compile and execution to succeed
         //   - if `cfail`, expect compilation to fail
         //   - if `rfail`, expect execution to fail
-        // - create a directory build/foo/bar.incremental
-        // - compile foo/bar.rs with -Z incremental=.../foo/bar.incremental and -C rpass1
-        //   - because name of revision starts with "rpass", expect success
-        // - compile foo/bar.rs with -Z incremental=.../foo/bar.incremental and -C cfail2
-        //   - because name of revision starts with "cfail", expect an error
+        // - create a directory `build/foo/bar.incremental`
+        // - compile `foo/bar.rs` with `-Z incremental=.../foo/bar.incremental` and `-C rpass1`
+        //   - because name of revision starts with `rpass`, expect success
+        // - compile `foo/bar.rs` with `-Z incremental=.../foo/bar.incremental` and `-C cfail2`
+        //   - because name of revision starts with `cfail`, expect an error
         //   - load expected errors as usual, but filter for those that end in `[rfail2]`
-        // - compile foo/bar.rs with -Z incremental=.../foo/bar.incremental and -C rpass3
-        //   - because name of revision starts with "rpass", expect success
-        // - execute build/foo/bar.exe and save output
+        // - compile `foo/bar.rs` with `-Z incremental=.../foo/bar.incremental` and `-C rpass3`
+        //   - because name of revision starts with `rpass`, expect success
+        // - execute `build/foo/bar` and save output
         //
-        // FIXME -- use non-incremental mode as an oracle? That doesn't apply
-        // to #[rustc_dirty] and clean tests I guess
+        // FIXME: use non-incremental mode as an oracle? That doesn't apply
+        // to `#[rustc_dirty]` and clean tests, I guess.
 
         let revision = self
             .revision
@@ -2637,8 +2638,8 @@ impl<'test> TestCx<'test> {
             cmd.env("CLANG", clang);
         }
 
-        // We don't want RUSTFLAGS set from the outside to interfere with
-        // compiler flags set in the test cases:
+        // We don't want `RUSTFLAGS` set from the outside to interfere with
+        // compiler flags set in the test cases.
         cmd.env_remove("RUSTFLAGS");
 
         if self.config.target.contains("msvc") && self.config.cc != "" {
@@ -3054,12 +3055,12 @@ impl<'test> TestCx<'test> {
         let test_build_dir = &self.config.build_base;
         let parent_build_dir = test_build_dir.parent().unwrap().parent().unwrap().parent().unwrap();
 
-        // eg. /home/user/rust/build/x86_64-unknown-linux-gnu/test/ui
+        // E.g., `/home/user/rust/build/x86_64-unknown-linux-gnu/test/ui`.
         normalized = normalized.replace(test_build_dir.to_str().unwrap(), "$TEST_BUILD_DIR");
-        // eg. /home/user/rust/build
+        // E.g., `/home/user/rust/build`.
         normalized = normalized.replace(&parent_build_dir.to_str().unwrap(), "$BUILD_DIR");
 
-        // Paths into lib directory.
+        // Paths into `lib` directory.
         let mut lib_dir = parent_build_dir.parent().unwrap().to_path_buf();
         lib_dir.push("lib");
         normalized = normalized.replace(&lib_dir.to_str().unwrap(), "$LIB_DIR");
@@ -3075,7 +3076,7 @@ impl<'test> TestCx<'test> {
         // If there are `$SRC_DIR` normalizations with line and column numbers, then replace them
         // with placeholders as we do not want tests needing updated when compiler source code
         // changes.
-        // eg. $SRC_DIR/libcore/mem.rs:323:14 becomes $SRC_DIR/libcore/mem.rs:LL:COL
+        // E.g., `$SRC_DIR/libcore/mem.rs:323:14` becomes `$SRC_DIR/libcore/mem.rs:LL:COL`.
         normalized = Regex::new("SRC_DIR(.+):\\d+:\\d+").unwrap()
             .replace_all(&normalized, "SRC_DIR$1:LL:COL").into_owned();
 

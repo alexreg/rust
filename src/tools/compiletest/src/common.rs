@@ -191,7 +191,7 @@ pub struct Config {
     /// Path to / name of the GDB executable
     pub gdb: Option<String>,
 
-    /// Version of GDB, encoded as ((major * 1000) + minor) * 1000 + patch
+    /// Version of GDB, encoded as `((major * 1000) + minor) * 1000 + patch`.
     pub gdb_version: Option<u32>,
 
     /// Whether GDB has native rust support
@@ -200,13 +200,13 @@ pub struct Config {
     /// Version of LLDB
     pub lldb_version: Option<String>,
 
-    /// Whether LLDB has native rust support
+    /// `true` if LLDB has native rust support.
     pub lldb_native_rust: bool,
 
     /// Version of LLVM
     pub llvm_version: Option<String>,
 
-    /// Is LLVM a system LLVM
+    /// `true` if LLVM is system LLVM.
     pub system_llvm: bool,
 
     /// Path to the android tools
@@ -224,13 +224,13 @@ pub struct Config {
     /// the path containing LLDB's Python module
     pub lldb_python_dir: Option<String>,
 
-    /// Explain what's going on
+    /// `true` to enable verbose output.
     pub verbose: bool,
 
     /// Print one character per test instead of one line
     pub quiet: bool,
 
-    /// Whether to use colors in test.
+    /// `true` to use colors in test.
     pub color: ColorConfig,
 
     /// where to find the remote test client process, if we're using it

@@ -1,5 +1,5 @@
-// FIXME: This is a complete copy of `cargo/src/cargo/util/read2.rs`
-// Consider unify the read2() in libstd, cargo and this to prevent further code duplication.
+// FIXME: this is a complete copy of `cargo/src/cargo/util/read2.rs`
+// Consider unifying the `read2()` in libstd, cargo and this to prevent further code duplication.
 
 pub use self::imp::read2;
 
