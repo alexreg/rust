@@ -35,7 +35,7 @@ pub struct Pipes {
 /// processes in the standard library, so "ours" is the one that'll stay in our
 /// process whereas "theirs" will be inherited to a child.
 ///
-/// The ours/theirs pipes are *not* specifically readable or writable. Each
+/// The `ours`/`theirs` pipes are *not* specifically readable or writable. Each
 /// one only supports a read or a write, but which is which depends on the
 /// boolean flag given. If `ours_readable` is true then `ours` is readable where
 /// `theirs` is writable. Conversely if `ours_readable` is false then `ours` is

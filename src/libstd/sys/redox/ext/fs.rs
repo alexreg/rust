@@ -258,16 +258,16 @@ impl MetadataExt for fs::Metadata {
 /// [`FileType`]: ../../../../std/fs/struct.FileType.html
 #[stable(feature = "file_type_ext", since = "1.5.0")]
 pub trait FileTypeExt {
-    /// Returns whether this file type is a block device.
+    /// Returns `true` if this file type is a block device.
     #[stable(feature = "file_type_ext", since = "1.5.0")]
     fn is_block_device(&self) -> bool;
-    /// Returns whether this file type is a char device.
+    /// Returns `true` if this file type is a char device.
     #[stable(feature = "file_type_ext", since = "1.5.0")]
     fn is_char_device(&self) -> bool;
-    /// Returns whether this file type is a fifo.
+    /// Returns `true` if this file type is a fifo.
     #[stable(feature = "file_type_ext", since = "1.5.0")]
     fn is_fifo(&self) -> bool;
-    /// Returns whether this file type is a socket.
+    /// Returns `true` if this file type is a socket.
     #[stable(feature = "file_type_ext", since = "1.5.0")]
     fn is_socket(&self) -> bool;
 }

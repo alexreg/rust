@@ -1308,7 +1308,7 @@ impl Drop for BorrowRefMut<'_> {
 impl<'b> BorrowRefMut<'b> {
     #[inline]
     fn new(borrow: &'b Cell<BorrowFlag>) -> Option<BorrowRefMut<'b>> {
-        // NOTE: Unlike BorrowRefMut::clone, new is called to create the initial
+        // NOTE: unlike `BorrowRefMut::clone`, new is called to create the initial
         // mutable reference, and so there must currently be no existing
         // references. Thus, while clone increments the mutable ref count, here
         // we explicitly only allow going from `UNUSED` to `UNUSED - 1`.

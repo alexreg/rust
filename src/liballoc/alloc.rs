@@ -197,7 +197,8 @@ pub(crate) unsafe fn box_free<T: ?Sized>(ptr: Unique<T>) {
     let ptr = ptr.as_ptr();
     let size = size_of_val(&*ptr);
     let align = min_align_of_val(&*ptr);
-    // We do not allocate for Box<T> when T is ZST, so deallocation is also not necessary.
+    // We do not allocate for `Box<T>` when `T` is zero-sized, so deallocation is also not
+    // necessary.
     if size != 0 {
         let layout = Layout::from_size_align_unchecked(size, align);
         dealloc(ptr as *mut u8, layout);

@@ -10,7 +10,7 @@ macro_rules! search_asserts {
     }
 }
 
-/// Combined enum for the results of next() and next_match()/next_reject()
+/// Combined enum for the results of `next()` and `next_match()`/`next_reject()`.
 #[derive(Debug, PartialEq, Eq)]
 enum Step {
     // variant names purposely chosen to
@@ -106,15 +106,15 @@ fn test_simple_search() {
     );
 }
 
-// Á, 각, ก, 😀 all end in 0x81
-// 🁀, ᘀ do not end in 0x81 but contain the byte
-// ꁁ has 0x81 as its second and third bytes.
+// `Á`, `각`, `ก`, `😀` all end in `0x81`.
+// `🁀`, `ᘀ` do not end in `0x81`, but contain the byte.
+// `ꁁ` has `0x81` as its second and third bytes.
 //
-// The memchr-using implementation of next_match
-// and next_match_back temporarily violate
+// The `memchr`-using implementation of `next_match`
+// and `next_match_back` temporarily violate
 // the property that the search is always on a unicode boundary,
-// which is fine as long as this never reaches next() or next_back().
-// So we test if next() is correct after each next_match() as well.
+// which is fine as long as this never reaches `next()` or `next_back()`.
+// So we test if `next()` is correct after each `next_match()` as well.
 const STRESS: &str = "Áa🁀bÁꁁfg😁각กᘀ각aÁ각ꁁก😁a";
 
 #[test]

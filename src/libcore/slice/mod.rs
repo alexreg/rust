@@ -1651,7 +1651,7 @@ impl<T> [T] {
         // over all the elements, swapping as we go so that at the end
         // the elements we wish to keep are in the front, and those we
         // wish to reject are at the back. We can then split the slice.
-        // This operation is still O(n).
+        // This operation is still `O(n)`.
         //
         // Example: We start in this state, where `r` represents "next
         // read" and `w` represents "next_write`.
@@ -1662,9 +1662,9 @@ impl<T> [T] {
         //     +---+---+---+---+---+---+
         //           w
         //
-        // Comparing self[r] against self[w-1], this is not a duplicate, so
-        // we swap self[r] and self[w] (no effect as r==w) and then increment both
-        // r and w, leaving us with:
+        // Comparing `self[r]` against `self[w - 1]`, this is not a duplicate, so
+        // we swap `self[r]` and `self[w]` (no effect as `r == w`) and then increment both
+        // `r` and `w`, leaving us with:
         //
         //               r
         //     +---+---+---+---+---+---+
@@ -1672,7 +1672,7 @@ impl<T> [T] {
         //     +---+---+---+---+---+---+
         //               w
         //
-        // Comparing self[r] against self[w-1], this value is a duplicate,
+        // Comparing `self[r]` against `self[w - 1]`, this value is a duplicate,
         // so we increment `r` but leave everything else unchanged:
         //
         //                   r
@@ -1681,8 +1681,8 @@ impl<T> [T] {
         //     +---+---+---+---+---+---+
         //               w
         //
-        // Comparing self[r] against self[w-1], this is not a duplicate,
-        // so swap self[r] and self[w] and advance r and w:
+        // Comparing `self[r]` against `self[w - 1]`, this is not a duplicate,
+        // so swap `self[r]` and `self[w]` and advance `r` and `w`:
         //
         //                       r
         //     +---+---+---+---+---+---+
@@ -1698,7 +1698,7 @@ impl<T> [T] {
         //     +---+---+---+---+---+---+
         //                       w
         //
-        // Duplicate, advance r. End of slice. Split at w.
+        // Duplicate, advance `r`. End of slice. Split at `w`.
 
         let len = self.len();
         if len <= 1 {
@@ -2184,8 +2184,8 @@ impl<T> [T] {
             return (self, &[], &[]);
         }
 
-        // First, find at what point do we split between the first and 2nd slice. Easy with
-        // ptr.align_offset.
+        // First, find at what point do we split between the first and 2nd slice -- easy with
+        // `ptr.align_offset`.
         let ptr = self.as_ptr();
         let offset = ::ptr::align_offset(ptr, ::mem::align_of::<U>());
         if offset > self.len() {
@@ -3128,9 +3128,10 @@ macro_rules! iterator {
 #[stable(feature = "rust1", since = "1.0.0")]
 pub struct Iter<'a, T: 'a> {
     ptr: *const T,
-    end: *const T, // If T is a ZST, this is actually ptr+len.  This encoding is picked so that
-                   // ptr == end is a quick test for the Iterator being empty, that works
-                   // for both ZST and non-ZST.
+    // If `T` is a ZST, this is actually `ptr + len`. This encoding is picked so that
+    // `ptr == end` is a quick test for the `Iterator` being empty, which works
+    // for both ZST and non-ZST.
+    end: *const T,
     _marker: marker::PhantomData<&'a T>,
 }
 
@@ -3230,9 +3231,10 @@ impl<T> AsRef<[T]> for Iter<'_, T> {
 #[stable(feature = "rust1", since = "1.0.0")]
 pub struct IterMut<'a, T: 'a> {
     ptr: *mut T,
-    end: *mut T, // If T is a ZST, this is actually ptr+len.  This encoding is picked so that
-                 // ptr == end is a quick test for the Iterator being empty, that works
-                 // for both ZST and non-ZST.
+    // If `T` is a ZST, this is actually `ptr + len`. This encoding is picked so that
+    // `ptr == end` is a quick test for the `Iterator` being empty, that works
+    // for both ZST and non-ZST.
+    end: *mut T,
     _marker: marker::PhantomData<&'a mut T>,
 }
 

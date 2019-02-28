@@ -47,7 +47,8 @@ macro_rules! impl_full_ops {
         $(
             impl FullOps for $ty {
                 fn full_add(self, other: $ty, carry: bool) -> (bool, $ty) {
-                    // This cannot overflow; the output is between `0` and `2 * 2^nbits - 1`.
+                    // This cannot overflow;
+                    // the output is between `0` and `2 * 2^nbits - 1`.
                     // FIXME: will LLVM optimize this into ADC or similar?
                     let (v, carry1) = intrinsics::add_with_overflow(self, other);
                     let (v, carry2) = intrinsics::add_with_overflow(v, if carry {1} else {0});
@@ -74,7 +75,8 @@ macro_rules! impl_full_ops {
 
                 fn full_div_rem(self, other: $ty, borrow: $ty) -> ($ty, $ty) {
                     debug_assert!(borrow < other);
-                    // This cannot overflow; the output is between `0` and `other * (2^nbits - 1)`.
+                    // This cannot overflow;
+                    // the output is between `0` and `other * (2^nbits - 1)`.
                     let nbits = mem::size_of::<$ty>() * 8;
                     let lhs = ((borrow as $bigty) << nbits) | (self as $bigty);
                     let rhs = other as $bigty;

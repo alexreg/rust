@@ -39,7 +39,8 @@ impl Thread {
         return if ret as usize == 0 {
             Err(io::Error::last_os_error())
         } else {
-            mem::forget(p); // ownership passed to CreateThread
+            // Ownership passed to `CreateThread`.
+            mem::forget(p);
             Ok(Thread { handle: Handle::new(ret) })
         };
 

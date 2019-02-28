@@ -823,7 +823,7 @@ impl<K, V> RawTable<K, V> {
 
     /// Drops buckets in reverse order. It leaves the table in an inconsistent
     /// state and should only be used for dropping the table's remaining
-    /// entries. It's used in the implementation of Drop.
+    /// entries. It's used in the implementation of `Drop`.
     unsafe fn rev_drop_buckets(&mut self) {
         // initialize the raw bucket past the end of the table
         let mut raw = self.raw_bucket_at(self.capacity());
@@ -932,8 +932,8 @@ pub struct IterMut<'a, K: 'a, V: 'a> {
 }
 
 unsafe impl<K: Sync, V: Sync> Sync for IterMut<'_, K, V> {}
-// Both K: Sync and K: Send are correct for IterMut's Send impl,
-// but Send is the more useful bound
+// Both `K: Sync` and `K: Send` are correct for `IterMut`'s `Send` impl,
+// but `Send` is the more useful bound.
 unsafe impl<K: Send, V: Send> Send for IterMut<'_, K, V> {}
 
 impl<'a, K: 'a, V: 'a> IterMut<'a, K, V> {

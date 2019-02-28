@@ -602,9 +602,9 @@ pub struct Components<'a> {
     // The prefix as it was originally parsed, if any
     prefix: Option<Prefix<'a>>,
 
-    // true if path *physically* has a root separator; for most Windows
-    // prefixes, it may have a "logical" rootseparator for the purposes of
-    // normalization, e.g.,  \\server\share == \\server\share\.
+    // `true` if path *physically* has a root separator; for most Windows
+    // prefixes, it may have a "logical" root separator for the purposes of
+    // normalization (e.g., `\\server\share == \\server\share\`).
     has_physical_root: bool,
 
     // The iterator is double-ended, and these two states keep track of what has
@@ -3876,7 +3876,7 @@ mod tests {
                 "\\\\?\\UNC\\server\\share");
             tp!("\\\\.\\foo\\bar", "baz", "\\\\.\\foo\\bar\\baz");
             tp!("\\\\.\\foo\\bar", "C:a", "C:a");
-            // again, not sure about the following, but I'm assuming \\.\ should be verbatim
+            // Again, not sure about the following, but I'm assuming `\\.\` should be verbatim.
             tp!("\\\\.\\foo", "..\\bar", "\\\\.\\foo\\..\\bar");
 
             tp!("\\\\?\\C:", "foo", "\\\\?\\C:\\foo"); // this is a weird one

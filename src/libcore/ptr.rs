@@ -366,13 +366,13 @@ pub(crate) unsafe fn swap_nonoverlapping_one<T>(x: *mut T, y: *mut T) {
 
 #[inline]
 unsafe fn swap_nonoverlapping_bytes(x: *mut u8, y: *mut u8, len: usize) {
-    // The approach here is to utilize simd to swap x & y efficiently. Testing reveals
+    // The approach here is to utilize simd to swap `x` and `y` efficiently. Testing reveals
     // that swapping either 32 bytes or 64 bytes at a time is most efficient for Intel
     // Haswell E processors. LLVM is more able to optimize if we give a struct a
-    // #[repr(simd)], even if we don't actually use this struct directly.
+    // `#[repr(simd)]`, even if we don't actually use this struct directly.
     //
-    // FIXME repr(simd) broken on emscripten and redox
-    // It's also broken on big-endian powerpc64 and s390x. #42778
+    // FIXME: `repr(simd)` broken on emscripten and redox
+    // It's also broken on big-endian powerpc64 and s390x (see issue #42778).
     #[cfg_attr(not(any(target_os = "emscripten", target_os = "redox",
                        target_endian = "big")),
                repr(simd))]
@@ -381,7 +381,7 @@ unsafe fn swap_nonoverlapping_bytes(x: *mut u8, y: *mut u8, len: usize) {
 
     let block_size = mem::size_of::<Block>();
 
-    // Loop through x & y, copying them `Block` at a time
+    // Loop through `x` and `y`, copying them `Block` at a time
     // The optimizer should unroll the loop fully for most types
     // N.B. We can't use a for loop as the `range` impl calls `mem::swap` recursively
     let mut i = 0;

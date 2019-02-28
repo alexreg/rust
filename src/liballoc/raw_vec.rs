@@ -13,29 +13,29 @@ use crate::boxed::Box;
 
 /// A low-level utility for more ergonomically allocating, reallocating, and deallocating
 /// a buffer of memory on the heap without having to worry about all the corner cases
-/// involved. This type is excellent for building your own data structures like Vec and VecDeque.
+/// involved. This type is excellent for building your own data structures like `Vec` and `VecDeque`.
 /// In particular:
 ///
-/// * Produces Unique::empty() on zero-sized types
-/// * Produces Unique::empty() on zero-length allocations
+/// * Produces `Unique::empty()` on zero-sized types.
+/// * Produces `Unique::empty()` on zero-length allocations.
 /// * Catches all overflows in capacity computations (promotes them to "capacity overflow" panics)
-/// * Guards against 32-bit systems allocating more than isize::MAX bytes
-/// * Guards against overflowing your length
-/// * Aborts on OOM or calls handle_alloc_error as applicable
-/// * Avoids freeing Unique::empty()
-/// * Contains a ptr::Unique and thus endows the user with all related benefits
+/// * Guards against 32-bit systems allocating more than `isize::MAX` bytes.
+/// * Guards against overflowing your length.
+/// * Aborts on OOM or calls `handle_alloc_error` as applicable.
+/// * Avoids freeing `Unique::empty()`.
+/// * Contains a `ptr::Unique` and thus endows the user with all related benefits.
 ///
 /// This type does not in anyway inspect the memory that it manages. When dropped it *will*
-/// free its memory, but it *won't* try to Drop its contents. It is up to the user of RawVec
-/// to handle the actual things *stored* inside of a RawVec.
+/// free its memory, but it *won't* try to `Drop` its contents. It is up to the user of `RawVec`
+/// to handle the actual things *stored* inside of a `RawVec`.
 ///
-/// Note that a RawVec always forces its capacity to be usize::MAX for zero-sized types.
+/// Note that a `RawVec` always forces its capacity to be `usize::MAX` for zero-sized types.
 /// This enables you to use capacity growing logic catch the overflows in your length
 /// that might occur with zero-sized types.
 ///
 /// However this means that you need to be careful when round-tripping this type
 /// with a `Box<[T]>`: `cap()` won't yield the len. However `with_capacity`,
-/// `shrink_to_fit`, and `from_box` will actually set RawVec's private capacity
+/// `shrink_to_fit`, and `from_box` will actually set `RawVec`s private capacity
 /// field. This allows zero-sized types to not be special-cased by consumers of
 /// this type.
 #[allow(missing_debug_implementations)]
@@ -47,30 +47,30 @@ pub struct RawVec<T, A: Alloc = Global> {
 
 impl<T, A: Alloc> RawVec<T, A> {
     /// Like `new` but parameterized over the choice of allocator for
-    /// the returned RawVec.
+    /// the returned `RawVec`.
     pub const fn new_in(a: A) -> Self {
-        // !0 is usize::MAX. This branch should be stripped at compile time.
+        // `!0` is `usize::MAX`. This branch should be stripped at compile time.
         // FIXME(mark-i-m): use this line when `if`s are allowed in `const`
         //let cap = if mem::size_of::<T>() == 0 { !0 } else { 0 };
 
-        // Unique::empty() doubles as "unallocated" and "zero-sized allocation"
+        // `Unique::empty()` doubles as "unallocated" and "zero-sized allocation".
         RawVec {
             ptr: Unique::empty(),
-            // FIXME(mark-i-m): use `cap` when ifs are allowed in const
+            // FIXME(mark-i-m): use `cap` when `if` statements are allowed in const.
             cap: [0, !0][(mem::size_of::<T>() == 0) as usize],
             a,
         }
     }
 
     /// Like `with_capacity` but parameterized over the choice of
-    /// allocator for the returned RawVec.
+    /// allocator for the returned `RawVec`.
     #[inline]
     pub fn with_capacity_in(cap: usize, a: A) -> Self {
         RawVec::allocate_in(cap, false, a)
     }
 
     /// Like `with_capacity_zeroed` but parameterized over the choice
-    /// of allocator for the returned RawVec.
+    /// of allocator for the returned `RawVec`.
     #[inline]
     pub fn with_capacity_zeroed_in(cap: usize, a: A) -> Self {
         RawVec::allocate_in(cap, true, a)
@@ -110,20 +110,20 @@ impl<T, A: Alloc> RawVec<T, A> {
 }
 
 impl<T> RawVec<T, Global> {
-    /// Creates the biggest possible RawVec (on the system heap)
+    /// Creates the biggest possible `RawVec` (on the system heap)
     /// without allocating. If T has positive size, then this makes a
-    /// RawVec with capacity 0. If T has 0 size, then it makes a
-    /// RawVec with capacity `usize::MAX`. Useful for implementing
+    /// `RawVec` with capacity 0. If T has size 0, then it makes a
+    /// `RawVec` with capacity `usize::MAX`. Useful for implementing
     /// delayed allocation.
     pub const fn new() -> Self {
         Self::new_in(Global)
     }
 
-    /// Creates a RawVec (on the system heap) with exactly the
+    /// Creates a `RawVec` (on the system heap) with exactly the
     /// capacity and alignment requirements for a `[T; cap]`. This is
-    /// equivalent to calling RawVec::new when `cap` is 0 or T is
+    /// equivalent to calling `RawVec::new` when `cap` is 0 or T is
     /// zero-sized. Note that if `T` is zero-sized this means you will
-    /// *not* get a RawVec with the requested capacity!
+    /// **not** get a `RawVec` with the requested capacity.
     ///
     /// # Panics
     ///
@@ -147,13 +147,13 @@ impl<T> RawVec<T, Global> {
 }
 
 impl<T, A: Alloc> RawVec<T, A> {
-    /// Reconstitutes a RawVec from a pointer, capacity, and allocator.
+    /// Reconstitutes a `RawVec` from a pointer, capacity, and allocator.
     ///
     /// # Undefined Behavior
     ///
     /// The ptr must be allocated (via the given allocator `a`), and with the given capacity. The
     /// capacity cannot exceed `isize::MAX` (only a concern on 32-bit systems).
-    /// If the ptr and capacity come from a RawVec created via `a`, then this is guaranteed.
+    /// If the ptr and capacity come from a `RawVec` created via `a`, then this is guaranteed.
     pub unsafe fn from_raw_parts_in(ptr: *mut T, cap: usize, a: A) -> Self {
         RawVec {
             ptr: Unique::new_unchecked(ptr),
@@ -164,13 +164,13 @@ impl<T, A: Alloc> RawVec<T, A> {
 }
 
 impl<T> RawVec<T, Global> {
-    /// Reconstitutes a RawVec from a pointer, capacity.
+    /// Reconstitutes a `RawVec` from a pointer and capacity.
     ///
     /// # Undefined Behavior
     ///
     /// The ptr must be allocated (on the system heap), and with the given capacity. The
     /// capacity cannot exceed `isize::MAX` (only a concern on 32-bit systems).
-    /// If the ptr and capacity come from a RawVec, then this is guaranteed.
+    /// If the pointer and capacity come from a `RawVec`, then this is guaranteed.
     pub unsafe fn from_raw_parts(ptr: *mut T, cap: usize) -> Self {
         RawVec {
             ptr: Unique::new_unchecked(ptr),
@@ -191,7 +191,7 @@ impl<T> RawVec<T, Global> {
 
 impl<T, A: Alloc> RawVec<T, A> {
     /// Gets a raw pointer to the start of the allocation. Note that this is
-    /// Unique::empty() if `cap = 0` or T is zero-sized. In the former case, you must
+    /// `Unique::empty()` if `cap = 0` or T is zero-sized. In the former case, you must
     /// be careful.
     pub fn ptr(&self) -> *mut T {
         self.ptr.as_ptr()
@@ -209,12 +209,12 @@ impl<T, A: Alloc> RawVec<T, A> {
         }
     }
 
-    /// Returns a shared reference to the allocator backing this RawVec.
+    /// Returns a shared reference to the allocator backing this `RawVec`.
     pub fn alloc(&self) -> &A {
         &self.a
     }
 
-    /// Returns a mutable reference to the allocator backing this RawVec.
+    /// Returns a mutable reference to the allocator backing this `RawVec`.
     pub fn alloc_mut(&mut self) -> &mut A {
         &mut self.a
     }
@@ -287,14 +287,14 @@ impl<T, A: Alloc> RawVec<T, A> {
         unsafe {
             let elem_size = mem::size_of::<T>();
 
-            // since we set the capacity to usize::MAX when elem_size is
-            // 0, getting to here necessarily means the RawVec is overfull.
+            // Since we set the capacity to `usize::MAX` when `elem_size` is
+            // `0`, getting to here necessarily means the `RawVec` is overfull.
             assert!(elem_size != 0, "capacity overflow");
 
             let (new_cap, uniq) = match self.current_layout() {
                 Some(cur) => {
                     // Since we guarantee that we never allocate more than
-                    // isize::MAX bytes, `elem_size * self.cap <= isize::MAX` as
+                    // `isize::MAX` bytes, `elem_size * self.cap <= isize::MAX` as
                     // a precondition, so this can't overflow. Additionally the
                     // alignment will never be too large as to "not be
                     // satisfiable", so `Layout::from_size_align` will always
@@ -317,8 +317,8 @@ impl<T, A: Alloc> RawVec<T, A> {
                     }
                 }
                 None => {
-                    // skip to 4 because tiny Vec's are dumb; but not if that
-                    // would cause overflow
+                    // Skip to 4 because tiny `Vec`s are dumb, but not if that
+                    // would cause overflow.
                     let new_cap = if elem_size > (!0) / 8 { 1 } else { 4 };
                     match self.a.alloc_array::<T>(new_cap) {
                         Ok(ptr) => (new_cap, ptr.into()),
@@ -353,11 +353,11 @@ impl<T, A: Alloc> RawVec<T, A> {
                 None => return false, // nothing to double
             };
 
-            // since we set the capacity to usize::MAX when elem_size is
-            // 0, getting to here necessarily means the RawVec is overfull.
+            // Since we set the capacity to `usize::MAX` when `elem_size` is
+            // 0, getting to here necessarily means the `RawVec` is overfull.
             assert!(elem_size != 0, "capacity overflow");
 
-            // Since we guarantee that we never allocate more than isize::MAX
+            // Since we guarantee that we never allocate more than `isize::MAX`
             // bytes, `elem_size * self.cap <= isize::MAX` as a precondition, so
             // this can't overflow.
             //
@@ -514,7 +514,7 @@ impl<T, A: Alloc> RawVec<T, A> {
     pub fn reserve_in_place(&mut self, used_cap: usize, needed_extra_cap: usize) -> bool {
         unsafe {
             // NOTE: we don't early branch on ZSTs here because we want this
-            // to actually catch "asking for more than usize::MAX" in that case.
+            // to actually catch "asking for more than `usize::MAX`" in that case.
             // If we make it past the first branch then we are guaranteed to
             // panic.
 
@@ -533,8 +533,8 @@ impl<T, A: Alloc> RawVec<T, A> {
                 .unwrap_or_else(|_| capacity_overflow());
 
             // Here, `cap < used_cap + needed_extra_cap <= new_cap`
-            // (regardless of whether `self.cap - used_cap` wrapped).
-            // Therefore we can safely call grow_in_place.
+            // (regardless of whether `self.cap - used_cap` wrapped),
+            // therefore we can safely call `grow_in_place`.
 
             let new_layout = Layout::new::<T>().repeat(new_cap).unwrap().0;
             // FIXME: may crash and burn on over-reserve
@@ -554,7 +554,7 @@ impl<T, A: Alloc> RawVec<T, A> {
     }
 
     /// Shrinks the allocation down to the specified amount. If the given amount
-    /// is 0, actually completely deallocates.
+    /// is `0`, actually completely deallocates.
     ///
     /// # Panics
     ///
@@ -572,15 +572,15 @@ impl<T, A: Alloc> RawVec<T, A> {
             return;
         }
 
-        // This check is my waterloo; it's the only thing Vec wouldn't have to do.
+        // This check is my waterloo; it's the only thing `Vec` wouldn't have to do.
         assert!(self.cap >= amount, "Tried to shrink to a larger capacity");
 
         if amount == 0 {
             // We want to create a new zero-length vector within the
-            // same allocator.  We use ptr::write to avoid an
+            // same allocator. We use `ptr::write` to avoid an
             // erroneous attempt to drop the contents, and we use
-            // ptr::read to sidestep condition against destructuring
-            // types that implement Drop.
+            // `ptr::read` to sidestep condition against destructuring
+            // types that implement `Drop`.
 
             unsafe {
                 let a = ptr::read(&self.a as *const A);
@@ -686,7 +686,7 @@ impl<T> RawVec<T, Global> {
     /// Converts the entire buffer into `Box<[T]>`.
     ///
     /// While it is not *strictly* Undefined Behavior to call
-    /// this procedure while some of the RawVec is uninitialized,
+    /// this procedure while some of the `RawVec` is uninitialized,
     /// it certainly makes it trivial to trigger it.
     ///
     /// Note that this will correctly reconstitute any `cap` changes
@@ -701,7 +701,7 @@ impl<T> RawVec<T, Global> {
 }
 
 impl<T, A: Alloc> RawVec<T, A> {
-    /// Frees the memory owned by the RawVec *without* trying to Drop its contents.
+    /// Frees the memory owned by the `RawVec` *without* trying to `Drop` its contents.
     pub unsafe fn dealloc_buffer(&mut self) {
         let elem_size = mem::size_of::<T>();
         if elem_size != 0 {
@@ -713,7 +713,7 @@ impl<T, A: Alloc> RawVec<T, A> {
 }
 
 unsafe impl<#[may_dangle] T, A: Alloc> Drop for RawVec<T, A> {
-    /// Frees the memory owned by the RawVec *without* trying to Drop its contents.
+    /// Frees the memory owned by the `RawVec` *without* trying to `Drop` its contents.
     fn drop(&mut self) {
         unsafe { self.dealloc_buffer(); }
     }
@@ -755,12 +755,12 @@ mod tests {
         use crate::alloc::AllocErr;
 
         // Writing a test of integration between third-party
-        // allocators and RawVec is a little tricky because the RawVec
+        // allocators and `RawVec` is a little tricky because the `RawVec`
         // API does not expose fallible allocation methods, so we
         // cannot check what happens when allocator is exhausted
         // (beyond detecting a panic).
         //
-        // Instead, this just checks that the RawVec methods do at
+        // Instead, this just checks that the `RawVec` methods do at
         // least go through the Allocator API when it reserves
         // storage.
 

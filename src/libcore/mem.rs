@@ -831,7 +831,7 @@ pub unsafe fn transmute_copy<T, U>(src: &T) -> U {
 #[stable(feature = "discriminant_value", since = "1.21.0")]
 pub struct Discriminant<T>(u64, PhantomData<fn() -> T>);
 
-// N.B. These trait implementations cannot be derived because we don't want any bounds on T.
+// N.B., these trait implementations cannot be derived because we don't want any bounds on `T`.
 
 #[stable(feature = "discriminant_value", since = "1.21.0")]
 impl<T> Copy for Discriminant<T> {}

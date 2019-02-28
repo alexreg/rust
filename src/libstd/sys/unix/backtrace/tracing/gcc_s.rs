@@ -72,13 +72,13 @@ extern fn trace_fn(ctx: *mut uw::_Unwind_Context,
         ip = (ip as usize - 1) as *mut _;
     }
 
-    // dladdr() on osx gets whiny when we use FindEnclosingFunction, and
+    // `dladdr()` on macOS gets whiny when we use `FindEnclosingFunction`, and
     // it appears to work fine without it, so we only use
-    // FindEnclosingFunction on non-osx platforms. In doing so, we get a
+    // `FindEnclosingFunction` on non-macOS platforms. In doing so, we get a
     // slightly more accurate stack trace in the process.
     //
     // This is often because panic involves the last instruction of a
-    // function being "call std::rt::begin_unwind", with no ret
+    // function being "call `std::rt::begin_unwind`", with no ret
     // instructions after it. This means that the return instruction
     // pointer points *outside* of the calling function, and by
     // unwinding it we go back to the original function.

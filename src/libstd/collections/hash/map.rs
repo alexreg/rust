@@ -64,8 +64,8 @@ impl DefaultResizePolicy {
         // This doesn't have to be checked for overflow since allocation size
         // in bytes will overflow earlier than multiplication by 10.
         //
-        // As per https://github.com/rust-lang/rust/pull/30991 this is updated
-        // to be: (raw_cap * den + den - 1) / num
+        // As per PR #30991, this is updated
+        // to be `(raw_cap * den + den - 1) / num`.
         (raw_cap * 10 + 10 - 1) / 11
     }
 }

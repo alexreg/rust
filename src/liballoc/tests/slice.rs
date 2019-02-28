@@ -526,7 +526,7 @@ fn test_rotate_left() {
 
     let expected: Vec<_> = (0..1000).collect();
 
-    // small rotations in large slice, uses ptr::copy
+    // Small rotations in large slice; uses `ptr::copy`.
     v = (2..1000).chain(0..2).collect();
     v.rotate_left(998);
     assert_eq!(v, expected);
@@ -561,7 +561,7 @@ fn test_rotate_right() {
 
     let expected: Vec<_> = (0..1000).collect();
 
-    // small rotations in large slice, uses ptr::copy
+    // Small rotations in large slice; uses `ptr::copy`.
     v = (2..1000).chain(0..2).collect();
     v.rotate_right(2);
     assert_eq!(v, expected);

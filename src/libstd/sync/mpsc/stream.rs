@@ -39,7 +39,8 @@ struct ProducerAddition {
     cnt: AtomicIsize, // How many items are on this channel
     to_wake: AtomicUsize, // SignalToken for the blocked thread to wake up
 
-    port_dropped: AtomicBool, // flag if the channel has been destroyed.
+    // `true` if the channel has been destroyed.
+    port_dropped: AtomicBool,
 }
 
 struct ConsumerAddition {
@@ -432,16 +433,16 @@ impl<T> Packet<T> {
             assert!(cur >= 0);
 
             // If the previous count was negative, then we just made things go
-            // positive, hence we passed the -1 boundary and we're responsible
-            // for removing the to_wake() field and trashing it.
+            // positive, hence we passed the `-1` boundary and we're responsible
+            // for removing the `to_wake()` field and trashing it.
             //
             // If the previous count was positive then we're in a tougher
             // situation. A possible race is that a sender just incremented
-            // through -1 (meaning it's going to try to wake a thread up), but it
+            // through `-1` (meaning it's going to try to wake a thread up), but it
             // hasn't yet read the to_wake. In order to prevent a future recv()
             // from waking up too early (this sender picking up the plastered
-            // over to_wake), we spin loop here waiting for to_wake to be 0.
-            // Note that this entire select() implementation needs an overhaul,
+            // over to_wake), we spin loop here waiting for `to_wake` to be `0`.
+            // Note that this entire `select()` implementation needs an overhaul,
             // and this is *not* the worst part of it, so this is not done as a
             // final solution but rather out of necessity for now to get
             // something working.

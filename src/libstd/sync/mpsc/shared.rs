@@ -42,13 +42,12 @@ pub struct Packet<T> {
     // The number of channels which are currently using this packet.
     channels: AtomicUsize,
 
-    // See the discussion in Port::drop and the channel send methods for what
-    // these are used for
+    // See the discussion in `Port::drop` and the channel `send_*` methods for what
+    // these are used for.
     port_dropped: AtomicBool,
     sender_drain: AtomicIsize,
 
-    // this lock protects various portions of this implementation during
-    // select()
+    // This lock protects various portions of this implementation during `select()`.
     select_lock: Mutex<()>,
 }
 
