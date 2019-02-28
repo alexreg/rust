@@ -1103,7 +1103,7 @@ pub union MaybeUninit<T> {
 }
 
 impl<T> MaybeUninit<T> {
-    /// Create a new `MaybeUninit` initialized with the given value.
+    /// Creates a new `MaybeUninit` initialized with the given value.
     ///
     /// Note that dropping a `MaybeUninit` will never call `T`'s drop code.
     /// It is your responsibility to make sure `T` gets dropped if it got initialized.

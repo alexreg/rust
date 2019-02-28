@@ -41,7 +41,7 @@ extern "Rust" {
 #[derive(Copy, Clone, Default, Debug)]
 pub struct Global;
 
-/// Allocate memory with the global allocator.
+/// Allocates memory with the global allocator.
 ///
 /// This function forwards calls to the [`GlobalAlloc::alloc`] method
 /// of the allocator registered with the `#[global_allocator]` attribute
@@ -75,7 +75,7 @@ pub unsafe fn alloc(layout: Layout) -> *mut u8 {
     __rust_alloc(layout.size(), layout.align())
 }
 
-/// Deallocate memory with the global allocator.
+/// Deallocates memory with the global allocator.
 ///
 /// This function forwards calls to the [`GlobalAlloc::dealloc`] method
 /// of the allocator registered with the `#[global_allocator]` attribute
@@ -93,7 +93,7 @@ pub unsafe fn dealloc(ptr: *mut u8, layout: Layout) {
     __rust_dealloc(ptr, layout.size(), layout.align())
 }
 
-/// Reallocate memory with the global allocator.
+/// Reallocates memory with the global allocator.
 ///
 /// This function forwards calls to the [`GlobalAlloc::realloc`] method
 /// of the allocator registered with the `#[global_allocator]` attribute
@@ -111,7 +111,7 @@ pub unsafe fn realloc(ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 
     __rust_realloc(ptr, layout.size(), layout.align(), new_size)
 }
 
-/// Allocate zero-initialized memory with the global allocator.
+/// Allocates zero-initialized memory with the global allocator.
 ///
 /// This function forwards calls to the [`GlobalAlloc::alloc_zeroed`] method
 /// of the allocator registered with the `#[global_allocator]` attribute
@@ -205,7 +205,7 @@ pub(crate) unsafe fn box_free<T: ?Sized>(ptr: Unique<T>) {
     }
 }
 
-/// Abort on memory allocation error or failure.
+/// Aborts on memory allocation error or failure.
 ///
 /// Callers of memory allocation APIs wishing to abort computation
 /// in response to an allocation error are encouraged to call this function,

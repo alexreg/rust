@@ -11,7 +11,7 @@ extern "C" fn restorer() -> ! {
     unreachable!();
 }
 
-/// Set the end of the process's heap
+/// Sets the end of the process's heap.
 ///
 /// When `addr` is `0`, this function will return the current break.
 ///

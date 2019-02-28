@@ -6,7 +6,7 @@ use cmp::Ordering::{self, Less, Equal, Greater};
 
 pub use num::bignum::Big32x40 as Big;
 
-/// Test whether truncating all bits less significant than `ones_place` introduces
+/// Tests whether truncating all bits less significant than `ones_place` introduces
 /// a relative error less, equal, or greater than 0.5 ULP.
 pub fn compare_with_half_ulp(f: &Big, ones_place: usize) -> Ordering {
     if ones_place == 0 {

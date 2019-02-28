@@ -421,7 +421,7 @@ impl<T, A: Alloc> RawVec<T, A> {
     fn amortized_new_size(&self, used_cap: usize, needed_extra_cap: usize)
         -> Result<usize, CollectionAllocErr> {
 
-        // Nothing we can really do about these checks :(
+        // Nothing we can really do about these checks.
         let required_cap = used_cap.checked_add(needed_extra_cap).ok_or(CapacityOverflow)?;
         // Cannot overflow, because `cap <= isize::MAX`, and type of `cap` is `usize`.
         let double_cap = self.cap * 2;
@@ -651,7 +651,7 @@ impl<T, A: Alloc> RawVec<T, A> {
                 return Ok(());
             }
 
-            // Nothing we can really do about these checks :(
+            // Nothing we can really do about these checks.
             let new_cap = match strategy {
                 Exact => used_cap.checked_add(needed_extra_cap).ok_or(CapacityOverflow)?,
                 Amortized => self.amortized_new_size(used_cap, needed_extra_cap)?,
