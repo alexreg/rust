@@ -32,4 +32,4 @@ type Type_8<'a,,> = &'a ();
 //~^ error: expected one of `>`, `const`, identifier, or lifetime, found `,`
 
 
-//type Type_9<T,,> = Box<T>; // error: expected identifier, found `,`
+// type Type_9<T,,> = Box<T>; // error: expected identifier, found `,`

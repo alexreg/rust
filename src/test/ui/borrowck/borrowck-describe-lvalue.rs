@@ -182,7 +182,7 @@ fn main() {
         }
         drop(x);
     }
-    // Downcasted field
+    // Downcast field.
     {
         enum E<X> { A(X), B { x: X } }
 

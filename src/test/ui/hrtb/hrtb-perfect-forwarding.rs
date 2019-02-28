@@ -1,5 +1,5 @@
 // Test a case where you have an impl of `Foo<X>` for all `X` that
-// is being applied to `for<'a> Foo<&'a mut X>`. Issue #19730.
+// is being applied to `for<'a> Foo<&'a mut X>`. See issue #19730.
 
 trait Foo<X> {
     fn foo(&mut self, x: X) { }

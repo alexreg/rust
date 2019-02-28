@@ -56,7 +56,7 @@ fn scribbled<'a>(s: Scribble<'a>) -> &'a mut u32 {
     //[migrate]~| WARNING this represents potential undefined behavior in your code
 }
 
-// This, by analogy to previous case, is *also* not okay.
+// This, by analogy to previous case, is *also* not ok.
 //
 // (But again, AST-borrowck was not smart enogh to know that this
 // should be an error.)
@@ -67,7 +67,7 @@ fn boxed_scribbled<'a>(s: Box<Scribble<'a>>) -> &'a mut u32 {
     //[migrate]~| WARNING this represents potential undefined behavior in your code
 }
 
-// This, by analogy to previous case, is *also* not okay.
+// This, by analogy to previous case, is *also* not ok.
 //
 // (But again, AST-borrowck was not smart enogh to know that this
 // should be an error.)

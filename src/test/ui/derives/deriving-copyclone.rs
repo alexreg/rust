@@ -38,4 +38,3 @@ fn main() {
     is_copy(B { a: 1, b: D }); //~ERROR Copy
     is_clone(B { a: 1, b: D });
 }
-

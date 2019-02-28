@@ -1,4 +1,3 @@
-//
 // run-pass
 
 // FIXME(#54366): we probably shouldn't allow `#[thread_local]` static mut to get a `'static`
