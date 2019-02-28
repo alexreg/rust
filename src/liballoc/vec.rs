@@ -692,7 +692,7 @@ impl<T> Vec<T> {
             // https://github.com/rust-lang/rust/issues/51802
             let mut local_len = SetLenOnDrop::new(&mut self.len);
 
-            // drop any extra elements
+            // Drop any extra elements.
             for _ in len..current_len {
                 local_len.decrement_len(1);
                 ptr = ptr.offset(-1);
@@ -2584,7 +2584,7 @@ impl<I: Iterator> Drop for Splice<'_, I> {
             }
 
             // There may be more elements. Use the lower bound as an estimate.
-            // FIXME: Is the upper bound a better guess? Or something else?
+            // FIXME: is the upper bound a better guess? Or something else?
             let (lower_bound, _upper_bound) = self.replace_with.size_hint();
             if lower_bound > 0  {
                 self.drain.move_tail(lower_bound);

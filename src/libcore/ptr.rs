@@ -383,7 +383,7 @@ unsafe fn swap_nonoverlapping_bytes(x: *mut u8, y: *mut u8, len: usize) {
 
     // Loop through `x` and `y`, copying them `Block` at a time
     // The optimizer should unroll the loop fully for most types
-    // N.B. We can't use a for loop as the `range` impl calls `mem::swap` recursively
+    // N.B., we can't use a for loop as the `range` impl calls `mem::swap` recursively.
     let mut i = 0;
     while i + block_size <= len {
         // Create some uninitialized memory as scratch space

@@ -1901,7 +1901,7 @@ impl Path {
     #[allow(deprecated)]
     pub fn is_absolute(&self) -> bool {
         if cfg!(target_os = "redox") {
-            // FIXME: Allow Redox prefixes
+            // FIXME: allow Redox prefixes.
             self.has_root() || has_redox_scheme(self.as_u8_slice())
         } else {
             self.has_root() && (cfg!(unix) || self.prefix().is_some())

@@ -31,7 +31,7 @@ const MAX_STEALS: isize = 5;
 const MAX_STEALS: isize = 1 << 20;
 
 pub struct Packet<T> {
-    // internal queue for all messages
+    // Internal queue for all messages.
     queue: spsc::Queue<Message<T>, ProducerAddition, ConsumerAddition>,
 }
 
@@ -293,7 +293,7 @@ impl<T> Packet<T> {
         // need to do is flag that we're disconnected and then everything else
         // can take over (we don't have anyone to wake up).
         //
-        // The catch for Ports is that we want to drop the entire contents of
+        // The catch for ports is that we want to drop the entire contents of
         // the queue. There are multiple reasons for having this property, the
         // largest of which is that if another chan is waiting in this channel
         // (but not received yet), then waiting on that port will cause a
@@ -458,8 +458,7 @@ impl<T> Packet<T> {
                 *self.queue.consumer_addition().steals.get() = steals;
             }
 
-            // if we were previously positive, then there's surely data to
-            // receive
+            // If we were previously positive, then there's surely data to receive.
             prev >= 0
         };
 

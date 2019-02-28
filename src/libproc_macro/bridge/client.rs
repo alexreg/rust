@@ -15,7 +15,7 @@ macro_rules! define_handles {
         }
 
         impl HandleCounters {
-            // FIXME(#53451) public to work around `Cannot create local mono-item` ICE.
+            // FIXME(#53451): public to work around `cannot create local mono-item` ICE.
             pub extern "C" fn get() -> &'static Self {
                 static COUNTERS: HandleCounters = HandleCounters {
                     $($oty: AtomicUsize::new(1),)*
@@ -360,7 +360,7 @@ pub extern "C" fn __run_expand1(
             // Take the `cached_buffer` back out, for the output value.
             b = Bridge::with(|bridge| bridge.cached_buffer.take());
 
-            // HACK(eddyb) Separate encoding a success value (`Ok(output)`)
+            // HACK(eddyb): separate encoding a success value (`Ok(output)`)
             // from encoding a panic (`Err(e: PanicMessage)`) to avoid
             // having handles outside the `bridge.enter(|| ...)` scope, and
             // to catch panics that could happen while encoding the success.
@@ -414,7 +414,7 @@ pub extern "C" fn __run_expand2(
             // Take the `cached_buffer` back out, for the output value.
             b = Bridge::with(|bridge| bridge.cached_buffer.take());
 
-            // HACK(eddyb) Separate encoding a success value (`Ok(output)`)
+            // HACK(eddyb): separate encoding a success value (`Ok(output)`)
             // from encoding a panic (`Err(e: PanicMessage)`) to avoid
             // having handles outside the `bridge.enter(|| ...)` scope, and
             // to catch panics that could happen while encoding the success.

@@ -573,7 +573,7 @@ impl<'a> Iterator for Chars<'a> {
 
     #[inline]
     fn count(self) -> usize {
-        // length in `char` is equal to the number of non-continuation bytes
+        // Length in `char`s is equal to the number of non-continuation bytes.
         let bytes_len = self.iter.len();
         let mut cont_bytes = 0;
         for &byte in self.iter {

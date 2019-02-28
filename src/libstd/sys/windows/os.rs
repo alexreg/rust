@@ -37,7 +37,7 @@ pub fn error_string(mut errnum: i32) -> String {
         // GetLastError. For more information about Windows error codes, see
         // `[MS-ERREF]`: https://msdn.microsoft.com/en-us/library/cc231198.aspx
         if (errnum & c::FACILITY_NT_BIT as i32) != 0 {
-            // format according to https://support.microsoft.com/en-us/help/259693
+            // Format according to <https://support.microsoft.com/en-us/help/259693>.
             const NTDLL_DLL: &[u16] = &['N' as _, 'T' as _, 'D' as _, 'L' as _, 'L' as _,
                                         '.' as _, 'D' as _, 'L' as _, 'L' as _, 0];
             module = c::GetModuleHandleW(NTDLL_DLL.as_ptr());
@@ -318,7 +318,7 @@ mod tests {
     use io::Error;
     use sys::c;
 
-    // tests `error_string` above
+    // Tests `error_string` above.
     #[test]
     fn ntstatus_error() {
         const STATUS_UNSUCCESSFUL: u32 = 0xc000_0001;

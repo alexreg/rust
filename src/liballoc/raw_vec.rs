@@ -83,7 +83,7 @@ impl<T, A: Alloc> RawVec<T, A> {
             let alloc_size = cap.checked_mul(elem_size).unwrap_or_else(|| capacity_overflow());
             alloc_guard(alloc_size).unwrap_or_else(|_| capacity_overflow());
 
-            // handles ZSTs and `cap = 0` alike
+            // Handles ZSTs and `cap = 0` alike.
             let ptr = if alloc_size == 0 {
                 NonNull::<T>::dangling()
             } else {

@@ -13,8 +13,7 @@ macro_rules! search_asserts {
 /// Combined enum for the results of `next()` and `next_match()`/`next_reject()`.
 #[derive(Debug, PartialEq, Eq)]
 enum Step {
-    // variant names purposely chosen to
-    // be the same length for easy alignment
+    // Variant names purposely chosen to be the same length for easy alignment.
     Matches(usize, usize),
     Rejects(usize, usize),
     InRange(usize, usize),
@@ -119,8 +118,8 @@ const STRESS: &str = "Áa🁀bÁꁁfg😁각กᘀ각aÁ각ꁁก😁a";
 
 #[test]
 fn test_stress_indices() {
-    // this isn't really a test, more of documentation on the indices of each character in the stresstest string
-
+    // This isn't really a test -- more of documentation on the indices of each character in the
+    // stress-test string.
     search_asserts!(STRESS, 'x', "Indices of characters in stress test",
         [next, next, next, next, next, next, next, next, next, next, next, next, next, next, next, next, next, next, next, next, next],
         [Rejects(0, 2), // Á

@@ -825,7 +825,7 @@ impl<K, V> RawTable<K, V> {
     /// state and should only be used for dropping the table's remaining
     /// entries. It's used in the implementation of `Drop`.
     unsafe fn rev_drop_buckets(&mut self) {
-        // initialize the raw bucket past the end of the table
+        // Initialize the raw bucket past the end of the table.
         let mut raw = self.raw_bucket_at(self.capacity());
         let mut elems_left = self.size;
 
@@ -864,7 +864,7 @@ struct RawBuckets<'a, K, V> {
     marker: marker::PhantomData<&'a ()>,
 }
 
-// FIXME(#26925) Remove in favor of `#[derive(Clone)]`
+// FIXME(#26925): remove in favor of `#[derive(Clone)]`.
 impl<K, V> Clone for RawBuckets<'_, K, V> {
     fn clone(&self) -> Self {
         RawBuckets {
@@ -915,7 +915,7 @@ pub struct Iter<'a, K: 'a, V: 'a> {
 unsafe impl<K: Sync, V: Sync> Sync for Iter<'_, K, V> {}
 unsafe impl<K: Sync, V: Sync> Send for Iter<'_, K, V> {}
 
-// FIXME(#26925) Remove in favor of `#[derive(Clone)]`
+// FIXME(#26925): remove in favor of `#[derive(Clone)]`.
 impl<K, V> Clone for Iter<'_, K, V> {
     fn clone(&self) -> Self {
         Iter {

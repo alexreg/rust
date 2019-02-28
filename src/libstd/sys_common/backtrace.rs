@@ -211,7 +211,7 @@ fn output_fileline(w: &mut dyn Write,
                    file: &[u8],
                    line: u32,
                    format: PrintFormat) -> io::Result<()> {
-    // prior line: "  ##: {:2$} - func"
+    // Prior line: "  ##: {:2$} - func"
     w.write_all(b"")?;
     match format {
         PrintFormat::Full => write!(w,

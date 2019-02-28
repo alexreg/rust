@@ -1898,7 +1898,7 @@ impl<T> [T] {
     pub fn clone_from_slice(&mut self, src: &[T]) where T: Clone {
         assert!(self.len() == src.len(),
                 "destination and source slices have different lengths");
-        // NOTE: We need to explicitly slice them to the same length
+        // NOTE: we need to explicitly slice them to the same length
         // for bounds checking to be elided, and the optimizer will
         // generate memcpy for simple cases (for example T = u8).
         let len = self.len();
@@ -2180,7 +2180,7 @@ impl<T> [T] {
     pub unsafe fn align_to<U>(&self) -> (&[T], &[U], &[T]) {
         // Note that most of this function will be constant-evaluated,
         if ::mem::size_of::<U>() == 0 || ::mem::size_of::<T>() == 0 {
-            // handle ZSTs specially, which is – don't handle them at all.
+            // Handle ZSTs specially, which is -- don't handle them at all.
             return (self, &[], &[]);
         }
 
@@ -2192,7 +2192,7 @@ impl<T> [T] {
             (self, &[], &[])
         } else {
             let (left, rest) = self.split_at(offset);
-            // now `rest` is definitely aligned, so `from_raw_parts_mut` below is okay
+            // Now `rest` is definitely aligned, so `from_raw_parts_mut` below is ok.
             let (us_len, ts_len) = rest.align_to_offsets::<U>();
             (left,
              from_raw_parts(rest.as_ptr() as *const U, us_len),

@@ -21,7 +21,7 @@ impl Mutex {
 
     #[inline]
     pub unsafe fn init(&mut self) {
-        // nothing to do
+        // Nothing to do.
     }
 
     pub unsafe fn lock(&self) {
@@ -109,7 +109,7 @@ impl ReentrantMutex {
         // Make sure `id` isn't `0`.
         let id = id.checked_add(1).unwrap();
         match self.owner.compare_exchange(0, id, SeqCst, SeqCst) {
-            // we transitioned from unlocked to locked
+            // We transitioned from unlocked to locked.
             Ok(_) => {
                 debug_assert_eq!(*self.recursions.get(), 0);
                 Ok(())

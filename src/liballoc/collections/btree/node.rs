@@ -250,7 +250,7 @@ impl<K, V> Root<K, V> {
         NodeRef {
             height: self.height,
             node: self.node.as_ptr(),
-            root: ptr::null_mut(), // FIXME: Is there anything better to do here?
+            root: ptr::null_mut(), // FIXME: is there anything better to do here?
             _marker: PhantomData,
         }
     }

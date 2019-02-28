@@ -453,7 +453,7 @@ impl<T: ?Sized> Arc<T> {
         let mut cur = this.inner().weak.load(Relaxed);
 
         loop {
-            // check if the weak counter is currently "locked"; if so, spin.
+            // Check if the weak counter is currently "locked"; if so, spin.
             if cur == usize::MAX {
                 cur = this.inner().weak.load(Relaxed);
                 continue;
