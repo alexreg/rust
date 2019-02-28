@@ -239,7 +239,7 @@ pub struct Config {
     /// mode describing what file the actual ui output will be compared to
     pub compare_mode: Option<CompareMode>,
 
-    // Configuration for various run-make tests frobbing things like C compilers
+    // Configuration for various run-make tests-frobbing things like C compilers,
     // or querying about various LLVM component information.
     pub cc: String,
     pub cxx: String,

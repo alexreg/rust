@@ -819,7 +819,7 @@ impl<'test> TestCx<'test> {
                     );
 
                     if version > extract_gdb_version("7.4").unwrap() {
-                        // Add the directory containing the pretty printers to
+                        // Add the directory containing the pretty-printers to
                         // GDB's script auto loading safe path
                         script_str.push_str(&format!(
                             "add-auto-load-safe-path {}\n",
@@ -835,8 +835,8 @@ impl<'test> TestCx<'test> {
                 }
             }
 
-            // The following line actually doesn't have to do anything with
-            // pretty printing, it just tells GDB to print values on one line:
+            // Theis doesn't actually have to do anything with pretty-printing,
+            // it just tells GDB to print values on one line.
             script_str.push_str("set print pretty off\n");
 
             // Add the pretty printer directory to GDB's source-file search path
@@ -953,7 +953,7 @@ impl<'test> TestCx<'test> {
             PREFIXES
         };
 
-        // Parse debugger commands etc from test files
+        // Parse debugger commands, etc., from test files.
         let DebuggerCommands {
             commands,
             check_lines,
@@ -3069,7 +3069,7 @@ impl<'test> TestCx<'test> {
             // escaped newlines in json strings should be readable
             // in the stderr files. There's no point int being correct,
             // since only humans process the stderr files.
-            // Thus we just turn escaped newlines back into newlines.
+            // Thus, we just turn escaped newlines back into newlines.
             normalized = normalized.replace("\\n", "\n");
         }
 
