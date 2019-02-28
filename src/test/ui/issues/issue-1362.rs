@@ -1,4 +1,4 @@
-// Regression test for issue #1362 - without that fix the span will be bogus
+// Regression test for issue #1362 -- without that fix the span will be bogus.
 // no-reformat
 fn main() {
   let x: u32 = 20i32; //~ ERROR mismatched types

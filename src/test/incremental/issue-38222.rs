@@ -4,9 +4,7 @@
 // revisions:rpass1 rpass2
 // compile-flags: -Z query-dep-graph
 
-
 #![feature(rustc_attrs)]
-
 
 #![rustc_partition_reused(module="issue_38222-mod1", cfg="rpass2")]
 

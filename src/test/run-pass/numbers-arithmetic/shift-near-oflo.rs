@@ -1,8 +1,8 @@
 // run-pass
 // compile-flags: -C debug-assertions
 
-// Check that we do *not* overflow on a number of edge cases.
-// (compare with test/run-fail/overflowing-{lsh,rsh}*.rs)
+// Check that we do *not* overflow on a number of edge cases
+// (Compare with `test/run-fail/overflowing-{lsh,rsh}*.rs`.)
 
 fn main() {
     test_left_shift();
@@ -11,10 +11,10 @@ fn main() {
 
 pub static mut HACK: i32 = 0;
 
-// Work around constant-evaluation
+// Work around constant-evaluation.
 // The point of this test is to exercise the code generated for execution at runtime,
-// `id` can never be flagged as a const fn by future aggressive analyses...
-// due to the modification of the static
+// `id` can never be flagged as a const fn by future aggressive analyses
+// due to the modification of the static.
 #[inline(never)]
 fn id<T>(x: T) -> T {
     unsafe { HACK += 1; }
@@ -22,7 +22,7 @@ fn id<T>(x: T) -> T {
 }
 
 fn test_left_shift() {
-    // negative rhs can panic, but values in [0,N-1] are okay for iN
+    // Negative RHS can panic, but values in `[0, N - 1]` are ok for `iN`.
 
     macro_rules! tests {
         ($iN:ty, $uN:ty, $max_rhs:expr, $expect_i:expr, $expect_u:expr) => { {
@@ -65,7 +65,7 @@ fn test_left_shift() {
 }
 
 fn test_right_shift() {
-    // negative rhs can panic, but values in [0,N-1] are okay for iN
+    // Negative RHS can panic, but values in `[0, N - 1]` are ok for `iN`.
 
     macro_rules! tests {
         ($iN:ty, $uN:ty, $max_rhs:expr,
@@ -79,7 +79,7 @@ fn test_right_shift() {
             assert_eq!(x, 1);
             let x = ($highbit_u) >> id($max_rhs);
             assert_eq!(x, 1);
-            // sign-bit is carried by arithmetic right shift
+            // Sign bit is carried by arithmetic right shift.
             let x = ($signbit_i) >> id($max_rhs);
             assert_eq!(x, -1);
             // low-order bits on LHS are silently discarded without panic.

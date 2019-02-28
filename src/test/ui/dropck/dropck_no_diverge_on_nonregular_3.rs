@@ -6,6 +6,8 @@
 // error messages will report different types depending on which type
 // dropck is analyzing.)
 
+// ignore-tidy-linelength
+
 use std::marker::PhantomData;
 
 struct Digit<T> {
@@ -16,7 +18,7 @@ struct Node<T:'static> { m: PhantomData<&'static T> }
 
 enum FingerTree<T:'static> {
     Single(T),
-    // According to the bug report, Digit before Box would infinite loop.
+    // Bug report indicated `Digit` before `Box` would loop infinitely.
     Deep(
         Digit<T>,
         Box<FingerTree<Node<T>>>,
@@ -29,8 +31,8 @@ enum Wrapper<T:'static> {
 }
 
 fn main() {
-    let w = //~ ERROR overflow while adding drop-check rules for std::option
-        Some(Wrapper::Simple::<u32>);
-    //~^ ERROR overflow while adding drop-check rules for std::option::Option
-    //~| ERROR overflow while adding drop-check rules for Wrapper
+    let w = Some(Wrapper::Simple::<u32>);
+    //~^ ERROR overflow while adding drop-check rules for `std::option::Option<Wrapper<u32>>` [E0320]
+    //~^^ ERROR overflow while adding drop-check rules for `std::option::Option<Wrapper<u32>>` [E0320]
+    //~| ERROR overflow while adding drop-check rules for `Wrapper<u32>` [E0320]
 }

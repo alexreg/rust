@@ -1,7 +1,7 @@
 #![feature(box_syntax)]
 
 // Iota-reduction is a rule in the Calculus of (Co-)Inductive Constructions,
-// which "says that a destructor applied to an object built from a constructor
+// which says that "a destructor applied to an object built from a constructor
 // behaves as expected".  -- http://coq.inria.fr/doc/Reference-Manual006.html
 //
 // It's a little more complicated here, because of pointers and regions and

@@ -149,7 +149,7 @@ pub fn second_var_add(a: i32, b: i32) -> i32 {
 
 
 
-// Change operator from + to - -------------------------------------------------
+// Change operator from `+` to `-` ---------------------------------------------
 #[cfg(cfail1)]
 pub fn plus_to_minus(a: i32) -> i32 {
     1 + a
@@ -164,7 +164,7 @@ pub fn plus_to_minus(a: i32) -> i32 {
 
 
 
-// Change operator from + to * -------------------------------------------------
+// Change operator from `+` to `*` ---------------------------------------------
 #[cfg(cfail1)]
 pub fn plus_to_mult(a: i32) -> i32 {
     1 + a
@@ -179,7 +179,7 @@ pub fn plus_to_mult(a: i32) -> i32 {
 
 
 
-// Change operator from + to / -------------------------------------------------
+// Change operator from `+` to `/` ---------------------------------------------
 #[cfg(cfail1)]
 pub fn plus_to_div(a: i32) -> i32 {
     1 + a
@@ -194,7 +194,7 @@ pub fn plus_to_div(a: i32) -> i32 {
 
 
 
-// Change operator from + to % -------------------------------------------------
+// Change operator from `+` to `%` ---------------------------------------------
 #[cfg(cfail1)]
 pub fn plus_to_mod(a: i32) -> i32 {
     1 + a
@@ -209,7 +209,7 @@ pub fn plus_to_mod(a: i32) -> i32 {
 
 
 
-// Change operator from && to || -----------------------------------------------
+// Change operator from `&&` to `||` -------------------------------------------
 #[cfg(cfail1)]
 pub fn and_to_or(a: bool, b: bool) -> bool {
     a && b
@@ -224,7 +224,7 @@ pub fn and_to_or(a: bool, b: bool) -> bool {
 
 
 
-// Change operator from & to | -------------------------------------------------
+// Change operator from `&` to `|` ---------------------------------------------
 #[cfg(cfail1)]
 pub fn bitwise_and_to_bitwise_or(a: i32) -> i32 {
     1 & a
@@ -239,7 +239,7 @@ pub fn bitwise_and_to_bitwise_or(a: i32) -> i32 {
 
 
 
-// Change operator from & to ^ -------------------------------------------------
+// Change operator from `&` to `^` ---------------------------------------------
 #[cfg(cfail1)]
 pub fn bitwise_and_to_bitwise_xor(a: i32) -> i32 {
     1 & a
@@ -254,7 +254,7 @@ pub fn bitwise_and_to_bitwise_xor(a: i32) -> i32 {
 
 
 
-// Change operator from & to << ------------------------------------------------
+// Change operator from `&` to `<<` --------------------------------------------
 #[cfg(cfail1)]
 pub fn bitwise_and_to_lshift(a: i32) -> i32 {
     a & 1
@@ -269,7 +269,7 @@ pub fn bitwise_and_to_lshift(a: i32) -> i32 {
 
 
 
-// Change operator from & to >> ------------------------------------------------
+// Change operator from `&` to `>>` --------------------------------------------
 #[cfg(cfail1)]
 pub fn bitwise_and_to_rshift(a: i32) -> i32 {
     a & 1
@@ -284,7 +284,7 @@ pub fn bitwise_and_to_rshift(a: i32) -> i32 {
 
 
 
-// Change operator from == to != -----------------------------------------------
+// Change operator from `==` to `!=` -------------------------------------------
 #[cfg(cfail1)]
 pub fn eq_to_uneq(a: i32) -> bool {
     a == 1
@@ -299,7 +299,7 @@ pub fn eq_to_uneq(a: i32) -> bool {
 
 
 
-// Change operator from == to < ------------------------------------------------
+// Change operator from `==` to `<` --------------------------------------------
 #[cfg(cfail1)]
 pub fn eq_to_lt(a: i32) -> bool {
     a == 1
@@ -314,7 +314,7 @@ pub fn eq_to_lt(a: i32) -> bool {
 
 
 
-// Change operator from == to > ------------------------------------------------
+// Change operator from `==` to `>` --------------------------------------------
 #[cfg(cfail1)]
 pub fn eq_to_gt(a: i32) -> bool {
     a == 1
@@ -329,7 +329,7 @@ pub fn eq_to_gt(a: i32) -> bool {
 
 
 
-// Change operator from == to <= -----------------------------------------------
+// Change operator from `==` to `<=` -------------------------------------------
 #[cfg(cfail1)]
 pub fn eq_to_le(a: i32) -> bool {
     a == 1
@@ -344,7 +344,7 @@ pub fn eq_to_le(a: i32) -> bool {
 
 
 
-// Change operator from == to >= -----------------------------------------------
+// Change operator from `==` to `>=` -------------------------------------------
 #[cfg(cfail1)]
 pub fn eq_to_ge(a: i32) -> bool {
     a == 1

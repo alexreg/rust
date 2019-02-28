@@ -2,7 +2,7 @@
 // Test that we can parse all the various places that a `for` keyword
 // can appear representing universal quantification.
 
-// pretty-expanded FIXME #23616
+// pretty-expanded FIXME(#23616)
 
 #![allow(unused_variables)]
 #![allow(dead_code)]
@@ -11,7 +11,7 @@ trait Get<A,R> {
     fn get(&self, arg: A) -> R;
 }
 
-// Parse HRTB with explicit `for` in a where-clause:
+// Parse HRTB with explicit `for` in a `where` clause:
 
 fn foo00<T>(t: T)
     where T : for<'a> Get<&'a i32, &'a i32>

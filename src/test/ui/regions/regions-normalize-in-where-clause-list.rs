@@ -1,4 +1,4 @@
-// Test that we are able to normalize in the list of where-clauses,
+// Test that we are able to normalize in the list of `where` clauses,
 // even if `'a: 'b` is required.
 
 trait Project<'a, 'b> {

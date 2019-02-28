@@ -3,7 +3,7 @@
 // the return occurs.
 //
 // We will explicitly test AST-borrowck, NLL, and migration modes;
-// thus we will also skip the automated compare-mode=nll.
+// thus we will also skip the automated `compare-mode=nll`.
 
 // revisions: ast nll migrate
 // ignore-compare-mode-nll

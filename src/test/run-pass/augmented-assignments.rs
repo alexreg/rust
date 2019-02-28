@@ -74,8 +74,8 @@ fn main() {
     assert_eq!(array[1], 2);
     assert_eq!(array[2], 3);
 
-    // sized indirection
-    // check that this does *not* trigger the unused_assignments lint
+    // Sized indirection.
+    // Check that this does *not* trigger the `unused_assignments` lint.
     let mut array = [0, 1, 2];
     let mut view = View(&mut array);
     view += 1;

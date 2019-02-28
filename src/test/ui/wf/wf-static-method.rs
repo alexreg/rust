@@ -50,5 +50,4 @@ fn inherent_evil<'a, 'b>(b: &'b u32) -> &'a u32 {
     <Evil>::inherent_evil(b) // bug? shouldn't this be an error
 }
 
-
 fn main() {}

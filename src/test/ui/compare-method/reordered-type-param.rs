@@ -1,5 +1,5 @@
-// Tests that ty params get matched correctly when comparing
-// an impl against a trait
+// Tests that type params get matched correctly when comparing
+// an impl against a trait.
 //
 // cc #26111
 

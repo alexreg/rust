@@ -1,5 +1,5 @@
 // run-pass
-// ignore-emscripten FIXME(#45351) hits an LLVM assert
+// ignore-emscripten FIXME(#45351): hits an LLVM assert
 
 #![feature(repr_simd, platform_intrinsics, concat_idents)]
 #![allow(non_camel_case_types)]
@@ -61,8 +61,8 @@ macro_rules! tests {
     }}
 }
 fn main() {
-    // 13 vs. -100 tests that we get signed vs. unsigned comparisons
-    // correct (i32: 13 > -100, u32: 13 < -100).    let i1 = i32x4(10, -11, 12, 13);
+    // 13 vs. -100 tests that we get signed vs. unsigned comparisons.
+    // Correct: (`i32: 13 > -100`, `u32: 13 < -100`).
     let i1 = i32x4(10, -11, 12, 13);
     let i2 = i32x4(5, -5, 20, -100);
     let i3 = i32x4(10, -11, 20, -100);

@@ -1,4 +1,4 @@
-// Test error message when enum variants are used as types
+// Test error message when enum variants are used as types.
 
 
 // issue 21225

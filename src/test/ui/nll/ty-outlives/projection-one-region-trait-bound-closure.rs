@@ -55,7 +55,7 @@ where
     T::AssocType: 'a,
 {
     // We are projecting `<T as Anything<'b>>::AssocType`, and we know
-    // that this outlives `'a` because of the where-clause.
+    // that this outlives `'a` because of the `where` clause.
 
     with_signature(cell, t, |cell, t| require(cell, t));
 }

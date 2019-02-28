@@ -9,7 +9,7 @@ pub struct Thread(Void);
 pub const DEFAULT_MIN_STACK_SIZE: usize = 4096;
 
 impl Thread {
-    // unsafe: see thread::Builder::spawn_unchecked for safety requirements
+    // Unsafe: see `thread::Builder::spawn_unchecked` for safety requirements.
     pub unsafe fn new(_stack: usize, _p: Box<dyn FnBox()>)
         -> io::Result<Thread>
     {
@@ -86,7 +86,7 @@ cfg_if! {
         }
 
         // FIXME: still need something for hooking exiting a thread to free
-        // data...
+        // data.
 
     } else if #[cfg(target_feature = "atomics")] {
         pub fn my_id() -> u32 {

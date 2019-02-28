@@ -1,4 +1,4 @@
-// Test that we check where-clauses on fn items.
+// Test that we check `where` clauses on fn items.
 
 
 #![allow(dead_code)]

@@ -141,7 +141,7 @@ type AddTypeParamBound<T1: Clone> = (T1, u32);
 
 
 
-// Add type param bound in where clause ----------------------------------------
+// Add type param bound in `where` clause --------------------------------------
 #[cfg(cfail1)]
 type AddTypeParamBoundWhereClause<T1> where T1: Clone = (T1, u32);
 
@@ -174,7 +174,7 @@ type AddLifetimeParamBound<'a, 'b: 'a> = (&'a u32, &'b u32);
 
 
 
-// Add lifetime param bound in where clause ------------------------------------
+// Add lifetime param bound in `where` clause ----------------------------------
 #[cfg(cfail1)]
 type AddLifetimeParamBoundWhereClause<'a, 'b, 'c>
 where 'b: 'a
@@ -207,7 +207,7 @@ mod change_trait_bound_indirectly {
 
 
 
-// Change Trait Bound Indirectly In Where Clause -------------------------------
+// Change trait bound indirectly in `where` clause -----------------------------
 mod change_trait_bound_indirectly_in_where_clause {
     #[cfg(cfail1)]
     use super::ReferencedTrait1 as Trait;

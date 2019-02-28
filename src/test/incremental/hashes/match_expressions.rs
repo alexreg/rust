@@ -111,7 +111,7 @@ pub fn change_guard_clause(x: u32, y: bool) -> u32 {
 
 
 
-// Add @-Binding ---------------------------------------------------------------
+// Add `@`-Binding -------------------------------------------------------------
 #[cfg(cfail1)]
 pub fn add_at_binding(x: u32) -> u32 {
     match x {
@@ -135,7 +135,7 @@ pub fn add_at_binding(x: u32) -> u32 {
 
 
 
-// Change Name of @-Binding ----------------------------------------------------
+// Change Name of `@`-Binding --------------------------------------------------
 #[cfg(cfail1)]
 pub fn change_name_of_at_binding(x: u32) -> u32 {
     match x {

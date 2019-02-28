@@ -1,4 +1,4 @@
-// Test that we check where-clauses on inherent impl methods.
+// Test that we check `where` clauses on inherent impl methods.
 
 #![feature(associated_type_defaults)]
 

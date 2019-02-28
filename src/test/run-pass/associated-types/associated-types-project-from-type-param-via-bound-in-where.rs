@@ -1,6 +1,6 @@
 // run-pass
 // Various uses of `T::Item` syntax where the bound that supplies
-// `Item` originates in a where-clause, not the declaration of
+// `Item` originates in a `where` clause, not the declaration of
 // `T`. Issue #20300.
 
 use std::marker::{PhantomData};
@@ -16,7 +16,7 @@ impl Trait for Struct {
     type Item = u32;
 }
 
-// Where-clause attached on the method which declares `T`.
+// `where` clause attached on the method which declares `T`.
 struct A;
 impl A {
     fn foo<T>(_x: T::Item) where T: Trait {
@@ -24,7 +24,7 @@ impl A {
     }
 }
 
-// Where-clause attached on the method to a parameter from the struct.
+// `where` clause attached on the method to a parameter from the struct.
 struct B<T>(PhantomData<T>);
 impl<T> B<T> {
     fn foo(_x: T::Item) where T: Trait {
@@ -32,12 +32,12 @@ impl<T> B<T> {
     }
 }
 
-// Where-clause attached to free fn.
+// `where` clause attached to free fn.
 fn c<T>(_: T::Item) where T : Trait {
     COUNTER.fetch_add(100, SeqCst);
 }
 
-// Where-clause attached to defaulted and non-defaulted trait method.
+// `where` clause attached to defaulted and non-defaulted trait method.
 trait AnotherTrait {
     fn method<T>(&self, _: T::Item) where T: Trait;
     fn default_method<T>(&self, _: T::Item) where T: Trait {
@@ -51,7 +51,7 @@ impl AnotherTrait for D {
     }
 }
 
-// Where-clause attached to trait and impl containing the method.
+// `where` clause attached to trait and impl containing the method.
 trait YetAnotherTrait<T>
     where T : Trait
 {
@@ -69,7 +69,7 @@ impl<T> YetAnotherTrait<T> for E<T>
     }
 }
 
-// Where-clause attached to inherent impl containing the method.
+// `where` clause attached to inherent impl containing the method.
 struct F<T>(PhantomData<T>);
 impl<T> F<T> where T : Trait {
     fn method(&self, _: T::Item) {
@@ -77,7 +77,7 @@ impl<T> F<T> where T : Trait {
     }
 }
 
-// Where-clause attached to struct.
+// `where` clause attached to struct.
 #[allow(dead_code)]
 struct G<T> where T : Trait {
     data: T::Item,

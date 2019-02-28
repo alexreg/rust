@@ -11,13 +11,6 @@
 // flag for such subcontent of `Foo` will always have the same value
 // as the drop flag for `Foo` itself.
 
-
-
-
-
-
-
-
 // compile-pass
 
 struct Foo(String);
@@ -27,7 +20,7 @@ impl Drop for Foo {
 }
 
 fn inline() {
-    // (dummy variable so `f` gets assigned `var1` in MIR for both fn's)
+    // Dummy variable so `f` gets assigned `var1` in MIR for both fn's.
     let _s = ();
     let mut f = Foo(String::from("foo"));
     f.0 = String::from("bar");

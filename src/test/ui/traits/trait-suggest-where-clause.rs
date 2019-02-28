@@ -3,7 +3,7 @@ use std::mem;
 struct Misc<T:?Sized>(T);
 
 fn check<T: Iterator, U: ?Sized>() {
-    // suggest a where-clause, if needed
+    // suggest a `where` clause, if needed
     mem::size_of::<U>();
     //~^ ERROR the size for values of type
 

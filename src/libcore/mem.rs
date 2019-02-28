@@ -1206,7 +1206,7 @@ impl<T> MaybeUninit<T> {
     /// state. Calling this when the content is not yet fully initialized causes undefined
     /// behavior.
     // FIXME(#53491): We currently rely on the above being incorrect, i.e., we have references
-    // to uninitialized data (e.g., in `libcore/fmt/float.rs`).  We should make
+    // to uninitialized data (e.g., in `libcore/fmt/float.rs`). We should make
     // a final decision about the rules before stabilization.
     #[unstable(feature = "maybe_uninit_ref", issue = "53491")]
     #[inline(always)]

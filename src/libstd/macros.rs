@@ -344,7 +344,7 @@ macro_rules! await {
             {
                 break x;
             }
-            // FIXME(cramertj) prior to stabilizing await, we have to ensure that this
+            // FIXME(cramertj): prior to stabilizing await, we have to ensure that this
             // can't be used to create a generator on stable via `|| await!()`.
             yield
         }

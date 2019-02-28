@@ -1,5 +1,5 @@
 // run-pass
-// Test that methods whose impl-trait-ref contains associated types
+// Test that methods whose impl trait ref contains associated types
 // are supported.
 
 trait Device {

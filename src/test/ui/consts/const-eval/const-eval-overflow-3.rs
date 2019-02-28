@@ -3,12 +3,6 @@
 //
 // This test is checking the count in an array expression.
 
-
-
-
-
-
-
 #![allow(unused_imports)]
 
 use std::fmt;

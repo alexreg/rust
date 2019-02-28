@@ -451,14 +451,14 @@ impl<T> [T] {
         let ln = self.len();
 
         // For very small types, all the individual reads in the normal
-        // path perform poorly.  We can do better, given efficient unaligned
+        // path perform poorly. We can do better, given efficient unaligned
         // load/store, by loading a larger chunk and reversing a register.
 
         // Ideally LLVM would do this for us, as it knows better than we do
         // whether unaligned reads are efficient (since that changes between
         // different ARM versions, for example) and what the best chunk size
-        // would be.  Unfortunately, as of LLVM 4.0 (2017-05) it only unrolls
-        // the loop, so we need to do this ourselves.  (Hypothesis: reverse
+        // would be. Unfortunately, as of LLVM 4.0 (2017-05) it only unrolls
+        // the loop, so we need to do this ourselves. (Hypothesis: reverse
         // is troublesome because the sides can be aligned differently --
         // will be, when the length is odd -- so there's no way of emitting
         // pre- and postludes to use fully-aligned SIMD in the middle.)
@@ -2877,7 +2877,7 @@ macro_rules! iterator {
             #[inline(always)]
             unsafe fn post_inc_start(&mut self, offset: isize) -> * $raw_mut T {
                 if mem::size_of::<T>() == 0 {
-                    // This is *reducing* the length.  `ptr` never changes with ZST.
+                    // This is *reducing* the length. `ptr` never changes with ZST.
                     self.end = (self.end as * $raw_mut u8).wrapping_offset(-offset) as * $raw_mut T;
                     self.ptr
                 } else {
@@ -3456,8 +3456,8 @@ impl<'a, T, P> Iterator for SplitMut<'a, T, P> where P: FnMut(&T) -> bool {
         if self.finished {
             (0, Some(0))
         } else {
-            // if the predicate doesn't match anything, we yield one slice
-            // if it matches every element, we yield len+1 empty slices.
+            // If the predicate doesn't match anything, we yield one slice
+            // if it matches every element, we yield `len + 1` empty slices.
             (1, Some(self.v.len() + 1))
         }
     }

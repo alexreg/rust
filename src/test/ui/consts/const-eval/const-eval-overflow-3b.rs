@@ -7,12 +7,6 @@
 // types for the left- and right-hand sides of the addition do not
 // match (as well as overflow).
 
-
-
-
-
-
-
 #![allow(unused_imports)]
 
 use std::fmt;

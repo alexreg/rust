@@ -342,11 +342,11 @@ impl<T> Packet<T> {
     }
 
     // Prepares this shared packet for a channel clone, essentially just bumping
-    // a refcount.
+    // a ref count.
     pub fn clone_chan(&self) {
         let old_count = self.channels.fetch_add(1, Ordering::SeqCst);
 
-        // See comments on Arc::clone() on why we do this (for `mem::forget`).
+        // See comments on `Arc::clone()` on why we do this (for `mem::forget`).
         if old_count > MAX_REFCOUNT {
             unsafe {
                 abort();

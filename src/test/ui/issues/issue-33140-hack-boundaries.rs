@@ -69,7 +69,7 @@ impl<'a> Trait4d for dyn Send + 'a {}
 //~^ ERROR E0119
 
 
-// Problem 5: where-clauses
+// Problem 5: `where` clauses
 trait Trait5 {
 }
 

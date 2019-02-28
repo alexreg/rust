@@ -69,5 +69,4 @@ fn test_stream_enumerate() {
     println!("{}", a);
 }
 
-
 fn main() {}

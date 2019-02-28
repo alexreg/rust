@@ -1606,7 +1606,7 @@ mod tests {
 
     #[test]
     fn test_child_doesnt_ref_parent() {
-        // If the child refcounts the parent thread, this will stack overflow when
+        // If the child ref counts the parent thread, this will stack overflow when
         // climbing the thread tree to dereference each ancestor. (See #1789)
         // (well, it would if the constant were 8000+ - I lowered it to be more
         // valgrind-friendly. try this at home, instead..!)

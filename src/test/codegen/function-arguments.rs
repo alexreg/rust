@@ -19,7 +19,7 @@ pub fn boolean(x: bool) -> bool {
 }
 
 // CHECK: @readonly_borrow(i32* noalias readonly align 4 dereferenceable(4) %arg0)
-// FIXME #25759 This should also have `nocapture`
+// FIXME(#25759): this should also have `nocapture`.
 #[no_mangle]
 pub fn readonly_borrow(_: &i32) {
 }
@@ -43,13 +43,13 @@ pub fn unsafe_borrow(_: &UnsafeInner) {
 }
 
 // CHECK: @mutable_unsafe_borrow(i16* align 2 dereferenceable(2) %arg0)
-// ... unless this is a mutable borrow, those never alias
+// ... unless this is a mutable borrow, those never alias.
 #[no_mangle]
 pub fn mutable_unsafe_borrow(_: &mut UnsafeInner) {
 }
 
 // CHECK: @mutable_borrow(i32* align 4 dereferenceable(4) %arg0)
-// FIXME #25759 This should also have `nocapture`
+// FIXME(#25759): this should also have `nocapture`.
 #[no_mangle]
 pub fn mutable_borrow(_: &mut i32) {
 }
@@ -60,7 +60,7 @@ pub fn indirect_struct(_: S) {
 }
 
 // CHECK: @borrowed_struct(%S* noalias readonly align 4 dereferenceable(32) %arg0)
-// FIXME #25759 This should also have `nocapture`
+// FIXME(#25759): this should also have `nocapture`.
 #[no_mangle]
 pub fn borrowed_struct(_: &S) {
 }

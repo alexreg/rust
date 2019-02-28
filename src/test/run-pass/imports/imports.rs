@@ -33,9 +33,12 @@ fn h() {
 
 // Here, there appears to be shadowing but isn't because of namespaces.
 mod b {
-    use foo::*; // This imports `f` in the value namespace.
-    use super::b as f; // This imports `f` only in the type namespace,
-    fn test() { self::f(); } // so the glob isn't shadowed.
+    // This imports `f` in the value namespace.
+    use foo::*;
+    // This imports `f` only in the type namespace,
+    use super::b as f;
+    // so the glob isn't shadowed.
+    fn test() { self::f(); }
 }
 
 // Here, there is shadowing in one namespace, but not the other.
@@ -55,8 +58,10 @@ mod c {
 
 // Unused names can be ambiguous.
 mod d {
-    pub use foo::*; // This imports `f` in the value namespace.
-    pub use bar::*; // This also imports `f` in the value namespace.
+    // This imports `f` in the value namespace.
+    pub use foo::*;
+    // This also imports `f` in the value namespace.
+    pub use bar::*;
 }
 
 mod e {

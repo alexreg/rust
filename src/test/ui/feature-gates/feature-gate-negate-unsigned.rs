@@ -1,4 +1,4 @@
-// Test that negating unsigned integers doesn't compile
+// Test that negating unsigned integers doesn't compile.
 
 struct S;
 impl std::ops::Neg for S {

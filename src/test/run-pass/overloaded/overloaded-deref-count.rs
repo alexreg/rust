@@ -62,12 +62,12 @@ pub fn main() {
     *n -= 3; // Mutable deref + assignment with binary operation.
     assert_eq!(n.counts(), (2, 3));
 
-    // Immutable deref used for calling a method taking &self. (The
-    // typechecker is smarter now about doing this.)
+    // Immutable deref used for calling a method taking `&self`. (The
+    // type-checker is smarter now about doing this.)
     (*n).to_string();
     assert_eq!(n.counts(), (3, 3));
 
-    // Mutable deref used for calling a method taking &mut self.
+    // Mutable deref used for calling a method taking `&mut self`.
     (*v).push(2);
     assert_eq!(v.counts(), (1, 3));
 
