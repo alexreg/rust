@@ -50,13 +50,13 @@ fn test_left_shift() {
     assert_eq!(x, std::i8::MIN);
     let x = 1_u8 << id(7);
     assert_eq!(x, 0x80);
-    // high-order bits on LHS are silently discarded without panic.
+    // High-order bits on LHS are silently discarded without panic.
     let x = 3_i8 << id(7);
     assert_eq!(x, std::i8::MIN);
     let x = 3_u8 << id(7);
     assert_eq!(x, 0x80);
 
-    // above is (approximately) expanded from:
+    // Above is (approximately) expanded from:
     tests!(i8, u8, 7, std::i8::MIN, 0x80_u8);
 
     tests!(i16, u16, 15, std::i16::MIN, 0x8000_u16);
@@ -82,7 +82,7 @@ fn test_right_shift() {
             // Sign bit is carried by arithmetic right shift.
             let x = ($signbit_i) >> id($max_rhs);
             assert_eq!(x, -1);
-            // low-order bits on LHS are silently discarded without panic.
+            // Low-order bits on LHS are silently discarded without panic.
             let x = ($highbit_i + 1) >> id($max_rhs-1);
             assert_eq!(x, 1);
             let x = ($highbit_u + 1) >> id($max_rhs);

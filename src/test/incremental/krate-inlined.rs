@@ -18,7 +18,7 @@ fn main() {
 
 mod x {
     pub fn method() {
-        // use some methods that require inlining HIR from another crate:
+        // Use some methods that require inlining HIR from another crate.
         let mut v = vec![];
         v.push(1);
     }

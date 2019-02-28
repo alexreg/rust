@@ -134,7 +134,7 @@ trait TraitChangeMethodParameterName {
 #[rustc_clean(label="Hir", cfg="cfail2")]
 #[rustc_clean(label="Hir", cfg="cfail3")]
 trait TraitChangeMethodParameterName {
-    // FIXME(#38501) This should preferably always be clean.
+    // FIXME(#38501): this should preferably always be clean.
     #[rustc_dirty(label="Hir", cfg="cfail2")]
     #[rustc_clean(label="Hir", cfg="cfail3")]
     fn method(b: u32);

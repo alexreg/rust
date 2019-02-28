@@ -25,19 +25,19 @@ pub fn readonly_borrow(_: &i32) {
 }
 
 // CHECK: @static_borrow(i32* noalias readonly align 4 dereferenceable(4) %arg0)
-// static borrow may be captured
+// Static borrow may be captured.
 #[no_mangle]
 pub fn static_borrow(_: &'static i32) {
 }
 
 // CHECK: @named_borrow(i32* noalias readonly align 4 dereferenceable(4) %arg0)
-// borrow with named lifetime may be captured
+// Borrow with named lifetime may be captured.
 #[no_mangle]
 pub fn named_borrow<'r>(_: &'r i32) {
 }
 
 // CHECK: @unsafe_borrow(i16* align 2 dereferenceable(2) %arg0)
-// unsafe interior means this isn't actually readonly and there may be aliases ...
+// Unsafe interior means this isn't actually readonly and there may be aliases ...
 #[no_mangle]
 pub fn unsafe_borrow(_: &UnsafeInner) {
 }

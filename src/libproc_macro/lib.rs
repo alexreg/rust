@@ -177,7 +177,7 @@ impl Extend<TokenTree> for TokenStream {
 #[stable(feature = "token_stream_extend", since = "1.30.0")]
 impl Extend<TokenStream> for TokenStream {
     fn extend<I: IntoIterator<Item = TokenStream>>(&mut self, streams: I) {
-        // FIXME(eddyb) Use an optimized implementation if/when possible.
+        // FIXME(eddyb): use an optimized implementation if/when possible.
         *self = iter::once(mem::replace(self, Self::new())).chain(streams).collect();
     }
 }

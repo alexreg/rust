@@ -6,7 +6,7 @@
 
 use std::hash::{Hash, SipHasher};
 
-// testing multiple separate deriving attributes
+// Testing multiple separate deriving attributes.
 #[derive(PartialEq)]
 #[derive(Clone)]
 #[derive(Hash)]

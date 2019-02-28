@@ -62,12 +62,12 @@ fn main() {
     x -= Int(1);
     assert_eq!(x, Int(0));
 
-    // indexed LHS
+    // Indexed LHS.
     let mut v = vec![Int(1), Int(2)];
     v[0] += Int(2);
     assert_eq!(v[0], Int(3));
 
-    // unsized RHS
+    // Unsized RHS.
     let mut array = [0, 1, 2];
     *Slice::new(&mut array) += 1;
     assert_eq!(array[0], 1);

@@ -1,7 +1,7 @@
-// RFC 736 (and Issue 21407): functional struct update should respect privacy.
+// RFC #736 (and issue #21407): functional struct update should respect privacy.
 
 // The `foo` module attempts to maintains an invariant that each `S`
-// has a unique `u64` id.
+// has a unique `u64` ID.
 use self::foo::S;
 mod foo {
     use std::cell::{UnsafeCell};

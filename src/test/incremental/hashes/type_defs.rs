@@ -1,7 +1,7 @@
 // This test case tests the incremental compilation hash (ICH) implementation
 // for `type` definitions.
 
-// The general pattern followed here is: Change one thing between rev1 and rev2
+// The general pattern followed here is: change one thing between rev1 and rev2
 // and make sure that the hash has changed, then change nothing between rev2 and
 // rev3 and make sure that the hash has not changed.
 
@@ -190,7 +190,7 @@ where 'b: 'a,
 
 
 
-// Change Trait Bound Indirectly -----------------------------------------------
+// Change trait bound Indirectly -----------------------------------------------
 trait ReferencedTrait1 {}
 trait ReferencedTrait2 {}
 

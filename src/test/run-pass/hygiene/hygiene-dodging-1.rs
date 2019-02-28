@@ -9,7 +9,7 @@ mod x {
 pub fn main(){
     // Should *not* shadow the module `x`.
     let x = 9;
-    // use it to avoid warnings:
+    // Use it to avoid warnings.
     x+3;
     assert_eq!(x::g(),14);
 }

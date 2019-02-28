@@ -1,4 +1,4 @@
-// Issue 34101: Circa 2016-06-05, `fn inline` below issued an
+// Issue #34101: circa 2016-06-05, `fn inline` below issued an
 // erroneous warning from the elaborate_drops pass about moving out of
 // a field in `Foo`, which has a destructor (and thus cannot have
 // content moved out of it). The reason that the warning is erroneous

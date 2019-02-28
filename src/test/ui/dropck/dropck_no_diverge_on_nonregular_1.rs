@@ -1,4 +1,4 @@
-// Issue 22443: Reject code using non-regular types that would
+// Issue #22443: reject code using non-regular types that would
 // otherwise cause dropck to loop infinitely.
 
 use std::marker::PhantomData;

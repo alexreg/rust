@@ -174,7 +174,7 @@ impl<T> Packet<T> {
             // much as possible, and then can only exit when they are the
             // only pusher (otherwise they must try again).
             n if n < DISCONNECTED + FUDGE => {
-                // see the comment in 'try' for a shared channel for why this
+                // See the comment in 'try' for a shared channel for why this
                 // window of "not disconnected" is ok.
                 self.cnt.store(DISCONNECTED, Ordering::SeqCst);
 
@@ -189,7 +189,7 @@ impl<T> Packet<T> {
                                 mpsc::Inconsistent => thread::yield_now(),
                             }
                         }
-                        // maybe we're done, if we're not the last ones
+                        // Maybe we're done. If we're not the last ones
                         // here, then we need to go try again.
                         if self.sender_drain.fetch_sub(1, Ordering::SeqCst) == 1 {
                             break

@@ -1,4 +1,4 @@
-// original problem
+// Original problem.
 pub fn foo<T>() -> isize {
     {
         static foo: isize = 2;
@@ -6,7 +6,7 @@ pub fn foo<T>() -> isize {
     }
 }
 
-// issue 8134
+// Issue #8134.
 struct Foo;
 impl Foo {
     pub fn foo<T>(&self) {
@@ -14,7 +14,7 @@ impl Foo {
     }
 }
 
-// issue 8134
+// Issue #8134.
 pub struct Parser<T>(T);
 impl<T: std::iter::Iterator<Item=char>> Parser<T> {
     fn in_doctype(&mut self) {

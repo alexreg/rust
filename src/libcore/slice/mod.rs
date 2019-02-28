@@ -2110,8 +2110,8 @@ impl<T> [T] {
         #[inline]
         fn gcd(a: usize, b: usize) -> usize {
             // iterative stein’s algorithm
-            // We should still make this `const fn` (and revert to recursive algorithm if we do)
-            // because relying on llvm to consteval all this is… well, it makes me uncomfortable.
+            // We should still make this `const fn` (and revert to recursive algorithm if we do),
+            // because relying on LLVM to const-eval all this does not make me comfortable.
             let (ctz_a, mut ctz_b) = unsafe {
                 if a == 0 { return b; }
                 if b == 0 { return a; }
@@ -3325,7 +3325,7 @@ impl<T: fmt::Debug, P> fmt::Debug for Split<'_, T, P> where P: FnMut(&T) -> bool
     }
 }
 
-// FIXME(#26925) Remove in favor of `#[derive(Clone)]`
+// FIXME(#26925): remove in favor of `#[derive(Clone)]`.
 #[stable(feature = "rust1", since = "1.0.0")]
 impl<T, P> Clone for Split<'_, T, P> where P: Clone + FnMut(&T) -> bool {
     fn clone(&self) -> Self {

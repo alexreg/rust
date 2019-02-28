@@ -74,13 +74,13 @@ struct Scribble<'a>(&'a mut u32);
 
 impl<'a> Drop for Scribble<'a> { fn drop(&mut self) { *self.0 = 42; } }
 
-// this is okay, in both AST-borrowck and NLL: The `Scribble` here *has*
+// This is ok, in both AST-borrowck and NLL: The `Scribble` here *has*
 // to strictly outlive `'a`
 fn borrowed_scribble<'a>(s: &'a mut Scribble) -> &'a mut u32 {
     &mut *s.0
 }
 
-// this, by analogy to previous case, is also okay.
+// This, by analogy to previous case, is also ok.
 fn boxed_borrowed_scribble<'a>(s: Box<&'a mut Scribble>) -> &'a mut u32 {
     &mut *(*s).0
 }

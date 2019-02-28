@@ -40,7 +40,7 @@ impl Deref for Bar<u8> {
     }
 }
 
-// actually invoke things
+// Actually invoke things.
 
 fn main() {
     let mut foo: Option<Foo<_>> = None;

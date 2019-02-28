@@ -1,4 +1,4 @@
-// check that static methods don't get to assume their trait-ref
+// Check that static methods don't get to assume their trait ref
 // is well-formed.
 // FIXME(#27579): this is just a bug. However, our checking with
 // static inherent methods isn't quite working - need to
@@ -34,8 +34,7 @@ impl<'a, 'b> Evil<'a, 'b> {
     }
 }
 
-// while static methods don't get to *assume* this, we still
-// *check* that they hold.
+// While static methods don't get to *assume* this, we still *check* that they hold.
 
 fn evil<'a, 'b>(b: &'b u32) -> &'a u32 {
     <()>::static_evil(b) //~ ERROR cannot infer an appropriate lifetime
@@ -47,7 +46,7 @@ fn indirect_evil<'a, 'b>(b: &'b u32) -> &'a u32 {
 }
 
 fn inherent_evil<'a, 'b>(b: &'b u32) -> &'a u32 {
-    <Evil>::inherent_evil(b) // bug? shouldn't this be an error
+    <Evil>::inherent_evil(b) // Bug? Shouldn't this be an error?
 }
 
 fn main() {}

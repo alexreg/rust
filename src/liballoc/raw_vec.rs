@@ -817,7 +817,7 @@ mod tests {
             // 3 is less than half of 12, so `reserve` must grow
             // exponentially. At the time of writing this test grow
             // factor is 2, so new capacity is 24, however, grow factor
-            // of 1.5 is OK too. Hence `>= 18` in assert.
+            // of 1.5 is ok too. Hence `>= 18` in assert.
             assert!(v.cap() >= 12 + 12 / 2);
         }
     }

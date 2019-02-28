@@ -11,7 +11,7 @@ struct S<A>(A);
 impl<A> T0 for S<A> { type O = A; }
 
 trait T1: T0 {
-    // this looks okay but as we see below, `f` is unusable
+    // This looks ok, but as we see below, `f` is unusable.
     fn m0<F: Fn(<Self as T0>::O) -> bool>(self, f: F) -> bool;
 }
 

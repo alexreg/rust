@@ -17,7 +17,7 @@ impl Thread {
     }
 
     pub fn yield_now() {
-        // do nothing
+        // Do nothing.
     }
 
     pub fn set_name(_name: &CStr) {
@@ -101,7 +101,7 @@ cfg_if! {
             panic!("thread local data not implemented on wasm with atomics yet")
         }
     } else {
-        // stubbed out because no functions actually access these intrinsics
-        // unless atomics are enabled
+        // Stubbed out because no functions actually access these intrinsics
+        // unless atomics are enabled.
     }
 }

@@ -4,7 +4,7 @@
 //
 // In this case, the values in question hold (non-zero) unique IDs
 // that zero themselves out when dropped, and are wrapped in another
-// type with a destructor that asserts that the ids it references are
+// type with a destructor that asserts that the IDs it references are
 // indeed non-zero (i.e., effectively checking that the id's are not
 // dropped while there are still any outstanding references).
 //

@@ -336,7 +336,7 @@ impl<T> Packet<T> {
         };
         mem::drop(guard);
 
-        // only outside of the lock do we wake up the pending threads
+        // Only outside of the lock do we wake up the pending threads.
         pending_sender1.map(|t| t.signal());
         pending_sender2.map(|t| t.signal());
     }
