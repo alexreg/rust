@@ -670,7 +670,7 @@ impl<T> RefCell<T> {
     pub fn into_inner(self) -> T {
         // Since this function takes `self` (the `RefCell`) by value, the
         // compiler statically verifies that it is not currently borrowed.
-        // Therefore the following assertion is just a `debug_assert!`.
+        // Therefore, the following assertion is just a `debug_assert!`.
         debug_assert!(self.borrow.get() == UNUSED);
         self.value.into_inner()
     }

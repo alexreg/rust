@@ -108,7 +108,7 @@ fn filter_frames(frames: &[Frame],
         let mut is_marker = false;
         let _ = resolve_symname(*frame, |symname| {
             if let Some(mangled_symbol_name) = symname {
-                // Use grep to find the concerned functions
+                // Use grep to find the concerned functions.
                 if mangled_symbol_name.contains("__rust_begin_short_backtrace") {
                     is_marker = true;
                 }
@@ -119,7 +119,7 @@ fn filter_frames(frames: &[Frame],
     }).unwrap_or(frames.len());
 
     if skipped_before + skipped_after >= frames.len() {
-        // Avoid showing completely empty backtraces
+        // Avoid showing completely empty backtraces.
         return (0, 0);
     }
 

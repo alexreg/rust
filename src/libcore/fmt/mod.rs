@@ -1117,7 +1117,7 @@ impl<'a> Formatter<'a> {
     // all formatting traits can use.
 
     /// Performs the correct padding for an integer which has already been
-    /// emitted into a str. The str should *not* contain the sign for the
+    /// emitted into a str. The str should **not** contain the sign for the
     /// integer, that will be added by this method.
     ///
     /// # Arguments

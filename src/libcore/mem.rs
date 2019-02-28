@@ -1096,7 +1096,7 @@ impl<T: ?Sized> DerefMut for ManuallyDrop<T> {
 // FIXME before stabilizing, explain how to initialize a struct field-by-field.
 #[allow(missing_debug_implementations)]
 #[unstable(feature = "maybe_uninit", issue = "53491")]
-// NOTE after stabilizing `MaybeUninit` proceed to deprecate `mem::{uninitialized,zeroed}`
+// NOTE: after stabilizing `MaybeUninit`, proceed to deprecate `mem::{uninitialized,zeroed}`.
 pub union MaybeUninit<T> {
     uninit: (),
     value: ManuallyDrop<T>,

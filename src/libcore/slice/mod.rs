@@ -3764,7 +3764,7 @@ pub struct Windows<'a, T:'a> {
     size: usize
 }
 
-// FIXME(#26925) Remove in favor of `#[derive(Clone)]`
+// FIXME(#26925): Remove in favor of `#[derive(Clone)]`.
 #[stable(feature = "rust1", since = "1.0.0")]
 impl<T> Clone for Windows<'_, T> {
     fn clone(&self) -> Self {
@@ -3877,7 +3877,7 @@ pub struct Chunks<'a, T:'a> {
     chunk_size: usize
 }
 
-// FIXME(#26925) Remove in favor of `#[derive(Clone)]`
+// FIXME(#26925): Remove in favor of `#[derive(Clone)]`.
 #[stable(feature = "rust1", since = "1.0.0")]
 impl<T> Clone for Chunks<'_, T> {
     fn clone(&self) -> Self {
@@ -4138,7 +4138,7 @@ impl<'a, T> ChunksExact<'a, T> {
     }
 }
 
-// FIXME(#26925) Remove in favor of `#[derive(Clone)]`
+// FIXME(#26925): Remove in favor of `#[derive(Clone)]`.
 #[stable(feature = "chunks_exact", since = "1.31.0")]
 impl<T> Clone for ChunksExact<'_, T> {
     fn clone(&self) -> Self {
@@ -4365,7 +4365,7 @@ pub struct RChunks<'a, T:'a> {
     chunk_size: usize
 }
 
-// FIXME(#26925) Remove in favor of `#[derive(Clone)]`
+// FIXME(#26925): Remove in favor of `#[derive(Clone)]`.
 #[stable(feature = "rchunks", since = "1.31.0")]
 impl<T> Clone for RChunks<'_, T> {
     fn clone(&self) -> Self {
@@ -4634,7 +4634,7 @@ impl<'a, T> RChunksExact<'a, T> {
     }
 }
 
-// FIXME(#26925) Remove in favor of `#[derive(Clone)]`
+// FIXME(#26925): Remove in favor of `#[derive(Clone)]`.
 #[stable(feature = "rchunks", since = "1.31.0")]
 impl<'a, T> Clone for RChunksExact<'a, T> {
     fn clone(&self) -> RChunksExact<'a, T> {

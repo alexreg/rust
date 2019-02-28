@@ -2416,7 +2416,7 @@ pub fn fence(order: Ordering) {
 /// of memory re-ordering the compiler is allowed to do. Specifically, depending on
 /// the given [`Ordering`] semantics, the compiler may be disallowed from moving reads
 /// or writes from before or after the call to the other side of the call to
-/// `compiler_fence`. Note that it does **not** prevent the *hardware*
+/// `compiler_fence`. Note that it does *not* prevent the *hardware*
 /// from doing such re-ordering. This is not a problem in a single-threaded,
 /// execution context, but when other threads may modify memory at the same
 /// time, stronger synchronization primitives such as [`fence`] are required.
@@ -2445,7 +2445,7 @@ pub fn fence(order: Ordering) {
 /// # Examples
 ///
 /// Without `compiler_fence`, the `assert_eq!` in following code
-/// is *not* guaranteed to succeed, despite everything happening in a single thread.
+/// is **not** guaranteed to succeed, despite everything happening in a single thread.
 /// To see why, remember that the compiler is free to swap the stores to
 /// `IMPORTANT_VARIABLE` and `IS_READ` since they are both
 /// `Ordering::Relaxed`. If it does, and the signal handler is invoked right

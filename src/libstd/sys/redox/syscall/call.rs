@@ -5,7 +5,7 @@ use super::number::*;
 
 use core::{mem, ptr};
 
-// Signal restorer
+// Signal restorer.
 extern "C" fn restorer() -> ! {
     sigreturn().unwrap();
     unreachable!();

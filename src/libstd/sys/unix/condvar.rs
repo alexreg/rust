@@ -24,7 +24,7 @@ fn saturating_cast_to_time_t(value: u64) -> libc::time_t {
 impl Condvar {
     pub const fn new() -> Condvar {
         // Might be moved and address is changing it is better to avoid
-        // initialization of potentially opaque OS data before it landed
+        // initialization of potentially opaque OS data before it landed.
         Condvar { inner: UnsafeCell::new(libc::PTHREAD_COND_INITIALIZER) }
     }
 

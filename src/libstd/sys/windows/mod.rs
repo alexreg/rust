@@ -253,7 +253,7 @@ pub fn dur2timeout(dur: Duration) -> c::DWORD {
 
 // On Windows, use the processor-specific `__fastfail` mechanism. On Windows 8
 // and later, this will terminate the process immediately without running any
-// in-process exception handlers.  In earlier versions of Windows, this
+// in-process exception handlers. In earlier versions of Windows, this
 // sequence of instructions will be treated as an access violation,
 // terminating the process but without necessarily bypassing all exception
 // handlers.

@@ -1,6 +1,6 @@
 //! Utility functions for bignums that don't make too much sense to turn into methods.
 
-// FIXME This module's name is a bit unfortunate, since other modules also import `core::num`.
+// FIXME: This module's name is a bit unfortunate, since other modules also import `core::num`.
 
 use cmp::Ordering::{self, Less, Equal, Greater};
 

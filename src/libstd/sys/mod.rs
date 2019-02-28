@@ -84,7 +84,7 @@ cfg_if! {
                         target_arch = "wasm32",
                         all(target_vendor = "fortanix", target_env = "sgx")))] {
         // On CloudABI and wasm right now the shim below doesn't compile, so
-        // just omit it
+        // just omit it.
         #[unstable(issue = "0", feature = "std_internals")]
         #[allow(missing_docs)]
         pub mod windows_ext {}

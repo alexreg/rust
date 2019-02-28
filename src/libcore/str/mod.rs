@@ -531,7 +531,7 @@ pub fn next_code_point<'a, I: Iterator<Item = &'a u8>>(bytes: &mut I) -> Option<
 fn next_code_point_reverse<'a, I>(bytes: &mut I) -> Option<u32>
     where I: DoubleEndedIterator<Item = &'a u8>,
 {
-    // Decode UTF-8
+    // Decode UTF-8.
     let w = match *bytes.next_back()? {
         next_byte if next_byte < 128 => return Some(next_byte as u32),
         back_byte => back_byte,

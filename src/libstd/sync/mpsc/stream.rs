@@ -1,4 +1,4 @@
-/// Stream channels
+/// Stream channels.
 ///
 /// This is the flavor of channels which are optimized for one sender and one
 /// receiver. The sender will be upgraded to a shared channel if the channel is
@@ -170,7 +170,7 @@ impl<T> Packet<T> {
                 self.queue.producer_addition().cnt.store(DISCONNECTED, Ordering::SeqCst);
             }
             // If we factor in our steals and notice that the channel has no
-            // data, we successfully sleep
+            // data, we successfully sleep.
             n => {
                 assert!(n >= 0);
                 if n - steals <= 0 { return Ok(()) }

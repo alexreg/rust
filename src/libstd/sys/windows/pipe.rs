@@ -46,7 +46,7 @@ pub struct Pipes {
 /// with `OVERLAPPED` instances, but also works out ok if it's only ever used
 /// once at a time (which we do indeed guarantee).
 pub fn anon_pipe(ours_readable: bool) -> io::Result<Pipes> {
-    // Note that we specifically do *not* use `CreatePipe` here because
+    // Note that we specifically do **not** use `CreatePipe` here because
     // unfortunately the anonymous pipes returned do not support overlapped
     // operations. Instead, we create a "hopefully unique" name and create a
     // named pipe which has overlapped operations enabled.

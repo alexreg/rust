@@ -122,12 +122,12 @@ pub use core::slice::{RChunks, RChunksMut, RChunksExact, RChunksExactMut};
 // Basic slice extension methods
 ////////////////////////////////////////////////////////////////////////////////
 
-// HACK(japaric) needed for the implementation of `vec!` macro during testing
+// HACK(japaric): needed for the implementation of `vec!` macro during testing
 // NB see the hack module in this file for more details
 #[cfg(test)]
 pub use hack::into_vec;
 
-// HACK(japaric) needed for the implementation of `Vec::clone` during testing
+// HACK(japaric): needed for the implementation of `Vec::clone` during testing
 // NB see the hack module in this file for more details
 #[cfg(test)]
 pub use hack::to_vec;

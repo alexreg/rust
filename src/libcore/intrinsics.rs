@@ -747,7 +747,7 @@ extern "rust-intrinsic" {
     /// assert_eq!(bitpattern, 0x3F800000);
     /// ```
     ///
-    /// Turning a pointer into a function pointer. This is *not* portable to
+    /// Turning a pointer into a function pointer. This is **not** portable to
     /// machines where function pointers and data pointers have different sizes.
     ///
     /// ```

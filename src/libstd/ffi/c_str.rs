@@ -49,7 +49,7 @@ use sys;
 ///
 /// Alternatively, you can obtain a `&[`[`u8`]`]` slice from a
 /// `CString` with the [`as_bytes`] method. Slices produced in this
-/// way do *not* contain the trailing nul terminator. This is useful
+/// way do **not** contain the trailing nul terminator. This is useful
 /// when you will be calling an extern function that takes a `*const
 /// u8` argument which is not necessarily nul-terminated, plus another
 /// argument with the length of the string — like C's `strndup()`.
@@ -132,7 +132,7 @@ pub struct CString {
 /// in each pair are borrowed references; the latter are owned
 /// strings.
 ///
-/// Note that this structure is **not** `repr(C)` and is not recommended to be
+/// Note that this structure is *not* `repr(C)` and is not recommended to be
 /// placed in the signatures of FFI functions. Instead, safe wrappers of FFI
 /// functions may leverage the unsafe [`from_ptr`] constructor to provide a safe
 /// interface to other consumers.
@@ -406,7 +406,7 @@ impl CString {
     ///
     /// The pointer which this function returns must be returned to Rust and reconstituted using
     /// [`from_raw`] to be properly deallocated. Specifically, one
-    /// should *not* use the standard C `free()` function to deallocate
+    /// should **not** use the standard C `free()` function to deallocate
     /// this string.
     ///
     /// Failure to call [`from_raw`] will lead to a memory leak.
@@ -470,7 +470,7 @@ impl CString {
 
     /// Consumes the `CString` and returns the underlying byte buffer.
     ///
-    /// The returned buffer does **not** contain the trailing nul
+    /// The returned buffer does *not* contain the trailing nul
     /// terminator, and it is guaranteed to not have any interior nul
     /// bytes.
     ///
@@ -512,7 +512,7 @@ impl CString {
 
     /// Returns the contents of this `CString` as a slice of bytes.
     ///
-    /// The returned slice does **not** contain the trailing nul
+    /// The returned slice does *not* contain the trailing nul
     /// terminator, and it is guaranteed to not have any interior nul
     /// bytes. If you need the nul terminator, use
     /// [`as_bytes_with_nul`] instead.
@@ -1087,7 +1087,7 @@ impl CStr {
 
     /// Converts this C string to a byte slice.
     ///
-    /// The returned slice will **not** contain the trailing nul terminator that this C
+    /// The returned slice will *not* contain the trailing nul terminator that this C
     /// string has.
     ///
     /// > **Note**: This method is currently implemented as a constant-time

@@ -95,7 +95,7 @@ macro_rules! sh_impl_unsigned {
     )
 }
 
-// FIXME (#23545): uncomment the remaining impls
+// FIXME(#23545): uncomment the remaining impls
 macro_rules! sh_impl_all {
     ($($t:ident)*) => ($(
         //sh_impl_unsigned! { $t, u8 }

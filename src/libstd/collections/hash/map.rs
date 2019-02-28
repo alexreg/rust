@@ -231,7 +231,7 @@ const DISPLACEMENT_THRESHOLD: usize = 128;
 /// subject to change at any point in the future. While its performance is very
 /// competitive for medium sized keys, other hashing algorithms will outperform
 /// it for small keys such as integers as well as large keys such as long
-/// strings, though those algorithms will typically *not* protect against
+/// strings, though those algorithms will typically **not** protect against
 /// attacks such as HashDoS.
 ///
 /// The hashing algorithm can be replaced on a per-`HashMap` basis using the

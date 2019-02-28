@@ -305,7 +305,7 @@ impl<K, V> Root<K, V> {
     }
 }
 
-// N.B. `NodeRef` is always covariant in `K` and `V`, even when the `BorrowType`
+// N.B., `NodeRef` is always covariant in `K` and `V`, even when the `BorrowType`
 // is `Mut`. This is technically wrong, but cannot result in any unsafety due to
 // internal use of `NodeRef` because we stay completely generic over `K` and `V`.
 // However, whenever a public type wraps `NodeRef`, make sure that it has the
@@ -322,8 +322,8 @@ impl<K, V> Root<K, V> {
 ///   `Leaf`, the `NodeRef` points to a leaf node, when this is `Internal` the
 ///   `NodeRef` points to an internal node, and when this is `LeafOrInternal` the
 ///   `NodeRef` could be pointing to either type of node.
-///   Note that in case of a leaf node, this might still be the shared root!  Only turn
-///   this into a `LeafNode` reference if you know it is not a root!  Shared references
+///   Note that in case of a leaf node, this might still be the shared root! Only turn
+///   this into a `LeafNode` reference if you know it is not a root! Shared references
 ///   must be dereferencable *for the entire size of their pointee*, so `&InternalNode`
 ///   pointing to the shared root is UB.
 ///   Turning this into a `NodeHeader` is always safe.
@@ -585,7 +585,7 @@ impl<'a, K: 'a, V: 'a, Type> NodeRef<marker::Immut<'a>, K, V, Type> {
         // We can sometimes do this even for the shared root, as the slice will be
         // empty. We cannot *always* do this because if the type is too highly
         // aligned, the offset of `keys` in a "full node" might be outside the bounds
-        // of the header!  So we do an alignment check first, that will be
+        // of the header! So we do an alignment check first, that will be
         // evaluated at compile-time, and only do any run-time check in the rare case
         // that the alignment is very big.
         if mem::align_of::<K>() > mem::align_of::<LeafNode<(), ()>>() && self.is_shared_root() {
@@ -602,7 +602,7 @@ impl<'a, K: 'a, V: 'a, Type> NodeRef<marker::Immut<'a>, K, V, Type> {
             // and hence just adds a size-0-align-1 field, not affecting layout).
             // We know that we can transmute `NodeHeader<K, V, ()>` to `NodeHeader<K, V, K>`
             // because we did the alignment check above, and hence `NodeHeader<K, V, K>`
-            // is not bigger than `NodeHeader<K, V, ()>`!  Then we can use `NodeHeader<K, V, K>`
+            // is not bigger than `NodeHeader<K, V, ()>`! Then we can use `NodeHeader<K, V, K>`
             // to compute the pointer where the keys start.
             // This entire hack will become unnecessary once
             // <https://github.com/rust-lang/rfcs/pull/2582> lands, then we can just take a raw

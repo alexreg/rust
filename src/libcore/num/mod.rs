@@ -1224,7 +1224,7 @@ $EndFeature, "
             concat!("Panic-free bitwise shift-left; yields `self << mask(rhs)`, where `mask` removes
 any high-order bits of `rhs` that would cause the shift to exceed the bitwidth of the type.
 
-Note that this is *not* the same as a rotate-left; the RHS of a wrapping shift-left is restricted to
+Note that this is **not** the same as a rotate-left; the RHS of a wrapping shift-left is restricted to
 the range of the type, rather than the bits shifted out of the LHS being returned to the other end.
 The primitive integer types all implement a `rotate_left` function, which may be what you want
 instead.
@@ -1251,7 +1251,7 @@ $EndFeature, "
             concat!("Panic-free bitwise shift-right; yields `self >> mask(rhs)`, where `mask`
 removes any high-order bits of `rhs` that would cause the shift to exceed the bitwidth of the type.
 
-Note that this is *not* the same as a rotate-right; the RHS of a wrapping shift-right is restricted
+Note that this is **not** the same as a rotate-right; the RHS of a wrapping shift-right is restricted
 to the range of the type, rather than the bits shifted out of the LHS being returned to the other
 end. The primitive integer types all implement a `rotate_right` function, which may be what you want
 instead.
@@ -3094,7 +3094,7 @@ assert_eq!(100", stringify!($SelfT), ".wrapping_rem_euclid(10), 0);
 where `mask` removes any high-order bits of `rhs` that
 would cause the shift to exceed the bitwidth of the type.
 
-Note that this is *not* the same as a rotate-left; the
+Note that this is **not** the same as a rotate-left; the
 RHS of a wrapping shift-left is restricted to the range
 of the type, rather than the bits shifted out of the LHS
 being returned to the other end. The primitive integer
@@ -3123,7 +3123,7 @@ assert_eq!(1", stringify!($SelfT), ".wrapping_shl(128), 1);", $EndFeature, "
 where `mask` removes any high-order bits of `rhs` that
 would cause the shift to exceed the bitwidth of the type.
 
-Note that this is *not* the same as a rotate-right; the
+Note that this is **not** the same as a rotate-right; the
 RHS of a wrapping shift-right is restricted to the range
 of the type, rather than the bits shifted out of the LHS
 being returned to the other end. The primitive integer

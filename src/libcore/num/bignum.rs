@@ -398,7 +398,7 @@ macro_rules! define_bignum {
 
                 // Stupid slow base-2 long division taken from
                 // https://en.wikipedia.org/wiki/Division_algorithm
-                // FIXME use a greater base ($ty) for the long division.
+                // FIXME: use a greater base ($ty) for the long division.
                 assert!(!d.is_zero());
                 let digitbits = mem::size_of::<$ty>() * 8;
                 for digit in &mut q.base[..] {

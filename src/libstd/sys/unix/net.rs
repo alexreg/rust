@@ -191,7 +191,7 @@ impl Socket {
         // Unfortunately, the only known way right now to accept a socket and
         // atomically set the `CLOEXEC` flag is to use the `accept4` syscall on
         // Linux. This was added in 2.6.28, however, and because we support
-        // 2.6.18 we must detect this support dynamically.
+        // 2.6.18, we must detect this support dynamically.
         if cfg!(target_os = "linux") {
             syscall! {
                 fn accept4(

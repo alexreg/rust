@@ -133,7 +133,7 @@ impl<T> RawVec<T, Global> {
     ///
     /// # Aborts
     ///
-    /// Aborts on OOM
+    /// Aborts on OOM.
     #[inline]
     pub fn with_capacity(cap: usize) -> Self {
         RawVec::allocate_in(cap, false, Global)
@@ -251,7 +251,7 @@ impl<T, A: Alloc> RawVec<T, A> {
     ///
     /// # Aborts
     ///
-    /// Aborts on OOM
+    /// Aborts on OOM.
     ///
     /// # Examples
     ///
@@ -300,7 +300,7 @@ impl<T, A: Alloc> RawVec<T, A> {
                     // satisfiable", so `Layout::from_size_align` will always
                     // return `Some`.
                     //
-                    // tl;dr; we bypass runtime checks due to dynamic assertions
+                    // TL;DR, we bypass runtime checks due to dynamic assertions
                     // in this module, allowing us to use
                     // `from_size_align_unchecked`.
                     let new_cap = 2 * self.cap;
@@ -406,7 +406,7 @@ impl<T, A: Alloc> RawVec<T, A> {
     ///
     /// # Aborts
     ///
-    /// Aborts on OOM
+    /// Aborts on OOM.
     pub fn reserve_exact(&mut self, used_cap: usize, needed_extra_cap: usize) {
         match self.reserve_internal(used_cap, needed_extra_cap, Infallible, Exact) {
             Err(CapacityOverflow) => capacity_overflow(),
@@ -455,7 +455,7 @@ impl<T, A: Alloc> RawVec<T, A> {
     ///
     /// # Aborts
     ///
-    /// Aborts on OOM
+    /// Aborts on OOM.
     ///
     /// # Examples
     ///
@@ -520,7 +520,7 @@ impl<T, A: Alloc> RawVec<T, A> {
 
             // Don't actually need any more capacity. If the current `cap` is 0, we can't
             // reallocate in place.
-            // Wrapping in case they give a bad `used_cap`
+            // Wrapping in case they give a bad `used_cap`.
             let old_layout = match self.current_layout() {
                 Some(layout) => layout,
                 None => return false,
@@ -566,7 +566,7 @@ impl<T, A: Alloc> RawVec<T, A> {
     pub fn shrink_to_fit(&mut self, amount: usize) {
         let elem_size = mem::size_of::<T>();
 
-        // Set the `cap` because they might be about to promote to a `Box<[T]>`
+        // Set the `cap` because they might be about to promote to a `Box<[T]>`.
         if elem_size == 0 {
             self.cap = amount;
             return;
@@ -728,7 +728,7 @@ unsafe impl<#[may_dangle] T, A: Alloc> Drop for RawVec<T, A> {
 // On 64-bit we just need to check for overflow since trying to allocate
 // `> isize::MAX` bytes will surely fail. On 32-bit and 16-bit we need to add
 // an extra guard for this in case we're running on a platform which can use
-// all 4GB in user-space. e.g., PAE or x32
+// all 4GB in user-space. e.g., PAE or x32.
 
 #[inline]
 fn alloc_guard(alloc_size: usize) -> Result<(), CollectionAllocErr> {
@@ -794,7 +794,7 @@ mod tests {
     fn reserve_does_not_overallocate() {
         {
             let mut v: RawVec<u32> = RawVec::new();
-            // First `reserve` allocates like `reserve_exact`
+            // First `reserve` allocates like `reserve_exact`.
             v.reserve(0, 9);
             assert_eq!(9, v.cap());
         }
@@ -821,6 +821,4 @@ mod tests {
             assert!(v.cap() >= 12 + 12 / 2);
         }
     }
-
-
 }

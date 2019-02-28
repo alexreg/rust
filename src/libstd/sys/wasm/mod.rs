@@ -1,4 +1,4 @@
-//! System bindings for the wasm/web platform
+//! System bindings for the wasm/web platform.
 //!
 //! This module contains the facade (aka platform-specific) implementations of
 //! OS level functionality for wasm. Note that this wasm is *not* the emscripten

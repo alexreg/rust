@@ -281,7 +281,7 @@ impl BridgeState<'_> {
     fn with<R>(f: impl FnOnce(&mut BridgeState<'_>) -> R) -> R {
         BRIDGE_STATE.with(|state| {
             state.replace(BridgeState::InUse, |mut state| {
-                // FIXME(#52812) pass `f` directly to `replace` when `RefMutL` is gone
+                // FIXME(#52812): pass `f` directly to `replace` when `RefMutL` is gone
                 f(&mut *state)
             })
         })
@@ -338,7 +338,7 @@ pub struct Client<F> {
     pub(super) f: F,
 }
 
-// FIXME(#53451) public to work around `Cannot create local mono-item` ICE,
+// FIXME(#53451): public to work around `Cannot create local mono-item` ICE,
 // affecting not only the function itself, but also the `BridgeState` `thread_local!`.
 pub extern "C" fn __run_expand1(
     mut bridge: Bridge<'_>,
@@ -391,7 +391,7 @@ impl Client<fn(crate::TokenStream) -> crate::TokenStream> {
     }
 }
 
-// FIXME(#53451) public to work around `Cannot create local mono-item` ICE,
+// FIXME(#53451): public to work around `Cannot create local mono-item` ICE,
 // affecting not only the function itself, but also the `BridgeState` `thread_local!`.
 pub extern "C" fn __run_expand2(
     mut bridge: Bridge<'_>,
