@@ -394,7 +394,7 @@ impl<'test> TestCx<'test> {
             self.fatal_proc_rec("compilation failed!", &proc_res);
         }
 
-        // FIXME(#41968): Move this check to tidy?
+        // FIXME(#41968): move this check to *tidy*?
         let expected_errors = errors::load_errors(&self.testpaths.file, self.revision);
         assert!(
             expected_errors.is_empty(),
@@ -519,7 +519,7 @@ impl<'test> TestCx<'test> {
             return;
         }
 
-        // additionally, run `--pretty expanded` and try to build it.
+        // Additionally, run `--pretty expanded` and try to build it.
         let proc_res = self.print_source(ReadFrom::Path, "expanded");
         if !proc_res.status.success() {
             self.fatal_proc_rec("pretty-printing (expanded) failed", &proc_res);
@@ -685,7 +685,7 @@ impl<'test> TestCx<'test> {
                 None => self.fatal("cannot find android cross path"),
             };
 
-            // write debugger script
+            // Write debugger script.
             let mut script_str = String::with_capacity(2048);
             script_str.push_str(&format!("set charset {}\n", Self::charset()));
             script_str.push_str(&format!("set sysroot {}\n", tool_path));
@@ -1322,7 +1322,7 @@ impl<'test> TestCx<'test> {
 
             match opt_index {
                 Some(index) => {
-                    // found a match, everybody is happy
+                    // Found a match; everybody is happy.
                     assert!(!found[index]);
                     found[index] = true;
                 }
@@ -1346,7 +1346,7 @@ impl<'test> TestCx<'test> {
         }
 
         let mut not_found = Vec::new();
-        // anything not yet found is a problem
+        // Anything not yet found is a problem.
         for (index, expected_error) in expected_errors.iter().enumerate() {
             if !found[index] {
                 self.error(&format!(
@@ -1536,8 +1536,8 @@ impl<'test> TestCx<'test> {
         };
 
         if proc_res.status.success() {
-            // delete the executable after running it to save space.
-            // it is ok if the deletion failed.
+            // Delete the executable after running it, to save space.
+            // It is ok if the deletion failed.
             let _ = fs::remove_file(self.make_exe_name());
         }
 
@@ -1804,7 +1804,7 @@ impl<'test> TestCx<'test> {
             }
             RunFail | RunPassValgrind | Pretty | DebugInfoBoth | DebugInfoGdb | DebugInfoLldb
             | Codegen | Rustdoc | RunMake | CodegenUnits => {
-                // do not use JSON output
+                // Do not use JSON output.
             }
         }
 
@@ -1882,8 +1882,8 @@ impl<'test> TestCx<'test> {
     }
 
     fn make_run_args(&self) -> ProcArgs {
-        // If we've got another tool to run under (valgrind),
-        // then split apart its command
+        // If we've got another tool to run under (Valgrind),
+        // then split apart its command.
         let mut args = self.split_maybe_args(&self.config.runtool);
 
         // If this is emscripten, then run tests under nodejs
@@ -1893,8 +1893,8 @@ impl<'test> TestCx<'test> {
             } else {
                 self.fatal("no NodeJS binary found (`--nodejs`)");
             }
-        // If this is otherwise wasm, then run tests under nodejs with our
-        // shim
+        // If this is otherwise wasm, then run tests under NodeJS with our
+        // shim.
         } else if self.config.target.contains("wasm32") {
             if let Some(ref p) = self.config.nodejs {
                 args.push(p.clone());
@@ -1911,7 +1911,7 @@ impl<'test> TestCx<'test> {
 
         let exe_file = self.make_exe_name();
 
-        // FIXME (#9639): This needs to handle non-utf8 paths
+        // FIXME (#9639): This needs to handle non-UTF8 paths.
         args.push(exe_file.to_str().unwrap().to_owned());
 
         // Add the arguments in the `run_flags` directive.
@@ -2695,7 +2695,7 @@ impl<'test> TestCx<'test> {
             if entry.file_type()?.is_dir() {
                 self.aggressive_rm_rf(&path)?;
             } else {
-                // Remove readonly files as well on windows (by default we can't)
+                // Remove read-only files as well, on Windows (by default we can't).
                 fs::remove_file(&path).or_else(|e| {
                     if cfg!(windows) && e.kind() == io::ErrorKind::PermissionDenied {
                         let mut meta = entry.metadata()?.permissions();
@@ -2712,7 +2712,7 @@ impl<'test> TestCx<'test> {
     }
 
     fn run_ui_test(&self) {
-        // if the user specified a format in the ui test
+        // If the user specified a format in the ui test
         // print the output to the stderr file, otherwise extract
         // the rendered error messages from json and print them
         let explicit = self
@@ -2750,7 +2750,7 @@ impl<'test> TestCx<'test> {
         self.prune_duplicate_outputs(&modes_to_prune);
 
         if self.config.compare_mode.is_some() {
-            // don't test rustfix with nll right now
+            // Don't test rustfix with NLL right now.
         } else if self.props.run_rustfix {
             // Apply suggestions from rustc to the code itself
             let unfixed_code = self
@@ -2994,7 +2994,7 @@ impl<'test> TestCx<'test> {
                     }
                 }
                 Some(&ExpectedLine::Elision) => {
-                    // skip any number of elisions in a row.
+                    // Skip any number of elisions in a row.
                     while let Some(&&ExpectedLine::Elision) = expected_lines.peek() {
                         expected_lines.next();
                     }
@@ -3066,8 +3066,8 @@ impl<'test> TestCx<'test> {
         normalized = normalized.replace(&lib_dir.to_str().unwrap(), "$LIB_DIR");
 
         if json {
-            // escaped newlines in json strings should be readable
-            // in the stderr files. There's no point int being correct,
+            // Escaped newlines in JSON strings should be readable
+            // in the stderr files. There's no point in being correct,
             // since only humans process the stderr files.
             // Thus, we just turn escaped newlines back into newlines.
             normalized = normalized.replace("\\n", "\n");

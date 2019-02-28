@@ -209,7 +209,7 @@ pub struct Config {
     /// `true` if LLVM is system LLVM.
     pub system_llvm: bool,
 
-    /// Path to the android tools
+    /// Path to the Android tools.
     pub android_cross_path: PathBuf,
 
     /// Extra parameter to run adb on arm-linux-androideabi
@@ -218,7 +218,7 @@ pub struct Config {
     /// Extra parameter to run test suite on arm-linux-androideabi
     pub adb_test_dir: String,
 
-    /// status whether android device available or not
+    /// Status whether android device available or not.
     pub adb_device_status: bool,
 
     /// the path containing LLDB's Python module
@@ -233,10 +233,10 @@ pub struct Config {
     /// `true` to use colors in test.
     pub color: ColorConfig,
 
-    /// where to find the remote test client process, if we're using it
+    /// Where to find the remote test client process, if we're using it.
     pub remote_test_client: Option<PathBuf>,
 
-    /// mode describing what file the actual ui output will be compared to
+    /// Mode describing what file the actual ui output will be compared to.
     pub compare_mode: Option<CompareMode>,
 
     // Configuration for various run-make tests-frobbing things like C compilers,

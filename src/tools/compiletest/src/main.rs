@@ -470,7 +470,7 @@ pub fn run_tests(config: &Config) {
         _ => { /* proceed */ }
     }
 
-    // FIXME(#33435) Avoid spurious failures in codegen-units/partitioning tests.
+    // FIXME(#33435): avoid spurious failures in codegen-units/partitioning tests.
     if let Mode::CodegenUnits = config.mode {
         let _ = fs::remove_dir_all("tmp/partitioning-tests");
     }
@@ -640,7 +640,7 @@ pub fn make_test(config: &Config, testpaths: &TestPaths) -> Vec<test::TestDescAn
     revisions
         .into_iter()
         .map(|revision| {
-            // Debugging emscripten code doesn't make sense today
+            // Debugging Emscripten code doesn't make sense today.
             let ignore = early_props.ignore == Ignore::Ignore
                 || !up_to_date(
                     config,
