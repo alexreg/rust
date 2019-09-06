@@ -1,23 +1,4 @@
-// Not in interpret to make sure we do not use private implementation details
-
-use std::fmt;
-use std::error::Error;
-use std::borrow::{Borrow, Cow};
-use std::hash::Hash;
-use std::collections::hash_map::Entry;
-use std::convert::TryInto;
-
-use rustc::hir::def::DefKind;
-use rustc::hir::def_id::DefId;
-use rustc::mir::interpret::{ConstEvalErr, ErrorHandled, ScalarMaybeUndef};
-use rustc::mir;
-use rustc::ty::{self, Ty, TyCtxt, subst::Subst};
-use rustc::ty::layout::{self, LayoutOf, VariantIdx};
-use rustc::traits::Reveal;
-use rustc_data_structures::fx::FxHashMap;
-use crate::interpret::eval_nullary_intrinsic;
-
-use syntax::source_map::{Span, DUMMY_SP};
+// Not in `interpret` module to make sure we do not use private implementation details.
 
 use crate::interpret::{self,
     PlaceTy, MPlaceTy, OpTy, ImmTy, Immediate, Scalar, Pointer,
@@ -27,7 +8,26 @@ use crate::interpret::{self,
     snapshot, RefTracking, intern_const_alloc_recursive,
 };
 
-/// Number of steps until the detector even starts doing anything.
+use rustc::hir::def::DefKind;
+use rustc::hir::def_id::DefId;
+use rustc::mir;
+use rustc::mir::interpret::{ConstEvalErr, ErrorHandled, ScalarMaybeUndef};
+use rustc::ty::{self, Ty, TyCtxt, subst::Subst};
+use rustc::ty::layout::{self, LayoutOf, VariantIdx};
+use rustc::traits::Reveal;
+use rustc_data_structures::fx::FxHashMap;
+use crate::interpret::eval_nullary_intrinsic;
+
+use syntax::source_map::{Span, DUMMY_SP};
+
+use std::fmt;
+use std::error::Error;
+use std::borrow::{Borrow, Cow};
+use std::hash::Hash;
+use std::collections::hash_map::Entry;
+use std::convert::TryInto;
+
+/// The number of steps until the detector even starts doing anything.
 /// Also, a warning is shown to the user when this number is reached.
 const STEPS_UNTIL_DETECTOR_ENABLED: isize = 1_000_000;
 /// The number of steps between loop detector snapshots.
@@ -47,7 +47,12 @@ pub(crate) fn mk_eval_cx<'mir, 'tcx>(
     param_env: ty::ParamEnv<'tcx>,
 ) -> CompileTimeEvalContext<'mir, 'tcx> {
     debug!("mk_eval_cx: {:?}", param_env);
-    InterpCx::new(tcx.at(span), param_env, CompileTimeInterpreter::new(), Default::default())
+    InterpCx::new(
+        tcx.at(span),
+        param_env,
+        CompileTimeInterpreter::new(),
+        Default::default(),
+    )
 }
 
 fn op_to_const<'tcx>(
@@ -130,7 +135,7 @@ fn op_to_const<'tcx>(
     ecx.tcx.mk_const(ty::Const { val, ty: op.layout.ty })
 }
 
-// Returns a pointer to where the result lives
+// Returns a pointer to where the result lives.
 fn eval_body_using_ecx<'mir, 'tcx>(
     ecx: &mut CompileTimeEvalContext<'mir, 'tcx>,
     cid: GlobalId<'tcx>,
@@ -154,10 +159,10 @@ fn eval_body_using_ecx<'mir, 'tcx>(
         StackPopCleanup::None { cleanup: false },
     )?;
 
-    // The main interpreter loop.
+    // Run the main interpreter loop.
     ecx.run()?;
 
-    // Intern the result
+    // Intern the result.
     intern_const_alloc_recursive(
         ecx,
         cid.instance.def_id(),
@@ -207,7 +212,7 @@ impl Error for ConstEvalError {
     }
 }
 
-// Extra machine state for CTFE, and the Machine instance
+// Extra machine state for CTFE, and the `Machine` instance.
 pub struct CompileTimeInterpreter<'mir, 'tcx> {
     /// When this value is negative, it indicates the number of interpreter
     /// steps *until* the loop detector is enabled. When it is positive, it is
@@ -221,7 +226,7 @@ pub struct CompileTimeInterpreter<'mir, 'tcx> {
 
 impl<'mir, 'tcx> CompileTimeInterpreter<'mir, 'tcx> {
     fn new() -> Self {
-        CompileTimeInterpreter {
+        Self {
             loop_detector: Default::default(),
             steps_since_detector_enabled: -STEPS_UNTIL_DETECTOR_ENABLED,
         }
@@ -261,13 +266,12 @@ impl<K: Hash + Eq, V> interpret::AllocMap<K, V> for FxHashMap<K, V> {
         &self,
         k: K,
         vacant: impl FnOnce() -> Result<V, E>
-    ) -> Result<&V, E>
-    {
+    ) -> Result<&V, E> {
         match self.get(&k) {
             Some(v) => Ok(v),
             None => {
                 vacant()?;
-                bug!("The CTFE machine shouldn't ever need to extend the alloc_map when reading")
+                bug!("the CTFE machine shouldn't ever need to extend the `alloc_map` when reading");
             }
         }
     }
@@ -277,8 +281,7 @@ impl<K: Hash + Eq, V> interpret::AllocMap<K, V> for FxHashMap<K, V> {
         &mut self,
         k: K,
         vacant: impl FnOnce() -> Result<V, E>
-    ) -> Result<&mut V, E>
-    {
+    ) -> Result<&mut V, E> {
         match self.entry(k) {
             Entry::Occupied(e) => Ok(e.into_mut()),
             Entry::Vacant(e) => {
@@ -295,7 +298,7 @@ crate type CompileTimeEvalContext<'mir, 'tcx> =
 impl interpret::MayLeak for ! {
     #[inline(always)]
     fn may_leak(self) -> bool {
-        // `self` is uninhabited
+        // `self` is uninhabited.
         self
     }
 }
@@ -319,7 +322,7 @@ impl<'mir, 'tcx> interpret::Machine<'mir, 'tcx> for CompileTimeInterpreter<'mir,
 
     #[inline(always)]
     fn enforce_validity(_ecx: &InterpCx<'mir, 'tcx, Self>) -> bool {
-        false // for now, we don't enforce validity
+        false // For now, we don't enforce validity.
     }
 
     fn find_fn(
@@ -330,7 +333,7 @@ impl<'mir, 'tcx> interpret::Machine<'mir, 'tcx> for CompileTimeInterpreter<'mir,
         ret: Option<mir::BasicBlock>,
     ) -> InterpResult<'tcx, Option<&'mir mir::Body<'tcx>>> {
         debug!("eval_fn_call: {:?}", instance);
-        // Only check non-glue functions
+        // Only check non-glue functions.
         if let ty::InstanceDef::Item(def_id) = instance.def {
             // Execution might have wandered off into other crates, so we cannot do a stability-
             // sensitive check here.  But we can at least rule out functions that are not const
@@ -347,7 +350,7 @@ impl<'mir, 'tcx> interpret::Machine<'mir, 'tcx> for CompileTimeInterpreter<'mir,
                 };
             }
         }
-        // This is a const fn. Call it.
+        // This is a const fn; call it.
         Ok(Some(match ecx.load_mir(instance.def, None) {
             Ok(body) => body,
             Err(err) => {
@@ -422,7 +425,7 @@ impl<'mir, 'tcx> interpret::Machine<'mir, 'tcx> for CompileTimeInterpreter<'mir,
         alloc: Cow<'b, Allocation>,
         _kind: Option<MemoryKind<!>>,
     ) -> (Cow<'b, Allocation<Self::PointerTag>>, Self::PointerTag) {
-        // We do not use a tag so we can just cheaply forward the allocation
+        // We do not use a tag so that we can just cheaply forward the allocation.
         (alloc, ())
     }
 
@@ -480,7 +483,8 @@ impl<'mir, 'tcx> interpret::Machine<'mir, 'tcx> for CompileTimeInterpreter<'mir,
 }
 
 /// Extracts a field of a (variant of a) const.
-// this function uses `unwrap` copiously, because an already validated constant must have valid
+//
+// This function uses `unwrap` copiously, because an already validated constant must have valid
 // fields and can thus never fail outside of compiler bugs
 pub fn const_field<'tcx>(
     tcx: TyCtxt<'tcx>,
@@ -491,22 +495,22 @@ pub fn const_field<'tcx>(
 ) -> &'tcx ty::Const<'tcx> {
     trace!("const_field: {:?}, {:?}", field, value);
     let ecx = mk_eval_cx(tcx, DUMMY_SP, param_env);
-    // get the operand again
+    // Get the operand again, ...
     let op = ecx.eval_const_to_op(value, None).unwrap();
-    // downcast
+    // ... downcast, ...
     let down = match variant {
         None => op,
         Some(variant) => ecx.operand_downcast(op, variant).unwrap(),
     };
-    // then project
+    // ... then project, ...
     let field = ecx.operand_field(down, field.index() as u64).unwrap();
     // and finally move back to the const world, always normalizing because
     // this is not called for statics.
     op_to_const(&ecx, field)
 }
 
-// this function uses `unwrap` copiously, because an already validated constant must have valid
-// fields and can thus never fail outside of compiler bugs
+// This function uses `unwrap` copiously, because an already validated constant must have valid
+// fields and can thus never fail outside of compiler bugs.
 pub fn const_variant_index<'tcx>(
     tcx: TyCtxt<'tcx>,
     param_env: ty::ParamEnv<'tcx>,
@@ -588,18 +592,18 @@ pub fn const_eval_provider<'tcx>(
     tcx: TyCtxt<'tcx>,
     key: ty::ParamEnvAnd<'tcx, GlobalId<'tcx>>,
 ) -> ::rustc::mir::interpret::ConstEvalResult<'tcx> {
-    // see comment in const_eval_raw_provider for what we're doing here
+    // See comment in `const_eval_raw_provider` for what we're doing here.
     if key.param_env.reveal == Reveal::All {
         let mut key = key.clone();
         key.param_env.reveal = Reveal::UserFacing;
         match tcx.const_eval(key) {
-            // try again with reveal all as requested
+            // Try again with reveal all as requested.
             Err(ErrorHandled::TooGeneric) => {
                 // Promoteds should never be "too generic" when getting evaluated.
                 // They either don't get evaluated, or we are in a monomorphic context
                 assert!(key.value.promoted.is_none());
             },
-            // dedupliate calls
+            // Dedupliate calls.
             other => return other,
         }
     }
@@ -641,9 +645,9 @@ pub fn const_eval_raw_provider<'tcx>(
         let mut key = key.clone();
         key.param_env.reveal = Reveal::UserFacing;
         match tcx.const_eval_raw(key) {
-            // try again with reveal all as requested
+            // Try again with reveal-all as requested.
             Err(ErrorHandled::TooGeneric) => {},
-            // dedupliate calls
+            // Dedupliate calls.
             other => return other,
         }
     }
@@ -669,7 +673,7 @@ pub fn const_eval_raw_provider<'tcx>(
         tcx.at(span),
         key.param_env,
         CompileTimeInterpreter::new(),
-        Default::default()
+        Default::default(),
     );
 
     let res = ecx.load_mir(cid.instance.def, cid.promoted);
@@ -682,7 +686,7 @@ pub fn const_eval_raw_provider<'tcx>(
         })
     }).map_err(|error| {
         let err = error_to_const_error(&ecx, error);
-        // errors in statics are always emitted as fatal errors
+        // Errors in statics are always emitted as fatal errors.
         if tcx.is_static(def_id) {
             // Ensure that if the above error was either `TooGeneric` or `Reported`
             // an error must be reported.
@@ -693,14 +697,15 @@ pub fn const_eval_raw_provider<'tcx>(
             );
             v
         } else if def_id.is_local() {
-            // constant defined in this crate, we can figure out a lint level!
+            // Constant is defined in this crate; we can figure out a lint level!
             match tcx.def_kind(def_id) {
-                // constants never produce a hard error at the definition site. Anything else is
-                // a backwards compatibility hazard (and will break old versions of winapi for sure)
+                // Constants never produce a hard error at the definition site. Anything else is
+                // a backwards compatibility hazard (and will break old versions of WinAPI for
+                // sure).
                 //
-                // note that validation may still cause a hard error on this very same constant,
+                // Note that validation may still cause a hard error on this very same constant,
                 // because any code that existed before validation could not have failed validation
-                // thus preventing such a hard error from being a backwards compatibility hazard
+                // thus preventing such a hard error from being a backwards compatibility hazard.
                 Some(DefKind::Const) | Some(DefKind::AssocConst) => {
                     let hir_id = tcx.hir().as_local_hir_id(def_id).unwrap();
                     err.report_as_lint(
@@ -710,8 +715,8 @@ pub fn const_eval_raw_provider<'tcx>(
                         Some(err.span),
                     )
                 },
-                // promoting runtime code is only allowed to error if it references broken constants
-                // any other kind of error will be reported to the user as a deny-by-default lint
+                // Promoting runtime code is only allowed to error if it references broken constants
+                // any other kind of error will be reported to the user as a deny-by-default lint.
                 _ => if let Some(p) = cid.promoted {
                     let span = tcx.promoted_mir(def_id)[p].span;
                     if let err_inval!(ReferencedConstant) = err.error {
@@ -727,8 +732,8 @@ pub fn const_eval_raw_provider<'tcx>(
                             Some(err.span),
                         )
                     }
-                // anything else (array lengths, enum initializers, constant patterns) are reported
-                // as hard errors
+                // Anything else (array lengths, enum initializers, constant patterns) are reported
+                // as hard errors.
                 } else {
                     err.report_as_error(
                         ecx.tcx,
@@ -737,7 +742,7 @@ pub fn const_eval_raw_provider<'tcx>(
                 },
             }
         } else {
-            // use of broken constant from other crate
+            // Use of broken constant from other crate.
             err.report_as_error(ecx.tcx, "could not evaluate constant")
         }
     })

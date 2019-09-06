@@ -1,11 +1,13 @@
 use crate::borrow_check::ArtificialField;
 use crate::borrow_check::Overlap;
 use crate::borrow_check::{Deep, Shallow, AccessDepth};
+
 use rustc::hir;
 use rustc::mir::{
     Body, BorrowKind, Place, PlaceBase, PlaceElem, PlaceRef, ProjectionElem, StaticKind,
 };
 use rustc::ty::{self, TyCtxt};
+
 use std::cmp::max;
 
 /// When checking if a place conflicts with another place, this enum is used to influence decisions
@@ -246,19 +248,19 @@ fn place_components_conflict<'tcx>(
                 }
 
                 (ProjectionElem::Deref, _, Shallow(None)) => {
-                    // e.g., a borrow of `*x.y` while we shallowly access `x.y` or some
-                    // prefix thereof - the shallow access can't touch anything behind
+                    // E.g., a borrow of `*x.y` while we shallowly access `x.y` or some
+                    // prefix thereof -- the shallow access can't touch anything behind
                     // the pointer.
                     debug!("borrow_conflicts_with_place: shallow access behind ptr");
                     return false;
                 }
                 (ProjectionElem::Deref, ty::Ref(_, _, hir::MutImmutable), _) => {
-                    // Shouldn't be tracked
+                    // Shouldn't be tracked.
                     bug!("Tracking borrow behind shared reference.");
                 }
                 (ProjectionElem::Deref, ty::Ref(_, _, hir::MutMutable), AccessDepth::Drop) => {
                     // Values behind a mutable reference are not access either by dropping a
-                    // value, or by StorageDead
+                    // value, or by StorageDead.
                     debug!("borrow_conflicts_with_place: drop access behind ptr");
                     return false;
                 }

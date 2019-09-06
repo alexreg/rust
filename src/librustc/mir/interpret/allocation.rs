@@ -131,7 +131,7 @@ impl<Tag> Allocation<Tag> {
 }
 
 impl Allocation<(), ()> {
-    /// Add Tag and Extra fields
+    /// Adds `Tag` and `Extra` fields.
     pub fn with_tags_and_extra<T, E>(
         self,
         mut tagger: impl FnMut(AllocId) -> T,

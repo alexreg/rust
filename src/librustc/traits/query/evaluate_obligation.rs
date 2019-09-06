@@ -69,7 +69,7 @@ impl<'cx, 'tcx> InferCtxt<'cx, 'tcx> {
                     .unwrap_or_else(|r| {
                         span_bug!(
                             obligation.cause.span,
-                            "Overflow should be caught earlier in standard query mode: {:?}, {:?}",
+                            "overflow should be caught earlier in standard query mode: {:?}, {:?}",
                             obligation,
                             r,
                         )

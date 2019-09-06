@@ -607,15 +607,15 @@ pub struct VarBindingForm<'tcx> {
     /// Is variable bound via `x`, `mut x`, `ref x`, or `ref mut x`?
     pub binding_mode: ty::BindingMode,
     /// If an explicit type was provided for this variable binding,
-    /// this holds the source Span of that type.
+    /// this holds the source `Span` of that type.
     ///
     /// NOTE: if you want to change this to a `HirId`, be wary that
     /// doing so breaks incremental compilation (as of this writing),
     /// while a `Span` does not cause our tests to fail.
     pub opt_ty_info: Option<Span>,
-    /// Place of the RHS of the =, or the subject of the `match` where this
-    /// variable is initialized. None in the case of `let PATTERN;`.
-    /// Some((None, ..)) in the case of and `let [mut] x = ...` because
+    /// The `Place` of the RHS of the `=`, or the subject of the `match` where this
+    /// variable is initialized. `None` in the case of `let PATTERN;`.
+    /// `Some((None, ..))` in the case of and `let [mut] x = ...` because
     /// (a) the right-hand side isn't evaluated as a place expression.
     /// (b) it gives a way to separate this case from the remaining cases
     ///     for diagnostics.
@@ -664,7 +664,7 @@ impl_stable_hash_for!(enum self::ImplicitSelfKind {
     Mut,
     ImmRef,
     MutRef,
-    None
+    None,
 });
 
 impl_stable_hash_for!(enum self::MirPhase {
