@@ -8,7 +8,18 @@ use rustc::mir::interpret::{InterpResult, Scalar, PointerArithmetic};
 
 use super::{InterpCx, Machine};
 
-/// Classify whether an operator is "left-homogeneous", i.e., the LHS has the
+/// The action performed by a run step.
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub enum RunStep {
+    /// Perform the default action for this step.
+    Default,
+    /// Perform no action for this step.
+    Ignore,
+    /// Abort evaluation.
+    Abort,
+}
+
+/// Classifies whether an operator is "left-homogeneous", i.e., the LHS has the
 /// same type as the result.
 #[inline]
 fn binop_left_homogeneous(op: mir::BinOp) -> bool {
@@ -21,7 +32,8 @@ fn binop_left_homogeneous(op: mir::BinOp) -> bool {
             false,
     }
 }
-/// Classify whether an operator is "right-homogeneous", i.e., the RHS has the
+
+/// Classifies whether an operator is "right-homogeneous", i.e., the RHS has the
 /// same type as the LHS.
 #[inline]
 fn binop_right_homogeneous(op: mir::BinOp) -> bool {
@@ -37,16 +49,20 @@ fn binop_right_homogeneous(op: mir::BinOp) -> bool {
 
 impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
     pub fn run(&mut self) -> InterpResult<'tcx> {
-        while self.step()? {}
+        loop {
+            if let RunStep::Abort = self.step()? {
+                break;
+            }
+        }
         Ok(())
     }
 
     /// Returns `true` as long as there are more things to do.
     ///
-    /// This is used by [priroda](https://github.com/oli-obk/priroda)
-    pub fn step(&mut self) -> InterpResult<'tcx, bool> {
+    /// This is used by [priroda](https://github.com/oli-obk/priroda).
+    pub fn step(&mut self) -> InterpResult<'tcx, RunStep> {
         if self.stack.is_empty() {
-            return Ok(false);
+            return Ok(RunStep::Abort);
         }
 
         let block = self.frame().block;
@@ -56,18 +72,34 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
 
         let old_frames = self.cur_frame();
 
-        if let Some(stmt) = basic_block.statements.get(stmt_id) {
-            assert_eq!(old_frames, self.cur_frame());
-            self.statement(stmt)?;
-            return Ok(true);
-        }
+        let step = if let Some(stmt) = basic_block.statements.get(stmt_id) {
+            let step = M::before_statement(self)?;
 
-        M::before_terminator(self)?;
+            match step {
+                RunStep::Default => {
+                    assert_eq!(old_frames, self.cur_frame());
+                    self.statement(stmt)?;
+                }
+                RunStep::Ignore => {
+                    self.frame_mut().stmt += 1;
+                },
+                _ => {}
+            }
+            step
+        } else {
+            let step = M::before_terminator(self)?;
 
-        let terminator = basic_block.terminator();
-        assert_eq!(old_frames, self.cur_frame());
-        self.terminator(terminator)?;
-        Ok(true)
+            match step {
+                RunStep::Default => {
+                    let terminator = basic_block.terminator();
+                    assert_eq!(old_frames, self.cur_frame());
+                    self.terminator(terminator)?;
+                }
+                _ => {}
+            }
+            step
+        };
+        Ok(step)
     }
 
     fn statement(&mut self, stmt: &mir::Statement<'tcx>) -> InterpResult<'tcx> {

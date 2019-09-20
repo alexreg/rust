@@ -4,6 +4,7 @@ use rustc_target::spec::TargetTriple;
 use rustc::hir;
 use rustc::hir::intravisit;
 use rustc::session::{self, config, DiagnosticOutput};
+use rustc::session::vfs::DiskVfs;
 use rustc::util::common::ErrorReported;
 use syntax::ast;
 use syntax::with_globals;
@@ -74,6 +75,7 @@ pub fn run(options: Options) -> i32 {
         stderr: None,
         crate_name: options.crate_name.clone(),
         lint_caps: Default::default(),
+        incr_comp_vfs: Box::new(DiskVfs),
     };
 
     let mut test_args = options.test_args.clone();

@@ -64,8 +64,9 @@ pub struct Frame<'mir, 'tcx, Tag = (), Extra = ()> {
     ////////////////////////////////////////////////////////////////////////////////
     // Return place and locals
     ////////////////////////////////////////////////////////////////////////////////
-    /// Work to perform when returning from this function.
-    pub return_to_block: StackPopCleanup,
+
+    /// Behavior when popping this frame off the stack.
+    pub pop_behavior: StackPopBehavior,
 
     /// The location where the result of the current stack frame should be written to,
     /// and its layout in the caller.
@@ -95,19 +96,25 @@ pub struct Frame<'mir, 'tcx, Tag = (), Extra = ()> {
 
 /// The action to perform when popping a particular frame off the stack.
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
-pub enum StackPopCleanup {
-    /// Jump to the next block in the caller, or cause UB if None (that's a function
-    /// that may never return). Also store layout of return place so
-    /// we can validate it at that layout.
+pub enum StackPopAction {
+    /// Jump to the next block in the caller, or cause UB if `None` (that's a function that may
+    /// never return). Also store layout of return place so we can validate it at that layout.
     Goto(Option<mir::BasicBlock>),
-    /// Just do nohing: Used by Main and for the box_alloc hook in miri.
-    /// `cleanup` says whether locals are deallocated. Static computation
-    /// wants them leaked to intern what they need (and just throw away
-    /// the entire `ecx` when it is done).
-    None { cleanup: bool },
+    /// Just do nothing; used by `main` and for the `box_alloc` hook in Miri.
+    None,
 }
 
-/// State of a local variable including a memoized layout
+/// The behavior of the machine when popping a particular frame off the stack.
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+pub struct StackPopBehavior {
+    /// The action to perform.
+    pub action: StackPopAction,
+    /// Indicates whether locals are deallocated. Static computation wants them leaked to intern
+    /// what they need (and just throw away the entire `ecx` when it is done).
+    pub cleanup: bool,
+}
+
+/// The state of a local variable including a memoized layout.
 #[derive(Clone, PartialEq, Eq)]
 pub struct LocalState<'tcx, Tag = (), Id = AllocId> {
     pub value: LocalValue<Tag, Id>,
@@ -268,7 +275,7 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
     }
 
     #[inline(always)]
-    pub(super) fn body(&self) -> &'mir mir::Body<'tcx> {
+    pub fn body(&self) -> &'mir mir::Body<'tcx> {
         self.frame().body
     }
 
@@ -492,7 +499,7 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
         span: Span,
         body: &'mir mir::Body<'tcx>,
         return_place: Option<PlaceTy<'tcx, M::PointerTag>>,
-        return_to_block: StackPopCleanup,
+        pop_behavior: StackPopBehavior,
     ) -> InterpResult<'tcx> {
         if self.stack.len() > 0 {
             info!("PAUSING({}) {}", self.cur_frame(), self.frame().instance);
@@ -500,11 +507,11 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
         ::log_settings::settings().indentation += 1;
 
         // First, push a stack frame so we have access to the local substs.
-        let extra = M::stack_push(self)?;
+        let extra = M::before_stack_push(self)?;
         self.stack.push(Frame {
             body,
             block: mir::START_BLOCK,
-            return_to_block,
+            pop_behavior,
             return_place,
             // Empty local array; we fill it in below, after we are inside the stack frame and
             // all methods actually know about the frame.
@@ -514,6 +521,7 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
             stmt: 0,
             extra,
         });
+        M::after_stack_push(self)?;
 
         // Don't allocate at all for trivial constants.
         if body.local_decls.len() > 1 {
@@ -528,7 +536,7 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
             locals[mir::RETURN_PLACE].value = LocalValue::Dead;
             // Now mark those locals as dead that we do not want to initialize.
             match self.tcx.def_kind(instance.def_id()) {
-                // Statics and constants don't have `Storage*` statements; no need to look for them.
+                // Statics and constants don't have Storage* statements; no need to look for them.
                 Some(DefKind::Static)
                 | Some(DefKind::Const)
                 | Some(DefKind::AssocConst) => {},
@@ -564,26 +572,31 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
     pub(super) fn pop_stack_frame(&mut self) -> InterpResult<'tcx> {
         info!("LEAVING({}) {}", self.cur_frame(), self.frame().instance);
         ::log_settings::settings().indentation -= 1;
+
+        M::before_stack_pop(self)?;
         let frame = self.stack.pop().expect(
             "tried to pop a stack frame, but there were none",
         );
-        M::stack_pop(self, frame.extra)?;
-        // Abort early if we do not want to clean up: We also avoid validation in that case,
-        // because this is CTFE and the final value will be thoroughly validated anyway.
-        match frame.return_to_block {
-            StackPopCleanup::Goto(_) => {},
-            StackPopCleanup::None { cleanup } => {
-                if !cleanup {
-                    assert!(self.stack.is_empty(), "only the topmost frame should ever be leaked");
-                    // Leak the locals, skip validation.
-                    return Ok(());
-                }
+        M::after_stack_pop(self, frame.extra)?;
+
+        // Abort early if we do not want to return or clean up; we also avoid validation in that
+        // case, since this is CTFE and the final value will be thoroughly validated anyway.
+        if let StackPopBehavior {
+            action: StackPopAction::None,
+            cleanup: false,
+        } = frame.pop_behavior {
+            // assert!(self.stack.is_empty(), "only the topmost frame should ever be leaked");
+            // Leak the locals, skip validation.
+            return Ok(());
+        }
+
+        if frame.pop_behavior.cleanup {
+            // Deallocate all locals that are backed by an allocation.
+            for local in frame.locals {
+                self.deallocate_local(local.value)?;
             }
         }
-        // Deallocate all locals that are backed by an allocation.
-        for local in frame.locals {
-            self.deallocate_local(local.value)?;
-        }
+
         // Validate the return value. Do this after deallocating so that we catch dangling
         // references.
         if let Some(return_place) = frame.return_place {
@@ -607,11 +620,11 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
         }
 
         // Jump to new block -- *after* validation so that the spans make more sense.
-        match frame.return_to_block {
-            StackPopCleanup::Goto(block) => {
+        match frame.pop_behavior.action {
+            StackPopAction::Goto(block) => {
                 self.goto_block(block)?;
             }
-            StackPopCleanup::None { .. } => {}
+            StackPopAction::None { .. } => {}
         }
 
         if self.stack.len() > 0 {

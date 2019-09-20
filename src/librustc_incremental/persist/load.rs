@@ -1,8 +1,9 @@
-//! Code to save/load the dep-graph from files.
+//! This module handles loading of the dep-graph from the virtual filesystem.
 
 use rustc_data_structures::fx::FxHashMap;
 use rustc::dep_graph::{PreviousDepGraph, SerializedDepGraph, WorkProduct, WorkProductId};
 use rustc::session::Session;
+use rustc::session::vfs::Vfs;
 use rustc::ty::TyCtxt;
 use rustc::ty::query::OnDiskCache;
 use rustc::util::common::time_ext;
@@ -51,9 +52,10 @@ impl LoadResult<(PreviousDepGraph, WorkProductMap)> {
     }
 }
 
-
-fn load_data(report_incremental_info: bool, path: &Path) -> LoadResult<(Vec<u8>, usize)> {
-    match file_format::read_file(report_incremental_info, path) {
+fn load_data(vfs: &dyn Vfs, report_incremental_info: bool, path: &Path)
+    -> LoadResult<(Vec<u8>, usize)>
+{
+    match file_format::read_file(vfs, report_incremental_info, path) {
         Ok(Some(data_and_pos)) => LoadResult::Ok {
             data: data_and_pos
         },
@@ -65,7 +67,7 @@ fn load_data(report_incremental_info: bool, path: &Path) -> LoadResult<(Vec<u8>,
         Err(err) => {
             LoadResult::Error {
                 message: format!("could not load dep-graph from `{}`: {}",
-                                  path.display(), err)
+                                 path.display(), err)
             }
         }
     }
@@ -95,7 +97,7 @@ impl<T> MaybeAsync<T> {
 
 pub type DepGraphFuture = MaybeAsync<LoadResult<(PreviousDepGraph, WorkProductMap)>>;
 
-/// Launch a thread and load the dependency graph in the background.
+/// Launches a thread and loads the dependency graph in the background.
 pub fn load_dep_graph(sess: &Session) -> DepGraphFuture {
     // Since `sess` isn't `Sync`, we perform all accesses to `sess`
     // before we fire the background thread.
@@ -117,20 +119,24 @@ pub fn load_dep_graph(sess: &Session) -> DepGraphFuture {
 
     let mut prev_work_products = FxHashMap::default();
 
-    // If we are only building with -Zquery-dep-graph but without an actual
+    // If we are only building with `-Zquery-dep-graph` but without an actual
     // incr. comp. session directory, we skip this. Otherwise we'd fail
     // when trying to load work products.
     if sess.incr_comp_session_dir_opt().is_some() {
         let work_products_path = work_products_path(sess);
-        let load_result = load_data(report_incremental_info, &work_products_path);
+        let load_result = load_data(
+            &**sess.incr_comp_vfs.read().unwrap(),
+            report_incremental_info,
+            &work_products_path,
+        );
 
         if let LoadResult::Ok { data: (work_products_data, start_pos) } = load_result {
-            // Decode the list of work_products
-            let mut work_product_decoder = Decoder::new(&work_products_data[..], start_pos);
+            // Decode the list of `WorkProduct`.
+            let mut work_product_decoder = Decoder::new(&*work_products_data, start_pos);
             let work_products: Vec<SerializedWorkProduct> =
                 RustcDecodable::decode(&mut work_product_decoder).unwrap_or_else(|e| {
                     let msg = format!("Error decoding `work-products` from incremental \
-                                    compilation session directory: {}", e);
+                                       compilation session directory: {}", e);
                     sess.fatal(&msg[..])
                 });
 
@@ -143,7 +149,7 @@ pub fn load_dep_graph(sess: &Session) -> DepGraphFuture {
 
                         if sess.opts.debugging_opts.incremental_info {
                             eprintln!("incremental: could not find file for work \
-                                    product: {}", path.display());
+                                       product: {}", path.display());
                         }
                     }
                 }
@@ -159,31 +165,32 @@ pub fn load_dep_graph(sess: &Session) -> DepGraphFuture {
         }
     }
 
+    let vfs = sess.incr_comp_vfs.clone();
     MaybeAsync::Async(std::thread::spawn(move || {
         time_ext(time_passes, None, "background load prev dep-graph", move || {
-            match load_data(report_incremental_info, &path) {
+            let vfs = &**vfs.read().unwrap();
+            match load_data(vfs, report_incremental_info, &path) {
                 LoadResult::DataOutOfDate => LoadResult::DataOutOfDate,
                 LoadResult::Error { message } => LoadResult::Error { message },
                 LoadResult::Ok { data: (bytes, start_pos) } => {
-
-                    let mut decoder = Decoder::new(&bytes, start_pos);
+                    let mut decoder = Decoder::new(&*bytes, start_pos);
                     let prev_commandline_args_hash = u64::decode(&mut decoder)
-                        .expect("Error reading commandline arg hash from cached dep-graph");
+                        .expect("error reading command-line arg hash from cached dep-graph");
 
                     if prev_commandline_args_hash != expected_hash {
                         if report_incremental_info {
                             println!("[incremental] completely ignoring cache because of \
-                                    differing commandline arguments");
+                                      differing command-line arguments");
                         }
-                        // We can't reuse the cache, purge it.
-                        debug!("load_dep_graph_new: differing commandline arg hashes");
+                        // We can't reuse the cache; purge it.
+                        debug!("load_dep_graph_new: differing command-line arg hashes");
 
-                        // No need to do any further work
+                        // No need to do any further work.
                         return LoadResult::DataOutOfDate;
                     }
 
                     let dep_graph = SerializedDepGraph::decode(&mut decoder)
-                        .expect("Error reading cached dep-graph");
+                        .expect("error reading cached dep-graph");
 
                     LoadResult::Ok { data: (PreviousDepGraph::new(dep_graph), prev_work_products) }
                 }
@@ -193,12 +200,12 @@ pub fn load_dep_graph(sess: &Session) -> DepGraphFuture {
 }
 
 pub fn load_query_result_cache(sess: &Session) -> OnDiskCache<'_> {
-    if sess.opts.incremental.is_none() ||
-       !sess.opts.debugging_opts.incremental_queries {
+    if sess.opts.incremental.is_none() || !sess.opts.debugging_opts.incremental_queries {
         return OnDiskCache::new_empty(sess.source_map());
     }
 
-    match load_data(sess.opts.debugging_opts.incremental_info, &query_cache_path(sess)) {
+    let vfs = &**sess.incr_comp_vfs.read().unwrap();
+    match load_data(vfs, sess.opts.debugging_opts.incremental_info, &query_cache_path(sess)) {
         LoadResult::Ok{ data: (bytes, start_pos) } => OnDiskCache::new(sess, bytes, start_pos),
         _ => OnDiskCache::new_empty(sess.source_map())
     }

@@ -1256,6 +1256,8 @@ pub struct Local {
     /// Can be `ForLoopDesugar` if the `let` statement is part of a `for` loop
     /// desugaring. Otherwise will be `Normal`.
     pub source: LocalSource,
+    /// See comment on `syntax::ast::Local`.
+    pub interp_tag: Option<ast::LocalInterpTag>,
 }
 
 /// Represents a single arm of a `match` expression, e.g.
@@ -2002,6 +2004,8 @@ pub enum TyKind {
     /// Placeholder for C-variadic arguments. We "spoof" the `VaListImpl` created
     /// from the variadic arguments. This type is only valid up to typeck.
     CVarArgs(Lifetime),
+    /// A type with a special meaning in interpreter mode.
+    InterpTy(usize /* ID */),
 }
 
 #[derive(Copy, Clone, RustcEncodable, RustcDecodable, Debug, HashStable)]

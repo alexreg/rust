@@ -36,9 +36,10 @@ use syntax_pos::{MultiSpan, Span};
 use crate::util::profiling::SelfProfiler;
 
 use rustc_target::spec::{PanicStrategy, RelroLevel, Target, TargetTriple};
-use rustc_data_structures::flock;
 use rustc_data_structures::jobserver;
 use ::jobserver::Client;
+
+use self::vfs::{Vfs, VfsLock};
 
 use std;
 use std::cell::{self, Cell, RefCell};
@@ -53,6 +54,7 @@ mod code_stats;
 pub mod config;
 pub mod filesearch;
 pub mod search_paths;
+pub mod vfs;
 
 pub struct OptimizationFuel {
     /// If `-zfuel=crate=n` is specified, initially set to `n`, otherwise `0`.
@@ -122,6 +124,7 @@ pub struct Session {
     /// macro name and definition span in the source crate.
     pub imported_macro_spans: OneThread<RefCell<FxHashMap<Span, (String, Span)>>>,
 
+    pub incr_comp_vfs: Arc<std::sync::RwLock<Box<dyn Vfs>>>,
     incr_comp_session: OneThread<RefCell<IncrCompSession>>,
     /// Used for incremental compilation tests. Will only be populated if
     /// `-Zquery-dep-graph` is specified.
@@ -753,7 +756,7 @@ impl Session {
     pub fn init_incr_comp_session(
         &self,
         session_dir: PathBuf,
-        lock_file: flock::Lock,
+        lock: VfsLock,
         load_dep_graph: bool,
     ) {
         let mut incr_comp_session = self.incr_comp_session.borrow_mut();
@@ -761,14 +764,14 @@ impl Session {
         if let IncrCompSession::NotInitialized = *incr_comp_session {
         } else {
             bug!(
-                "Trying to initialize IncrCompSession `{:?}`",
+                "trying to initialize `IncrCompSession` `{:?}`",
                 *incr_comp_session
             )
         }
 
         *incr_comp_session = IncrCompSession::Active {
             session_directory: session_dir,
-            lock_file,
+            lock,
             load_dep_graph,
         };
     }
@@ -777,6 +780,7 @@ impl Session {
         let mut incr_comp_session = self.incr_comp_session.borrow_mut();
 
         if let IncrCompSession::Active { .. } = *incr_comp_session {
+            ()
         } else {
             bug!(
                 "trying to finalize `IncrCompSession` `{:?}`",
@@ -1021,6 +1025,7 @@ pub fn build_session(
     sopts: config::Options,
     local_crate_source_file: Option<PathBuf>,
     registry: errors::registry::Registry,
+    incr_comp_vfs: Box<dyn Vfs>,
 ) -> Session {
     let file_path_mapping = sopts.file_path_mapping();
 
@@ -1031,6 +1036,7 @@ pub fn build_session(
         Lrc::new(source_map::SourceMap::new(file_path_mapping)),
         DiagnosticOutput::Default,
         Default::default(),
+        incr_comp_vfs,
     )
 }
 
@@ -1103,6 +1109,7 @@ pub fn build_session_with_source_map(
     source_map: Lrc<source_map::SourceMap>,
     diagnostics_output: DiagnosticOutput,
     lint_caps: FxHashMap<lint::LintId, lint::Level>,
+    incr_comp_vfs: Box<dyn Vfs>,
 ) -> Session {
     // FIXME: This is not general enough to make the warning lint completely override
     // normal diagnostic warnings, since the warning lint can also be denied and changed
@@ -1143,7 +1150,14 @@ pub fn build_session_with_source_map(
         },
     );
 
-    build_session_(sopts, local_crate_source_file, diagnostic_handler, source_map, lint_caps)
+    build_session_(
+        sopts,
+        local_crate_source_file,
+        diagnostic_handler,
+        source_map,
+        lint_caps,
+        incr_comp_vfs,
+    )
 }
 
 fn build_session_(
@@ -1152,6 +1166,7 @@ fn build_session_(
     span_diagnostic: errors::Handler,
     source_map: Lrc<source_map::SourceMap>,
     driver_lint_caps: FxHashMap<lint::LintId, lint::Level>,
+    incr_comp_vfs: Box<dyn Vfs>,
 ) -> Session {
     let self_profiler =
         if let SwitchWithOptPath::Enabled(ref d) = sopts.debugging_opts.self_profile {
@@ -1257,6 +1272,7 @@ fn build_session_(
         allocator_kind: Once::new(),
         injected_panic_runtime: Once::new(),
         imported_macro_spans: OneThread::new(RefCell::new(FxHashMap::default())),
+        incr_comp_vfs: Arc::new(std::sync::RwLock::new(incr_comp_vfs)),
         incr_comp_session: OneThread::new(RefCell::new(IncrCompSession::NotInitialized)),
         cgu_reuse_tracker,
         self_profiling: self_profiler,
@@ -1366,16 +1382,20 @@ pub enum IncrCompSession {
     /// be modified.
     Active {
         session_directory: PathBuf,
-        lock_file: flock::Lock,
+        lock: VfsLock,
         load_dep_graph: bool,
     },
     /// This is the state after the session directory has been finalized. In this
     /// state, the contents of the directory must not be modified any more.
-    Finalized { session_directory: PathBuf },
+    Finalized {
+        session_directory: PathBuf,
+    },
     /// This is an error state that is reached when some compilation error has
     /// occurred. It indicates that the contents of the session directory must
     /// not be used, since they might be invalid.
-    InvalidBecauseOfErrors { session_directory: PathBuf },
+    InvalidBecauseOfErrors {
+        session_directory: PathBuf,
+    },
 }
 
 pub fn early_error(output: config::ErrorOutputType, msg: &str) -> ! {

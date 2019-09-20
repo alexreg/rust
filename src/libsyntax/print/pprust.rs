@@ -1051,6 +1051,11 @@ impl<'a> State<'a> {
             ast::TyKind::CVarArgs => {
                 self.s.word("...");
             }
+            ast::TyKind::InterpTy(id) => {
+                self.s.word("interp_ty(");
+                self.print_usize(id);
+                self.s.word(")");
+            }
         }
         self.end();
     }

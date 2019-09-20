@@ -3,9 +3,9 @@
 use crate::interpret::{self,
     PlaceTy, MPlaceTy, OpTy, ImmTy, Immediate, Scalar, Pointer,
     RawConst, ConstValue,
-    InterpResult, InterpErrorInfo, GlobalId, InterpCx, StackPopCleanup,
-    Allocation, AllocId, MemoryKind, Memory,
-    snapshot, RefTracking, intern_const_alloc_recursive,
+    InterpResult, InterpErrorInfo, InterpCx, RunStep, StackPopBehavior, StackPopAction,
+    GlobalId, Allocation, AllocId, Memory, MemoryKind,
+    RefTracking, snapshot, intern_const_alloc_recursive,
 };
 
 use rustc::hir::def::DefKind;
@@ -156,7 +156,7 @@ fn eval_body_using_ecx<'mir, 'tcx>(
         body.span,
         body,
         Some(ret.into()),
-        StackPopCleanup::None { cleanup: false },
+        StackPopBehavior { action: StackPopAction::None, cleanup: false },
     )?;
 
     // Run the main interpreter loop.
@@ -446,18 +446,22 @@ impl<'mir, 'tcx> interpret::Machine<'mir, 'tcx> for CompileTimeInterpreter<'mir,
         )
     }
 
-    fn before_terminator(ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx> {
+    fn before_statement(_ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx, RunStep> {
+        Ok(RunStep::Default)
+    }
+
+    fn before_terminator(ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx, RunStep> {
         {
             let steps = &mut ecx.machine.steps_since_detector_enabled;
 
             *steps += 1;
             if *steps < 0 {
-                return Ok(());
+                return Ok(RunStep::Default);
             }
 
             *steps %= DETECTOR_SNAPSHOT_PERIOD;
             if *steps != 0 {
-                return Ok(());
+                return Ok(RunStep::Default);
             }
         }
 
@@ -467,17 +471,27 @@ impl<'mir, 'tcx> interpret::Machine<'mir, 'tcx> for CompileTimeInterpreter<'mir,
             span,
             &ecx.memory,
             &ecx.stack[..],
-        )
+        )?;
+        Ok(RunStep::Default)
     }
 
     #[inline(always)]
-    fn stack_push(_ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx> {
+    fn before_stack_push(_ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx> {
         Ok(())
     }
 
-    /// Called immediately before a stack frame gets popped.
     #[inline(always)]
-    fn stack_pop(_ecx: &mut InterpCx<'mir, 'tcx, Self>, _extra: ()) -> InterpResult<'tcx> {
+    fn after_stack_push(_ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx> {
+        Ok(())
+    }
+
+    #[inline(always)]
+    fn before_stack_pop(_ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx> {
+        Ok(())
+    }
+
+    #[inline(always)]
+    fn after_stack_pop(_ecx: &mut InterpCx<'mir, 'tcx, Self>, _extra: ()) -> InterpResult<'tcx> {
         Ok(())
     }
 }

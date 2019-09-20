@@ -4,7 +4,7 @@
 
 use super::{
     Allocation, AllocId, InterpResult, Scalar, AllocationExtra,
-    InterpCx, PlaceTy, OpTy, ImmTy, MemoryKind, Pointer, Memory,
+    InterpCx, RunStep, PlaceTy, OpTy, ImmTy, MemoryKind, Pointer, Memory,
 };
 
 use std::borrow::{Borrow, Cow};
@@ -115,10 +115,6 @@ pub trait Machine<'mir, 'tcx>: Sized {
     /// Indicates whether to enforce the validity invariant.
     fn enforce_validity(ecx: &InterpCx<'mir, 'tcx, Self>) -> bool;
 
-    /// Called before a basic block terminator is executed.
-    /// You can use this to detect endlessly running programs.
-    fn before_terminator(ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx>;
-
     /// The entry point to all function calls.
     ///
     /// Returns either the mir to use for the call, or `None` if execution should
@@ -227,14 +223,29 @@ pub trait Machine<'mir, 'tcx>: Sized {
         Ok(())
     }
 
-    /// Called immediately before a new stack frame got pushed
-    fn stack_push(ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx, Self::FrameExtra>;
+    /// Called before a statement is executed.
+    fn before_statement(ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx, RunStep>;
 
-    /// Called immediately after a stack frame gets popped
-    fn stack_pop(
+    /// Called before a basic block terminator is executed.
+    /// You can use this to detect endlessly running programs.
+    fn before_terminator(ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx, RunStep>;
+
+    /// Called immediately before a new stack frame gets pushed.
+    fn before_stack_push(
+        ecx: &mut InterpCx<'mir, 'tcx, Self>
+    ) -> InterpResult<'tcx, Self::FrameExtra>;
+
+    /// Called immediately before a new stack frame gets pushed.
+    fn after_stack_push(ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx>;
+
+    /// Called immediately after a stack frame gets popped.
+    fn after_stack_pop(
         ecx: &mut InterpCx<'mir, 'tcx, Self>,
         extra: Self::FrameExtra,
     ) -> InterpResult<'tcx>;
+
+    /// Called immediately before a stack frame gets popped.
+    fn before_stack_pop(ecx: &mut InterpCx<'mir, 'tcx, Self>) -> InterpResult<'tcx>;
 
     fn int_to_ptr(
         _mem: &Memory<'mir, 'tcx, Self>,

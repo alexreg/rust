@@ -22,7 +22,7 @@ use rustc_data_structures::stable_hasher::{HashStable, StableHasher};
 use syntax::ast::Mutability;
 use syntax::source_map::Span;
 
-use super::eval_context::{LocalState, StackPopCleanup};
+use super::context::{LocalState, StackPopBehavior};
 use super::{Frame, Memory, Operand, MemPlace, Place, Immediate, ScalarMaybeUndef, LocalValue};
 use crate::const_eval::CompileTimeInterpreter;
 
@@ -314,16 +314,21 @@ impl<'a, Ctx> Snapshot<'a, Ctx> for &'a Allocation
     }
 }
 
-impl_stable_hash_for!(enum crate::interpret::eval_context::StackPopCleanup {
+impl_stable_hash_for!(enum crate::interpret::context::StackPopAction {
     Goto(block),
-    None { cleanup },
+    None,
+});
+
+impl_stable_hash_for!(struct crate::interpret::context::StackPopBehavior {
+    action,
+    cleanup,
 });
 
 #[derive(Eq, PartialEq)]
 struct FrameSnapshot<'a, 'tcx> {
     instance: ty::Instance<'tcx>,
     span: Span,
-    return_to_block: &'a StackPopCleanup,
+    pop_behavior: &'a StackPopBehavior,
     return_place: Option<Place<(), AllocIdSnapshot<'a>>>,
     locals: IndexVec<mir::Local, LocalValue<(), AllocIdSnapshot<'a>>>,
     block: &'a mir::BasicBlock,
@@ -334,7 +339,7 @@ impl_stable_hash_for!(impl<> for struct Frame<'mir, 'tcx> {
     body,
     instance,
     span,
-    return_to_block,
+    pop_behavior,
     return_place -> (return_place.as_ref().map(|r| &**r)),
     locals,
     block,
@@ -352,7 +357,7 @@ impl<'a, 'mir, 'tcx, Ctx> Snapshot<'a, Ctx> for &'a Frame<'mir, 'tcx>
             body: _,
             instance,
             span,
-            return_to_block,
+            pop_behavior,
             return_place,
             locals,
             block,
@@ -363,7 +368,7 @@ impl<'a, 'mir, 'tcx, Ctx> Snapshot<'a, Ctx> for &'a Frame<'mir, 'tcx>
         FrameSnapshot {
             instance: *instance,
             span: *span,
-            return_to_block,
+            pop_behavior,
             block,
             stmt: *stmt,
             return_place: return_place.map(|r| r.snapshot(ctx)),

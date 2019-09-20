@@ -5,7 +5,7 @@ use rustc::ty::{
     self,
 };
 use rustc::hir::map::{DefPathData, DisambiguatedDefPathData};
-use rustc::hir::def_id::CrateNum;
+use rustc::hir::def_id::{DefId, CrateNum};
 use std::fmt::Write;
 use rustc::mir::interpret::Allocation;
 
@@ -25,6 +25,22 @@ impl<'tcx> Printer<'tcx> for AbsolutePathPrinter<'tcx> {
 
     fn tcx(&self) -> TyCtxt<'tcx> {
         self.tcx
+    }
+
+    fn print_def_path(
+        mut self,
+        def_id: DefId,
+        substs: &'tcx [Kind<'tcx>],
+    ) -> Result<Self::Path, Self::Error> {
+        if self.tcx().sess.opts.interp_mode {
+            // In interpreter mode, don't print section of type path beyond user fn.
+            if def_id == self.tcx().get_interp_user_fn() {
+                write!(self, "eval")?;
+                return Ok(self);
+            }
+        }
+
+        self.default_print_def_path(def_id, substs)
     }
 
     fn print_region(self, _region: ty::Region<'_>) -> Result<Self::Region, Self::Error> {

@@ -5,17 +5,19 @@ pub use crate::passes::BoxedResolver;
 
 use rustc::lint;
 use rustc::session::config::{self, Input};
+use rustc::session::vfs::Vfs;
 use rustc::session::{DiagnosticOutput, Session};
 use rustc::util::common::ErrorReported;
 use rustc_codegen_utils::codegen_backend::CodegenBackend;
 use rustc_data_structures::OnDrop;
+use rustc_data_structures::fx::{FxHashMap, FxHashSet};
 use rustc_data_structures::sync::Lrc;
-use rustc_data_structures::fx::{FxHashSet, FxHashMap};
 use rustc_metadata::cstore::CStore;
 use std::path::PathBuf;
 use std::result;
 use std::sync::{Arc, Mutex};
 use syntax;
+use syntax::parse::parser::InterpUserFn;
 use syntax::source_map::{FileLoader, SourceMap};
 use syntax_pos::edition;
 
@@ -35,9 +37,19 @@ pub struct Compiler {
     pub(crate) queries: Queries,
     pub(crate) cstore: Lrc<CStore>,
     pub(crate) crate_name: Option<String>,
+    /// In interpreter mode, the user fn to use when parsing.
+    pub(crate) interp_user_fn: Option<Lrc<InterpUserFn>>,
 }
 
 impl Compiler {
+    pub fn with_interp_user_fn(
+        &mut self,
+        interp_user_fn: Option<InterpUserFn>,
+    ) -> &mut Self {
+        self.interp_user_fn = interp_user_fn.map(|user_fn| Lrc::new(user_fn));
+        self
+    }
+
     pub fn session(&self) -> &Lrc<Session> {
         &self.sess
     }
@@ -81,9 +93,12 @@ pub struct Config {
 
     pub crate_name: Option<String>,
     pub lint_caps: FxHashMap<lint::LintId, lint::Level>,
+
+    /// The virtual filesystem to use for incremental compilation.
+    pub incr_comp_vfs: Box<dyn Vfs>,
 }
 
-fn create_compiler(config: Config) -> Compiler {
+pub fn create_compiler(config: Config) -> Compiler {
     let (sess, codegen_backend, source_map) = util::create_session(
         config.opts,
         config.crate_cfg,
@@ -91,6 +106,7 @@ fn create_compiler(config: Config) -> Compiler {
         config.file_loader,
         config.input_path.clone(),
         config.lint_caps,
+        config.incr_comp_vfs,
     );
 
     let cstore = Lrc::new(CStore::new(codegen_backend.metadata_loader()));
@@ -106,6 +122,7 @@ fn create_compiler(config: Config) -> Compiler {
         output_file: config.output_file,
         queries: Default::default(),
         crate_name: config.crate_name,
+        interp_user_fn: None,
     }
 }
 

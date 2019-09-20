@@ -1,5 +1,6 @@
 use rustc_lint;
 use rustc::session::{self, config};
+use rustc::session::vfs::DiskVfs;
 use rustc::hir::def_id::{DefId, DefIndex, CrateNum, LOCAL_CRATE};
 use rustc::hir::HirId;
 use rustc::middle::cstore::CrateStore;
@@ -334,6 +335,7 @@ pub fn run_core(options: RustdocOptions) -> (clean::Crate, RenderInfo, RenderOpt
         stderr: None,
         crate_name,
         lint_caps,
+        incr_comp_vfs: Box::new(DiskVfs),
     };
 
     interface::run_compiler_in_existing_thread_pool(config, |compiler| {

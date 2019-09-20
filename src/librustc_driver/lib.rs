@@ -32,6 +32,7 @@ use rustc_save_analysis::DumpHandler;
 use rustc::session::{config, Session, DiagnosticOutput};
 use rustc::session::config::{Input, PrintRequest, ErrorOutputType, OutputType};
 use rustc::session::config::nightly_options;
+use rustc::session::vfs::DiskVfs;
 use rustc::session::{early_error, early_warn};
 use rustc::lint::Lint;
 use rustc::lint;
@@ -183,6 +184,7 @@ pub fn run_compiler(
             stderr: None,
             crate_name: None,
             lint_caps: Default::default(),
+            incr_comp_vfs: Box::new(DiskVfs),
         };
         callbacks.config(&mut config);
         config
@@ -256,6 +258,7 @@ pub fn run_compiler(
         stderr: None,
         crate_name: None,
         lint_caps: Default::default(),
+        incr_comp_vfs: Box::new(DiskVfs),
     };
 
     callbacks.config(&mut config);

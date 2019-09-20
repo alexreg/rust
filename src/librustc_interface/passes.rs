@@ -11,7 +11,7 @@ use rustc::lint;
 use rustc::middle::{self, reachable, resolve_lifetime, stability};
 use rustc::middle::cstore::CrateStore;
 use rustc::ty::{self, AllArenas, Resolutions, TyCtxt, GlobalCtxt};
-use rustc::ty::steal::Steal;
+use rustc_data_structures::steal::Steal;
 use rustc::traits;
 use rustc::util::common::{time, ErrorReported};
 use rustc::session::Session;
@@ -39,6 +39,7 @@ use syntax::early_buffered_lints::BufferedEarlyLint;
 use syntax::ext::base::{NamedSyntaxExtension, ExtCtxt};
 use syntax::mut_visit::MutVisitor;
 use syntax::parse::{self, PResult};
+use syntax::parse::parser::InterpUserFn;
 use syntax::util::node_count::NodeCounter;
 use syntax::symbol::Symbol;
 use syntax_pos::FileName;
@@ -58,16 +59,28 @@ use std::sync::mpsc;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub fn parse<'a>(sess: &'a Session, input: &Input) -> PResult<'a, ast::Crate> {
+pub fn parse<'a>(
+    sess: &'a Session,
+    input: &Input,
+    interp_user_fn: Option<Lrc<InterpUserFn>>,
+) -> PResult<'a, ast::Crate> {
     sess.diagnostic()
         .set_continue_after_error(sess.opts.debugging_opts.continue_parse_after_error);
     sess.profiler(|p| p.start_activity("parsing"));
     let krate = time(sess, "parsing", || match *input {
-        Input::File(ref file) => parse::parse_crate_from_file(file, &sess.parse_sess),
+        Input::File(ref file) => parse::parse_crate_from_file(
+            file,
+            &sess.parse_sess,
+        ),
         Input::Str {
             ref input,
             ref name,
-        } => parse::parse_crate_from_source_str(name.clone(), input.clone(), &sess.parse_sess),
+        } => parse::parse_crate_from_source_str(
+            name.clone(),
+            input.clone(),
+            &sess.parse_sess,
+            interp_user_fn,
+        ),
     })?;
     sess.profiler(|p| p.end_activity("parsing"));
 

@@ -359,6 +359,7 @@ symbols! {
         infer_static_outlives_requirements,
         inline,
         intel,
+        interp_user_fn,
         into_iter,
         IntoIterator,
         into_result,

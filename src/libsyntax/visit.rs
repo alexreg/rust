@@ -374,6 +374,7 @@ pub fn walk_ty<'a, V: Visitor<'a>>(visitor: &mut V, typ: &'a Ty) {
         }
         TyKind::Never |
         TyKind::CVarArgs => {}
+        TyKind::InterpTy(_id) => {}
     }
 }
 

@@ -6,7 +6,9 @@ Core encoding and decoding interfaces.
 
 use std::any;
 use std::borrow::Cow;
+use std::ffi;
 use std::marker::PhantomData;
+use std::ops::Range;
 use std::path;
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
@@ -364,6 +366,30 @@ impl Decodable for ::std::num::NonZeroU32 {
     }
 }
 
+impl Encodable for ::std::num::NonZeroU64 {
+    fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+        s.emit_u64(self.get())
+    }
+}
+
+impl Decodable for ::std::num::NonZeroU64 {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Self, D::Error> {
+        d.read_u64().map(|d| ::std::num::NonZeroU64::new(d).unwrap())
+    }
+}
+
+impl Encodable for ::std::num::NonZeroUsize {
+    fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+        s.emit_usize(self.get())
+    }
+}
+
+impl Decodable for ::std::num::NonZeroUsize {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Self, D::Error> {
+        d.read_usize().map(|d| ::std::num::NonZeroUsize::new(d).unwrap())
+    }
+}
+
 impl Encodable for u64 {
     fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
         s.emit_u64(*self)
@@ -535,6 +561,23 @@ impl Encodable for () {
 impl Decodable for () {
     fn decode<D: Decoder>(d: &mut D) -> Result<Self, D::Error> {
         d.read_nil()
+    }
+}
+
+impl<Idx: Encodable> Encodable for Range<Idx> {
+    fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+        self.start.encode(s)?;
+        self.end.encode(s)?;
+        Ok(())
+    }
+}
+
+impl<Idx: Decodable> Decodable for Range<Idx> {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Self, D::Error> {
+        Ok(Range {
+            start: Decodable::decode(d)?,
+            end: Decodable::decode(d)?,
+        })
     }
 }
 
@@ -769,6 +812,25 @@ macro_rules! tuple {
 }
 
 tuple! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, }
+
+impl Encodable for ffi::OsStr {
+    fn encode<S: Encoder>(&self, e: &mut S) -> Result<(), S::Error> {
+        self.to_str().unwrap().encode(e)
+    }
+}
+
+impl Encodable for ffi::OsString {
+    fn encode<S: Encoder>(&self, e: &mut S) -> Result<(), S::Error> {
+        ffi::OsStr::encode(self, e)
+    }
+}
+
+impl Decodable for ffi::OsString {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Self, D::Error> {
+        let bytes: String = Decodable::decode(d)?;
+        Ok(ffi::OsString::from(bytes))
+    }
+}
 
 impl Encodable for path::Path {
     fn encode<S: Encoder>(&self, e: &mut S) -> Result<(), S::Error> {

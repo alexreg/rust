@@ -1,3 +1,5 @@
+//! This module handles saving of the dep-graph to the virtual filesystem.
+
 use super::data::*;
 use super::fs::*;
 use super::dirty_clean;
@@ -6,6 +8,7 @@ use super::work_product;
 
 use rustc::dep_graph::{DepGraph, DepKind, WorkProduct, WorkProductId};
 use rustc::session::Session;
+use rustc::session::vfs::Buf;
 use rustc::ty::TyCtxt;
 use rustc::util::common::time;
 use rustc_data_structures::fx::FxHashMap;
@@ -13,7 +16,6 @@ use rustc_data_structures::sync::join;
 use rustc_serialize::Encodable as RustcEncodable;
 use rustc_serialize::opaque::Encoder;
 
-use std::fs;
 use std::path::PathBuf;
 
 pub fn save_dep_graph(tcx: TyCtxt<'_>) {
@@ -92,12 +94,14 @@ fn save_in<F>(sess: &Session, path_buf: PathBuf, encode: F)
 {
     debug!("save: storing data in {}", path_buf.display());
 
+    let vfs = &mut sess.incr_comp_vfs.write().unwrap();
+
     // Delete the old dep-graph, if any.
     // Note: It's important that we actually delete the old file and not just
     // truncate and overwrite it, since it might be a shared hard-link, the
     // underlying data of which we don't want to modify.
     if path_buf.exists() {
-        match fs::remove_file(&path_buf) {
+        match vfs.remove_file(&path_buf) {
             Ok(()) => {
                 debug!("save: remove old file");
             }
@@ -117,7 +121,7 @@ fn save_in<F>(sess: &Session, path_buf: PathBuf, encode: F)
 
     // Write the data out.
     let data = encoder.into_inner();
-    match fs::write(&path_buf, data) {
+    match vfs.write_file(&path_buf, Buf::Owned(data)) {
         Ok(_) => {
             debug!("save: data written to disk successfully");
         }
@@ -131,7 +135,7 @@ fn save_in<F>(sess: &Session, path_buf: PathBuf, encode: F)
 }
 
 fn encode_dep_graph(tcx: TyCtxt<'_>, encoder: &mut Encoder) {
-    // First encode the commandline arguments hash
+    // First, encode the command-line arguments hash.
     tcx.sess.opts.dep_tracking_hash().encode(encoder).unwrap();
 
     // Encode the graph data.

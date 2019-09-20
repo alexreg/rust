@@ -243,6 +243,7 @@ impl<'a> ExtCtxt<'a> {
             id: ast::DUMMY_NODE_ID,
             span: sp,
             attrs: ThinVec::new(),
+            interp_tag: None,
         });
         ast::Stmt {
             id: ast::DUMMY_NODE_ID,
@@ -271,6 +272,7 @@ impl<'a> ExtCtxt<'a> {
             id: ast::DUMMY_NODE_ID,
             span: sp,
             attrs: ThinVec::new(),
+            interp_tag: None,
         });
         ast::Stmt {
             id: ast::DUMMY_NODE_ID,
@@ -288,6 +290,7 @@ impl<'a> ExtCtxt<'a> {
             id: ast::DUMMY_NODE_ID,
             span,
             attrs: ThinVec::new(),
+            interp_tag: None,
         });
         ast::Stmt {
             id: ast::DUMMY_NODE_ID,

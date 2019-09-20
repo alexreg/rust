@@ -1,7 +1,7 @@
 //! An interpreter for MIR used in CTFE and by miri
 
 mod cast;
-mod eval_context;
+mod context;
 mod place;
 mod operand;
 mod machine;
@@ -18,8 +18,8 @@ mod intern;
 
 pub use rustc::mir::interpret::*; // have all the `interpret` symbols in one place: here
 
-pub use self::eval_context::{
-    InterpCx, Frame, StackPopCleanup, LocalState, LocalValue,
+pub use self::context::{
+    InterpCx, Frame, StackPopBehavior, StackPopAction, LocalState, LocalValue,
 };
 
 pub use self::place::{Place, PlaceTy, MemPlace, MPlaceTy};
@@ -37,3 +37,5 @@ pub use self::validity::RefTracking;
 pub use self::intern::intern_const_alloc_recursive;
 
 crate use self::intrinsics::eval_nullary_intrinsic;
+
+pub use self::step::RunStep;

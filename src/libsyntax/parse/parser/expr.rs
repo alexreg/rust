@@ -1093,6 +1093,26 @@ impl<'a> Parser<'a> {
         let mut attrs = outer_attrs;
         attrs.extend(self.parse_inner_attributes()?);
 
+        if let Some(ref interp_user_fn) = self.interp_user_fn {
+            let super::InterpUserFn {
+                ref placeholder,
+                ref body,
+            } = *interp_user_fn.clone();
+            if let token::Ident(name, _) = self.token.kind {
+                if &*name.as_str() == placeholder {
+                    // We are in interpreter mode, and have found the block to use as the
+                    // "user fn" body. Insert the given body for the user fn instead of
+                    // parsing one.
+
+                    self.bump();
+                    self.expect(&token::CloseDelim(token::Brace))?;
+
+                    let blk = body.steal();
+                    return Ok(self.mk_expr(blk.span, ExprKind::Block(blk, opt_label), attrs));
+                }
+            }
+        }
+
         let blk = self.parse_block_tail(lo, blk_mode)?;
         Ok(self.mk_expr(blk.span, ExprKind::Block(blk, opt_label), attrs))
     }

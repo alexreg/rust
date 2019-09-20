@@ -1085,6 +1085,14 @@ impl<F: fmt::Write> Printer<'tcx> for FmtPrinter<'_, 'tcx, F> {
     ) -> Result<Self::Path, Self::Error> {
         define_scoped_cx!(self);
 
+        if self.tcx().sess.opts.interp_mode {
+            // In interpreter mode, don't print section of type path beyond user fn.
+            if def_id == self.tcx().get_interp_user_fn() {
+                write!(self, "eval")?;
+                return Ok(self);
+            }
+        }
+
         if substs.is_empty() {
             match self.try_print_visible_def_path(def_id)? {
                 (cx, true) => return Ok(cx),

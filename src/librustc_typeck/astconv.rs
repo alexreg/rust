@@ -2154,6 +2154,9 @@ impl<'o, 'tcx> dyn AstConv<'tcx> + 'o {
                 let region = self.ast_region_to_region(&lt, None);
                 tcx.type_of(va_list_did).subst(tcx, &[region.into()])
             }
+            hir::TyKind::InterpTy(id) => {
+                tcx.get_interp_ty(id)
+            },
             hir::TyKind::Err => {
                 tcx.types.err
             }

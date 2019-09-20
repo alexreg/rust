@@ -6,9 +6,9 @@ use crate::require_same_types;
 use rustc::hir;
 use rustc::traits::{ObligationCause, ObligationCauseCode};
 use rustc::ty::{self, TyCtxt, Ty};
-use rustc::ty::subst::Subst;
+use rustc::ty::subst::{InternalSubsts, Subst};
 use rustc_target::spec::abi::Abi;
-use syntax::symbol::InternedString;
+use syntax::symbol::{InternedString, sym};
 
 use std::iter;
 
@@ -91,6 +91,22 @@ pub fn check_intrinsic_type(tcx: TyCtxt<'_>, it: &hir::ForeignItem) {
                 ty: va_list_ty,
                 mutbl
             }), va_list_ty)
+        })
+    };
+
+    let mk_dyn_debug_ty = || {
+        tcx.get_diagnostic_item(sym::debug_trait).map(|did| {
+            let debug_trait_ref = ty::ExistentialTraitRef {
+                def_id: did,
+                substs: InternalSubsts::empty(),
+            };
+            let debug_predicate = ty::ExistentialPredicate::Trait(debug_trait_ref);
+
+            let existential_predicates = ty::Binder::bind(tcx.mk_existential_predicates(
+                vec![debug_predicate].into_iter()
+            ));
+            let region = tcx.mk_region(ty::RegionKind::ReStatic);
+            tcx.mk_dynamic(existential_predicates, region)
         })
     };
 
@@ -367,6 +383,28 @@ pub fn check_intrinsic_type(tcx: TyCtxt<'_>, it: &hir::ForeignItem) {
 
             "nontemporal_store" => {
                 (1, vec![ tcx.mk_mut_ptr(param(0)), param(0) ], tcx.mk_unit())
+            }
+
+            // Only available in interpreter mode.
+            "as_debug" if tcx.sess.opts.interp_mode => {
+                match mk_dyn_debug_ty() {
+                    Some(dyn_debug_ty) => {
+                        (
+                            1,
+                            vec![
+                                tcx.mk_ptr(ty::TypeAndMut {
+                                    ty: param(0),
+                                    mutbl: hir::MutImmutable
+                                }),
+                            ],
+                            tcx.mk_ptr(ty::TypeAndMut {
+                                ty: dyn_debug_ty,
+                                mutbl: hir::MutImmutable
+                            })
+                        )
+                    }
+                    None => bug!("`debug_trait` language item needed for `as_debug` intrinsic"),
+                }
             }
 
             ref other => {

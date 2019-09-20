@@ -454,6 +454,13 @@ impl<T> ClearCrossCrate<T> {
             ClearCrossCrate::Set(v) => v,
         }
     }
+
+    pub fn assert_crate_local_ref(&self) -> &T {
+        match *self {
+            ClearCrossCrate::Clear => bug!("unwrapping cross-crate data"),
+            ClearCrossCrate::Set(ref v) => v,
+        }
+    }
 }
 
 impl<T: Encodable> rustc_serialize::UseSpecializedEncodable for ClearCrossCrate<T> {}
@@ -604,7 +611,9 @@ pub enum LocalKind {
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug, RustcEncodable, RustcDecodable)]
 pub struct VarBindingForm<'tcx> {
-    /// Is variable bound via `x`, `mut x`, `ref x`, or `ref mut x`?
+    /// The `HirId` of th variable declaration.
+    pub var_id: hir::HirId,
+    /// `true` if the variable is bound via `x`, `mut x`, `ref x`, or `ref mut x`.
     pub binding_mode: ty::BindingMode,
     /// If an explicit type was provided for this variable binding,
     /// this holds the source `Span` of that type.
@@ -653,10 +662,11 @@ pub enum ImplicitSelfKind {
 CloneTypeFoldableAndLiftImpls! { BindingForm<'tcx>, }
 
 impl_stable_hash_for!(struct self::VarBindingForm<'tcx> {
+    var_id,
     binding_mode,
     opt_ty_info,
     opt_match_place,
-    pat_span
+    pat_span,
 });
 
 impl_stable_hash_for!(enum self::ImplicitSelfKind {
@@ -872,6 +882,7 @@ impl<'tcx> LocalDecl<'tcx> {
     pub fn can_be_made_mutable(&self) -> bool {
         match self.is_user_variable {
             Some(ClearCrossCrate::Set(BindingForm::Var(VarBindingForm {
+                var_id: _,
                 binding_mode: ty::BindingMode::BindByValue(_),
                 opt_ty_info: _,
                 opt_match_place: _,
@@ -890,6 +901,7 @@ impl<'tcx> LocalDecl<'tcx> {
     pub fn is_nonref_binding(&self) -> bool {
         match self.is_user_variable {
             Some(ClearCrossCrate::Set(BindingForm::Var(VarBindingForm {
+                var_id: _,
                 binding_mode: ty::BindingMode::BindByValue(_),
                 opt_ty_info: _,
                 opt_match_place: _,
@@ -899,6 +911,36 @@ impl<'tcx> LocalDecl<'tcx> {
             Some(ClearCrossCrate::Set(BindingForm::ImplicitSelf(_))) => true,
 
             _ => false,
+        }
+    }
+
+    /// Returns the `HirId` of the local if it is a user variable.
+    pub fn var_id(&self) -> Option<hir::HirId> {
+        match self.is_user_variable {
+            Some(ClearCrossCrate::Set(BindingForm::Var(VarBindingForm {
+                var_id,
+                binding_mode: _,
+                opt_ty_info: _,
+                opt_match_place: _,
+                pat_span: _,
+            }))) => Some(var_id),
+
+            _ => None,
+        }
+    }
+
+    /// Returns the `LocalInterpTag` for the corresponding `hir::Local`.
+    pub fn interp_tag(
+        &self,
+        tcx: TyCtxt<'_>,
+    ) -> Option<syntax::ast::LocalInterpTag> {
+        let var_id = self.var_id()?;
+        let local_id = tcx.hir().get_parent_node(var_id);
+        let local_node = tcx.hir().find(local_id)?;
+        trace!("interp_tag: local_node={:?}", local_node);
+        match local_node {
+            hir::Node::Local(l) => l.interp_tag,
+            _ => None,
         }
     }
 

@@ -10,6 +10,7 @@ use rustc_data_structures::fx::FxHashSet;
 use rustc_data_structures::indexed_vec::Idx;
 use rustc_errors::{Applicability, DiagnosticBuilder};
 use syntax_pos::Span;
+use syntax::ast::LocalInterpTag;
 use syntax::source_map::DesugaringKind;
 
 use super::nll::explain_borrow::BorrowExplanation;
@@ -44,6 +45,30 @@ enum StorageDeadOrDrop<'tcx> {
 }
 
 impl<'cx, 'tcx> MirBorrowckCtxt<'cx, 'tcx> {
+    fn local_interp_tag(
+        &self,
+        place: PlaceRef<'cx, 'tcx>,
+    ) -> Option<LocalInterpTag> {
+        match place {
+            PlaceRef {
+                base: PlaceBase::Local(local),
+                projection: _,
+            } => {
+                let gcx = self.infcx.tcx.global_tcx();
+                let local = &self.body.local_decls[*local];
+                local.interp_tag(gcx)
+            }
+            _ => None,
+        }
+    }
+
+    /// Reports the use of a moved or uninitialized place.
+    ///
+    /// Consider the following example:
+    ///     let x = ((String::new(),),);
+    ///     drop(x.0);
+    ///     let y = x.0.0.len();
+    /// Here, `moved_place` would be `x.0` and `used_place` would be `x.0.0`.
     pub(super) fn report_use_of_moved_or_uninitialized(
         &mut self,
         location: Location,
@@ -51,9 +76,11 @@ impl<'cx, 'tcx> MirBorrowckCtxt<'cx, 'tcx> {
         (moved_place, used_place, span): (PlaceRef<'cx, 'tcx>, PlaceRef<'cx, 'tcx>, Span),
         mpi: MovePathIndex,
     ) {
+        use syntax::ast::LocalInterpState;
+
         debug!(
-            "report_use_of_moved_or_uninitialized: location={:?} desired_action={:?} \
-             moved_place={:?} used_place={:?} span={:?} mpi={:?}",
+            "report_use_of_moved_or_uninitialized(location={:?}, desired_action={:?}, \
+             moved_place={:?}, used_place={:?}, span={:?}, mpi={:?})",
             location, desired_action, moved_place, used_place, span, mpi
         );
 
@@ -61,17 +88,45 @@ impl<'cx, 'tcx> MirBorrowckCtxt<'cx, 'tcx> {
             .or_else(|| self.borrow_spans(span, location));
         let span = use_spans.args_or_use();
 
-        let move_site_vec = self.get_moved_indexes(location, mpi);
+        let move_sites = self.get_moved_indexes(location, mpi);
         debug!(
-            "report_use_of_moved_or_uninitialized: move_site_vec={:?}",
-            move_site_vec
+            "report_use_of_moved_or_uninitialized: move_sites={:?}",
+            move_sites
         );
-        let move_out_indices: Vec<_> = move_site_vec
+        let move_out_indices: Vec<_> = move_sites
             .iter()
             .map(|move_site| move_site.moi)
             .collect();
 
-        if move_out_indices.is_empty() {
+        let moved_local_tag = self.local_interp_tag(moved_place);
+
+        if !move_out_indices.is_empty() ||
+            moved_local_tag.map_or(false, |tag| tag.state == LocalInterpState::Moved)
+        {
+            if let Some((reported_place, _)) = self.move_error_reported.get(&move_out_indices) {
+                if self.prefixes(*reported_place, PrefixSet::All)
+                    .any(|p| p == used_place)
+                {
+                    debug!(
+                        "report_use_of_moved_or_uninitialized place: error suppressed mois={:?}",
+                        move_out_indices
+                    );
+                    return;
+                }
+            }
+
+            self.report_use_of_moved(
+                location,
+                desired_action,
+                (moved_place, used_place),
+                use_spans,
+                span,
+                move_sites,
+                move_out_indices,
+            )
+        } else if move_out_indices.is_empty() &&
+            moved_local_tag.map_or(true, |tag| tag.state == LocalInterpState::Uninitialized)
+        {
             let root_place = self
                 .prefixes(used_place, PrefixSet::All)
                 .last()
@@ -87,185 +142,201 @@ impl<'cx, 'tcx> MirBorrowckCtxt<'cx, 'tcx> {
 
             self.uninitialized_error_reported.insert(root_place);
 
-            let item_msg = match self.describe_place_with_options(used_place,
-                                                                  IncludingDowncast(true)) {
-                Some(name) => format!("`{}`", name),
-                None => "value".to_owned(),
-            };
-            let mut err = self.cannot_act_on_uninitialized_variable(
-                span,
-                desired_action.as_noun(),
-                &self.describe_place_with_options(moved_place, IncludingDowncast(true))
-                    .unwrap_or_else(|| "_".to_owned()),
-            );
-            err.span_label(span, format!("use of possibly-uninitialized {}", item_msg));
-
-            use_spans.var_span_label(
-                &mut err,
-                format!("{} occurs due to use{}", desired_action.as_noun(), use_spans.describe()),
-            );
-
-            // This error should not be downgraded to a warning,
-            // even in migrate mode.
-            self.disable_error_downgrading();
-            err.buffer(&mut self.errors_buffer);
-        } else {
-            if let Some((reported_place, _)) = self.move_error_reported.get(&move_out_indices) {
-                if self.prefixes(*reported_place, PrefixSet::All)
-                    .any(|p| p == used_place)
-                {
-                    debug!(
-                        "report_use_of_moved_or_uninitialized place: error suppressed \
-                         mois={:?}",
-                        move_out_indices
-                    );
-                    return;
-                }
-            }
-
-            let msg = ""; //FIXME: add "partially " or "collaterally "
-
-            let mut err = self.cannot_act_on_moved_value(
-                span,
-                desired_action.as_noun(),
-                msg,
-                self.describe_place_with_options(moved_place, IncludingDowncast(true)),
-            );
-
-            self.add_moved_or_invoked_closure_note(
+            self.report_use_of_uninitialized(
                 location,
-                used_place,
-                &mut err,
-            );
+                desired_action,
+                (moved_place, used_place),
+                use_spans,
+                span,
+            )
+        }
+    }
 
-            let mut is_loop_move = false;
-            let is_partial_move = move_site_vec.iter().any(|move_site| {
-                let move_out = self.move_data.moves[(*move_site).moi];
-                let moved_place = &self.move_data.move_paths[move_out.path].place;
-                used_place != moved_place.as_ref()
-                    && used_place.is_prefix_of(moved_place.as_ref())
-            });
-            for move_site in &move_site_vec {
-                let move_out = self.move_data.moves[(*move_site).moi];
-                let moved_place = &self.move_data.move_paths[move_out.path].place;
+    fn report_use_of_moved(
+        &mut self,
+        location: Location,
+        desired_action: InitializationRequiringAction,
+        (moved_place, used_place): (PlaceRef<'cx, 'tcx>, PlaceRef<'cx, 'tcx>),
+        use_spans: UseSpans,
+        span: Span,
+        move_sites: Vec<MoveSite>,
+        move_out_indices: Vec<MoveOutIndex>,
+    ) {
+        let msg = ""; // FIXME: add "partially " or "collaterally "
 
-                let move_spans = self.move_spans(moved_place.as_ref(), move_out.source);
-                let move_span = move_spans.args_or_use();
+        let mut err = self.cannot_act_on_moved_value(
+            span,
+            desired_action.as_noun(),
+            msg,
+            self.describe_place_with_options(moved_place, IncludingDowncast(true)),
+        );
 
-                let move_msg = if move_spans.for_closure() {
-                    " into closure"
-                } else {
-                    ""
-                };
+        self.add_moved_or_invoked_closure_note(
+            location,
+            used_place,
+            &mut err,
+        );
 
-                if span == move_span {
-                    err.span_label(
-                        span,
-                        format!("value moved{} here, in previous iteration of loop", move_msg),
-                    );
-                    is_loop_move = true;
-                } else if move_site.traversed_back_edge {
-                    err.span_label(
-                        move_span,
-                        format!(
-                            "value moved{} here, in previous iteration of loop",
-                            move_msg
-                        ),
-                    );
-                } else {
-                    err.span_label(move_span, format!("value moved{} here", move_msg));
-                    move_spans.var_span_label(
-                        &mut err,
-                        format!("variable moved due to use{}", move_spans.describe()),
-                    );
-                }
-                if Some(DesugaringKind::ForLoop) == move_span.desugaring_kind() {
-                    if let Ok(snippet) = self.infcx.tcx.sess.source_map().span_to_snippet(span) {
-                        err.span_suggestion(
-                            move_span,
-                            "consider borrowing to avoid moving into the for loop",
-                            format!("&{}", snippet),
-                            Applicability::MaybeIncorrect,
-                        );
-                    }
-                }
-            }
+        let mut is_loop_move = false;
+        let is_partial_move = move_sites.iter().any(|move_site| {
+            let move_out = self.move_data.moves[(*move_site).moi];
+            let moved_place = &self.move_data.move_paths[move_out.path].place;
+            used_place != moved_place.as_ref()
+                && used_place.is_prefix_of(moved_place.as_ref())
+        });
+        for move_site in &move_sites {
+            let move_out = self.move_data.moves[(*move_site).moi];
+            let moved_place = &self.move_data.move_paths[move_out.path].place;
 
-            use_spans.var_span_label(
-                &mut err,
-                format!("{} occurs due to use{}", desired_action.as_noun(), use_spans.describe()),
-            );
+            let move_spans = self.move_spans(moved_place.as_ref(), move_out.source);
+            let move_span = move_spans.args_or_use();
 
-            if !is_loop_move {
+            let move_msg = if move_spans.for_closure() {
+                " into closure"
+            } else {
+                ""
+            };
+
+            if span == move_span {
                 err.span_label(
                     span,
+                    format!("value moved{} here, in previous iteration of loop", move_msg),
+                );
+                is_loop_move = true;
+            } else if move_site.traversed_back_edge {
+                err.span_label(
+                    move_span,
                     format!(
-                        "value {} here {}",
-                        desired_action.as_verb_in_past_tense(),
-                        if is_partial_move { "after partial move" } else { "after move" },
+                        "value moved{} here, in previous iteration of loop",
+                        move_msg
                     ),
                 );
-            }
-
-            let ty =
-                Place::ty_from(used_place.base, used_place.projection, self.body, self.infcx.tcx)
-                    .ty;
-            let needs_note = match ty.sty {
-                ty::Closure(id, _) => {
-                    let tables = self.infcx.tcx.typeck_tables_of(id);
-                    let hir_id = self.infcx.tcx.hir().as_local_hir_id(id).unwrap();
-
-                    tables.closure_kind_origins().get(hir_id).is_none()
-                }
-                _ => true,
-            };
-
-            if needs_note {
-                let mpi = self.move_data.moves[move_out_indices[0]].path;
-                let place = &self.move_data.move_paths[mpi].place;
-
-                let ty = place.ty(self.body, self.infcx.tcx).ty;
-                let opt_name =
-                    self.describe_place_with_options(place.as_ref(), IncludingDowncast(true));
-                let note_msg = match opt_name {
-                    Some(ref name) => format!("`{}`", name),
-                    None => "value".to_owned(),
-                };
-                if let ty::Param(param_ty) = ty.sty {
-                    let tcx = self.infcx.tcx;
-                    let generics = tcx.generics_of(self.mir_def_id);
-                    let def_id = generics.type_param(&param_ty, tcx).def_id;
-                    if let Some(sp) = tcx.hir().span_if_local(def_id) {
-                        err.span_label(
-                            sp,
-                            "consider adding a `Copy` constraint to this type argument",
-                        );
-                    }
-                }
-                let span = if let Place {
-                    base: PlaceBase::Local(local),
-                    projection: box [],
-                } = place {
-                    let decl = &self.body.local_decls[*local];
-                    Some(decl.source_info.span)
-                } else {
-                    None
-                };
-                self.note_type_does_not_implement_copy(
+            } else {
+                err.span_label(move_span, format!("value moved{} here", move_msg));
+                move_spans.var_span_label(
                     &mut err,
-                    &note_msg,
-                    ty,
-                    span,
+                    format!("variable moved due to use{}", move_spans.describe()),
                 );
             }
-
-            if let Some((_, mut old_err)) = self.move_error_reported
-                .insert(move_out_indices, (used_place, err))
-            {
-                // Cancel the old error so it doesn't ICE.
-                old_err.cancel();
+            if Some(DesugaringKind::ForLoop) == move_span.desugaring_kind() {
+                if let Ok(snippet) = self.infcx.tcx.sess.source_map().span_to_snippet(span) {
+                    err.span_suggestion(
+                        move_span,
+                        "consider borrowing to avoid moving into the for loop",
+                        format!("&{}", snippet),
+                        Applicability::MaybeIncorrect,
+                    );
+                }
             }
         }
+
+        use_spans.var_span_label(
+            &mut err,
+            format!("{} occurs due to use{}", desired_action.as_noun(), use_spans.describe()),
+        );
+
+        if !is_loop_move {
+            err.span_label(
+                span,
+                format!(
+                    "value {} here {}",
+                    desired_action.as_verb_in_past_tense(),
+                    if is_partial_move { "after partial move" } else { "after move" },
+                ),
+            );
+        }
+
+        let ty =
+            Place::ty_from(used_place.base, used_place.projection, self.body, self.infcx.tcx)
+                .ty;
+        let needs_note = match ty.sty {
+            ty::Closure(id, _) => {
+                let tables = self.infcx.tcx.typeck_tables_of(id);
+                let hir_id = self.infcx.tcx.hir().as_local_hir_id(id).unwrap();
+
+                tables.closure_kind_origins().get(hir_id).is_none()
+            }
+            _ => true,
+        };
+
+        if needs_note && !move_out_indices.is_empty() {
+            let mpi = self.move_data.moves[move_out_indices[0]].path;
+            let place = &self.move_data.move_paths[mpi].place;
+
+            let ty = place.ty(self.body, self.infcx.tcx).ty;
+            let opt_name =
+                self.describe_place_with_options(place.as_ref(), IncludingDowncast(true));
+            let note_msg = match opt_name {
+                Some(ref name) => format!("`{}`", name),
+                None => "value".to_owned(),
+            };
+            if let ty::Param(param_ty) = ty.sty {
+                let tcx = self.infcx.tcx;
+                let generics = tcx.generics_of(self.mir_def_id);
+                let def_id = generics.type_param(&param_ty, tcx).def_id;
+                if let Some(sp) = tcx.hir().span_if_local(def_id) {
+                    err.span_label(
+                        sp,
+                        "consider adding a `Copy` constraint to this type argument",
+                    );
+                }
+            }
+            let span = if let Place {
+                base: PlaceBase::Local(local),
+                projection: box [],
+            } = place {
+                let decl = &self.body.local_decls[*local];
+                Some(decl.source_info.span)
+            } else {
+                None
+            };
+            self.note_type_does_not_implement_copy(
+                &mut err,
+                &note_msg,
+                ty,
+                span,
+            );
+        }
+
+        if let Some((_, mut old_err)) = self.move_error_reported
+            .insert(move_out_indices, (used_place, err))
+        {
+            // Cancel the old error so it doesn't ICE.
+            old_err.cancel();
+        }
+    }
+
+    fn report_use_of_uninitialized(
+        &mut self,
+        _location: Location,
+        desired_action: InitializationRequiringAction,
+        (moved_place, used_place): (PlaceRef<'cx, 'tcx>, PlaceRef<'cx, 'tcx>),
+        use_spans: UseSpans,
+        span: Span,
+    ) {
+        let item_msg = match self.describe_place_with_options(
+            used_place,
+            IncludingDowncast(true),
+        ) {
+            Some(name) => format!("`{}`", name),
+            None => "value".to_owned(),
+        };
+        let mut err = self.cannot_act_on_uninitialized_variable(
+            span,
+            desired_action.as_noun(),
+            &self.describe_place_with_options(moved_place, IncludingDowncast(true))
+                .unwrap_or_else(|| "_".to_owned()),
+        );
+        err.span_label(span, format!("use of possibly-uninitialized {}", item_msg));
+
+        use_spans.var_span_label(
+            &mut err,
+            format!("{} occurs due to use{}", desired_action.as_noun(), use_spans.describe()),
+        );
+
+        // This error should not be downgraded to a warning, even in migrate mode.
+        self.disable_error_downgrading();
+        err.buffer(&mut self.errors_buffer);
     }
 
     pub(super) fn report_move_out_while_borrowed(

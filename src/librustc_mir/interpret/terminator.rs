@@ -7,8 +7,8 @@ use syntax::source_map::Span;
 use rustc_target::spec::abi::Abi;
 
 use super::{
-    InterpResult, PointerArithmetic,
-    InterpCx, Machine, OpTy, ImmTy, PlaceTy, MPlaceTy, StackPopCleanup, FnVal,
+    InterpResult, InterpCx, Machine, StackPopBehavior, StackPopAction,
+    OpTy, ImmTy, PlaceTy, MPlaceTy, FnVal, PointerArithmetic,
 };
 
 impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
@@ -306,7 +306,7 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
                     span,
                     body,
                     dest,
-                    StackPopCleanup::Goto(ret),
+                    StackPopBehavior { action: StackPopAction::Goto(ret), cleanup: true },
                 )?;
 
                 // We want to pop this frame again in case there was an error, to put

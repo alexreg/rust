@@ -302,7 +302,8 @@ impl<'tcx> MirPass<'tcx> for SimplifyLocals {
         }
 
         // We may need to keep dead user variables live for debuginfo.
-        if tcx.sess.opts.debuginfo == DebugInfo::Full {
+        // If we are in interpreter mode, we also need to keep all user-declared variables alive.
+        if tcx.sess.opts.debuginfo == DebugInfo::Full || tcx.sess.opts.interp_mode {
             for local in body.vars_iter() {
                 marker.locals.insert(local);
             }

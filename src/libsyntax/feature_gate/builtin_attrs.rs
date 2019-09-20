@@ -262,6 +262,9 @@ pub const BUILTIN_ATTRIBUTES: &[BuiltinAttribute] = &[
     ungated!(no_builtins, Whitelisted, template!(Word)),
     ungated!(target_feature, Whitelisted, template!(List: r#"enable = "name""#)),
 
+    // Interpreter:
+    ungated!(interp_user_fn, Normal, template!(Word)),
+
     // FIXME: #14408 whitelist docs since rustdoc looks at them
     ungated!(doc, Whitelisted, template!(List: "hidden|inline|...", NameValueStr: "string")),
 

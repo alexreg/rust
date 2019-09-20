@@ -1,5 +1,6 @@
 use log::info;
 use rustc::session::config::{Input, OutputFilenames, ErrorOutputType};
+use rustc::session::vfs::Vfs;
 use rustc::session::{self, config, early_error, filesearch, Session, DiagnosticOutput};
 use rustc::session::CrateDisambiguator;
 use rustc::ty;
@@ -89,6 +90,7 @@ pub fn create_session(
     file_loader: Option<Box<dyn FileLoader + Send + Sync + 'static>>,
     input_path: Option<PathBuf>,
     lint_caps: FxHashMap<lint::LintId, lint::Level>,
+    incr_comp_vfs: Box<dyn Vfs>,
 ) -> (Lrc<Session>, Lrc<Box<dyn CodegenBackend>>, Lrc<SourceMap>) {
     let descriptions = diagnostics_registry();
 
@@ -104,6 +106,7 @@ pub fn create_session(
         source_map.clone(),
         diagnostic_output,
         lint_caps,
+        incr_comp_vfs,
     );
 
     let codegen_backend = get_codegen_backend(&sess);

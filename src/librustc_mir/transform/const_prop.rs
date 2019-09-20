@@ -24,7 +24,7 @@ use rustc::ty::layout::{
 
 use crate::interpret::{
     self, InterpCx, ScalarMaybeUndef, Immediate, OpTy,
-    ImmTy, MemoryKind, StackPopCleanup, LocalValue, LocalState,
+    ImmTy, MemoryKind, StackPopBehavior, StackPopAction, LocalValue, LocalState,
 };
 use crate::const_eval::{
     CompileTimeInterpreter, error_to_const_error, mk_eval_cx,
@@ -158,9 +158,7 @@ impl<'mir, 'tcx> ConstPropagator<'mir, 'tcx> {
             span,
             dummy_body,
             None,
-            StackPopCleanup::None {
-                cleanup: false,
-            },
+            StackPopBehavior { action: StackPopAction::None, cleanup: false },
         ).expect("failed to push initial stack frame");
 
         ConstPropagator {

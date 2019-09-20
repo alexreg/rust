@@ -6,7 +6,7 @@ use rustc::session::config::{OutputFilenames, OutputType};
 use rustc::util::common::{time, ErrorReported};
 use rustc::hir;
 use rustc::hir::def_id::LOCAL_CRATE;
-use rustc::ty::steal::Steal;
+use rustc_data_structures::steal::Steal;
 use rustc::dep_graph::DepGraph;
 use std::cell::{Ref, RefMut, RefCell};
 use std::rc::Rc;
@@ -100,11 +100,15 @@ impl Compiler {
 
     pub fn parse(&self) -> Result<&Query<ast::Crate>> {
         self.queries.parse.compute(|| {
-            passes::parse(self.session(), &self.input).map_err(
+            passes::parse(
+                self.session(),
+                &self.input,
+                self.interp_user_fn.as_ref().map(|user_fn| user_fn.clone()),
+            ).map_err(
                 |mut parse_error| {
                     parse_error.emit();
                     ErrorReported
-                },
+                }
             )
         })
     }

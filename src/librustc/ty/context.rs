@@ -38,7 +38,6 @@ use crate::ty::{InferConst, ParamConst};
 use crate::ty::GenericParamDefKind;
 use crate::ty::layout::{LayoutDetails, TargetDataLayout, VariantIdx};
 use crate::ty::query;
-use crate::ty::steal::Steal;
 use crate::ty::subst::{UserSubsts, UnpackedKind};
 use crate::ty::{BoundVar, BindingMode};
 use crate::ty::CanonicalPolyFnSig;
@@ -53,8 +52,9 @@ use rustc_data_structures::stable_hasher::{
     HashStable, StableHasher, StableHasherResult, StableVec, hash_stable_hashmap,
 };
 use rustc_data_structures::indexed_vec::{Idx, IndexVec};
+use rustc_data_structures::steal::Steal;
 use rustc_data_structures::sharded::ShardedHashMap;
-use rustc_data_structures::sync::{Lrc, Lock, WorkerLocal};
+use rustc_data_structures::sync::{Lrc, Lock, Once, WorkerLocal};
 use std::any::Any;
 use std::borrow::Borrow;
 use std::cmp::Ordering;
@@ -1073,6 +1073,12 @@ pub struct GlobalCtxt<'tcx> {
     pub tx_to_llvm_workers: Lock<mpsc::Sender<Box<dyn Any + Send>>>,
 
     output_filenames: Arc<OutputFilenames>,
+
+    /// In interpreter mode, the `DefId` of the user fn.
+    interp_user_fn: Once<DefId>,
+
+    /// In interpreter mode, a map of types provided by the interpreter, keyed by their IDs.
+    interp_tys: Lock<Option<FxHashMap<usize, Ty<'tcx>>>>,
 }
 
 impl<'tcx> TyCtxt<'tcx> {
@@ -1087,6 +1093,68 @@ impl<'tcx> TyCtxt<'tcx> {
     #[inline(always)]
     pub fn hir(self) -> &'tcx hir_map::Map<'tcx> {
         &self.hir_map
+    }
+
+    #[inline]
+    pub fn get_interp_user_fn(&self) -> DefId {
+        use hir::intravisit::{self, Visitor};
+
+        struct InterpUserFnVisitor<'tcx> {
+            tcx: TyCtxt<'tcx>,
+            def_id: Option<DefId>,
+        }
+
+        impl<'tcx> Visitor<'tcx> for InterpUserFnVisitor<'tcx> {
+            fn nested_visit_map<'this>(&'this mut self)
+                -> intravisit::NestedVisitorMap<'this, 'tcx>
+            {
+                intravisit::NestedVisitorMap::OnlyBodies(&self.tcx.hir())
+            }
+
+            fn visit_expr(&mut self, ex: &'tcx hir::Expr) {
+                if ex.attrs.iter().any(|attr| attr.check_name(sym::interp_user_fn)) {
+                    self.def_id = Some(self.tcx.hir().local_def_id(ex.hir_id));
+                    return;
+                }
+
+                intravisit::walk_expr(self, ex);
+            }
+        }
+
+        if let Some(&def_id) = self.interp_user_fn.try_get() {
+            def_id
+        } else {
+            let mut visitor = InterpUserFnVisitor {
+                tcx: *self,
+                def_id: None,
+            };
+            self.hir().krate().visit_all_item_likes(&mut visitor.as_deep_visitor());
+            let def_id = visitor.def_id
+                .expect(&format!(
+                    "could not find interpreter user fn in HIR; it should be a closure expression \
+                     marked with the `#[{}]` attribute",
+                    sym::interp_user_fn
+                ));
+            self.interp_user_fn.set(def_id);
+            def_id
+        }
+    }
+
+    #[inline]
+    pub fn set_interp_tys(&self, tys: Option<FxHashMap<usize, Ty<'tcx>>>) {
+        *self.interp_tys.lock() = tys;
+    }
+
+    #[inline]
+    pub fn get_interp_ty(&self, id: usize) -> Ty<'tcx> {
+        debug_assert!(self.sess.opts.interp_mode, "not in interpreter mode");
+
+        if let Some(ref interp_tys) = *self.interp_tys.lock() {
+            interp_tys.get(&id)
+                .expect(&format!("`interp_tys` does not contain value for ID {}", id))
+        } else {
+            panic!("`interp_tys` is not set");
+        }
     }
 
     pub fn alloc_steal_mir(self, mir: Body<'tcx>) -> &'tcx Steal<Body<'tcx>> {
@@ -1293,6 +1361,8 @@ impl<'tcx> TyCtxt<'tcx> {
             alloc_map: Lock::new(interpret::AllocMap::new()),
             tx_to_llvm_workers: Lock::new(tx),
             output_filenames: Arc::new(output_filenames.clone()),
+            interp_user_fn: Once::new(),
+            interp_tys: Lock::new(None),
         }
     }
 

@@ -1,7 +1,8 @@
-use rustc_data_structures::sync::{RwLock, ReadGuard, MappedReadGuard};
+use crate::stable_hasher::{StableHasher, StableHasherResult, HashStable};
+use crate::sync::{RwLock, ReadGuard, MappedReadGuard};
 
 /// The `Steal` struct is intended to used as the value for a query.
-/// Specifically, we sometimes have queries (*cough* MIR *cough*)
+/// Specifically, we sometimes have queries (in particular, for MIR)
 /// where we create a large, complex value that we want to iteratively
 /// update (e.g., optimize). We could clone the value for each
 /// optimization, but that'd be expensive. And yet we don't just want
@@ -20,6 +21,7 @@ use rustc_data_structures::sync::{RwLock, ReadGuard, MappedReadGuard};
 /// -- once the value is stolen -- it will never be read from again.
 //
 // FIXME(#41710): what is the best way to model linear queries?
+#[derive(Clone, Debug)]
 pub struct Steal<T> {
     value: RwLock<Option<T>>
 }
@@ -33,14 +35,23 @@ impl<T> Steal<T> {
 
     pub fn borrow(&self) -> MappedReadGuard<'_, T> {
         ReadGuard::map(self.value.borrow(), |opt| match *opt {
-            None => bug!("attempted to read from stolen value"),
+            None => panic!("attempted to read from stolen value"),
             Some(ref v) => v
         })
     }
 
     pub fn steal(&self) -> T {
-        let value_ref = &mut *self.value.try_write().expect("stealing value which is locked");
+        let value_ref = &mut *self.value.try_write()
+            .expect("stealing value that is locked");
         let value = value_ref.take();
         value.expect("attempt to read from stolen value")
+    }
+}
+
+impl<T: HashStable<CTX>, CTX> HashStable<CTX> for Steal<T> {
+    fn hash_stable<W: StableHasherResult>(&self,
+                                          hcx: &mut CTX,
+                                          hasher: &mut StableHasher<W>) {
+        self.borrow().hash_stable(hcx, hasher);
     }
 }

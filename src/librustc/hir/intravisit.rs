@@ -636,6 +636,7 @@ pub fn walk_ty<'v, V: Visitor<'v>>(visitor: &mut V, typ: &'v Ty) {
         TyKind::CVarArgs(ref lt) => {
             visitor.visit_lifetime(lt)
         }
+        TyKind::InterpTy(_id) => {}
         TyKind::Infer | TyKind::Err => {}
     }
 }

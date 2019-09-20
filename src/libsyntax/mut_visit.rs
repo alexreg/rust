@@ -466,6 +466,7 @@ pub fn noop_visit_ty<T: MutVisitor>(ty: &mut P<Ty>, vis: &mut T) {
             visit_vec(bounds, |bound| vis.visit_param_bound(bound));
         }
         TyKind::Mac(mac) => vis.visit_mac(mac),
+        TyKind::InterpTy(_id) => {},
     }
     vis.visit_span(span);
 }
@@ -540,7 +541,7 @@ pub fn noop_visit_parenthesized_parameter_data<T: MutVisitor>(args: &mut Parenth
 }
 
 pub fn noop_visit_local<T: MutVisitor>(local: &mut P<Local>, vis: &mut T) {
-    let Local { id, pat, ty, init, span, attrs } = local.deref_mut();
+    let Local { id, pat, ty, init, span, attrs, interp_tag: _ } = local.deref_mut();
     vis.visit_id(id);
     vis.visit_pat(pat);
     visit_opt(ty, |ty| vis.visit_ty(ty));

@@ -364,6 +364,11 @@ impl<'a> State<'a> {
             hir::TyKind::CVarArgs(_) => {
                 self.s.word("...");
             }
+            hir::TyKind::InterpTy(id) => {
+                self.s.word("interp_local(");
+                self.print_usize(id);
+                self.s.word(")");
+            }
         }
         self.end()
     }

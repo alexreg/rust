@@ -1,22 +1,19 @@
 //! Functions concerning immediate values and operands, and reading from operands.
 //! All high-level functions to read from memory work on operands as sources.
 
-use super::{
-    InterpCx, Machine,
-    MemPlace, MPlaceTy, PlaceTy, Place,
-};
+use super::{InterpCx, Machine, MemPlace, MPlaceTy, PlaceTy, Place};
 
 use rustc::{mir, ty};
+use rustc::mir::interpret::{
+    sign_extend, truncate,
+    GlobalId, AllocId, ConstValue, Pointer, Scalar, InterpResult,
+};
+pub use rustc::mir::interpret::ScalarMaybeUndef;
 use rustc::ty::layout::{
     self, Size, LayoutOf, TyLayout, HasDataLayout, IntegerExt, PrimitiveExt, VariantIdx,
 };
 
-use rustc::mir::interpret::{
-    GlobalId, AllocId,
-    ConstValue, Pointer, Scalar,
-    InterpResult, sign_extend, truncate,
-};
-pub use rustc::mir::interpret::ScalarMaybeUndef;
+use rustc_serialize::Encodable;
 
 use std::convert::{TryInto, TryFrom};
 
@@ -160,6 +157,15 @@ pub struct OpTy<'tcx, Tag = ()> {
     pub layout: TyLayout<'tcx>,
 }
 
+impl<'tcx, Tag> OpTy<'tcx, Tag> {
+    pub fn new(op: Operand<Tag>, layout: TyLayout<'tcx>) -> Self {
+        Self {
+            op,
+            layout,
+        }
+    }
+}
+
 impl<'tcx, Tag> ::std::ops::Deref for OpTy<'tcx, Tag> {
     type Target = Operand<Tag>;
     #[inline(always)]
@@ -167,6 +173,16 @@ impl<'tcx, Tag> ::std::ops::Deref for OpTy<'tcx, Tag> {
         &self.op
     }
 }
+
+impl<'tcx, Tag: Encodable> rustc_serialize::UseSpecializedEncodable for OpTy<'tcx, Tag> {
+    fn default_encode<S: rustc_serialize::Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+        self.op.encode(s)?;
+        self.layout.ty.encode(s)?;
+        Ok(())
+    }
+}
+
+impl<'tcx, Tag> rustc_serialize::UseSpecializedDecodable for OpTy<'tcx, Tag> {}
 
 impl<'tcx, Tag: Copy> From<MPlaceTy<'tcx, Tag>> for OpTy<'tcx, Tag> {
     #[inline(always)]

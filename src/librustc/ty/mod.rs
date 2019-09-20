@@ -106,7 +106,6 @@ pub mod outlives;
 pub mod print;
 pub mod query;
 pub mod relate;
-pub mod steal;
 pub mod subst;
 pub mod trait_def;
 pub mod walk;
@@ -2977,23 +2976,27 @@ impl<'tcx> TyCtxt<'tcx> {
         }
     }
 
-    pub fn item_name(self, id: DefId) -> Symbol {
+    pub fn opt_item_name(self, id: DefId) -> Option<Symbol> {
         if id.index == CRATE_DEF_INDEX {
-            self.original_crate_name(id.krate)
+            Some(self.original_crate_name(id.krate))
         } else {
             let def_key = self.def_key(id);
             match def_key.disambiguated_data.data {
                 // The name of a constructor is that of its parent.
                 hir_map::DefPathData::Ctor =>
-                    self.item_name(DefId {
+                    self.opt_item_name(DefId {
                         krate: id.krate,
                         index: def_key.parent.unwrap()
                     }),
-                _ => def_key.disambiguated_data.data.get_opt_name().unwrap_or_else(|| {
-                    bug!("item_name: no name for {:?}", self.def_path(id));
-                }).as_symbol(),
+                _ => def_key.disambiguated_data.data.get_opt_name().map(|n| n.as_symbol()),
             }
         }
+    }
+
+    pub fn item_name(self, id: DefId) -> Symbol {
+        self.opt_item_name(id).unwrap_or_else(|| {
+            bug!("item_name: no name for {:?}", self.def_path(id));
+        })
     }
 
     /// Returns the possibly-auto-generated MIR of a `(DefId, Subst)` pair.

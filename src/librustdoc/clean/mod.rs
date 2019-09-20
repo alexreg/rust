@@ -3029,9 +3029,11 @@ impl Clean<Type> for hir::Ty {
                 }
             }
             TyKind::BareFn(ref barefn) => BareFunction(box barefn.clean(cx)),
-            TyKind::Infer | TyKind::Err => Infer,
             TyKind::Typeof(..) => panic!("unimplemented type {:?}", self.node),
             TyKind::CVarArgs(_) => CVarArgs,
+            TyKind::Infer |
+            TyKind::InterpTy(_) |
+            TyKind::Err => Infer,
         }
     }
 }

@@ -22,7 +22,7 @@ use super::{
     Machine, AllocMap, MayLeak, ErrorHandled, CheckInAllocMsg,
 };
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Hash, RustcEncodable, RustcDecodable)]
 pub enum MemoryKind<T> {
     /// Error if deallocated except during a stack pop.
     Stack,
@@ -162,6 +162,16 @@ impl<'mir, 'tcx, M: Machine<'mir, 'tcx>> Memory<'mir, 'tcx, M> {
             }
         };
         self.tag_static_base_pointer(Pointer::from(id))
+    }
+
+    pub fn insert_alloc(
+        &mut self,
+        id: AllocId,
+        alloc: Allocation<M::PointerTag, M::AllocExtra>,
+        kind: MemoryKind<M::MemoryKinds>,
+    ) {
+        // FIXME(alexreg): do some sort of `insert_same` routine here?
+        self.alloc_map.insert(id, (kind, alloc));
     }
 
     pub fn allocate(

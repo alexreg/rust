@@ -230,17 +230,6 @@ impl<'a> HashStable<StableHashingContext<'a>> for ty::FloatVid {
     }
 }
 
-impl<'a, T> HashStable<StableHashingContext<'a>> for ty::steal::Steal<T>
-where
-    T: HashStable<StableHashingContext<'a>>,
-{
-    fn hash_stable<W: StableHasherResult>(&self,
-                                          hcx: &mut StableHashingContext<'a>,
-                                          hasher: &mut StableHasher<W>) {
-        self.borrow().hash_stable(hcx, hasher);
-    }
-}
-
 impl<'a> HashStable<StableHashingContext<'a>>
 for crate::middle::privacy::AccessLevels {
     fn hash_stable<W: StableHasherResult>(&self,
